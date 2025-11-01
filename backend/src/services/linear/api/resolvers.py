@@ -1,6 +1,6 @@
 from ariadne import QueryType, MutationType
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_, select
+from sqlalchemy import or_, and_, select, func
 from src.services.linear.database.schema import (
     Issue,
     Attachment,
@@ -35,6 +35,7 @@ from src.services.linear.database.schema import (
 from typing import Optional
 import base64
 import json
+import re
 import uuid
 from datetime import datetime, timezone, timedelta
 
@@ -2739,6 +2740,7 @@ def resolve_organizationInviteCreate(obj, info, **kwargs):
             organization_invite.teams = teams
 
         session.add(organization_invite)
+        session.flush()
 
         return organization_invite
 
@@ -5866,6 +5868,7 @@ def resolve_initiativeToProjectCreate(obj, info, **kwargs):
         )
 
         session.add(initiative_to_project)
+        session.flush()
 
         # Return the proper InitiativeToProjectPayload structure
         return {
@@ -6159,6 +6162,7 @@ def resolve_commentCreate(obj, info, **kwargs):
             comment.subscribers = subscribers
 
         session.add(comment)
+        session.flush()
 
         return comment
 
@@ -6440,6 +6444,7 @@ def resolve_attachmentCreate(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         # Handle linked comment creation if commentBody or commentBodyData is provided
         comment_body = input_data.get("commentBody")
@@ -6471,6 +6476,7 @@ def resolve_attachmentCreate(obj, info, **kwargs):
 
             comment = Comment(**comment_data)
             session.add(comment)
+            session.flush()
 
         return attachment
 
@@ -6623,13 +6629,14 @@ def resolve_attachmentLinkDiscord(obj, info, **kwargs):
                         updatedAt=datetime.utcnow(),
                     )
                     session.add(external_user)
-                    session.flush()  # Ensure external_user.id is available
+                    session.flush()
 
                 attachment_data["externalUserCreatorId"] = external_user.id
 
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -6739,6 +6746,7 @@ def resolve_attachmentLinkFront(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         # Flush to get the attachment ID
         session.flush()
@@ -6851,6 +6859,7 @@ def resolve_attachmentLinkGitHubIssue(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -6975,6 +6984,7 @@ def resolve_attachmentLinkGitHubPR(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7101,6 +7111,7 @@ def resolve_attachmentLinkGitLabMR(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7225,6 +7236,7 @@ def resolve_attachmentLinkIntercom(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7351,6 +7363,7 @@ def resolve_attachmentLinkJiraIssue(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7468,6 +7481,7 @@ def resolve_attachmentLinkSalesforce(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7600,6 +7614,7 @@ def resolve_attachmentLinkSlack(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7710,6 +7725,7 @@ def resolve_attachmentLinkURL(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -7836,6 +7852,7 @@ def resolve_attachmentLinkZendesk(obj, info, **kwargs):
             # Create the attachment entity
             attachment = Attachment(**attachment_data)
             session.add(attachment)
+            session.flush()
 
         return attachment
 
@@ -8044,6 +8061,7 @@ def resolve_cycleCreate(obj, info, **kwargs):
         )
 
         session.add(new_cycle)
+        session.flush()
 
         return new_cycle
 
@@ -8351,6 +8369,7 @@ def resolve_documentCreate(obj, info, **kwargs):
             document.subscribers = subscribers
 
         session.add(document)
+        session.flush()
 
         return document
 
@@ -8570,6 +8589,7 @@ def resolve_initiativeCreate(obj, info, **kwargs):
         )
 
         session.add(initiative)
+        session.flush()
 
         # Return InitiativePayload structure
         return {
@@ -8839,6 +8859,7 @@ def resolve_initiativeRelationCreate(obj, info, **kwargs):
         )
 
         session.add(initiative_relation)
+        session.flush()
 
         # Return InitiativeRelationPayload structure
         return {
@@ -9447,6 +9468,9 @@ def resolve_issueCreate(obj, info, **kwargs):
 
         # Extract required fields
         team_id = input_data["teamId"]  # Required field
+        team: Team | None = session.get(Team, team_id)
+        if team is None:
+            raise Exception(f"Team with id '{team_id}' not found")
 
         # Extract optional fields
         title = input_data.get("title", "")
@@ -9520,6 +9544,16 @@ def resolve_issueCreate(obj, info, **kwargs):
         create_as_user = input_data.get("createAsUser")  # External user display name
         preserve_sort_order = input_data.get("preserveSortOrderOnCreate", False)
 
+        # Generate identifier metadata
+        next_number = _next_issue_number(session, team_id)
+        identifier = input_data.get("identifier") or _build_issue_identifier(
+            team, next_number
+        )
+        branch_name = input_data.get("branchName") or _build_issue_branch_name(
+            identifier, title
+        )
+        issue_url = input_data.get("url") or _build_issue_url(identifier)
+
         # Create the Issue entity
         issue = Issue(
             id=issue_id,
@@ -9553,20 +9587,29 @@ def resolve_issueCreate(obj, info, **kwargs):
             slaBreachesAt=sla_breaches_at,
             slaStartedAt=sla_started_at,
             # Default values for required fields that are system-generated
-            branchName="",  # Will be generated based on title
+            branchName=branch_name,
             customerTicketCount=0,
-            identifier="",  # Will be generated based on team + number
-            number=0.0,  # Will be auto-incremented by the system
+            identifier=identifier,
+            number=float(next_number),
             priorityLabel=_get_priority_label(priority),
             reactionData={},
             previousIdentifiers=[],
-            url="",  # Will be generated from identifier
+            url=issue_url,
             archivedAt=None,
             trashed=False,
         )
 
         # Add to session
         session.add(issue)
+        session.flush()
+
+        # Hydrate relationships required by GraphQL response
+        issue.team = team
+        if assignee_id:
+            assignee = session.get(User, assignee_id)
+            if assignee is None:
+                raise Exception(f"Assignee with id '{assignee_id}' not found")
+            issue.assignee = assignee
 
         # Return the payload
         return {"issue": issue, "success": True, "lastSyncId": float(now.timestamp())}
@@ -9741,6 +9784,7 @@ def resolve_issueBatchCreate(obj, info, **kwargs):
             # Add to session
             session.add(issue)
             created_issues.append(issue)
+            session.flush()
 
         # Return the payload
         return {
@@ -10117,6 +10161,7 @@ def resolve_issueImportCreateAsana(obj, info, **kwargs):
 
         # Add to session
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10193,6 +10238,7 @@ def resolve_issueImportCreateClubhouse(obj, info, **kwargs):
         )
 
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10277,6 +10323,7 @@ def resolve_issueImportCreateCSVJira(obj, info, **kwargs):
         )
 
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10359,6 +10406,7 @@ def resolve_issueImportCreateGithub(obj, info, **kwargs):
 
         # Add to session
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10450,6 +10498,7 @@ def resolve_issueImportCreateJira(obj, info, **kwargs):
 
         # Add to session
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10508,6 +10557,7 @@ def resolve_issueImportCreateLinearV2(obj, info, **kwargs):
         )
 
         session.add(issue_import)
+        session.flush()
 
         return issue_import
 
@@ -10758,6 +10808,7 @@ def resolve_issueLabelCreate(obj, info, **kwargs):
 
         # Add to session
         session.add(issue_label)
+        session.flush()
 
         # Handle replaceTeamLabels if requested
         # This would replace all team-specific labels with the same name
@@ -10974,6 +11025,7 @@ def resolve_issueRelationCreate(obj, info, **kwargs):
         )
 
         session.add(issue_relation)
+        session.flush()
 
         # Return the proper IssueRelationPayload structure
         return {"success": True, "lastSyncId": 0.0, "issueRelation": issue_relation}
@@ -11516,6 +11568,7 @@ def resolve_userFlagUpdate(obj, info, **kwargs):
                 updatedAt=datetime.utcnow(),
             )
             session.add(user_flag)
+            session.flush()
 
         # Apply the operation
         if operation == "incr":
@@ -11599,6 +11652,7 @@ def resolve_userSettingsFlagsReset(obj, info, **kwargs):
                         updatedAt=datetime.utcnow(),
                     )
                     session.add(user_flag)
+                    session.flush()
                 else:
                     # Reset existing flag to 0
                     user_flag.value = 0
@@ -12050,6 +12104,7 @@ def resolve_notificationCategoryChannelSubscriptionUpdate(
                 notificationDeliveryPreferences={},
             )
             session.add(user_settings)
+            session.flush()
 
         # Update the notification preferences
         # The structure is typically: channelPreferences[channel][category] = boolean
@@ -13008,6 +13063,39 @@ def _get_priority_label(priority: int) -> str:
     return priority_map.get(priority, "No priority")
 
 
+def _next_issue_number(session: Session, team_id: str) -> int:
+    """Return next sequential issue number for a team."""
+    current_max = (
+        session.query(func.max(Issue.number))
+        .filter(Issue.teamId == team_id)
+        .scalar()
+    )
+    if current_max is None:
+        return 1
+    return int(current_max) + 1
+
+
+def _build_issue_identifier(team: Team, number: int) -> str:
+    """Compose Linear-style identifier from team and number."""
+    team_key = (team.key or "ISS").upper()
+    return f"{team_key}-{int(number)}"
+
+
+def _build_issue_branch_name(identifier: str, title: str) -> str:
+    """Generate a branch name using identifier and a slugified title."""
+    slug = title.strip().lower()
+    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[-\s]+", "-", slug).strip("-")
+    if slug:
+        return f"{identifier.lower()}-{slug}"[:80]
+    return identifier.lower()
+
+
+def _build_issue_url(identifier: str) -> str:
+    """Return placeholder issue URL matching Linear format."""
+    return f"https://linear.app/issue/{identifier}"
+
+
 def _generate_slug_id(name: str, project_id: str) -> str:
     """Generate a URL-friendly slug from the project name"""
     import re
@@ -13105,6 +13193,7 @@ def resolve_projectCreate(obj, info, **kwargs):
 
         # Add the project to the session
         session.add(project)
+        session.flush()
 
         # Flush to get the project ID if relationships need it
         session.flush()
@@ -13635,6 +13724,7 @@ def resolve_projectLabelCreate(obj, info, **kwargs):
         )
 
         session.add(project_label)
+        session.flush()
 
         return project_label
 
@@ -13799,6 +13889,7 @@ def resolve_projectMilestoneCreate(obj, info, **kwargs):
         )
 
         session.add(project_milestone)
+        session.flush()
 
         return project_milestone
 
@@ -14123,6 +14214,7 @@ def resolve_projectRelationCreate(obj, info, **kwargs):
         )
 
         session.add(project_relation)
+        session.flush()
 
         return project_relation
 
@@ -14305,6 +14397,7 @@ def resolve_projectStatusCreate(obj, info, **kwargs):
 
         # Add to session
         session.add(project_status)
+        session.flush()
 
         # Generate lastSyncId (using timestamp as sync ID)
         last_sync_id = now.timestamp()
@@ -14738,6 +14831,7 @@ def resolve_teamCreate(obj, info, **kwargs):
 
         # Add the team to the session
         session.add(new_team)
+        session.flush()
 
         # Flush to get the ID before creating membership
         session.flush()
@@ -14762,6 +14856,7 @@ def resolve_teamCreate(obj, info, **kwargs):
                 sortOrder=0.0,
             )
             session.add(membership)
+            session.flush()
 
         # Create default workflow states for the team
         # Linear default states: Triage, Backlog, Todo, In Progress, In Review, Done, Canceled, Duplicate
@@ -14830,6 +14925,7 @@ def resolve_teamCreate(obj, info, **kwargs):
                 updatedAt=now,
             )
             session.add(workflow_state)
+            session.flush()
 
             # Track the Backlog state ID (position 1) to set as default
             if state_config["position"] == 1.0:
@@ -15341,6 +15437,7 @@ def resolve_teamMembershipCreate(obj, info, **kwargs):
         team_membership = TeamMembership(**membership_data)
 
         session.add(team_membership)
+        session.flush()
 
         # Return the proper TeamMembershipPayload structure
         return {"success": True, "lastSyncId": 0.0, "teamMembership": team_membership}
@@ -15874,6 +15971,7 @@ def resolve_workflowStateCreate(obj, info, **kwargs):
         )
 
         session.add(workflow_state)
+        session.flush()
 
         # Return WorkflowStatePayload structure
         return {

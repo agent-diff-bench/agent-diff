@@ -20,12 +20,12 @@ class LinearGraphQL(GraphQL):
         coreEvaluationEngine: CoreEvaluationEngine,
         session_manager=None,
     ):
-        super().__init__(schema)
         self.coreIsolationEngine = coreIsolationEngine
         self.coreEvaluationEngine = coreEvaluationEngine
         self.session_manager = session_manager
+        super().__init__(schema, context_value=self._build_context)
 
-    async def context_value(self, request, data=None):
+    async def _build_context(self, request, data=None):
         """
         Extract context from request for GraphQL resolvers.
 
@@ -41,7 +41,7 @@ class LinearGraphQL(GraphQL):
 
         # Extract env_id from path: /api/env/{env_id}/services/linear/graphql
         path = request.url.path
-        logger.info(f"LinearGraphQL.context_value called for path: {path}")
+        logger.info(f"LinearGraphQL._build_context called for path: {path}")
 
         if "/api/env/" in path:
             path_parts = path.split("/")
