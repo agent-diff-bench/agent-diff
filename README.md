@@ -4,19 +4,9 @@
 
 ## Supported API Methods
 
-- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list: [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 
+- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. - [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 
 
-  ```python
-  "chat.postMessage"  # post messages in seeded channels/DMs
-  "conversations.open"  # spin up IM/MPIM threads
-  ```
-
-- **Linear** – GraphQL API. Full list: [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
-
-  ```python
-  "issues"            # list/filter issues with pagination
-  "issueCreate"       # create new issue
-  ```
+- **Linear** – GraphQL API - [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
 
 ## Templates, Seeds & Environments
 
@@ -40,8 +30,10 @@
 uv add agent-diff
 ```
 
-**TypeScript SDK also available:** `npm install agent-diff` - [docs](sdk/agent-diff-ts/README.md)
-
+**TypeScript:** [SDK docs](sdk/agent-diff-ts/README.md)
+```bash
+npm install agent-diff
+```
 
 ### 2. Set up backend
 ```bash
@@ -60,12 +52,6 @@ from agent_diff import AgentDiff
 # Self-hosted (defaults to http://localhost:8000)
 client = AgentDiff()
 
-# With authentication 
-client = AgentDiff(
-    api_key="your-api-key",
-    base_url="https://your-instance.com"
-)
-
 # Initialise isolated environment from a template. See: examples/slack/seeds
 env = client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9") #impersonateUserId - seeded user (agent) in seed
 
@@ -73,7 +59,6 @@ env = client.init_env(templateService="slack", templateName="slack_default", imp
 
 # Take before snapshot
 run = client.start_run(envId=env.environmentId)
-
 
 # Your agent does stuff using the environment URL 
  
@@ -114,7 +99,6 @@ print(diff.diff['deletes'])   # Deleted records
 # Clean up
 client.delete_env(envId=env.environmentId)
 ```
-
 
 ## Evaluations & Test Suites
 
