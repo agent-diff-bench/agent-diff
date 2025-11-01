@@ -3,18 +3,11 @@
 
 ## What This Is
 
-**A self-hosted interactive enviroments for testing AI agents & training LLMs against 3rd party APIs like Linear or Slack.** You run it locally (or deploy it), your agents call fake APIs, you get deterministic diffs. No external service, no rate limits, full control over test data and environments.
-
-Use it for:
-- RL training loops (reset state between episodes)
-- Integration tests (verify agent does what it should)
-- Regression tests (catch when changes break behaviour)
-- Training data generation (prompt → actions → diff → outcome)
-
+**A self-hosted interactive environments for evaluating AI agents & RL training on 3rd party APIs like Linear or Slack.**
 
 ## Supported APIs
 
-- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). A few examples:
+- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 
 
   ```python
   "chat.postMessage"  # post messages in seeded channels/DMs
@@ -22,19 +15,31 @@ Use it for:
   "reactions.add"  # add emoji reactions to seeded messages
   ```
 
-- **Linear** – GraphQL API. See [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). A few examples:
+- **Linear** – GraphQL API. See full list [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
 
   ```python
   "issues"            # list/filter issues with pagination
-  "teams"             # list teams
   "issueCreate"       # create new issue
   "issueUpdate"       # update issue (state, assignee, priority, etc.)
   "commentCreate"     # add comment to issue
   ```
 
-- Gmail, GitHub, Jira (TBD).
+## Templates & Environments
 
-If you have requests for specific services + any feedback, mail me at hubert@uni.minerva.edu
+**Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
+
+- **Location**: Templates (e.g., `slack_default`) populate the PostgreSQL schemas of services (e.g.`backend/src/services/slack/database/schema.py`)
+- **Content**: They include seeded data like users, channels, messages, issues, etc.
+- **Example Templates**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
+
+
+**Environments** are isolated, temporary copies of a template:
+
+- **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
+- **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
+- **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
+
+`Template` (permanent, shared) → `Environment` (temporary, isolated copy)
 
 
 ## Quick Start
@@ -46,16 +51,13 @@ If you have requests for specific services + any feedback, mail me at hubert@uni
 uv add agent-diff
 ```
 
-**TypeScript/Node.js:**
-```bash
-npm install agent-diff
-```
+**TypeScript SDK also available:** `npm install agent-diff` - [docs](sdk/agent-diff-ts/README.md)
+
 
 ### 2. Set up backend
 ```bash
 git clone https://github.com/hubertpysklo/agent-diff.git
 cd agent-diff
-cp env.example .env
 cd ops
 docker-compose up --build
 
@@ -86,7 +88,7 @@ run = client.start_run(envId=env.environmentId)
 
 # Your agent does stuff using the environment URL 
  
-# You can swap the URLs directly in MCPs or use the code executor tool for python or bash with proxy that will route the requests automatically
+# You can swap the URLs directly in MCPs or use the code executor tool for Python or bash with proxy that will route the requests automatically
 # e.g. proxy transforms:
 #   from: https://api.slack.com/api/conversations.list
 #   to:   http://localhost:8000/api/env/{environmentId}/services/slack/conversations.list 
@@ -124,42 +126,14 @@ print(diff.diff['deletes'])   # Deleted records
 client.delete_env(envId=env.environmentId)
 ```
 
-Every environment gets its own PostgreSQL schema. URLs bind requests to schemas. Snapshots diff exactly what changed in this specific isolated environment.
 
-**TypeScript SDK also available:** `npm install agent-diff` - [docs](sdk/agent-diff-ts/README.md)
+## Evaluations & Test Suites
 
-
-## Templates & Test Suites
-
-### What are Templates?
-**Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
-
-- **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `linear_base`)
-- **Content**: Include seeded data like users, channels, messages, issues, etc.
-
-#### Example Templates (You can edit them)
-- **[slack_base](examples/slack/seeds/)** - Empty Slack workspace (no seed data)
-- **[slack_default](examples/slack/seeds/slack_bench_default.json)** - Seeded with sample users and messages for Slack Bench.
-
-
-### What are Environments?
-**Environments** are isolated, temporary copies of a template:
-
-- **Lifecycle**: Created → Used → Deleted (with automatic TTL expiry)
-- **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
-- **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
-- **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
-
-`Template` (permanent, shared) → `Environment` (temporary, isolated copy)
-
-### What are Test Suites?
-Collections of test cases with assertions that you can run against agent runs using evaluations (see below).
+Collections of test cases with assertions that you can run against agent runs using evaluations.
 
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
 
-
-## Evaluations 
 
 To run evaluations:
 
