@@ -1,46 +1,35 @@
 # Agent Diff
 
+**Interactive environments for evaluating AI agents & RL training on replicas of 3rd party APIs like Linear or Slack.**
 
-## What This Is
+## Supported API Methods
 
-**A self-hosted interactive environments for evaluating AI agents & RL training on 3rd party APIs like Linear or Slack.**
-
-## Supported APIs
-
-- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 
+- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list: [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 
 
   ```python
   "chat.postMessage"  # post messages in seeded channels/DMs
   "conversations.open"  # spin up IM/MPIM threads
-  "reactions.add"  # add emoji reactions to seeded messages
   ```
 
-- **Linear** – GraphQL API. See full list [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
+- **Linear** – GraphQL API. Full list: [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
 
   ```python
   "issues"            # list/filter issues with pagination
   "issueCreate"       # create new issue
-  "issueUpdate"       # update issue (state, assignee, priority, etc.)
-  "commentCreate"     # add comment to issue
   ```
 
-## Templates & Environments
+## Templates, Seeds & Environments
 
 **Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
+- **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `linear_base`)
+- **Content**: Templates are seeded during startup time from seeds with data like users, channels, messages, issues, etc.
+- **Example Seeds**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
 
-- **Location**: Templates (e.g., `slack_default`) populate the PostgreSQL schemas of services (e.g.`backend/src/services/slack/database/schema.py`)
-- **Content**: They include seeded data like users, channels, messages, issues, etc.
-- **Example Templates**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
-
-
-**Environments** are isolated, temporary copies of a template:
-
+**Environments** are isolated, temporary copies of a template schema:
 - **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
 - **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
 - **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
-
-`Template` (permanent, shared) → `Environment` (temporary, isolated copy)
-
+  
 
 ## Quick Start
 
