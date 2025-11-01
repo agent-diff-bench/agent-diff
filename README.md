@@ -1,6 +1,6 @@
 # Agent Diff
 
-**Interactive environments for evaluating AI agents & RL training on replicas of 3rd party APIs like Linear or Slack.** You run it locally (or deploy it), your agents call fake APIs, you get deterministic diffs. No external service, no rate limits, full control over test data and environments.
+**Interactive environments for evaluating AI agents & RL training on replicas of 3rd party APIs like Linear or Slack.** Run it locally (or deploy it). Agents call sandboxed APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, full control over test data and environments without rate limits.
 
 ## Supported APIs
 
