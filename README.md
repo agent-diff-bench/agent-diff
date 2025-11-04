@@ -112,12 +112,17 @@ client.delete_env(envId=env.environmentId)
 - **Content**: Templates are seeded during startup time from seeds with data like users, channels, messages, issues, etc.
 - **Example Seeds**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
 
+<img width="2330" height="688" alt="image" src="https://github.com/user-attachments/assets/481d3f40-e378-402c-9d3c-8a2ab75c880e" />
+
 **Environments** are isolated, temporary copies of a template schema:
 - **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
-- **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
+- **Creation**: `client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9")`
 - **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
 
-## CodeExectuorProxy
+<img width="2344" height="432" alt="image" src="https://github.com/user-attachments/assets/c61e93f2-1826-429e-8ee7-4a32f4172a38" />
+
+
+## CodeExecutorProxy
 
 SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
 
@@ -129,25 +134,27 @@ Collections of test cases with assertions that you can run against agent runs us
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
 
+<img width="2516" height="1020" alt="image" src="https://github.com/user-attachments/assets/3270f1f1-5afa-4db2-97b0-c35c070ef44f" />
+
 
 To run evaluations:
 
 ```python
-suite = client.get_test_suite("slack-bench")
-# Returns: {"tests": [{"id": "...", "prompt": "Send hello to #general"}, ...]}
-# You can edit the file and add your own tests
+suite_list = client.list_test_suites(name="Slack Bench")
+slack_suite = suite_list.testSuites[0]
+suite = client.get_test_suite(slack_suite.id, expand=True)
 
 evaluation_results = []
 
-for test in suite['tests']:
-    prompt = test['prompt']
-    test_id = test['id']
+for test in suite.tests:
+    prompt = test.prompt
+    test_id = test.id
 
     #In test suite you define which env seed template is used for each test
-    env = client.init_env(testId = test_id)
+    env = client.init_env(testId=test_id)
 
     # This function will take a snapshot before run
-    run = client.start_run(envId = env.environmentId, testId = test_id) 
+    run = client.start_run(envId=env.environmentId, testId=test_id)
 
     from agent_diff import PythonExecutorProxy, create_openai_tool
     from agents import Agent, Runner
@@ -165,7 +172,7 @@ for test in suite['tests']:
     response = await Runner.run(agent, prompt)
 
     #This function will take a 2nd snapshot, run diff and assert results against expected state defined in test suite
-    evaluation_result = client.evaluate_run(run.runId) 
+    evaluation_result = client.evaluate_run(runId=run.runId)
 
     #returns score runId, status and score (0/1)
     evaluation_results.append(evaluation_result) 
@@ -185,14 +192,16 @@ from smolagents import CodeAgent, InferenceClientModel
 client = AgentDiff()
 
 # Load test suite with prompts
-test_suite = client.get_test_suite("slack-bench")
+suite_list = client.list_test_suites(name="Slack Bench")
+slack_suite = suite_list.testSuites[0]
+test_suite = client.get_test_suite(slack_suite.id, expand=True)
 
 training_data = []
 
-for test in test_suite['tests']:
+for test in test_suite.tests:
     # Initialize environment for each test
-    env = client.init_env(testId=test['id'])
-    run = client.start_run(envId=env.environmentId, testId=test['id'])
+    env = client.init_env(testId=test.id)
+    run = client.start_run(envId=env.environmentId, testId=test.id)
 
     # Create HF agent with Python and/ or Bash tools
     python_executor = PythonExecutorProxy(env.environmentId, base_url=client.base_url)
@@ -204,12 +213,12 @@ for test in test_suite['tests']:
     agent = CodeAgent(tools=[python_tool, bash_tool], model=model)
 
     # Execute task with prompt from test suite
-    prompt = test['prompt']
+    prompt = test.prompt
     response = agent.run(prompt)
     trace = agent.get_last_run_trace()  # Full execution history
 
     # Evaluate against expected outcomes
-    eval_result = client.evaluate_run(run.runId)
+    eval_result = client.evaluate_run(runId=run.runId)
 
     training_data.append({
             "prompt": prompt,
