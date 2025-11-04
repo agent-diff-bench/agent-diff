@@ -20,23 +20,28 @@ class LinearGraphQL(GraphQL):
         coreEvaluationEngine: CoreEvaluationEngine,
         session_manager=None,
     ):
+        super().__init__(schema, context_value=self._build_context)
         self.coreIsolationEngine = coreIsolationEngine
         self.coreEvaluationEngine = coreEvaluationEngine
         self.session_manager = session_manager
         super().__init__(schema, context_value=self._build_context)
 
-    async def _build_context(self, request, data=None):
+    def _build_context(self, request, data):
         """
         Extract context from request for GraphQL resolvers.
 
-        Extracts environment_id from URL path and creates a session for it.
-        This works around Starlette Mount isolation issues.
+        IsolationMiddleware has already set:
+        - request.state.db_session: Scoped to environment schema
+        - request.state.environment_id: UUID of the environment
+        - request.state.impersonate_user_id: User ID to impersonate (optional)
+        - request.state.impersonate_email: User email to impersonate (optional)
 
         Args:
             request: Starlette Request object
-            data: GraphQL request data (for Ariadne 0.20+)
+            data: GraphQL request data (query, variables, etc.)
         """
         import logging
+
         logger = logging.getLogger(__name__)
 
         # Extract env_id from path: /api/env/{env_id}/services/linear/graphql
@@ -62,7 +67,9 @@ class LinearGraphQL(GraphQL):
                         "impersonate_email": None,
                     }
 
-        logger.error("Failed to create context - missing environment identifier or session manager")
+        logger.error(
+            "Failed to create context - missing environment identifier or session manager"
+        )
         raise PermissionError("missing environment identifier or session manager")
 
     async def handle_request(self, request):

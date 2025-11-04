@@ -39,24 +39,10 @@ class CoreIsolationEngine:
         self.environment_handler.create_schema(environment_schema)
         self.environment_handler.migrate_schema(template_schema, environment_schema)
 
-        # Linear schemas have circular dependencies - use explicit table order
-        table_order = None
-        if template_schema.startswith("linear"):
-            table_order = [
-                "organizations", "users", "external_users", "teams", "workflow_states",
-                "team_memberships", "user_settings", "user_flags", "templates", "projects",
-                "project_labels", "project_milestones", "project_statuses", "cycles",
-                "issue_labels", "issues", "comments", "attachments", "reactions", "favorites",
-                "issue_histories", "issue_suggestions", "issue_relations", "customer_needs",
-                "documents", "document_contents", "drafts", "issue_drafts", "initiatives",
-                "initiative_updates", "initiative_histories", "initiative_relations",
-                "initiative_to_projects", "project_updates", "project_histories",
-                "project_relations", "posts", "notifications", "webhooks", "integrations",
-                "integrations_settings", "git_automation_states", "facets",
-                "triage_responsibilities", "agent_sessions", "organization_invites",
-                "organization_domains", "paid_subscriptions", "entity_external_links",
-                "issue_imports",
-            ]
+        template_meta = self.environment_handler.get_template_metadata(
+            location=template_schema
+        )
+        table_order = template_meta.table_order if template_meta else None
 
         self.environment_handler.seed_data_from_template(
             template_schema, environment_schema, tables_order=table_order
@@ -69,6 +55,7 @@ class CoreIsolationEngine:
             expires_at=expires_at,
             last_used_at=datetime.now(),
             created_by=created_by,
+            template_id=str(template_meta.id) if template_meta else None,
             impersonate_user_id=impersonate_user_id,
             impersonate_email=impersonate_email,
         )
@@ -108,6 +95,14 @@ class CoreIsolationEngine:
             source_schema, target_schema
         )
 
+        table_order = None
+        if rte.template_id:
+            template_meta = self.environment_handler.get_template_metadata(
+                template_id=rte.template_id
+            )
+            if template_meta and template_meta.table_order:
+                table_order = template_meta.table_order
+
         template_id = self.environment_handler.register_template(
             service=service,
             name=name,
@@ -117,6 +112,7 @@ class CoreIsolationEngine:
             owner_id=owner_id,
             kind="schema",
             location=target_schema,
+            table_order=table_order,
         )
 
         return TemplateCreateResult(

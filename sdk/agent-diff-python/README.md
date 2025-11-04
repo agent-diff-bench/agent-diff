@@ -8,63 +8,48 @@ Python SDK for testing AI agents against isolated replicas of production service
 uv add agent-diff
 ```
 
-## Quick Start
+## Environments
+
+Create isolated, ephemeral replicas of services:
 
 ```python
-from agent_diff import AgentDiff
-from agent_diff import PythonExecutorProxy, create_openai_tool
-
-# Self-hosted (defaults to http://localhost:8000)
-client = AgentDiff()
-
-# With authentication 
-client = AgentDiff(
-    api_key="your-api-key",
-    base_url="https://your-instance.com"
-)
-
-# 1. Create an isolated environment
 env = client.init_env(
     templateService="slack",
     templateName="slack_default",
-    impersonateUserId="U123456",
-    ttlSeconds=1800
+    impersonateUserId="U123",
+    ttlSeconds=3600
 )
 
-# 2. Create executor with automatic API interception
+# Access environment details
+env.environmentId
+env.environmentUrl
+env.expiresAt
 
-python_executor = PythonExecutorProxy(env.environmentId, base_url=client.base_url)
-python_tool = create_openai_tool(python_executor)
+# Delete when done
+client.delete_env(env.environmentId)
+```
 
-# 3. Take before snapshot
-run = client.start_run(envId=env.environmentId)
+## Templates
 
-# 4. Run your agent (API calls are automatically intercepted)
-from agents import Agent
+List and create environment templates:
 
-agent = Agent(
-    name="Slack Assistant",
-    model="gpt-4o",
-    tools=[python_tool],
-    instructions="Use execute_python tool to interact with Slack at https://slack.com/api/*. Authentication is automatic."
+```python
+# List available templates
+templates = client.list_templates()
+
+# Create custom template - you can populate the replica via API and turn it into a template with custom data
+custom = client.create_template_from_environment(
+    environmentId=env.environmentId,
+    service="slack",
+    name="my_template",
+    description="Custom template",
+    visibility="private"  # "private" means only you can view the template
 )
-response = agent.run("Send a message to #general saying 'Hello!'")
-
-# 5. Compute the diff
-diff = client.diff_run(runId=run.runId)
-
-# Inspect changes
-diff.diff['inserts']   # New records
-diff.diff['updates']   # Modified records
-diff.diff['deletes']   # Deleted records
-
-# 6. Cleanup
-client.delete_env(envId=env.environmentId)
 ```
 
 ## Code Execution Proxies
 
-Agent Diff provides **code execution proxies** that automatically intercept API calls and route them to isolated test environments. This enables agents with code execution capabilities to interact with service replicas without any code changes.
+SDK provides **code execution proxies** that automatically intercept API calls and route them to isolated test environments. This enables agents with code execution capabilities to interact with service replicas without any code changes.
 
 ### How It Works
 
@@ -152,28 +137,7 @@ else:
     print(result["stderr"])
 ```
 
-## Environments
-
-Create isolated, ephemeral replicas of services:
-
-```python
-env = client.init_env(
-    templateService="slack",
-    templateName="slack_default",
-    impersonateUserId="U123",
-    ttlSeconds=3600
-)
-
-# Access environment details
-env.environmentId
-env.environmentUrl
-env.expiresAt
-
-# Delete when done
-client.delete_env(env.environmentId)
-```
-
-## Test Suites
+## Test Suites & Evaluations
 
 To run evaluations:
 
@@ -210,23 +174,7 @@ for test in suite['tests']:
     client.delete_env(envId=env.environmentId)
 ```
 
-## Templates
 
-List and create environment templates:
-
-```python
-# List available templates
-templates = client.list_templates()
-
-# Create custom template - you can populate the replica and turn it into a template with custom data
-custom = client.create_template_from_environment(
-    environmentId=env.environmentId,
-    service="slack",
-    name="my_template",
-    description="Custom template",
-    visibility="private"  # "private" means only you can view the template
-)
-```
 
 ## License
 
