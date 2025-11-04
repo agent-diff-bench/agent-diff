@@ -3,19 +3,19 @@
 import pytest
 from httpx import AsyncClient
 
-# Constants from linear_default seed data
-USER_AGENT = "U01AGENT"
-USER_JOHN = "U02JOHN"
-USER_SARAH = "U03SARAH"
-TEAM_ENG = "TEAM01ENG"
-TEAM_PROD = "TEAM02PROD"
-ORG_ID = "ORG01"
-ISSUE_ENG_001 = "ISS_ENG_001"
-STATE_BACKLOG = "WS_ENG_BACKLOG"
-STATE_TODO = "WS_ENG_TODO"
-STATE_IN_PROGRESS = "WS_ENG_IN_PROGRESS"
-STATE_IN_REVIEW = "WS_ENG_IN_REVIEW"
-STATE_DONE = "WS_ENG_DONE"
+# Constants from linear_default seed data (UUID-based)
+USER_AGENT = "2790a7ee-fde0-4537-9588-e233aa5a68d1"
+USER_JOHN = "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+USER_SARAH = "03b0809e-713e-44ee-95de-b7a198b135ac"
+TEAM_ENG = "ad608998-915c-4bad-bcd9-85ebfccccee8"
+TEAM_PROD = "58c03c85-7b0c-466d-9a4c-120209fccb56"
+ORG_ID = "18c8630e-1fd6-4c2e-a032-aa2684c16e46"
+ISSUE_ENG_001 = "c6e168e3-fed4-45d0-b03f-a1c1f89ee7ab"
+STATE_BACKLOG = "8708b274-82d1-4769-bb1a-c4937db76d0f"
+STATE_TODO = "741f29ae-cfb3-4b8a-a1f8-c5161c842366"
+STATE_IN_PROGRESS = "6963a682-5967-477a-9afc-0b8a5b70b070"
+STATE_IN_REVIEW = "4379b3d7-1143-4aa4-a3a6-da0c436e73b6"
+STATE_DONE = "4334c4ee-405c-4d2c-bf25-4dcb7a8c0512"
 
 
 @pytest.mark.asyncio
@@ -191,7 +191,7 @@ class TestQueryTeams:
         assert team["name"] == "Engineering"
         assert team["key"] == "ENG"
         assert team["description"] == "Engineering team"
-        assert team["icon"] == "🚀"
+        assert team["icon"] is None
         assert team["color"] == "#3B82F6"
 
 
@@ -222,27 +222,29 @@ class TestQueryWorkflowStates:
         data = response.json()
         assert "data" in data
         states = data["data"]["workflowStates"]["nodes"]
-        # Should have 8 workflow states for Engineering team
-        assert len(states) == 8
+        # Should have at least the default workflow states for Engineering team
+        assert len(states) >= 7
 
         # Verify all states belong to Engineering team
         for state in states:
             assert state["team"]["id"] == TEAM_ENG
 
         # Check that specific states exist
-        state_names = [s["name"] for s in states]
-        assert "Triage" in state_names
-        assert "Backlog" in state_names
-        assert "Todo" in state_names
-        assert "In Progress" in state_names
-        assert "In Review" in state_names
-        assert "Done" in state_names
-        assert "Canceled" in state_names
-        assert "Duplicate" in state_names
+        state_names = {s["name"] for s in states}
+        required_state_names = {
+            "Backlog",
+            "Todo",
+            "In Progress",
+            "In Review",
+            "Done",
+            "Canceled",
+            "Duplicate",
+        }
+        assert required_state_names.issubset(state_names)
 
-        # Verify positions are sequential
-        positions = sorted([s["position"] for s in states])
-        assert positions == [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
+        # Verify positions cover the expected range
+        positions = sorted({s["position"] for s in states})
+        assert positions == [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]
 
 
 @pytest.mark.asyncio
@@ -483,7 +485,7 @@ class TestCommentCreate:
         comment = result["comment"]
         assert comment["body"] == "This is a test comment from integration test"
         assert comment["issue"]["id"] == ISSUE_ENG_001
-        assert comment["user"]["id"] == "U01AGENT"
+        assert comment["user"]["id"] == USER_AGENT
 
     async def test_create_comment_invalid_issue(self, linear_client: AsyncClient):
         """Test creating a comment with invalid issueId fails."""

@@ -459,7 +459,7 @@ async def linear_client(
     session_manager,
     environment_handler,
 ):
-    """Create an AsyncClient for testing Linear GraphQL API as U01AGENT (agent)."""
+    """Create an AsyncClient for testing Linear GraphQL API as Agent (UUID seed user)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
@@ -470,7 +470,7 @@ async def linear_client(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U01AGENT",
+        impersonate_user_id="2790a7ee-fde0-4537-9588-e233aa5a68d1",
         impersonate_email="agent@example.com",
     )
 
@@ -480,7 +480,7 @@ async def linear_client(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_user_id = "2790a7ee-fde0-4537-9588-e233aa5a68d1"
             request.state.impersonate_email = "agent@example.com"
             response = await call_next(request)
             return response
@@ -517,7 +517,7 @@ async def linear_client_john(
     session_manager,
     environment_handler,
 ):
-    """Create an AsyncClient for testing Linear GraphQL API as U02JOHN (John Doe)."""
+    """Create an AsyncClient for testing Linear GraphQL API as John Doe (UUID seed user)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
@@ -528,7 +528,7 @@ async def linear_client_john(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U02JOHN",
+        impersonate_user_id="2dcc8dc2-ca19-475d-9882-3ba5e911e7ec",
         impersonate_email="john@example.com",
     )
 
@@ -538,7 +538,7 @@ async def linear_client_john(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U02JOHN"
+            request.state.impersonate_user_id = "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
             request.state.impersonate_email = "john@example.com"
             response = await call_next(request)
             return response
@@ -586,7 +586,7 @@ async def linear_client_with_differ(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U01AGENT",
+        impersonate_user_id="2790a7ee-fde0-4537-9588-e233aa5a68d1",
         impersonate_email="agent@example.com",
     )
 
@@ -596,7 +596,7 @@ async def linear_client_with_differ(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_user_id = "2790a7ee-fde0-4537-9588-e233aa5a68d1"
             request.state.impersonate_email = "agent@example.com"
             response = await call_next(request)
             return response

@@ -10,14 +10,14 @@
       "prompt": "Create a new issue in the Engineering team titled 'Fix login bug' with high priority",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "added",
           "entity": "issues",
           "where": {
             "teamId": {
-              "eq": "TEAM01ENG"
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
             },
             "title": {
               "contains": "login bug"
@@ -36,7 +36,7 @@
       "prompt": "Move issue ENG-1 to 'In Progress' status",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "changed",
@@ -49,7 +49,7 @@
           "expected_changes": {
             "stateId": {
               "to": {
-                "eq": "WS_ENG_IN_PROGRESS"
+                "eq": "6963a682-5967-477a-9afc-0b8a5b70b070"
               }
             }
           }
@@ -62,7 +62,7 @@
       "prompt": "Assign issue ENG-1 to John Doe",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "changed",
@@ -75,7 +75,7 @@
           "expected_changes": {
             "assigneeId": {
               "to": {
-                "eq": "U02JOHN"
+                "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
               }
             }
           }
@@ -88,14 +88,14 @@
       "prompt": "Add a comment to issue ENG-1 saying 'I am working on this now'",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "added",
           "entity": "comments",
           "where": {
             "issueId": {
-              "eq": "ISS_ENG_001"
+              "eq": "c6e168e3-fed4-45d0-b03f-a1c1f89ee7ab"
             },
             "body": {
               "contains": "working on this"
@@ -111,7 +111,7 @@
       "prompt": "Create a new team called 'Design'",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "added",
@@ -141,7 +141,7 @@
       "prompt": "Change the priority of issue ENG-1 to Urgent",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "changed",
@@ -172,20 +172,20 @@
       "prompt": "Create a new issue 'Improve performance' in Engineering team, assign to John, with description 'Optimize database queries'",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "added",
           "entity": "issues",
           "where": {
             "teamId": {
-              "eq": "TEAM01ENG"
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
             },
             "title": {
               "contains": "performance"
             },
             "assigneeId": {
-              "eq": "U02JOHN"
+              "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
             },
             "description": {
               "contains": "database queries"
@@ -201,7 +201,7 @@
       "prompt": "Update the description of issue ENG-1 to include 'Root cause: session timeout issue'",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "changed",
@@ -227,14 +227,14 @@
       "prompt": "Create three new issues in the Engineering team: 'Update documentation', 'Refactor API endpoints', and 'Add unit tests'",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "added",
           "entity": "issues",
           "where": {
             "teamId": {
-              "eq": "TEAM01ENG"
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
             }
           },
           "expected_count": 3
@@ -247,7 +247,7 @@
       "prompt": "Mark issue ENG-1 as completed",
       "type": "actionEval",
       "seed_template": "linear_default",
-      "impersonate_user_id": "U01AGENT",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
           "diff_type": "changed",
@@ -260,7 +260,7 @@
           "expected_changes": {
             "stateId": {
               "to": {
-                "eq": "WS_ENG_DONE"
+                "eq": "4334c4ee-405c-4d2c-bf25-4dcb7a8c0512"
               }
             }
           }

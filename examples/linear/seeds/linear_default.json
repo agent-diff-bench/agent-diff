@@ -38,7 +38,13 @@
       "scimEnabled": false,
       "slaDayCount": "all",
       "userCount": 3,
-      "workingDays": [1.0, 2.0, 3.0, 4.0, 5.0]
+      "workingDays": [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0
+      ]
     }
   ],
   "users": [
@@ -47,7 +53,7 @@
       "email": "agent@example.com",
       "name": "AI Agent",
       "displayName": "Agent",
-      "organizationId": "ORG01",
+      "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "active": true,
       "admin": false,
       "app": false,
@@ -77,7 +83,7 @@
       "email": "john@example.com",
       "name": "John Doe",
       "displayName": "John",
-      "organizationId": "ORG01",
+      "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "active": true,
       "admin": false,
       "app": false,
@@ -107,7 +113,7 @@
       "email": "sarah@example.com",
       "name": "Sarah Smith",
       "displayName": "Sarah",
-      "organizationId": "ORG01",
+      "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "active": true,
       "admin": true,
       "app": false,
@@ -139,10 +145,9 @@
       "name": "Engineering",
       "key": "ENG",
       "displayName": "Engineering",
-      "organizationId": "ORG01",
+      "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "description": "Engineering team",
       "color": "#3B82F6",
-      "private": false,
       "createdAt": "2025-01-01T00:00:00",
       "updatedAt": "2025-01-01T00:00:00",
       "aiThreadSummariesEnabled": false,
@@ -185,10 +190,9 @@
       "name": "Product",
       "key": "PROD",
       "displayName": "Product",
-      "organizationId": "ORG01",
+      "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "description": "Product team",
       "color": "#10B981",
-      "private": false,
       "createdAt": "2025-01-01T00:00:00",
       "updatedAt": "2025-01-01T00:00:00",
       "aiThreadSummariesEnabled": false,
@@ -278,7 +282,7 @@
       "updatedAt": "2025-01-01T00:00:00"
     },
     {
-      "id": "13b20552-8997-4c01-944e-cb48955dce08",
+      "id": "d4f59a6d-33cb-45d1-8f4e-3e57536f912d",
       "teamId": "ad608998-915c-4bad-bcd9-85ebfccccee8",
       "name": "Canceled",
       "color": "#95a2b3",
