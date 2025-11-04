@@ -140,6 +140,11 @@ Collections of test cases with assertions that you can run against agent runs us
 To run evaluations:
 
 ```python
+from agent_diff import AgentDiff, PythonExecutorProxy, BashExecutorProxy, create_openai_tool
+
+client = AgentDiff()
+
+
 suite_list = client.list_test_suites(name="Slack Bench")
 slack_suite = suite_list.testSuites[0]
 suite = client.get_test_suite(slack_suite.id, expand=True)

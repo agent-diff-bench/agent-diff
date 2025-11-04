@@ -132,6 +132,9 @@ class TemplateManager:
             if not matches:
                 raise ValueError("template schema not registered")
 
+            if body.impersonateUserId is None and test.impersonate_user_id:
+                body.impersonateUserId = test.impersonate_user_id
+
             t = matches[0]
             check_template_access(principal_id, t)
             return t.location, t.service

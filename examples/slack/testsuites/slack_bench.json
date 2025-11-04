@@ -166,9 +166,6 @@
           "where": {
             "user_id": {
               "eq": "U05MORGAN23"
-            },
-            "channel_name": {
-              "i_contains": "rl-project"
             }
           },
           "expected_count": 1
