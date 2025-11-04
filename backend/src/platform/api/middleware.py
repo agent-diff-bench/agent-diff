@@ -77,7 +77,6 @@ class IsolationMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         path = request.scope.get("path", "")
-        logger.info(f"IsolationMiddleware called for path: {path}")
         # Expected: /api/env/{env_id}/services/{service}/...
         if not path.startswith("/api/env/"):
             return await call_next(request)
@@ -104,7 +103,6 @@ class IsolationMiddleware(BaseHTTPMiddleware):
 
             principal_id = await get_principal_id(api_key_hdr)
 
-            # Load impersonation data from meta session
             with self.session_manager.with_meta_session() as meta_session:
                 request.state.principal_id = principal_id
 
@@ -119,29 +117,14 @@ class IsolationMiddleware(BaseHTTPMiddleware):
                         request.state.impersonate_user_id = env.impersonate_user_id
                         request.state.impersonate_email = env.impersonate_email
                 except (ValueError, TypeError) as e:
-                    logger.debug(f"Could not load impersonation data for env {env_id}: {e}")
+                    logger.debug(
+                        f"Could not load impersonation data for env {env_id}: {e}"
+                    )
 
-            # Get environment session and manually manage lifecycle for mounted apps
-            # We can't use context manager here because Starlette's Mount creates a new scope
-            # and the session would be closed before the mounted app's handlers execute
-            session = self.session_manager.get_session_for_environment(env_id)
-
-            # Store in both request.state AND request.scope
-            # Mount creates a new Request but preserves the scope dict
-            request.state.db_session = session
-            request.state.environment_id = env_id
-            request.scope["db_session"] = session
-            request.scope["environment_id"] = env_id
-
-            try:
-                response = await call_next(request)
-                session.commit()
-                return response
-            except Exception:
-                session.rollback()
-                raise
-            finally:
-                session.close()
+            with self.session_manager.with_session_for_environment(env_id) as session:
+                request.state.db_session = session
+                request.state.environment_id = env_id
+                return await call_next(request)
 
         except PermissionError as exc:
             return JSONResponse(
