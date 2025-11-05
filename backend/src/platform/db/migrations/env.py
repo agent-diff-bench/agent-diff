@@ -8,7 +8,11 @@ from sqlalchemy import engine_from_config, pool
 from src.platform.db.schema import PlatformBase
 from src.services.slack.database.base import Base as SlackBase
 
-load_dotenv()
+# Load .env file if available (not needed in Docker where env vars are passed directly)
+try:
+    load_dotenv()
+except (OSError, IOError):
+    pass
 
 config = context.config
 

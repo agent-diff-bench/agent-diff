@@ -23,7 +23,10 @@ from src.platform.evaluationEngine.core import CoreEvaluationEngine
 
 env_path = Path(__file__).parent.parent / ".env"
 if env_path.exists():
-    load_dotenv(env_path)
+    try:
+        load_dotenv(env_path)
+    except (OSError, IOError):
+        pass
 
 
 @pytest.fixture(scope="session")

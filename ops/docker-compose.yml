@@ -5,6 +5,7 @@ services:
       POSTGRES_DB: diff_the_universe
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust # ONLY FOR LOCAL DEVELOPMENT. REMEMBER TO CHANGE TO PASSWORD AUTH IN PRODUCTION
     ports:
       - "5432:5432"
     volumes:
@@ -36,6 +37,7 @@ services:
       sh -c "
         alembic upgrade head &&
         python utils/seed_slack_template.py &&
+        python utils/seed_linear_template.py &&
         python utils/seed_tests.py &&
         uvicorn src.platform.api.main:app --host 0.0.0.0 --port 8000 --reload
       "
