@@ -253,7 +253,7 @@
     {
       "id": "test_10",
       "name": "Add emoji reaction",
-      "prompt": "React with :thumbsup: to the newest message in #general",
+      "prompt": "React with :thumbsup: to the most recent posted message in #general",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
