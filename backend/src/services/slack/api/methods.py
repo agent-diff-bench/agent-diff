@@ -1804,10 +1804,6 @@ async def auth_test(request: Request) -> JSONResponse:
         "user_id": user.user_id,
     }
 
-    # Add bot_id if user is a bot
-    if user.is_bot:
-        response["bot_id"] = user.user_id
-
     return _json_response(response)
 
 
