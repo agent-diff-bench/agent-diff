@@ -58,8 +58,7 @@ python_tool = create_openai_tool(python_executor)
 
 agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_python or execute_bash tools to interact
-        with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
+        instructions="Use execute_python tool to interact with Slack API at https://slack.com/api/*. Complete the task using the tools provided. Authentication is handled automatically via proxy. Leave a placeholder credential where you would add a real token.",
         tools=[python_tool] # python_tool (or bash_tool) where agent will write code
     )
 
@@ -141,6 +140,7 @@ To run evaluations:
 
 ```python
 from agent_diff import AgentDiff, PythonExecutorProxy, BashExecutorProxy, create_openai_tool
+from agents import Agent, Runner
 
 client = AgentDiff()
 
@@ -161,26 +161,27 @@ for test in suite.tests:
     # This function will take a snapshot before run
     run = client.start_run(envId=env.environmentId, testId=test_id)
 
-    from agent_diff import PythonExecutorProxy, create_openai_tool
-    from agents import Agent, Runner
 
     bash_executor = BashExecutorProxy(env.environmentId, base_url=client.base_url)
     bash_tool = create_openai_tool(bash_executor)
 
     agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_bash tool with curl to interact with Slack API
-        at https://slack.com/api/*. Authentication is handled automatically.",
+        instructions="Use execute_bash tool with curl to interact with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
         tools=[bash_tool]
     )
 
     response = await Runner.run(agent, prompt)
 
     #This function will take a 2nd snapshot, run diff and assert results against expected state defined in test suite
-    evaluation_result = client.evaluate_run(runId=run.runId)
-
+    
     #returns score runId, status and score (0/1)
-    evaluation_results.append(evaluation_result) 
+    score = client.evaluate_run(runId=run.runId)
+    
+    #returns score runId, full diff and score (0/1)
+    run_result = client.get_results_for_run(runId=run.runId)
+
+    evaluation_results.append(run_result) 
 
     client.delete_env(envId=env.environmentId)
 ```
