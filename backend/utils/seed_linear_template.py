@@ -13,7 +13,6 @@ Usage:
 import os
 import sys
 import json
-import re
 from pathlib import Path
 from uuid import uuid4
 
@@ -27,6 +26,7 @@ from src.services.linear.database import schema as linear_schema
 def quote_identifier(name: str) -> str:
     """Quote a column name for PostgreSQL to preserve case sensitivity."""
     return f'"{name}"'
+
 
 # Tables in foreign key dependency order
 TABLE_ORDER = [
@@ -115,35 +115,63 @@ def insert_seed_data(conn, schema_name: str, seed_data: dict):
         print(f"  Inserting {len(records)} {table_name}...")
 
         for record in records:
-            # Process values (convert dict/list to JSON strings) but keep original keys
+            # Convert dict/list values to JSON strings for PostgreSQL
             processed_record = {}
-            for key, value in record.items():
-                if isinstance(value, (dict, list)):
-                    processed_record[key] = json.dumps(value)
+            for k, v in record.items():
+                if isinstance(v, (dict, list)):
+                    processed_record[k] = json.dumps(v)
                 else:
-                    processed_record[key] = value
+                    processed_record[k] = v
 
-            # Quote column names to preserve camelCase
+            # Quote column names to preserve case sensitivity in PostgreSQL
             columns = ", ".join([quote_identifier(k) for k in processed_record.keys()])
             placeholders = ", ".join([f":{k}" for k in processed_record.keys()])
-            sql = f"INSERT INTO {schema_name}.{table_name} ({columns}) VALUES ({placeholders})"
+            sql = (
+                f'INSERT INTO "{schema_name}"."{table_name}" '
+                f"({columns}) VALUES ({placeholders})"
+            )
             conn.execute(text(sql), processed_record)
 
 
 def register_public_template(
-    conn, *, service: str, name: str, location: str, description: str | None = None
+    conn,
+    *,
+    service: str,
+    name: str,
+    location: str,
+    description: str | None = None,
+    table_order: list[str] | None = None,
 ):
-    """Register a template in platform meta DB as public (visibility='public')."""
+    """Register a template in platform meta DB as public."""
+
+    check_sql = text(
+        """
+        SELECT id FROM public.environments
+        WHERE service = :service
+          AND name = :name
+          AND version = :version
+          AND visibility = 'public'
+          AND owner_id IS NULL
+        LIMIT 1
+        """
+    )
+    existing = conn.execute(
+        check_sql, {"service": service, "name": name, "version": "v1"}
+    ).fetchone()
+
+    if existing:
+        print(f"Template {name} already exists, skipping")
+        return
+
     sql = text(
         """
         INSERT INTO public.environments (
             id, service, name, version, visibility, description,
-            owner_id, kind, location, created_at, updated_at
+            owner_id, kind, location, table_order, created_at, updated_at
         ) VALUES (
             :id, :service, :name, :version, 'public', :description,
-            NULL, 'schema', :location, NOW(), NOW()
+            NULL, 'schema', :location, :table_order, NOW(), NOW()
         )
-        ON CONFLICT ON CONSTRAINT uq_environments_identity DO NOTHING
         """
     )
     params = {
@@ -153,6 +181,7 @@ def register_public_template(
         "version": "v1",
         "description": description,
         "location": location,
+        "table_order": table_order,
     }
     conn.execute(sql, params)
 
@@ -198,6 +227,7 @@ def create_template(engine, template_name: str, seed_file: Path | None = None):
                 if template_name == "linear_base"
                 else "Linear default template"
             ),
+            table_order=TABLE_ORDER,
         )
         print(f"Registered public template: {template_name}")
 

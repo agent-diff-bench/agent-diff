@@ -1,51 +1,28 @@
 # Agent Diff
 
+**Interactive environments for evaluating AI agents & RL training on replicas of 3rd party APIs like Linear or Slack.**
 
-## What This Is
-
-**A self-hosted interactive enviroments for testing AI agents & training LLMs against 3rd party services like Linear or Slack.** You run it locally (or deploy it), your agents call fake APIs, you get deterministic diffs. No external service, no rate limits, full control over test data and environments.
-
-Use it for:
-- RL training loops (reset state between episodes)
-- Integration tests (verify agent does what it should)
-- Regression tests (catch when changes break behaviour)
-- Training data generation (prompt → actions → diff → outcome)
-
-## Services
-
-- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/READEME.md`](backend/src/services/slack/READEME.md). A few examples:
-
-  ```python
-  "chat.postMessage"  # post messages in seeded channels/DMs
-  "conversations.open"  # spin up IM/MPIM threads
-  "reactions.add"  # add emoji reactions to seeded messages
-  ```
-
-- **Linear** – GraphQL schema and resolvers for issues/projects (still WIP). See [`backend/src/services/linear/READEME.md`](backend/src/services/linear/READEME.md). Sample operations:
-
-  ```python
-  "issues"            # query issues (list/pagination)
-  "issueCreate"       # mutation to create an issue
-  "projectUpdate"     # mutation to update project metadata
-  ```
-
-- Gmail, GitHub, Jira (TBD).
-
-If you have requests for specific services + any feedback, mail me at hubert@uni.minerva.edu
+Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, no rate limits.
 
 
 ## Quick Start
 
 ### 1. Install SDK
+
+**Python:** [Python SDK docs](sdk/agent-diff-python/README.md)
 ```bash
 uv add agent-diff
+```
+
+**TypeScript:** [TS SDK docs](sdk/agent-diff-ts/README.md)
+```bash
+npm install agent-diff
 ```
 
 ### 2. Set up backend
 ```bash
 git clone https://github.com/hubertpysklo/agent-diff.git
 cd agent-diff
-cp env.example .env
 cd ops
 docker-compose up --build
 
@@ -59,75 +36,99 @@ from agent_diff import AgentDiff
 # Self-hosted (defaults to http://localhost:8000)
 client = AgentDiff()
 
-# With authentication 
-client = AgentDiff(
-    api_key="your-api-key",
-    base_url="https://your-instance.com"
-)
-
 # Initialise isolated environment from a template. See: examples/slack/seeds
-env = client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9") #impersonateUserId - seeded user (agent) in seed
+env = client.init_env(templateService="slack", templateName="slack_default",
+impersonateUserId="U01AGENBOT9") #impersonateUserId - seeded user account that agent will use
 
-# e.g. env.environmentUrl = http://localhost:8000/api/env/{environmentId}/services/slack
+# print(env.environmentUrl) = http://localhost:8000/api/env/{environmentId}/services/slack
 
 # Take before snapshot
 run = client.start_run(envId=env.environmentId)
 
-
 # Your agent does stuff using the environment URL 
- 
-# You can swap the URLs directly in MCPs or use the code executor tool for python or bash with proxy that will route the requests automatically
-# e.g. proxy transforms:
-#   from: https://api.slack.com/api/conversations.list
-#   to:   http://localhost:8000/api/env/{environmentId}/services/slack/conversations.list 
+# You can swap the URLs in MCPs or use the code executor tool (Python or bash) with a proxy 
 
-# Using CodeExecutorProxy (With OpenAI Agents SDK Tool example, LangChain is also available)
-from agent_diff import PythonExecutorProxy, BashExecutorProxy, create_openai_tool
+# Using CodeExecutorProxy with OpenAI Agents SDK (For Vercel AI, check TS SDK docs)
+from agent_diff import PythonExecutorProxy, create_openai_tool
 from agents import Agent, Runner
 
-# Pass base_url from client or use default
+# Pass base_url (Where requests will be routed) from the client and create a tool
 python_executor = PythonExecutorProxy(env.environmentId, base_url=client.base_url)
-bash_executor = BashExecutorProxy(env.environmentId, base_url=client.base_url)
 python_tool = create_openai_tool(python_executor) 
-bash_tool = create_openai_tool(bash_executor)
 
 agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_python or execute_bash tools to interact with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
-        tools=[python_tool, bash_tool]
+        instructions="Use execute_python or execute_bash tools to interact
+        with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
+        tools=[python_tool] # python_tool (or bash_tool) where agent will write code
     )
 
 response = await Runner.run(agent, "Post 'Hello' to Slack channel #general")
+
 # The agent writes normal code like:
 # requests.post('https://slack.com/api/chat.postMessage', ...)
-# But it will be proxied to the temporary sandbox environment  
+# But it will be proxied to the temporary sandbox environment
+# e.g. transforms:
+# from: https://api.slack.com/api/conversations.list
+# to: http://localhost:8000/api/env/{environmentId}/services/slack/conversations.list 
 
-# Compute diff and get results
+# Compute diff (changes in the environment) and get results
 diff = client.diff_run(runId=run.runId)
 
 # Inspect changes
-print(diff.diff['inserts'])   # New records
-print(diff.diff['updates'])   # Modified records
-print(diff.diff['deletes'])   # Deleted records
+print(diff.diff['inserts'])   # New records, e.g. new message or user added by agent
+print(diff.diff['updates'])   # Modified records, edited message
+print(diff.diff['deletes'])   # Deleted records, deleted message, linear issue, etc.
 
 # Clean up
 client.delete_env(envId=env.environmentId)
+
 ```
 
-Every environment gets its own PostgreSQL schema. URLs bind requests to schemas. Snapshots diff exactly what changed in this specific isolated environment.
+## Supported APIs
 
-## Templates & Test Suites
+- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). A few examples:
 
-### Sample Templates
-- **[slack_base](examples/slack/seeds/)** - Empty Slack workspace (no seed data)
-- **[slack_default](examples/slack/seeds/slack_bench_default.json)** - Seeded with sample users and messages for Slack Bench.
+  ```python
+  "chat.postMessage"  # post messages in seeded channels/DMs
+  "conversations.open"  # spin up IM/MPIM threads
+  "reactions.add"  # add emoji reactions to seeded messages
+  ```
 
-### Test Suites (DSL)
+- **Linear** – GraphQL API. See [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
+
+  ```python
+  "issues"            # list/filter issues with pagination
+  "teams"             # list teams
+  "issueCreate"       # create new issue
+  "issueUpdate"       # update issue (state, assignee, priority, etc.)
+  "commentCreate"     # add comment to issue
+  ```
+
+## Templates, Seeds & Environments
+
+**Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
+- **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `linear_base`)
+- **Content**: Templates are seeded during startup time from seeds with data like users, channels, messages, issues, etc.
+- **Example Seeds**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
+
+**Environments** are isolated, temporary copies of a template schema:
+- **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
+- **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
+- **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
+
+## CodeExectuorProxy
+
+SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
+
+
+## Evaluations & Test Suites
+
+Collections of test cases with assertions that you can run against agent runs using evaluations.
+
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
 
-
-## Evaluations 
 
 To run evaluations:
 
@@ -156,13 +157,14 @@ for test in suite['tests']:
 
     agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_bash tool with curl to interact with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
+        instructions="Use execute_bash tool with curl to interact with Slack API
+        at https://slack.com/api/*. Authentication is handled automatically.",
         tools=[bash_tool]
     )
 
     response = await Runner.run(agent, prompt)
 
-    #This function will take a 2nd snapshot, run diff and assert results against expedted state defined in test suite
+    #This function will take a 2nd snapshot, run diff and assert results against expected state defined in test suite
     evaluation_result = client.evaluate_run(run.runId) 
 
     #returns score runId, status and score (0/1)
@@ -172,8 +174,6 @@ for test in suite['tests']:
 ```
 
 ## Training & Fine-tuning
-
-Agent Diff is perfect for generating training data for LLMs with tool calling capabilities:
 
 ### With Hugging Face (smolagents)
 
@@ -225,10 +225,11 @@ dataset = Dataset.from_list(training_data)
 dataset.save_to_disk("agent_training_data")
 ```
 
+
 ## Documentation
 
-- **[Getting Started Guide](docs/getting-started.md)** - Detailed setup and configuration
-- **[SDK](sdk/agent_diff_pkg/README.md)** - Complete API reference
+- **[Python SDK](sdk/agent-diff-python/README.md)** - Complete Python SDK reference
+- **[TS SDK](sdk/agent-diff-ts/README.md)** - Complete TS SDK reference
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Write test assertions
 - **[API Reference](docs/api-reference.md)** - REST API documentation
 

@@ -7,21 +7,23 @@ that can be used across all test files.
 
 import os
 from pathlib import Path
+from uuid import uuid4
+
 import pytest
 import pytest_asyncio
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from starlette.testclient import TestClient
-from uuid import uuid4
-
-env_path = Path(__file__).parent.parent / ".env"
-if env_path.exists():
-    load_dotenv(env_path)
 
 from src.platform.isolationEngine.session import SessionManager
 from src.platform.isolationEngine.environment import EnvironmentHandler
 from src.platform.isolationEngine.core import CoreIsolationEngine
 from src.platform.evaluationEngine.core import CoreEvaluationEngine
+
+
+env_path = Path(__file__).parent.parent / ".env"
+if env_path.exists():
+    load_dotenv(env_path)
 
 
 @pytest.fixture(scope="session")
@@ -130,28 +132,21 @@ def cleanup_test_environments(session_manager, created_schemas):
 
 
 @pytest_asyncio.fixture
-async def slack_client(
-    test_user_id, core_isolation_engine, session_manager, environment_handler
-):
+async def slack_client(slack_shared_environment, session_manager):
     """Create an AsyncClient for testing Slack API as U01AGENBOT9 (agent1)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.slack.api.methods import slack_endpoint
     from starlette.routing import Route
     from starlette.applications import Starlette
 
-    env_result = core_isolation_engine.create_environment(
-        template_schema="slack_default",
-        ttl_seconds=3600,
-        created_by=test_user_id,
-        impersonate_user_id="U01AGENBOT9",
-        impersonate_email="agent@example.com",
-    )
+    env_result = slack_shared_environment
 
     async def add_db_session(request, call_next):
         with session_manager.with_session_for_environment(
             env_result.environment_id
         ) as session:
             request.state.db_session = session
+            request.state.environment_id = env_result.environment_id
             request.state.impersonate_user_id = "U01AGENBOT9"
             request.state.impersonate_email = "agent@example.com"
             response = await call_next(request)
@@ -164,8 +159,6 @@ async def slack_client(
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
-
-    environment_handler.drop_schema(env_result.schema_name)
 
 
 @pytest_asyncio.fixture
@@ -265,28 +258,21 @@ async def slack_bench_client_with_differ(
 
 
 @pytest_asyncio.fixture
-async def slack_client_john(
-    test_user_id, core_isolation_engine, session_manager, environment_handler
-):
+async def slack_client_john(slack_shared_environment, session_manager):
     """Create an AsyncClient for testing Slack API as U02JOHNDOE1 (johndoe)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.slack.api.methods import slack_endpoint
     from starlette.routing import Route
     from starlette.applications import Starlette
 
-    env_result = core_isolation_engine.create_environment(
-        template_schema="slack_default",
-        ttl_seconds=3600,
-        created_by=test_user_id,
-        impersonate_user_id="U02JOHNDOE1",
-        impersonate_email="john@example.com",
-    )
+    env_result = slack_shared_environment
 
     async def add_db_session(request, call_next):
         with session_manager.with_session_for_environment(
             env_result.environment_id
         ) as session:
             request.state.db_session = session
+            request.state.environment_id = env_result.environment_id
             request.state.impersonate_user_id = "U02JOHNDOE1"
             request.state.impersonate_email = "john@example.com"
             response = await call_next(request)
@@ -300,7 +286,19 @@ async def slack_client_john(
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         yield client
 
-    environment_handler.drop_schema(env_result.schema_name)
+
+@pytest.fixture(scope="function")
+def slack_shared_environment(test_user_id, core_isolation_engine, environment_handler):
+    env_result = core_isolation_engine.create_environment(
+        template_schema="slack_default",
+        ttl_seconds=3600,
+        created_by=test_user_id,
+    )
+
+    try:
+        yield env_result
+    finally:
+        environment_handler.drop_schema(env_result.schema_name)
 
 
 def create_test_environment(
@@ -386,14 +384,202 @@ def sdk_client(test_api_key, cleanup_test_templates):
     """AgentDiff SDK client for integration tests."""
     import sys
 
-    sdk_path = "/sdk/agent_diff_pkg"
-    if sdk_path not in sys.path:
-        sys.path.insert(0, sdk_path)
+    # Support multiple local SDK path variants mounted by docker-compose
+    sdk_paths = [
+        "/sdk/agent-diff-python",  # current folder name
+        "/sdk/agent_diff_python",  # legacy underscore variant
+    ]
+    for sdk_path in sdk_paths:
+        if sdk_path not in sys.path:
+            sys.path.insert(0, sdk_path)
 
-    from agent_diff.client import AgentDiff
+    import importlib
+
+    AgentDiff = importlib.import_module("agent_diff.client").AgentDiff
 
     # Use backend service name for inter-container communication
     return AgentDiff(
         api_key=test_api_key,
         base_url="http://backend:8000",
     )
+
+
+@pytest_asyncio.fixture
+async def linear_client(
+    test_user_id,
+    core_isolation_engine,
+    core_evaluation_engine,
+    session_manager,
+    environment_handler,
+):
+    """Create an AsyncClient for testing Linear GraphQL API as U01AGENT (agent)."""
+    from httpx import AsyncClient, ASGITransport
+    from src.services.linear.api.graphql_linear import LinearGraphQL
+    from ariadne import load_schema_from_path, make_executable_schema
+    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from starlette.applications import Starlette
+
+    env_result = core_isolation_engine.create_environment(
+        template_schema="linear_default",
+        ttl_seconds=3600,
+        created_by=test_user_id,
+        impersonate_user_id="U01AGENT",
+        impersonate_email="agent@example.com",
+    )
+
+    async def add_db_session(request, call_next):
+        with session_manager.with_session_for_environment(
+            env_result.environment_id
+        ) as session:
+            request.state.db_session = session
+            request.state.environment_id = env_result.environment_id
+            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_email = "agent@example.com"
+            response = await call_next(request)
+            return response
+
+    # Create Linear GraphQL schema
+    linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
+    linear_type_defs = load_schema_from_path(linear_schema_path)
+    linear_schema = make_executable_schema(
+        linear_type_defs, query, mutation, issue_type
+    )
+
+    linear_graphql = LinearGraphQL(
+        linear_schema,
+        coreIsolationEngine=core_isolation_engine,
+        coreEvaluationEngine=core_evaluation_engine,
+    )
+
+    app = Starlette()
+    app.middleware("http")(add_db_session)
+    app.mount("/", linear_graphql)
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
+
+    environment_handler.drop_schema(env_result.schema_name)
+
+
+@pytest_asyncio.fixture
+async def linear_client_john(
+    test_user_id,
+    core_isolation_engine,
+    core_evaluation_engine,
+    session_manager,
+    environment_handler,
+):
+    """Create an AsyncClient for testing Linear GraphQL API as U02JOHN (John Doe)."""
+    from httpx import AsyncClient, ASGITransport
+    from src.services.linear.api.graphql_linear import LinearGraphQL
+    from ariadne import load_schema_from_path, make_executable_schema
+    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from starlette.applications import Starlette
+
+    env_result = core_isolation_engine.create_environment(
+        template_schema="linear_default",
+        ttl_seconds=3600,
+        created_by=test_user_id,
+        impersonate_user_id="U02JOHN",
+        impersonate_email="john@example.com",
+    )
+
+    async def add_db_session(request, call_next):
+        with session_manager.with_session_for_environment(
+            env_result.environment_id
+        ) as session:
+            request.state.db_session = session
+            request.state.environment_id = env_result.environment_id
+            request.state.impersonate_user_id = "U02JOHN"
+            request.state.impersonate_email = "john@example.com"
+            response = await call_next(request)
+            return response
+
+    linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
+    linear_type_defs = load_schema_from_path(linear_schema_path)
+    linear_schema = make_executable_schema(
+        linear_type_defs, query, mutation, issue_type
+    )
+
+    linear_graphql = LinearGraphQL(
+        linear_schema,
+        coreIsolationEngine=core_isolation_engine,
+        coreEvaluationEngine=core_evaluation_engine,
+    )
+
+    app = Starlette()
+    app.middleware("http")(add_db_session)
+    app.mount("/", linear_graphql)
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        yield client
+
+    environment_handler.drop_schema(env_result.schema_name)
+
+
+@pytest_asyncio.fixture
+async def linear_client_with_differ(
+    test_user_id,
+    core_isolation_engine,
+    core_evaluation_engine,
+    session_manager,
+    environment_handler,
+):
+    """Create AsyncClient and Differ for the same Linear environment."""
+    from httpx import AsyncClient, ASGITransport
+    from src.services.linear.api.graphql_linear import LinearGraphQL
+    from ariadne import load_schema_from_path, make_executable_schema
+    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from starlette.applications import Starlette
+    from src.platform.evaluationEngine.differ import Differ
+
+    env_result = core_isolation_engine.create_environment(
+        template_schema="linear_default",
+        ttl_seconds=3600,
+        created_by=test_user_id,
+        impersonate_user_id="U01AGENT",
+        impersonate_email="agent@example.com",
+    )
+
+    async def add_db_session(request, call_next):
+        with session_manager.with_session_for_environment(
+            env_result.environment_id
+        ) as session:
+            request.state.db_session = session
+            request.state.environment_id = env_result.environment_id
+            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_email = "agent@example.com"
+            response = await call_next(request)
+            return response
+
+    linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
+    linear_type_defs = load_schema_from_path(linear_schema_path)
+    linear_schema = make_executable_schema(
+        linear_type_defs, query, mutation, issue_type
+    )
+
+    linear_graphql = LinearGraphQL(
+        linear_schema,
+        coreIsolationEngine=core_isolation_engine,
+        coreEvaluationEngine=core_evaluation_engine,
+    )
+
+    app = Starlette()
+    app.middleware("http")(add_db_session)
+    app.mount("/", linear_graphql)
+
+    transport = ASGITransport(app=app)
+
+    # Create differ for same environment
+    differ = Differ(
+        schema=env_result.schema_name,
+        environment_id=env_result.environment_id,
+        session_manager=session_manager,
+    )
+
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        yield {"client": client, "differ": differ, "env_id": env_result.environment_id}
+
+    environment_handler.drop_schema(env_result.schema_name)

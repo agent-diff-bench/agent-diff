@@ -25,45 +25,39 @@ class LinearGraphQL(GraphQL):
         self.session_manager = session_manager
         super().__init__(schema, context_value=self._build_context)
 
-    async def _build_context(self, request, data=None):
+    def _build_context(self, request, data):
         """
         Extract context from request for GraphQL resolvers.
 
-        Extracts environment_id from URL path and creates a session for it.
-        This works around Starlette Mount isolation issues.
+        IsolationMiddleware has already set:
+        - request.state.db_session: Scoped to environment schema
+        - request.state.environment_id: UUID of the environment
+        - request.state.impersonate_user_id: User ID to impersonate (optional)
+        - request.state.impersonate_email: User email to impersonate (optional)
 
         Args:
             request: Starlette Request object
-            data: GraphQL request data (for Ariadne 0.20+)
+            data: GraphQL request data (query, variables, etc.)
         """
-        import logging
-        logger = logging.getLogger(__name__)
+        state = request.state
 
-        # Extract env_id from path: /api/env/{env_id}/services/linear/graphql
-        path = request.url.path
-        logger.info(f"LinearGraphQL._build_context called for path: {path}")
+        session = getattr(state, "db_session", None)
+        environment_id = getattr(state, "environment_id", None)
 
-        if "/api/env/" in path:
-            path_parts = path.split("/")
-            env_id_index = path_parts.index("env") + 1 if "env" in path_parts else None
-            if env_id_index and env_id_index < len(path_parts):
-                env_id = path_parts[env_id_index]
-                logger.info(f"Extracted env_id: {env_id}")
+        if session is None or environment_id is None:
+            raise PermissionError("missing environment session")
 
-                # Create session directly using session manager
-                if self.session_manager:
-                    session = self.session_manager.get_session_for_environment(env_id)
-                    logger.info(f"Created session: {session}")
-                    return {
-                        "request": request,
-                        "session": session,
-                        "environment_id": env_id,
-                        "user_id": None,  # Could extract from middleware if needed
-                        "impersonate_email": None,
-                    }
+        principal_id = getattr(state, "principal_id", None)
+        impersonate_user_id = getattr(state, "impersonate_user_id", None)
 
-        logger.error("Failed to create context - missing environment identifier or session manager")
-        raise PermissionError("missing environment identifier or session manager")
+        return {
+            "request": request,
+            "session": session,
+            "environment_id": environment_id,
+            "user_id": principal_id or impersonate_user_id,
+            "impersonate_user_id": impersonate_user_id,
+            "impersonate_email": getattr(state, "impersonate_email", None),
+        }
 
     async def handle_request(self, request):
         return await super().handle_request(request)
