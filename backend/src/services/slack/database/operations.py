@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import select, exists, and_, or_, func
+from sqlalchemy import select, exists, and_, or_, func, cast, Float
 from sqlalchemy.exc import IntegrityError
 
 
@@ -716,7 +716,12 @@ def list_channel_history(
         else:
             query = query.where(Message.created_at < latest)
 
-    query = query.order_by(Message.created_at.desc()).limit(limit).offset(offset)
+    ts_order = cast(Message.message_id, Float)
+    query = (
+        query.order_by(ts_order.desc(), Message.message_id.desc())
+        .limit(limit)
+        .offset(offset)
+    )
 
     history = session.execute(query).scalars().all()
     return history
