@@ -167,7 +167,7 @@
       "inheritIssueEstimation": false,
       "inheritWorkflowStatuses": false,
       "inviteHash": "eng-team-invite",
-      "issueCount": 1,
+      "issueCount": 4,
       "issueEstimationAllowZero": false,
       "issueEstimationExtended": false,
       "issueEstimationType": "notUsed",
