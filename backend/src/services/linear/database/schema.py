@@ -12,11 +12,11 @@ from sqlalchemy import (
     Float,
     ForeignKey,
     Integer,
-    JSON,
     String,
     Table,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -94,7 +94,7 @@ class Issue(Base):
     __tablename__ = "issues"
     id: Mapped[str] = mapped_column(String, primary_key=True)
     activitySummary: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True
+        JSONB, nullable=True
     )
     addedToCycleAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     addedToProjectAt: Mapped[Optional[datetime]] = mapped_column(
@@ -173,7 +173,7 @@ class Issue(Base):
     )
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     descriptionData: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True
+        JSONB, nullable=True
     )
     descriptionState: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     documentContent: Mapped[Optional["DocumentContent"]] = relationship(
@@ -221,7 +221,7 @@ class Issue(Base):
         back_populates="relatedIssue",
         foreign_keys="IssueRelation.relatedIssueId",
     )
-    labelIds: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    labelIds: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
     labels: Mapped[list["IssueLabel"]] = relationship(
         "IssueLabel",
         secondary=issue_label_issue_association,
@@ -237,7 +237,7 @@ class Issue(Base):
         "CustomerNeed", back_populates="issue", foreign_keys="CustomerNeed.issueId"
     )
     number: Mapped[float] = mapped_column(Float, nullable=False)
-    previousIdentifiers: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    previousIdentifiers: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
     priority: Mapped[float] = mapped_column(Float, nullable=False)
     priorityLabel: Mapped[str] = mapped_column(String, nullable=False)
     prioritySortOrder: Mapped[float] = mapped_column(Float, nullable=False)
@@ -261,7 +261,7 @@ class Issue(Base):
         back_populates="issues",
         foreign_keys="Issue.projectMilestoneId",
     )
-    reactionData: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    reactionData: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     reactions: Mapped[list["Reaction"]] = relationship(
         "Reaction", back_populates="issue", foreign_keys="Reaction.issueId"
     )
@@ -363,8 +363,8 @@ class Attachment(Base):
         "ExternalUser", foreign_keys=[externalUserCreatorId]
     )
     groupBySource: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    metadata_: Mapped[dict[str, Any]] = mapped_column("metadata", JSON, nullable=False)
-    source: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    metadata_: Mapped[dict[str, Any]] = mapped_column("metadata", JSONB, nullable=False)
+    source: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     sourceType: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     subtitle: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     title: Mapped[str] = mapped_column(String, nullable=False)
@@ -456,7 +456,7 @@ class Comment(Base):
         "ProjectUpdate", back_populates="comments", foreign_keys=[projectUpdateId]
     )
     quotedText: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    reactionData: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    reactionData: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     reactions: Mapped[list["Reaction"]] = relationship(
         "Reaction", back_populates="comment", foreign_keys="Reaction.commentId"
     )
@@ -483,7 +483,9 @@ class Comment(Base):
         "User", foreign_keys=[resolvingUserId]
     )
     # syncedWith skipped
-    threadSummary: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    threadSummary: Mapped[Optional[dict[str, Any]]] = mapped_column(
+        JSONB, nullable=True
+    )
     updatedAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     url: Mapped[str] = mapped_column(String, nullable=False)
     userId: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"), nullable=True)
@@ -570,14 +572,14 @@ class Cycle(Base):
     autoArchivedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completedIssueCountHistory: Mapped[list[float]] = mapped_column(
-        JSON, nullable=False
+        JSONB, nullable=False
     )
-    completedScopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    completedScopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     createdAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     endsAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    inProgressScopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    inProgressScopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     inheritedFromId: Mapped[Optional[str]] = mapped_column(
         ForeignKey("cycles.id"), nullable=True
     )
@@ -597,12 +599,12 @@ class Cycle(Base):
     isNext: Mapped[bool] = mapped_column(Boolean, nullable=False)
     isPast: Mapped[bool] = mapped_column(Boolean, nullable=False)
     isPrevious: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    issueCountHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    issueCountHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     name: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     number: Mapped[float] = mapped_column(Float, nullable=False)
     progress: Mapped[float] = mapped_column(Float, nullable=False)
-    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
-    scopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
+    scopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     startsAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     teamId: Mapped[str] = mapped_column(ForeignKey("teams.id"), nullable=False)
     team: Mapped["Team"] = relationship(
@@ -819,9 +821,9 @@ class Project(Base):
     )
     completedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     completedIssueCountHistory: Mapped[list[float]] = mapped_column(
-        JSON, nullable=False
+        JSONB, nullable=False
     )
-    completedScopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    completedScopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     content: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     contentState: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     convertedFromIssueId: Mapped[Optional[str]] = mapped_column(
@@ -838,7 +840,7 @@ class Project(Base):
         ForeignKey("users.id"), nullable=True
     )
     creator: Mapped[Optional["User"]] = relationship("User", foreign_keys=[creatorId])
-    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     description: Mapped[str] = mapped_column(String, nullable=False)
     documentContent: Mapped[Optional["DocumentContent"]] = relationship(
         "DocumentContent",
@@ -868,7 +870,7 @@ class Project(Base):
         foreign_keys="ProjectHistory.projectId",
     )
     icon: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    inProgressScopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    inProgressScopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     initiatives: Mapped[list["Initiative"]] = relationship(
         "Initiative",
         secondary=initiative_project_association,
@@ -885,8 +887,8 @@ class Project(Base):
         back_populates="project",
         foreign_keys="ProjectRelation.projectId",
     )
-    issueCountHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
-    labelIds: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    issueCountHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
+    labelIds: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
     labels: Mapped[list["ProjectLabel"]] = relationship(
         "ProjectLabel",
         secondary=project_label_project_association,
@@ -925,7 +927,7 @@ class Project(Base):
     priorityLabel: Mapped[str] = mapped_column(String, nullable=False)
     prioritySortOrder: Mapped[float] = mapped_column(Float, nullable=False)
     progress: Mapped[float] = mapped_column(Float, nullable=False)
-    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     projectMilestones: Mapped[list["ProjectMilestone"]] = relationship(
         "ProjectMilestone",
         back_populates="project",
@@ -940,7 +942,7 @@ class Project(Base):
         foreign_keys="ProjectRelation.relatedProjectId",
     )
     scope: Mapped[float] = mapped_column(Float, nullable=False)
-    scopeHistory: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    scopeHistory: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
     slackIssueComments: Mapped[bool] = mapped_column(Boolean, nullable=False)
     slackIssueStatuses: Mapped[bool] = mapped_column(Boolean, nullable=False)
     slackNewIssue: Mapped[bool] = mapped_column(Boolean, nullable=False)
@@ -1011,15 +1013,15 @@ class ProjectMilestone(Base):
     )
     archivedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     createdAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     description: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     descriptionData: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True
+        JSONB, nullable=True
     )
     descriptionState: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     progress: Mapped[float] = mapped_column(Float, nullable=False)
-    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     sortOrder: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[ProjectMilestoneStatus] = mapped_column(String, nullable=False)
     targetDate: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
@@ -1099,7 +1101,7 @@ class Team(Base):
     autoCloseStateId: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     color: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     createdAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
-    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    currentProgress: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     cycleCalenderUrl: Mapped[str] = mapped_column(String, nullable=False)
     cycleCooldownTime: Mapped[float] = mapped_column(Float, nullable=False)
     cycleDuration: Mapped[float] = mapped_column(Float, nullable=False)
@@ -1243,7 +1245,7 @@ class Team(Base):
         "Post", back_populates="team", foreign_keys="Post.teamId"
     )
     private: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    progressHistory: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     projects: Mapped[list["Project"]] = relationship(
         "Project",
         secondary=team_project_association,
@@ -1364,17 +1366,21 @@ class Organization(Base):
     aiAddonEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
     aiTelemetryEnabled: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     allowMembersToInvite: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
-    allowedAuthServices: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    allowedAuthServices: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
     allowedFileUploadContentTypes: Mapped[list[str]] = mapped_column(
-        JSON, nullable=False
+        JSONB, nullable=False
     )
     archivedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     createdAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     createdIssueCount: Mapped[int] = mapped_column(Integer, nullable=False)
     customerCount: Mapped[int] = mapped_column(Integer, nullable=False)
-    customersConfiguration: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    customersConfiguration: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, nullable=False
+    )
     customersEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    defaultFeedSummarySchedule: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    defaultFeedSummarySchedule: Mapped[Optional[str]] = mapped_column(
+        String, nullable=True
+    )
     deletionRequestedAt: Mapped[Optional[datetime]] = mapped_column(
         DateTime, nullable=True
     )
@@ -1414,7 +1420,7 @@ class Organization(Base):
         Boolean, nullable=True
     )
     periodUploadVolume: Mapped[float] = mapped_column(Float, nullable=False)
-    previousUrlKeys: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    previousUrlKeys: Mapped[list[str]] = mapped_column(JSONB, nullable=False)
     projectLabels: Mapped[list["ProjectLabel"]] = relationship(
         "ProjectLabel",
         back_populates="organization",
@@ -1444,9 +1450,9 @@ class Organization(Base):
     )
     roadmapEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
     samlEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    samlSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    samlSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     scimEnabled: Mapped[bool] = mapped_column(Boolean, nullable=False)
-    scimSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    scimSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     slaDayCount: Mapped[str] = mapped_column(String, nullable=False)
     slaEnabled: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
     subscription: Mapped[Optional["PaidSubscription"]] = relationship(
@@ -1460,12 +1466,14 @@ class Organization(Base):
         back_populates="organization",
         foreign_keys="Template.organizationId",
     )
-    themeSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True)
+    themeSettings: Mapped[Optional[dict[str, Any]]] = mapped_column(
+        JSONB, nullable=True
+    )
     trialEndsAt: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     urlKey: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     userCount: Mapped[int] = mapped_column(Integer, nullable=False)
-    workingDays: Mapped[list[float]] = mapped_column(JSON, nullable=False)
+    workingDays: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
 
 
 class User(Base):
@@ -1762,7 +1770,7 @@ class Post(Base):
     feedSummaryScheduleAtCreate: Mapped[Optional[str]] = mapped_column(
         String, nullable=True
     )
-    reactionData: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    reactionData: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     slugId: Mapped[str] = mapped_column(String, nullable=False)
     title: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     ttlUrl: Mapped[Optional[str]] = mapped_column(String, nullable=True)
@@ -1771,7 +1779,7 @@ class Post(Base):
     userId: Mapped[Optional[str]] = mapped_column(ForeignKey("users.id"), nullable=True)
     user: Mapped[Optional["User"]] = relationship("User", foreign_keys=[userId])
     writtenSummaryData: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        JSON, nullable=True
+        JSONB, nullable=True
     )
 
 
@@ -2129,7 +2137,7 @@ class OrganizationInvite(Base):
     inviterId: Mapped[str] = mapped_column(ForeignKey("users.id"), nullable=False)
     inviter: Mapped["User"] = relationship("User", foreign_keys=[inviterId])
     metadata_: Mapped[Optional[dict[str, Any]]] = mapped_column(
-        "metadata", JSON, nullable=True
+        "metadata", JSONB, nullable=True
     )
     organizationId: Mapped[Optional[str]] = mapped_column(
         ForeignKey("organizations.id"), nullable=True
@@ -2321,11 +2329,11 @@ class IssueImport(Base):
     csvFileUrl: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     displayName: Mapped[str] = mapped_column(String, nullable=False)
     error: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    errorMetadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    mapping: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    errorMetadata: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    mapping: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
     progress: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     service: Mapped[str] = mapped_column(String, nullable=False)
-    serviceMetadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    serviceMetadata: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
     status: Mapped[str] = mapped_column(String, nullable=False)
     teamName: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
@@ -2350,13 +2358,13 @@ class UserSettings(Base):
     createdAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     # Notification preferences stored as JSON
     notificationCategoryPreferences: Mapped[dict] = mapped_column(
-        JSON, nullable=False, default=dict
+        JSONB, nullable=False, default=dict
     )
     notificationChannelPreferences: Mapped[dict] = mapped_column(
-        JSON, nullable=False, default=dict
+        JSONB, nullable=False, default=dict
     )
     notificationDeliveryPreferences: Mapped[dict] = mapped_column(
-        JSON, nullable=False, default=dict
+        JSONB, nullable=False, default=dict
     )
     showFullUserNames: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
@@ -2376,10 +2384,9 @@ class UserSettings(Base):
     subscribedToGeneralMarketingCommunications: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False
     )
-    unsubscribedFrom: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    unsubscribedFrom: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     # Additional settings fields
     feedSummarySchedule: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    settings: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    usageWarningHistory: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    
+    settings: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    usageWarningHistory: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)

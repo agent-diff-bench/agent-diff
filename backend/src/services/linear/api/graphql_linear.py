@@ -1,6 +1,7 @@
 from ariadne.asgi import GraphQL
 from src.platform.isolationEngine.core import CoreIsolationEngine
 from src.platform.evaluationEngine.core import CoreEvaluationEngine
+from src.services.linear.database.schema import User
 
 
 class LinearGraphQL(GraphQL):
@@ -49,14 +50,20 @@ class LinearGraphQL(GraphQL):
 
         principal_id = getattr(state, "principal_id", None)
         impersonate_user_id = getattr(state, "impersonate_user_id", None)
+        impersonate_email = getattr(state, "impersonate_email", None)
+
+        if not impersonate_user_id and impersonate_email:
+            user = session.query(User).filter(User.email == impersonate_email).first()
+            if user:
+                impersonate_user_id = user.id
 
         return {
             "request": request,
             "session": session,
             "environment_id": environment_id,
-            "user_id": principal_id or impersonate_user_id,
+            "user_id": impersonate_user_id or principal_id,
             "impersonate_user_id": impersonate_user_id,
-            "impersonate_email": getattr(state, "impersonate_email", None),
+            "impersonate_email": impersonate_email,
         }
 
     async def handle_request(self, request):

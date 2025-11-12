@@ -15,7 +15,7 @@ from src.services.slack.api.methods import routes as slack_routes
 from src.platform.logging_config import setup_logging
 from ariadne import load_schema_from_path, make_executable_schema
 from src.services.linear.api.graphql_linear import LinearGraphQL
-from src.services.linear.api.resolvers import query, mutation
+from src.services.linear.api.resolvers import bindables
 
 setup_logging()
 
@@ -59,7 +59,7 @@ def create_app():
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(linear_type_defs, query, mutation)
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
