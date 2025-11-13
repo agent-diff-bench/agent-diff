@@ -467,9 +467,7 @@
       "sortOrder": 1.0,
       "customerTicketCount": 0,
       "branchName": "eng-2-polish-onboarding-dashboard-ux",
-      "labelIds": [
-        "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
-      ],
+      "labelIds": [],
       "previousIdentifiers": [],
       "reactionData": {},
       "url": "https://linear.app/test-org/issue/ENG-2",
