@@ -272,9 +272,6 @@ class EnvironmentHandler:
                 raise ValueError("environment not found")
             env.status = status
             env.updated_at = datetime.now()
-        # TODO: once we have a background worker, enforce TTL-based cleanup so
-        # expired environments are dropped automatically instead of relying on
-        # manual DELETE calls.
 
     @staticmethod
     def _to_uuid(value: str | UUID | None) -> UUID:
