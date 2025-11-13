@@ -128,6 +128,11 @@
       "user_id": "U06HUBERT23",
       "team_id": "T01WORKSPACE",
       "role": "member"
+    },
+    {
+      "user_id": "U02ARTEM23",
+      "team_id": "T01WORKSPACE",
+      "role": "member"
     }
   ],
   "channel_members": [
@@ -234,6 +239,13 @@
       "channel_id": "C03IJKL9012",
       "user_id": "U01AGENBOT9",
       "message_text": "I've noticed a few auth issues and potential improvements:"
+    },
+    {
+      "message_id": "1700153200.000999",
+      "channel_id": "C03IJKL9012",
+      "user_id": "U01AGENBOT9",
+      "parent_id": "1700143200.000999",
+      "message_text": "Joke: 'What do you call an AI enginner? Someone who can't write code or build software.'"
     },
     {
       "message_id": "1700173200.000456",

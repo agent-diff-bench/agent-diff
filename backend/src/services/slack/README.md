@@ -8,6 +8,7 @@ SLACK_HANDLERS = {
     "conversations.create": conversations_create,
     "conversations.list": conversations_list,
     "conversations.history": conversations_history,
+    "conversations.replies": conversations_replies,
     "conversations.info": conversations_info,
     "conversations.join": conversations_join,
     "conversations.invite": conversations_invite,

@@ -106,8 +106,8 @@ class Differ:
                 )
 
                 proj_cols = ", ".join(
-                    [f"a.{self.q(c)} AS after_{c}" for c in cols]
-                    + [f"b.{self.q(c)} AS before_{c}" for c in cols]
+                    [f"a.{self.q(c)} AS {self.q(f'after_{c}')}" for c in cols]
+                    + [f"b.{self.q(c)} AS {self.q(f'before_{c}')}" for c in cols]
                 )
                 sql = f"""
                     SELECT {proj_cols}
@@ -161,9 +161,7 @@ class Differ:
                     deletes.append(item)
         return deletes
 
-    def get_diff(
-        self, before_suffix: str, after_suffix: str
-    ) -> DiffResult:
+    def get_diff(self, before_suffix: str, after_suffix: str) -> DiffResult:
         inserts = self.get_inserts(before_suffix, after_suffix)
         updates = self.get_updates(before_suffix, after_suffix)
         deletes = self.get_deletes(before_suffix, after_suffix)
@@ -189,7 +187,7 @@ class Differ:
                 environment_id=self.environment_id,
                 before_suffix=before_suffix,
                 after_suffix=after_suffix,
-                diff=diff.model_dump(mode='json'),
+                diff=diff.model_dump(mode="json"),
                 created_at=datetime.now(),
                 updated_at=datetime.now(),
             )

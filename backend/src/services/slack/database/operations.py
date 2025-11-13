@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 from typing import Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import select, exists, and_
+from sqlalchemy import select, exists, and_, or_, func, cast, Float
 from sqlalchemy.exc import IntegrityError
 
 
@@ -716,7 +716,78 @@ def list_channel_history(
         else:
             query = query.where(Message.created_at < latest)
 
-    query = query.order_by(Message.created_at.desc()).limit(limit).offset(offset)
+    ts_order = cast(Message.message_id, Float)
+    query = (
+        query.order_by(ts_order.desc(), Message.message_id.desc())
+        .limit(limit)
+        .offset(offset)
+    )
 
     history = session.execute(query).scalars().all()
     return history
+
+
+def list_thread_messages(
+    session: Session,
+    channel_id: str,
+    user_id: str,
+    team_id: str,
+    thread_root_ts: str,
+    limit: int,
+    offset: int,
+    oldest: datetime | None = None,
+    latest: datetime | None = None,
+    inclusive: bool = False,
+):
+    """List messages for a thread anchored at thread_root_ts."""
+
+    channel = session.get(Channel, channel_id)
+    if channel is None:
+        raise ValueError("Channel not found")
+    team = session.get(Team, team_id)
+    if team is None:
+        raise ValueError("Team not found")
+    team_member = session.get(UserTeam, (user_id, team_id))
+    if team_member is None:
+        raise ValueError("User is not a member of the team")
+
+    root_message = session.get(Message, thread_root_ts)
+    if root_message is None or root_message.channel_id != channel_id:
+        raise ValueError("thread_not_found")
+
+    query = select(Message).where(
+        Message.channel_id == channel_id,
+        or_(
+            Message.message_id == thread_root_ts,
+            Message.parent_id == thread_root_ts,
+        ),
+    )
+
+    if oldest is not None:
+        if inclusive:
+            query = query.where(Message.created_at >= oldest)
+        else:
+            query = query.where(Message.created_at > oldest)
+
+    if latest is not None:
+        if inclusive:
+            query = query.where(Message.created_at <= latest)
+        else:
+            query = query.where(Message.created_at < latest)
+
+    query = (
+        query.order_by(Message.created_at.asc(), Message.message_id.asc())
+        .offset(offset)
+        .limit(limit)
+    )
+
+    return session.execute(query).scalars().all()
+
+
+def count_thread_replies(session: Session, channel_id: str, thread_root_ts: str) -> int:
+    return session.execute(
+        select(func.count())
+        .select_from(Message)
+        .where(Message.channel_id == channel_id)
+        .where(Message.parent_id == thread_root_ts)
+    ).scalar_one()

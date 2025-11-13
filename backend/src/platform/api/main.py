@@ -7,6 +7,7 @@ from src.platform.isolationEngine.core import CoreIsolationEngine
 from src.platform.evaluationEngine.core import CoreEvaluationEngine
 from src.platform.isolationEngine.environment import EnvironmentHandler
 from src.platform.isolationEngine.templateManager import TemplateManager
+from src.platform.isolationEngine.cleanup import create_cleanup_service
 from src.platform.testManager.core import CoreTestManager
 from starlette.routing import Router
 from src.platform.api.routes import routes as platform_routes
@@ -15,7 +16,7 @@ from src.services.slack.api.methods import routes as slack_routes
 from src.platform.logging_config import setup_logging
 from ariadne import load_schema_from_path, make_executable_schema
 from src.services.linear.api.graphql_linear import LinearGraphQL
-from src.services.linear.api.resolvers import query, mutation
+from src.services.linear.api.resolvers import bindables
 
 setup_logging()
 
@@ -35,13 +36,21 @@ def create_app():
     coreTestManager = CoreTestManager()
     templateManager = TemplateManager()
 
+    cleanup_interval = int(environ.get("CLEANUP_INTERVAL_SECONDS", 30))
+
+    cleanup_service = create_cleanup_service(
+        session_manager=sessions,
+        environment_handler=environment_handler,
+        interval_seconds=cleanup_interval,
+    )
+
     app.state.coreIsolationEngine = coreIsolationEngine
     app.state.coreEvaluationEngine = coreEvaluationEngine
     app.state.coreTestManager = coreTestManager
     app.state.templateManager = templateManager
     app.state.sessions = sessions
+    app.state.cleanup_service = cleanup_service
 
-    # Add middleware BEFORE mounting routes so it applies to mounted apps
     app.add_middleware(
         IsolationMiddleware,
         session_manager=sessions,
@@ -59,7 +68,7 @@ def create_app():
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(linear_type_defs, query, mutation)
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
@@ -69,6 +78,14 @@ def create_app():
     )
 
     app.mount("/api/env/{env_id}/services/linear", linear_graphql)
+
+    @app.on_event("startup")
+    async def startup_event():
+        await app.state.cleanup_service.start()
+
+    @app.on_event("shutdown")
+    async def shutdown_event():
+        await app.state.cleanup_service.stop()
 
     return app
 

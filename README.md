@@ -38,7 +38,7 @@ client = AgentDiff()
 
 # Initialise isolated environment from a template. See: examples/slack/seeds
 env = client.init_env(templateService="slack", templateName="slack_default",
-impersonateUserId="U01AGENBOT9") #impersonateUserId - seeded user account that agent will use
+impersonateUserId="U01AGENBOT9", TTL="3600") #impersonateUserId - seeded user account that agent will use
 
 # print(env.environmentUrl) = http://localhost:8000/api/env/{environmentId}/services/slack
 
@@ -58,8 +58,7 @@ python_tool = create_openai_tool(python_executor)
 
 agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_python or execute_bash tools to interact
-        with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
+        instructions="Use execute_python tool to interact with Slack API at https://slack.com/api/*. Complete the task using the tools provided. Authentication is handled automatically via proxy. Leave a placeholder credential where you would add a real token.",
         tools=[python_tool] # python_tool (or bash_tool) where agent will write code
     )
 
@@ -112,12 +111,17 @@ client.delete_env(envId=env.environmentId)
 - **Content**: Templates are seeded during startup time from seeds with data like users, channels, messages, issues, etc.
 - **Example Seeds**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
 
+<img width="2330" height="688" alt="image" src="https://github.com/user-attachments/assets/481d3f40-e378-402c-9d3c-8a2ab75c880e" />
+
 **Environments** are isolated, temporary copies of a template schema:
 - **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
-- **Creation**: `client.init_env(templateService="slack", templateName="slack_default")`
+- **Creation**: `client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9")`
 - **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
 
-## CodeExectuorProxy
+<img width="2344" height="432" alt="image" src="https://github.com/user-attachments/assets/c61e93f2-1826-429e-8ee7-4a32f4172a38" />
+
+
+## CodeExecutorProxy
 
 SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
 
@@ -127,103 +131,65 @@ SDK provides **code execution proxies** - tools for AI agents. You add it to you
 Collections of test cases with assertions that you can run against agent runs using evaluations.
 
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
+- **[linear_bench.json](examples/linear/testsuites/linear_bench.json)** - test cases covering issue management, labels, comments, workflow states, and team operations
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
 
+<img width="2516" height="1020" alt="image" src="https://github.com/user-attachments/assets/3270f1f1-5afa-4db2-97b0-c35c070ef44f" />
 
-To run evaluations:
+
+### To run evaluations:
 
 ```python
-suite = client.get_test_suite("slack-bench")
-# Returns: {"tests": [{"id": "...", "prompt": "Send hello to #general"}, ...]}
-# You can edit the file and add your own tests
+from agent_diff import AgentDiff, PythonExecutorProxy, BashExecutorProxy, create_openai_tool
+from agents import Agent, Runner
+
+client = AgentDiff()
+
+
+suite_list = client.list_test_suites(name="Slack Bench")
+slack_suite = suite_list.testSuites[0]
+suite = client.get_test_suite(slack_suite.id, expand=True)
 
 evaluation_results = []
 
-for test in suite['tests']:
-    prompt = test['prompt']
-    test_id = test['id']
+for test in suite.tests:
+    prompt = test.prompt
+    test_id = test.id
 
     #In test suite you define which env seed template is used for each test
-    env = client.init_env(testId = test_id)
+    env = client.init_env(testId=test_id)
 
     # This function will take a snapshot before run
-    run = client.start_run(envId = env.environmentId, testId = test_id) 
+    run = client.start_run(envId=env.environmentId, testId=test_id)
 
-    from agent_diff import PythonExecutorProxy, create_openai_tool
-    from agents import Agent, Runner
 
     bash_executor = BashExecutorProxy(env.environmentId, base_url=client.base_url)
     bash_tool = create_openai_tool(bash_executor)
 
     agent = Agent(
         name="Slack Assistant",
-        instructions="Use execute_bash tool with curl to interact with Slack API
-        at https://slack.com/api/*. Authentication is handled automatically.",
+        instructions="Use execute_bash tool with curl to interact with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
         tools=[bash_tool]
     )
 
     response = await Runner.run(agent, prompt)
 
     #This function will take a 2nd snapshot, run diff and assert results against expected state defined in test suite
-    evaluation_result = client.evaluate_run(run.runId) 
+    
+    #computes eval
+    client.evaluate_run(runId=run.runId)
+    
+    #returns score runId, full diff and score (0/1)
+    run_result = client.get_results_for_run(runId=run.runId)
 
-    #returns score runId, status and score (0/1)
-    evaluation_results.append(evaluation_result) 
+    evaluation_results.append(run_result) 
 
     client.delete_env(envId=env.environmentId)
 ```
 
-## Training & Fine-tuning
+### Example output:
 
-### With Hugging Face (smolagents)
-
-```python
-from agent_diff import AgentDiff, PythonExecutorProxy, BashExecutorProxy, create_smolagents_tool
-from smolagents import CodeAgent, InferenceClientModel
-
-# Setup and evaluation
-client = AgentDiff()
-
-# Load test suite with prompts
-test_suite = client.get_test_suite("slack-bench")
-
-training_data = []
-
-for test in test_suite['tests']:
-    # Initialize environment for each test
-    env = client.init_env(testId=test['id'])
-    run = client.start_run(envId=env.environmentId, testId=test['id'])
-
-    # Create HF agent with Python and/ or Bash tools
-    python_executor = PythonExecutorProxy(env.environmentId, base_url=client.base_url)
-    bash_executor = BashExecutorProxy(env.environmentId, base_url=client.base_url)
-    python_tool = create_smolagents_tool(python_executor)
-    bash_tool = create_smolagents_tool(bash_executor)
-
-    model = InferenceClientModel("meta-llama/Meta-Llama-3-70B-Instruct")
-    agent = CodeAgent(tools=[python_tool, bash_tool], model=model)
-
-    # Execute task with prompt from test suite
-    prompt = test['prompt']
-    response = agent.run(prompt)
-    trace = agent.get_last_run_trace()  # Full execution history
-
-    # Evaluate against expected outcomes
-    eval_result = client.evaluate_run(run.runId)
-
-    training_data.append({
-            "prompt": prompt,
-            "completion": json.dumps(trace),  # Full trace for learning reasoning
-            "label": eval_result.score == 1,  # True=passed, False=failed assertions
-        })
-
-    client.delete_env(envId=env.environmentId)
-
-
-# Use with HuggingFace TRL trainers (KTOTrainer, DPOTrainer, etc.)
-dataset = Dataset.from_list(training_data)
-dataset.save_to_disk("agent_training_data")
-```
+<img width="1669" height="878" alt="image" src="https://github.com/user-attachments/assets/096393d2-e464-4a3d-b0a8-b188af5cf8a9" />
 
 
 ## Documentation

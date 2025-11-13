@@ -1,5 +1,5 @@
-from ariadne import QueryType, MutationType
-from sqlalchemy.orm import Session
+from ariadne import QueryType, MutationType, ObjectType, ScalarType
+from sqlalchemy.orm import Session, aliased
 from sqlalchemy import or_, and_, select, func
 from src.services.linear.database.schema import (
     Issue,
@@ -32,7 +32,7 @@ from src.services.linear.database.schema import (
     WorkflowState,
     Template,
 )
-from typing import Optional
+from typing import Optional, Dict, Any
 import base64
 import json
 import re
@@ -44,9 +44,60 @@ from graphql import GraphQLError
 query = QueryType()
 mutation = MutationType()
 issue_type = ObjectType("Issue")
+team_type = ObjectType("Team")
+user_type = ObjectType("User")
+
+# DateTime scalar serializer
+datetime_scalar = ScalarType("DateTime")
+
+
+@datetime_scalar.serializer
+def serialize_datetime(value):
+    """Serialize Python datetime to ISO 8601 string."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, str):
+        return value  # Already serialized
+    raise ValueError(f"Cannot serialize {type(value)} as DateTime")
+
+
+@datetime_scalar.value_parser
+def parse_datetime_value(value):
+    """Parse ISO 8601 string to Python datetime."""
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        # Parse ISO 8601 string
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return datetime.fromisoformat(value)
+    raise ValueError(f"Cannot parse {type(value)} as DateTime")
+
+
+@datetime_scalar.literal_parser
+def parse_datetime_literal(ast, variable_values=None):
+    """Parse GraphQL literal value."""
+    value = ast.value
+    return parse_datetime_value(value)
+
 
 # Export query and mutation objects for use in schema binding
-__all__ = ["query", "mutation", "issue_type"]
+__all__ = [
+    "query",
+    "mutation",
+    "issue_type",
+    "team_type",
+    "user_type",
+    "datetime_scalar",
+]
+
+# Convenience export for all bindables
+bindables = [query, mutation, issue_type, team_type, user_type, datetime_scalar]
 
 
 def raise_validation_error(property_name, value, target, message):
@@ -127,6 +178,312 @@ def resolve_issue_labels(
 
     # Return in IssueLabelConnection format
     return {"nodes": labels}
+
+
+@issue_type.field("comments")
+def resolve_issue_comments(
+    issue,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the comments field to return a CommentConnection for comments on this issue.
+
+    Args:
+        issue: The parent Issue object
+        info: GraphQL resolve info
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: CommentFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived comments (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        CommentConnection with nodes field
+    """
+    session: Session = info.context["session"]
+    validate_pagination_params(after, before, first, last)
+
+    # Build base query for comments on this issue
+    base_query = session.query(Comment).filter(Comment.issueId == issue.id)
+
+    # Filter archived comments unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Comment.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    base_query = apply_comment_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Comment, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Comment.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Comment.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@team_type.field("states")
+def resolve_team_states(
+    team,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the states field to return a WorkflowStateConnection.
+
+    Args:
+        team: The parent Team object
+        info: GraphQL resolve info
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: WorkflowStateFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived states (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        WorkflowStateConnection with nodes field
+    """
+    session: Session = info.context["session"]
+
+    # Build base query for workflow states belonging to this team
+    base_query = session.query(WorkflowState).filter(WorkflowState.teamId == team.id)
+
+    # Filter archived states unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(WorkflowState.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        base_query = apply_workflow_state_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(WorkflowState, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, WorkflowState.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(WorkflowState, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, WorkflowState.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(WorkflowState, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), WorkflowState.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), WorkflowState.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@user_type.field("teams")
+def resolve_user_teams(
+    user,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the teams field to return a TeamConnection for teams the user is a member of.
+
+    Args:
+        user: The parent User object
+        info: GraphQL resolve info
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: TeamFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived teams (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        TeamConnection with nodes field
+    """
+    from src.services.linear.database.schema import TeamMembership
+
+    session: Session = info.context["session"]
+
+    # Build base query for teams the user is a member of
+    base_query = (
+        session.query(Team)
+        .join(TeamMembership, Team.id == TeamMembership.teamId)
+        .filter(TeamMembership.userId == user.id)
+    )
+
+    # Filter archived teams unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Team.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        base_query = apply_team_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination (similar to workflow states)
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Team, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Team.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Team, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Team.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Team, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Team.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Team.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
 
 
 # Helper functions for cursor-based pagination
@@ -1125,20 +1482,42 @@ def validate_issue_filter(filter_dict, path="filter"):
             validate_issue_filter(sub_filter, f"{path}.and[{i}]")
 
     # Check for nested relation filters (not fully implemented)
+    # Most common fields (name, email, key, type) are now supported via joins
     unsupported_relation_keys = {
         "assignee": [
-            "email",
-            "name",
             "displayName",
             "active",
             "admin",
             "createdAt",
             "updatedAt",
-        ],
-        "team": ["name", "key", "description", "createdAt", "updatedAt"],
-        "state": ["name", "color", "type", "description", "createdAt", "updatedAt"],
-        "project": ["name", "description", "slugId", "state", "createdAt", "updatedAt"],
-        "cycle": ["name", "number", "startsAt", "endsAt", "createdAt", "updatedAt"],
+        ],  # name and email now supported
+        "creator": [
+            "displayName",
+            "active",
+            "admin",
+            "createdAt",
+            "updatedAt",
+        ],  # name and email now supported
+        "team": ["description", "createdAt", "updatedAt"],  # key and name now supported
+        "state": [
+            "color",
+            "description",
+            "createdAt",
+            "updatedAt",
+        ],  # name and type now supported
+        "project": [
+            "description",
+            "slugId",
+            "state",
+            "createdAt",
+            "updatedAt",
+        ],  # name now supported
+        "cycle": [
+            "startsAt",
+            "endsAt",
+            "createdAt",
+            "updatedAt",
+        ],  # name and number now supported
     }
 
     for relation_name, unsupported_keys in unsupported_relation_keys.items():
@@ -1243,14 +1622,48 @@ def apply_issue_filter(query, filter_dict):
     if "id" in filter_dict:
         query = apply_id_comparator(query, Issue.id, filter_dict["id"])
 
-    # Relation filters (simplified - full implementation would need joins)
+    # Relation filters with join support for nested fields
     if "assignee" in filter_dict:
         assignee_filter = filter_dict["assignee"]
         if assignee_filter.get("null") is True:
             query = query.filter(Issue.assigneeId.is_(None))
         elif assignee_filter.get("null") is False:
             query = query.filter(Issue.assigneeId.isnot(None))
-        # Additional user filter criteria would be applied with joins
+        if "id" in assignee_filter:
+            query = apply_id_comparator(query, Issue.assigneeId, assignee_filter["id"])
+        # Handle nested assignee fields
+        if "email" in assignee_filter or "name" in assignee_filter:
+            query = query.join(User, Issue.assigneeId == User.id)
+            if "email" in assignee_filter:
+                query = apply_string_comparator(
+                    query, User.email, assignee_filter["email"]
+                )
+            if "name" in assignee_filter:
+                query = apply_string_comparator(
+                    query, User.name, assignee_filter["name"]
+                )
+
+    if "creator" in filter_dict:
+        creator_filter = filter_dict["creator"]
+        if creator_filter.get("null") is True:
+            query = query.filter(Issue.creatorId.is_(None))
+        elif creator_filter.get("null") is False:
+            query = query.filter(Issue.creatorId.isnot(None))
+        if "id" in creator_filter:
+            query = apply_id_comparator(query, Issue.creatorId, creator_filter["id"])
+        # Handle nested creator fields
+        if "email" in creator_filter or "name" in creator_filter:
+            # Alias User for creator to avoid conflict with assignee join
+            Creator = aliased(User)
+            query = query.join(Creator, Issue.creatorId == Creator.id)
+            if "email" in creator_filter:
+                query = apply_string_comparator(
+                    query, Creator.email, creator_filter["email"]
+                )
+            if "name" in creator_filter:
+                query = apply_string_comparator(
+                    query, Creator.name, creator_filter["name"]
+                )
 
     if "team" in filter_dict:
         team_filter = filter_dict["team"]
@@ -1260,6 +1673,13 @@ def apply_issue_filter(query, filter_dict):
             query = query.filter(Issue.teamId.isnot(None))
         if "id" in team_filter:
             query = apply_id_comparator(query, Issue.teamId, team_filter["id"])
+        # Handle nested team fields
+        if "key" in team_filter or "name" in team_filter:
+            query = query.join(Team, Issue.teamId == Team.id)
+            if "key" in team_filter:
+                query = apply_string_comparator(query, Team.key, team_filter["key"])
+            if "name" in team_filter:
+                query = apply_string_comparator(query, Team.name, team_filter["name"])
 
     if "state" in filter_dict:
         state_filter = filter_dict["state"]
@@ -1269,6 +1689,17 @@ def apply_issue_filter(query, filter_dict):
             query = query.filter(Issue.stateId.isnot(None))
         if "id" in state_filter:
             query = apply_id_comparator(query, Issue.stateId, state_filter["id"])
+        # Handle nested state fields
+        if "name" in state_filter or "type" in state_filter:
+            query = query.join(WorkflowState, Issue.stateId == WorkflowState.id)
+            if "name" in state_filter:
+                query = apply_string_comparator(
+                    query, WorkflowState.name, state_filter["name"]
+                )
+            if "type" in state_filter:
+                query = apply_string_comparator(
+                    query, WorkflowState.type, state_filter["type"]
+                )
 
     if "project" in filter_dict:
         project_filter = filter_dict["project"]
@@ -1278,6 +1709,10 @@ def apply_issue_filter(query, filter_dict):
             query = query.filter(Issue.projectId.isnot(None))
         if "id" in project_filter:
             query = apply_id_comparator(query, Issue.projectId, project_filter["id"])
+        # Handle nested project fields
+        if "name" in project_filter:
+            query = query.join(Project, Issue.projectId == Project.id)
+            query = apply_string_comparator(query, Project.name, project_filter["name"])
 
     if "cycle" in filter_dict:
         cycle_filter = filter_dict["cycle"]
@@ -1287,6 +1722,15 @@ def apply_issue_filter(query, filter_dict):
             query = query.filter(Issue.cycleId.isnot(None))
         if "id" in cycle_filter:
             query = apply_id_comparator(query, Issue.cycleId, cycle_filter["id"])
+        # Handle nested cycle fields
+        if "name" in cycle_filter or "number" in cycle_filter:
+            query = query.join(Cycle, Issue.cycleId == Cycle.id)
+            if "name" in cycle_filter:
+                query = apply_string_comparator(query, Cycle.name, cycle_filter["name"])
+            if "number" in cycle_filter:
+                query = apply_number_comparator(
+                    query, Cycle.number, cycle_filter["number"]
+                )
 
     return query
 
@@ -1365,6 +1809,76 @@ def apply_attachment_filter(query, filter_dict):
             query = apply_id_comparator(
                 query, Attachment.creatorId, creator_filter["id"]
             )
+
+    return query
+
+
+def apply_comment_filter(query, filter_dict: Optional[Dict[str, Any]]):
+    """
+    Apply CommentFilter criteria to a SQLAlchemy query.
+
+    Args:
+        query: SQLAlchemy query object
+        filter_dict: Dictionary containing filter criteria
+
+    Returns:
+        Modified query with filters applied
+    """
+    if not filter_dict:
+        return query
+
+    # Handle compound filters
+    if "and" in filter_dict:
+        for sub_filter in filter_dict["and"]:
+            query = apply_comment_filter(query, sub_filter)
+
+    if "or" in filter_dict:
+        raise Exception("OR filters are not currently supported for comments")
+
+    if "id" in filter_dict:
+        query = apply_id_comparator(query, Comment.id, filter_dict["id"])
+
+    if "body" in filter_dict:
+        query = apply_string_comparator(query, Comment.body, filter_dict["body"])
+
+    if "authorId" in filter_dict:
+        query = apply_id_comparator(query, Comment.userId, filter_dict["authorId"])
+
+    if "user" in filter_dict and isinstance(filter_dict["user"], dict):
+        user_filter = filter_dict["user"]
+        if "id" in user_filter:
+            query = apply_id_comparator(query, Comment.userId, user_filter["id"])
+
+    if "issue" in filter_dict and isinstance(filter_dict["issue"], dict):
+        issue_filter = filter_dict["issue"]
+        if "id" in issue_filter:
+            query = apply_id_comparator(query, Comment.issueId, issue_filter["id"])
+
+    if "createdAt" in filter_dict:
+        query = apply_date_comparator(
+            query, Comment.createdAt, filter_dict["createdAt"]
+        )
+
+    if "createdAfter" in filter_dict:
+        created_after = filter_dict["createdAfter"]
+        if isinstance(created_after, str):
+            created_after = parse_datetime_value(created_after)
+        query = query.filter(Comment.createdAt > created_after)
+
+    if "createdBefore" in filter_dict:
+        created_before = filter_dict["createdBefore"]
+        if isinstance(created_before, str):
+            created_before = parse_datetime_value(created_before)
+        query = query.filter(Comment.createdAt < created_before)
+
+    if "archived" in filter_dict:
+        archived_value = filter_dict["archived"]
+        if isinstance(archived_value, dict):
+            archived_value = archived_value.get("eq")
+        if archived_value is True:
+            query = query.filter(Comment.archivedAt.isnot(None))
+        elif archived_value is False:
+            query = query.filter(Comment.archivedAt.is_(None))
 
     return query
 
@@ -4931,8 +5445,6 @@ def apply_document_filter(query, filter_dict):
             for desc in query.column_descriptions
             if "entity" in desc
         ):
-            from sqlalchemy.orm import aliased
-
             CreatorAlias = aliased(User)
             query = query.join(CreatorAlias, Document.creatorId == CreatorAlias.id)
             # Apply user filters on the aliased table
@@ -11097,6 +11609,309 @@ def resolve_issueSubscribe(obj, info, **kwargs):
 
     except Exception as e:
         raise Exception(f"Failed to subscribe user to issue: {str(e)}")
+
+
+@query.field("issueLabel")
+def resolve_issueLabel(obj, info, id: str):
+    """
+    Query one specific issue label by its id.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        id: The label id to look up
+
+    Returns:
+        IssueLabel: The label with the specified id
+
+    Raises:
+        Exception: If the label is not found
+    """
+    session: Session = info.context["session"]
+
+    # Query for the label by id
+    label = session.query(IssueLabel).filter(IssueLabel.id == id).first()
+
+    if not label:
+        raise Exception(f"IssueLabel with id '{id}' not found")
+
+    return label
+
+
+@query.field("issueLabels")
+def resolve_issueLabels(
+    obj,
+    info,
+    after: Optional[str] = None,
+    before: Optional[str] = None,
+    filter: Optional[dict] = None,
+    first: Optional[int] = None,
+    includeArchived: bool = False,
+    last: Optional[int] = None,
+    orderBy: Optional[str] = None,
+):
+    """
+    Query all issue labels with filtering, sorting, and pagination.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: IssueLabelFilter to apply to results
+        first: Number of items to return (forward pagination, defaults to 50)
+        includeArchived: Whether to include archived labels (default: false)
+        last: Number of items to return (backward pagination, defaults to 50)
+        orderBy: Field to order by (createdAt or updatedAt, default: createdAt)
+
+    Returns:
+        IssueLabelConnection: Paginated list of labels
+    """
+    session: Session = info.context["session"]
+
+    # Validate pagination parameters
+    validate_pagination_params(after, before, first, last)
+
+    # Determine the order field
+    order_field = "createdAt"
+    if orderBy == "updatedAt":
+        order_field = "updatedAt"
+
+    # Build base query
+    base_query = session.query(IssueLabel)
+
+    # Apply archived filter
+    if not includeArchived:
+        base_query = base_query.filter(IssueLabel.archivedAt.is_(None))
+
+    # Apply additional filters if provided
+    if filter:
+        # Apply team filter
+        if "team" in filter and filter["team"]:
+            team_filter = filter["team"]
+            if isinstance(team_filter, dict):
+                id_filter = team_filter.get("id")
+                if isinstance(id_filter, dict):
+                    if "eq" in id_filter:
+                        base_query = base_query.filter(
+                            IssueLabel.teamId == id_filter["eq"]
+                        )
+                    if "neq" in id_filter:
+                        # SQL NULL semantics: NULL != value is NULL (not TRUE)
+                        # So we need to explicitly include NULLs with OR
+                        neq_value = id_filter["neq"]
+                        base_query = base_query.filter(
+                            or_(
+                                IssueLabel.teamId != neq_value,
+                                IssueLabel.teamId.is_(None),
+                            )
+                        )
+                    if "in" in id_filter:
+                        base_query = base_query.filter(
+                            IssueLabel.teamId.in_(id_filter["in"])
+                        )
+                    if "nin" in id_filter:
+                        # Similar to neq, include NULLs in the result
+                        nin_values = id_filter["nin"]
+                        base_query = base_query.filter(
+                            or_(
+                                IssueLabel.teamId.notin_(nin_values),
+                                IssueLabel.teamId.is_(None),
+                            )
+                        )
+
+                null_filter = team_filter.get("null")
+                if null_filter is not None:
+                    if isinstance(null_filter, dict):
+                        null_value = null_filter.get("eq")
+                    else:
+                        null_value = null_filter
+
+                    if null_value is True:
+                        base_query = base_query.filter(IssueLabel.teamId.is_(None))
+                    elif null_value is False:
+                        base_query = base_query.filter(IssueLabel.teamId.isnot(None))
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(IssueLabel, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, IssueLabel.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(IssueLabel, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, IssueLabel.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(IssueLabel, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), IssueLabel.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), IssueLabel.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@query.field("comment")
+def resolve_comment(obj, info, id: str):
+    """
+    Query one specific comment by its id.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        id: The comment id to look up
+
+    Returns:
+        Comment: The comment with the specified id
+
+    Raises:
+        Exception: If the comment is not found
+    """
+    session: Session = info.context["session"]
+
+    # Query for the comment by id
+    comment = session.query(Comment).filter(Comment.id == id).first()
+
+    if not comment:
+        raise Exception(f"Entity not found: Comment (id: {id})")
+
+    return comment
+
+
+@query.field("comments")
+def resolve_comments(
+    obj,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Query comments with pagination and filtering.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: CommentFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived comments (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        CommentConnection: Connection object with nodes and pageInfo
+    """
+    session: Session = info.context["session"]
+    validate_pagination_params(after, before, first, last)
+
+    # Build base query
+    base_query = session.query(Comment)
+
+    # Filter archived unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Comment.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    base_query = apply_comment_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Comment, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Comment.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Comment.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
 
 
 @mutation.field("issueLabelCreate")

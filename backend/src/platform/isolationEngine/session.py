@@ -45,8 +45,18 @@ class SessionManager:
                 .filter(RunTimeEnvironment.id == env_uuid)
                 .one_or_none()
             )
-            if env is None or env.status != "ready":
-                raise PermissionError("environment not available")
+            if env is None:
+                raise PermissionError(f"environment '{env_id}' not found")
+            if env.status == "expired":
+                raise PermissionError(
+                    f"environment '{env_id}' has expired (TTL reached)"
+                )
+            if env.status == "deleted":
+                raise PermissionError(f"environment '{env_id}' has been deleted")
+            if env.status != "ready":
+                raise PermissionError(
+                    f"environment '{env_id}' is not ready (status: {env.status})"
+                )
             env.last_used_at = datetime.now()
             s.commit()
             return env.schema, env.last_used_at

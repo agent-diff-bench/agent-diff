@@ -5,6 +5,7 @@ services:
       POSTGRES_DB: diff_the_universe
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust # ONLY FOR LOCAL DEVELOPMENT. REMEMBER TO CHANGE TO PASSWORD AUTH IN PRODUCTION
     ports:
       - "5432:5432"
     volumes:
@@ -23,8 +24,8 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: "postgresql+psycopg2://postgres:postgres@postgres:5432/diff_the_universe"
-      SECRET_KEY: "${SECRET_KEY:-change-in-production}"
-      ENV: "development"
+      ENVIRONMENT: "development"
+      CLEANUP_INTERVAL_SECONDS: "${CLEANUP_INTERVAL_SECONDS:-30}"
     depends_on:
       postgres:
         condition: service_healthy
@@ -36,6 +37,7 @@ services:
       sh -c "
         alembic upgrade head &&
         python utils/seed_slack_template.py &&
+        python utils/seed_linear_template.py &&
         python utils/seed_tests.py &&
         uvicorn src.platform.api.main:app --host 0.0.0.0 --port 8000 --reload
       "

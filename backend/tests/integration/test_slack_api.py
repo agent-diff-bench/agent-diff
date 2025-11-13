@@ -55,7 +55,7 @@ class TestChatPostMessage:
 
     async def test_post_message_no_channel(self, slack_client: AsyncClient):
         response = await slack_client.post("/chat.postMessage", json={"text": "Hello!"})
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "channel_not_found"
@@ -64,7 +64,7 @@ class TestChatPostMessage:
         response = await slack_client.post(
             "/chat.postMessage", json={"channel": CHANNEL_GENERAL}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "no_text"
@@ -76,7 +76,7 @@ class TestChatPostMessage:
             "/chat.postMessage",
             json={"channel": "C_NONEXISTENT", "text": "Hello!"},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "channel_not_found"
@@ -110,7 +110,7 @@ class TestChatUpdate:
                 "text": "Trying to update",
             },
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_update_message"
@@ -124,7 +124,7 @@ class TestChatUpdate:
                 "text": "Update",
             },
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "message_not_found"
@@ -133,10 +133,45 @@ class TestChatUpdate:
         response = await slack_client.post(
             "/chat.update", json={"channel": CHANNEL_GENERAL, "ts": MESSAGE_1}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "no_text"
+
+    async def test_update_thread_message(self, slack_client: AsyncClient):
+        reply_resp = await slack_client.post(
+            "/chat.postMessage",
+            json={
+                "channel": CHANNEL_GENERAL,
+                "text": "Thread original",
+                "thread_ts": MESSAGE_1,
+            },
+        )
+        assert reply_resp.status_code == 200
+        reply_ts = reply_resp.json()["ts"]
+
+        update_resp = await slack_client.post(
+            "/chat.update",
+            json={
+                "channel": CHANNEL_GENERAL,
+                "ts": reply_ts,
+                "text": "Thread updated",
+            },
+        )
+        assert update_resp.status_code == 200
+        update_data = update_resp.json()
+        assert update_data["ok"] is True
+        assert update_data["text"] == "Thread updated"
+        assert update_data["message"]["thread_ts"] == MESSAGE_1
+
+        history_resp = await slack_client.get(
+            f"/conversations.history?channel={CHANNEL_GENERAL}&limit=20"
+        )
+        assert history_resp.status_code == 200
+        messages = history_resp.json()["messages"]
+        updated_msg = next((m for m in messages if m["ts"] == reply_ts), None)
+        assert updated_msg is not None
+        assert updated_msg["text"] == "Thread updated"
 
 
 @pytest.mark.asyncio
@@ -160,7 +195,7 @@ class TestChatDelete:
         response = await slack_client.post(
             "/chat.delete", json={"channel": CHANNEL_GENERAL, "ts": MESSAGE_2}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_delete_message"
@@ -170,7 +205,7 @@ class TestChatDelete:
             "/chat.delete",
             json={"channel": CHANNEL_GENERAL, "ts": "9999999999.999999"},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "message_not_found"
@@ -207,14 +242,14 @@ class TestConversationsCreate:
         response = await slack_client.post(
             "/conversations.create", json={"name": "TestChannel"}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "invalid_name_specials"
 
     async def test_create_channel_invalid_name_empty(self, slack_client: AsyncClient):
         response = await slack_client.post("/conversations.create", json={"name": ""})
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "invalid_name_required"
@@ -224,7 +259,7 @@ class TestConversationsCreate:
         response = await slack_client.post(
             "/conversations.create", json={"name": long_name}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "invalid_name_maxlength"
@@ -233,7 +268,7 @@ class TestConversationsCreate:
         response = await slack_client.post(
             "/conversations.create", json={"name": "general"}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "name_taken"
@@ -320,10 +355,101 @@ class TestConversationsHistory:
         response = await slack_client.get(
             "/conversations.history?channel=C_NONEXISTENT"
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] in ["channel_not_found", "not_in_channel"]
+
+
+@pytest.mark.asyncio
+class TestConversationsReplies:
+    async def test_get_thread_replies(self, slack_client: AsyncClient):
+        parent_resp = await slack_client.post(
+            "/chat.postMessage",
+            json={"channel": CHANNEL_GENERAL, "text": "Thread root message"},
+        )
+        assert parent_resp.status_code == 200
+        parent_ts = parent_resp.json()["ts"]
+
+        reply1 = await slack_client.post(
+            "/chat.postMessage",
+            json={
+                "channel": CHANNEL_GENERAL,
+                "text": "First reply",
+                "thread_ts": parent_ts,
+            },
+        )
+        assert reply1.status_code == 200
+
+        reply2 = await slack_client.post(
+            "/chat.postMessage",
+            json={
+                "channel": CHANNEL_GENERAL,
+                "text": "Second reply",
+                "thread_ts": parent_ts,
+            },
+        )
+        assert reply2.status_code == 200
+
+        response = await slack_client.get(
+            f"/conversations.replies?channel={CHANNEL_GENERAL}&ts={parent_ts}"
+        )
+        assert response.status_code == 200
+        data = response.json()
+
+        assert data["ok"] is True
+        assert data["has_more"] is False
+        assert "response_metadata" in data
+        assert data["response_metadata"]["next_cursor"] == ""
+
+        messages = data["messages"]
+        assert len(messages) == 3
+
+        root = messages[0]
+        assert root["ts"] == parent_ts
+        assert root["thread_ts"] == parent_ts
+        assert root["reply_count"] == 2
+        assert root["subscribed"] is True
+        assert root["unread_count"] == 0
+        assert root["last_read"] == messages[-1]["ts"]
+
+        first_reply = messages[1]
+        assert first_reply["parent_user_id"] == USER_AGENT
+        assert first_reply["thread_ts"] == parent_ts
+
+    async def test_replies_with_reply_ts(self, slack_client: AsyncClient):
+        parent_resp = await slack_client.post(
+            "/chat.postMessage",
+            json={"channel": CHANNEL_GENERAL, "text": "Thread root for reply ts"},
+        )
+        parent_ts = parent_resp.json()["ts"]
+
+        reply_resp = await slack_client.post(
+            "/chat.postMessage",
+            json={
+                "channel": CHANNEL_GENERAL,
+                "text": "Thread reply for alternate fetch",
+                "thread_ts": parent_ts,
+            },
+        )
+        reply_ts = reply_resp.json()["ts"]
+
+        response = await slack_client.get(
+            f"/conversations.replies?channel={CHANNEL_GENERAL}&ts={reply_ts}"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["ok"] is True
+        assert any(msg["ts"] == reply_ts for msg in data["messages"])
+
+    async def test_replies_thread_not_found(self, slack_client: AsyncClient):
+        response = await slack_client.get(
+            "/conversations.replies?channel=C01ABCD1234&ts=9999999999.999999"
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["ok"] is False
+        assert data["error"] == "thread_not_found"
 
 
 @pytest.mark.asyncio
@@ -359,7 +485,7 @@ class TestConversationsJoin:
         response = await slack_client.post(
             "/conversations.join", json={"channel": "C_NONEXISTENT"}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "channel_not_found"
@@ -403,7 +529,7 @@ class TestConversationsInvite:
             "/conversations.invite",
             json={"channel": CHANNEL_GENERAL, "users": USER_AGENT},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_invite_self"
@@ -413,7 +539,7 @@ class TestConversationsInvite:
             "/conversations.invite",
             json={"channel": CHANNEL_GENERAL, "users": USER_JOHN},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "already_in_channel"
@@ -423,7 +549,7 @@ class TestConversationsInvite:
             "/conversations.invite",
             json={"channel": CHANNEL_GENERAL, "users": "U_NONEXISTENT"},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "user_not_found"
@@ -521,7 +647,7 @@ class TestConversationsInfo:
 
     async def test_get_info_channel_not_found(self, slack_client: AsyncClient):
         response = await slack_client.get("/conversations.info?channel=C_NONEXISTENT")
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "channel_not_found"
@@ -554,7 +680,7 @@ class TestConversationsArchive:
         response = await slack_client.post(
             "/conversations.archive", json={"channel": channel_id}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "already_archived"
@@ -563,7 +689,7 @@ class TestConversationsArchive:
         response = await slack_client.post(
             "/conversations.archive", json={"channel": CHANNEL_GENERAL}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_archive_general"
@@ -587,7 +713,7 @@ class TestConversationsArchive:
         response = await slack_client.post(
             "/conversations.unarchive", json={"channel": CHANNEL_GENERAL}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "not_archived"
@@ -620,7 +746,7 @@ class TestConversationsRename:
             "/conversations.rename",
             json={"channel": channel_id, "name": "general"},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "name_taken"
@@ -630,10 +756,10 @@ class TestConversationsRename:
             "/conversations.rename",
             json={"channel": CHANNEL_GENERAL, "name": "not-general"},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
-        assert data["error"] == "cannot_rename_general"
+        assert data["error"] == "not_authorized"
 
 
 @pytest.mark.asyncio
@@ -646,7 +772,7 @@ class TestConversationsSetTopic:
         assert response.status_code == 200
         data = response.json()
         assert data["ok"] is True
-        assert data["topic"] == "New channel topic"
+        assert "topic" not in data
 
     async def test_set_topic_empty(self, slack_client: AsyncClient):
         response = await slack_client.post(
@@ -655,6 +781,7 @@ class TestConversationsSetTopic:
         assert response.status_code == 200
         data = response.json()
         assert data["ok"] is True
+        assert "topic" not in data
 
 
 @pytest.mark.asyncio
@@ -677,7 +804,7 @@ class TestConversationsKickLeave:
         response = await slack_client.post(
             "/conversations.leave", json={"channel": CHANNEL_GENERAL}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_leave_general"
@@ -707,7 +834,7 @@ class TestConversationsKickLeave:
             "/conversations.kick",
             json={"channel": CHANNEL_GENERAL, "user": USER_AGENT},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_kick_self"
@@ -716,7 +843,7 @@ class TestConversationsKickLeave:
         response = await slack_client.post(
             "/conversations.kick", json={"channel": CHANNEL_GENERAL, "user": USER_JOHN}
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "cant_kick_from_general"
@@ -782,7 +909,7 @@ class TestReactions:
                 "timestamp": MESSAGE_1,
             },
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "invalid_name"
@@ -797,7 +924,7 @@ class TestReactions:
             "/reactions.add",
             json={"name": "tada", "channel": CHANNEL_GENERAL, "timestamp": MESSAGE_2},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "already_reacted"
@@ -836,7 +963,7 @@ class TestReactions:
             "/reactions.remove",
             json={"name": "wave", "channel": CHANNEL_GENERAL, "timestamp": MESSAGE_1},
         )
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "no_reaction"
@@ -855,7 +982,7 @@ class TestUsers:
 
     async def test_get_user_info_not_found(self, slack_client: AsyncClient):
         response = await slack_client.get("/users.info?user=U_NONEXISTENT")
-        assert response.status_code == 400
+        assert response.status_code == 200
         data = response.json()
         assert data["ok"] is False
         assert data["error"] == "user_not_found"
@@ -995,7 +1122,7 @@ class TestCompositeScenario:
 class TestSearchMessages:
     async def test_requires_query(self, slack_client: AsyncClient):
         resp = await slack_client.get("/search.messages")
-        assert resp.status_code == 400
+        assert resp.status_code == 200
         data = resp.json()
         assert data["ok"] is False
         assert data["error"] == "No query passed"

@@ -23,7 +23,10 @@ from src.platform.evaluationEngine.core import CoreEvaluationEngine
 
 env_path = Path(__file__).parent.parent / ".env"
 if env_path.exists():
-    load_dotenv(env_path)
+    try:
+        load_dotenv(env_path)
+    except (OSError, IOError):
+        pass
 
 
 @pytest.fixture(scope="session")
@@ -380,7 +383,54 @@ def cleanup_test_templates(session_manager, test_user_id):
 
 
 @pytest.fixture(scope="function")
-def sdk_client(test_api_key, cleanup_test_templates):
+def cleanup_test_suites(session_manager):
+    """Auto-cleanup fixture that removes test suites and tests created during a test."""
+    from src.platform.db.schema import TestSuite, Test, TestMembership, TestRun
+
+    with session_manager.with_meta_session() as s:
+        baseline_suite_ids = {suite.id for suite in s.query(TestSuite.id).all()}
+
+    yield
+
+    with session_manager.with_meta_session() as s:
+        suites = s.query(TestSuite).all()
+        for suite in suites:
+            if suite.id in baseline_suite_ids:
+                continue
+
+            memberships = (
+                s.query(TestMembership)
+                .filter(TestMembership.test_suite_id == suite.id)
+                .all()
+            )
+            test_ids = [membership.test_id for membership in memberships]
+
+            if memberships:
+                s.query(TestMembership).filter(
+                    TestMembership.test_suite_id == suite.id
+                ).delete(synchronize_session=False)
+
+            if test_ids:
+                s.query(TestRun).filter(TestRun.test_id.in_(test_ids)).delete(
+                    synchronize_session=False
+                )
+
+            s.query(TestRun).filter(TestRun.test_suite_id == suite.id).delete(
+                synchronize_session=False
+            )
+
+            if test_ids:
+                s.query(Test).filter(Test.id.in_(test_ids)).delete(
+                    synchronize_session=False
+                )
+
+            s.delete(suite)
+
+        s.commit()
+
+
+@pytest.fixture(scope="function")
+def sdk_client(test_api_key, cleanup_test_templates, cleanup_test_suites):
     """AgentDiff SDK client for integration tests."""
     import sys
 
@@ -412,18 +462,18 @@ async def linear_client(
     session_manager,
     environment_handler,
 ):
-    """Create an AsyncClient for testing Linear GraphQL API as U01AGENT (agent)."""
+    """Create an AsyncClient for testing Linear GraphQL API as Agent (UUID seed user)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
 
     env_result = core_isolation_engine.create_environment(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U01AGENT",
+        impersonate_user_id="2790a7ee-fde0-4537-9588-e233aa5a68d1",
         impersonate_email="agent@example.com",
     )
 
@@ -433,7 +483,7 @@ async def linear_client(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_user_id = "2790a7ee-fde0-4537-9588-e233aa5a68d1"
             request.state.impersonate_email = "agent@example.com"
             response = await call_next(request)
             return response
@@ -441,9 +491,7 @@ async def linear_client(
     # Create Linear GraphQL schema
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
@@ -470,18 +518,18 @@ async def linear_client_john(
     session_manager,
     environment_handler,
 ):
-    """Create an AsyncClient for testing Linear GraphQL API as U02JOHN (John Doe)."""
+    """Create an AsyncClient for testing Linear GraphQL API as John Doe (UUID seed user)."""
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
 
     env_result = core_isolation_engine.create_environment(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U02JOHN",
+        impersonate_user_id="2dcc8dc2-ca19-475d-9882-3ba5e911e7ec",
         impersonate_email="john@example.com",
     )
 
@@ -491,16 +539,14 @@ async def linear_client_john(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U02JOHN"
+            request.state.impersonate_user_id = "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
             request.state.impersonate_email = "john@example.com"
             response = await call_next(request)
             return response
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
@@ -531,7 +577,7 @@ async def linear_client_with_differ(
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
     from src.platform.evaluationEngine.differ import Differ
 
@@ -539,7 +585,7 @@ async def linear_client_with_differ(
         template_schema="linear_default",
         ttl_seconds=3600,
         created_by=test_user_id,
-        impersonate_user_id="U01AGENT",
+        impersonate_user_id="2790a7ee-fde0-4537-9588-e233aa5a68d1",
         impersonate_email="agent@example.com",
     )
 
@@ -549,16 +595,14 @@ async def linear_client_with_differ(
         ) as session:
             request.state.db_session = session
             request.state.environment_id = env_result.environment_id
-            request.state.impersonate_user_id = "U01AGENT"
+            request.state.impersonate_user_id = "2790a7ee-fde0-4537-9588-e233aa5a68d1"
             request.state.impersonate_email = "agent@example.com"
             response = await call_next(request)
             return response
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,

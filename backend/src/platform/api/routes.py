@@ -617,21 +617,25 @@ async def evaluate_run(request: Request) -> JSONResponse:
             before_suffix=run.before_snapshot_suffix,
             after_suffix=after.suffix,
         )
+        logger.debug(f"Diff payload: {diff_payload}")
         differ = Differ(
             schema=rte.schema,
             environment_id=str(run.environment_id),
             session_manager=request.app.state.sessions,
         )
+        logger.debug(f"Differ: {differ}")
         differ.store_diff(
             diff_payload,
             before_suffix=run.before_snapshot_suffix,
             after_suffix=after.suffix,
         )
         spec = session.query(Test).filter(Test.id == run.test_id).one()
+        logger.debug(f"Spec: {spec}")
         evaluation = core_eval.evaluate(
             compiled_spec=spec.expected_output,
             diff=diff_payload,
         )
+        logger.debug(f"Evaluation: {evaluation}")
         run.status = "passed" if evaluation.get("passed") else "failed"
         logger.info(f"Test run {run.id} completed with status {run.status}")
     except Exception as exc:  # snapshot/diff/eval failure
@@ -645,7 +649,7 @@ async def evaluate_run(request: Request) -> JSONResponse:
             ],
         }
     if diff_payload is not None:
-        evaluation.setdefault("diff", diff_payload.model_dump(mode="python"))
+        evaluation.setdefault("diff", diff_payload.model_dump(mode="json"))
     run.result = evaluation
     run.after_snapshot_suffix = after.suffix
     run.updated_at = datetime.now()
@@ -656,6 +660,7 @@ async def evaluate_run(request: Request) -> JSONResponse:
         passed=bool(evaluation.get("passed")),
         score=evaluation.get("score"),
     )
+    logger.debug(f"EndRunResponse: {response}")
     return JSONResponse(response.model_dump(mode="json"))
 
 

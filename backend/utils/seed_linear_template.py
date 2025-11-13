@@ -19,6 +19,7 @@ from uuid import uuid4
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sqlalchemy import create_engine, text
+from psycopg2.extras import Json
 from src.services.linear.database.schema import Base
 from src.services.linear.database import schema as linear_schema
 
@@ -181,7 +182,7 @@ def register_public_template(
         "version": "v1",
         "description": description,
         "location": location,
-        "table_order": table_order,
+        "table_order": Json(table_order) if table_order is not None else None,
     }
     conn.execute(sql, params)
 
