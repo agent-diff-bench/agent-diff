@@ -559,14 +559,23 @@
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
       "assertions": [
         {
-          "diff_type": "removed",
+          "diff_type": "changed",
           "entity": "comments",
           "where": {
             "id": {
               "eq": "e10f59c3-7a49-4d52-8dba-8c8602f8c807"
             }
           },
-          "expected_count": 1
+          "expected_changes": {
+            "archivedAt": {
+              "from": {
+                "is_null": true
+              },
+              "to": {
+                "is_not_null": true
+              }
+            }
+          }
         }
       ]
     },

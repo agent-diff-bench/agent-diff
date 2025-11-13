@@ -466,7 +466,7 @@ async def linear_client(
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
 
     env_result = core_isolation_engine.create_environment(
@@ -491,9 +491,7 @@ async def linear_client(
     # Create Linear GraphQL schema
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
@@ -524,7 +522,7 @@ async def linear_client_john(
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
 
     env_result = core_isolation_engine.create_environment(
@@ -548,9 +546,7 @@ async def linear_client_john(
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,
@@ -581,7 +577,7 @@ async def linear_client_with_differ(
     from httpx import AsyncClient, ASGITransport
     from src.services.linear.api.graphql_linear import LinearGraphQL
     from ariadne import load_schema_from_path, make_executable_schema
-    from src.services.linear.api.resolvers import query, mutation, issue_type
+    from src.services.linear.api.resolvers import bindables
     from starlette.applications import Starlette
     from src.platform.evaluationEngine.differ import Differ
 
@@ -606,9 +602,7 @@ async def linear_client_with_differ(
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
-    linear_schema = make_executable_schema(
-        linear_type_defs, query, mutation, issue_type
-    )
+    linear_schema = make_executable_schema(linear_type_defs, *bindables)
 
     linear_graphql = LinearGraphQL(
         linear_schema,

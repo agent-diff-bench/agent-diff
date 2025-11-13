@@ -159,6 +159,106 @@ def resolve_issue_labels(
     return {"nodes": labels}
 
 
+@issue_type.field("comments")
+def resolve_issue_comments(
+    issue,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the comments field to return a CommentConnection for comments on this issue.
+
+    Args:
+        issue: The parent Issue object
+        info: GraphQL resolve info
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: CommentFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived comments (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        CommentConnection with nodes field
+    """
+    session: Session = info.context["session"]
+
+    # Build base query for comments on this issue
+    base_query = session.query(Comment).filter(Comment.issueId == issue.id)
+
+    # Filter archived comments unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Comment.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        base_query = apply_comment_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Convert cursor field value to datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Comment, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Comment.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Comment.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
 @team_type.field("states")
 def resolve_team_states(
     team,
@@ -11475,6 +11575,144 @@ def resolve_issueLabels(
         base_query = base_query.order_by(order_column.desc(), IssueLabel.id.desc())
     else:
         base_query = base_query.order_by(order_column.asc(), IssueLabel.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@query.field("comment")
+def resolve_comment(obj, info, id: str):
+    """
+    Query one specific comment by its id.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        id: The comment id to look up
+
+    Returns:
+        Comment: The comment with the specified id
+
+    Raises:
+        Exception: If the comment is not found
+    """
+    session: Session = info.context["session"]
+
+    # Query for the comment by id
+    comment = session.query(Comment).filter(Comment.id == id).first()
+
+    if not comment:
+        raise Exception(f"Entity not found: Comment (id: {id})")
+
+    return comment
+
+
+@query.field("comments")
+def resolve_comments(
+    obj,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Query comments with pagination and filtering.
+
+    Args:
+        obj: Parent object (None for root queries)
+        info: GraphQL resolve info containing context
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: CommentFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived comments (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        CommentConnection: Connection object with nodes and pageInfo
+    """
+    session: Session = info.context["session"]
+
+    # Build base query
+    base_query = session.query(Comment)
+
+    # Filter archived unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Comment.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        # Basic filters we can support without a full apply_comment_filter function
+        if "id" in filter:
+            base_query = apply_id_comparator(base_query, Comment.id, filter["id"])
+        
+        if "body" in filter:
+            base_query = apply_string_comparator(base_query, Comment.body, filter["body"])
+        
+        # Nested issue filter
+        if "issue" in filter:
+            issue_filter = filter["issue"]
+            if "id" in issue_filter:
+                base_query = apply_id_comparator(base_query, Comment.issueId, issue_filter["id"])
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Comment, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Comment.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Comment, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Comment.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Comment.id.asc())
 
     # Determine limit
     limit = first if first else (last if last else 50)
