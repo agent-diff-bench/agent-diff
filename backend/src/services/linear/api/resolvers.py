@@ -7411,13 +7411,19 @@ def resolve_commentCreate(obj, info, **kwargs):
         body = input_data.get("body", "")
         body_data = input_data.get("bodyData", "{}")
         created_at = input_data.get("createdAt") or datetime.now(timezone.utc)
-        issue_id = input_data.get("issueId")
+        issue_id_input = input_data.get("issueId")
         parent_id = input_data.get("parentId")
         document_content_id = input_data.get("documentContentId")
         initiative_update_id = input_data.get("initiativeUpdateId")
         post_id = input_data.get("postId")
         project_update_id = input_data.get("projectUpdateId")
         quoted_text = input_data.get("quotedText")
+
+        # Resolve issue ID (supports both UUID and identifier like "ENG-1")
+        issue_id = None
+        if issue_id_input:
+            issue = _resolve_issue_id(session, issue_id_input)
+            issue_id = issue.id  # Use the resolved UUID
 
         # Fields not yet supported by ORM but in GraphQL schema
         # createAsUser, createOnSyncedSlackThread, displayIconUrl,
