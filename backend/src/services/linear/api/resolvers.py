@@ -10682,8 +10682,10 @@ def resolve_issueUpdate(obj, info, **kwargs):
 
         # Handle label updates (addedLabelIds and removedLabelIds)
         # NOTE: labelIds (direct replacement) takes precedence if provided
-        if "addedLabelIds" in input_data:
-            added_label_ids = input_data["addedLabelIds"]
+        # Skip incremental updates if labelIds is provided (it will overwrite them anyway)
+        if "addedLabelIds" in input_data and "labelIds" not in input_data:
+            # Deduplicate while preserving order (prevent constraint violation on join table)
+            added_label_ids = list(dict.fromkeys(input_data["addedLabelIds"]))
 
             # Validate UUID format first (matching Linear's validation)
             for label_id in added_label_ids:
@@ -10701,7 +10703,9 @@ def resolve_issueUpdate(obj, info, **kwargs):
                 found_ids = {label.id for label in labels_to_add}
                 missing_ids = set(to_add) - found_ids
                 if missing_ids:
-                    raise Exception("Received non-uuid id")
+                    # List the missing IDs for debugging
+                    missing_list = ", ".join(sorted(missing_ids))
+                    raise Exception(f"Label(s) not found: {missing_list}")
 
                 # Mutate only after validation succeeds
                 issue.labelIds = current_labels + to_add
@@ -10712,7 +10716,7 @@ def resolve_issueUpdate(obj, info, **kwargs):
                     if label.id not in existing_ids:
                         issue.labels.append(label)
 
-        if "removedLabelIds" in input_data:
+        if "removedLabelIds" in input_data and "labelIds" not in input_data:
             removed_label_ids = input_data["removedLabelIds"]
             current_labels = issue.labelIds if issue.labelIds else []
             # Remove labels
@@ -10730,7 +10734,8 @@ def resolve_issueUpdate(obj, info, **kwargs):
         # Handle labelIds (direct replacement)
         # NOTE: This takes precedence over addedLabelIds/removedLabelIds
         if "labelIds" in input_data:
-            label_ids = input_data["labelIds"]
+            # Deduplicate while preserving order (prevent constraint violation on join table)
+            label_ids = list(dict.fromkeys(input_data["labelIds"]))
 
             # Validate UUID format first (matching Linear's validation)
             for label_id in label_ids:
@@ -10748,7 +10753,9 @@ def resolve_issueUpdate(obj, info, **kwargs):
                 found_ids = {label.id for label in new_labels}
                 missing_ids = set(label_ids) - found_ids
                 if missing_ids:
-                    raise Exception("Received non-uuid id")
+                    # List the missing IDs for debugging
+                    missing_list = ", ".join(sorted(missing_ids))
+                    raise Exception(f"Label(s) not found: {missing_list}")
 
                 # Mutate only after validation succeeds
                 issue.labelIds = label_ids
