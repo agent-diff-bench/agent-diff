@@ -132,6 +132,8 @@ Collections of test cases with assertions that you can run against agent runs us
 
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
 - **[linear_bench.json](examples/linear/testsuites/linear_bench.json)** - test cases covering issue management, labels, comments, workflow states, and team operations
+<img width="2985" height="1966" alt="pass_rates_annotated" src="https://github.com/user-attachments/assets/f5c59c81-c3bd-427e-977c-a5c2c0695e86" />
+
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
 
 <img width="2516" height="1020" alt="image" src="https://github.com/user-attachments/assets/3270f1f1-5afa-4db2-97b0-c35c070ef44f" />
