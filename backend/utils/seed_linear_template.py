@@ -249,6 +249,7 @@ def main():
 
     # Create default template with seed data
     create_template(engine, "linear_default", seeds_dir / "linear_default.json")
+    create_template(engine, "linear_expanded", seeds_dir / "linear_expanded.json")
 
     print("\nAll templates created successfully\n")
 
