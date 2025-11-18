@@ -11092,6 +11092,24 @@ def resolve_issueCreate(obj, info, **kwargs):
                 session.add(issue)
                 session.flush()
                 session.refresh(issue)
+
+                # Sync label relationship so the join table matches labelIds,
+                # mirroring Linear's behavior for issueCreate.
+                if label_ids:
+                    new_labels = (
+                        session.query(IssueLabel)
+                        .filter(IssueLabel.id.in_(label_ids))
+                        .all()
+                    )
+                    found_ids = {label.id for label in new_labels}
+                    missing_ids = set(label_ids) - found_ids
+                    if missing_ids:
+                        missing_list = ", ".join(sorted(missing_ids))
+                        raise Exception(f"Label(s) not found: {missing_list}")
+                    # Assign relationship; SQLAlchemy will manage the join table.
+                    issue.labels = new_labels
+                else:
+                    issue.labels = []
                 break
             except OperationalError as oe:
                 if "deadlock detected" in str(oe).lower() and attempt < max_retries - 1:
@@ -11319,8 +11337,23 @@ def resolve_issueBatchCreate(obj, info, **kwargs):
 
             # Add to session
             session.add(issue)
-            created_issues.append(issue)
             session.flush()
+
+            # Sync label relationship so the join table matches labelIds
+            if label_ids:
+                new_labels = (
+                    session.query(IssueLabel).filter(IssueLabel.id.in_(label_ids)).all()
+                )
+                found_ids = {label.id for label in new_labels}
+                missing_ids = set(label_ids) - found_ids
+                if missing_ids:
+                    missing_list = ", ".join(sorted(missing_ids))
+                    raise Exception(f"Label(s) not found: {missing_list}")
+                issue.labels = new_labels
+            else:
+                issue.labels = []
+
+            created_issues.append(issue)
 
             # Hydrate relationships for GraphQL response
             issue.team = team

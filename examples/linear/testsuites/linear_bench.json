@@ -1105,6 +1105,42 @@
           "expected_count": 1
         }
       ]
+    },
+    {
+      "id": "test_39",
+      "name": "Issue Decomposition (Hierarchy)",
+      "prompt": "Break down the 'SSO' ticket into two sub-issues: 'Frontend Implementation' (assigned to Sarah) and 'Backend API' (assigned to John). Ensure the previous ticket is set as the parent for both.",
+      "type": "actionEval",
+      "seed_template": "linear_default",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "parentId": {
+              "eq": "7d3f21ac-89c1-4f3b-9c2e-4fe3a1b71002"
+            },
+            "assigneeId": {
+              "eq": "03b0809e-713e-44ee-95de-b7a198b135ac"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "parentId": {
+              "eq": "7d3f21ac-89c1-4f3b-9c2e-4fe3a1b71002"
+            },
+            "assigneeId": {
+              "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
     }
   ]
 }
