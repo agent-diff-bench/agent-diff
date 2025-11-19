@@ -798,6 +798,271 @@ def resolve_user_teams(
     return apply_pagination(items, after, before, first, last, order_field)
 
 
+@user_type.field("assignedIssues")
+def resolve_user_assigned_issues(
+    user,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the assignedIssues field to return an IssueConnection for issues assigned to this user.
+
+    Args:
+        user: The parent User object
+        info: GraphQL resolve info
+        after: Cursor for forward pagination
+        before: Cursor for backward pagination
+        filter: IssueFilter to filter results
+        first: Number of items for forward pagination (default: 50)
+        includeArchived: Include archived issues (default: False)
+        last: Number of items for backward pagination
+        orderBy: Order by field - "createdAt" or "updatedAt" (default: "createdAt")
+
+    Returns:
+        IssueConnection with nodes, edges, and pageInfo
+    """
+    session: Session = info.context["session"]
+
+    # Build base query for issues assigned to this user
+    base_query = session.query(Issue).filter(Issue.assigneeId == user.id)
+
+    # Filter archived issues unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Issue.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        validate_issue_filter(filter)
+        base_query = apply_issue_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for forward pagination
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        # Parse datetime if needed
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        # Apply cursor filter for backward pagination
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Issue, order_field)
+    if last or before:
+        # For backward pagination, reverse the order
+        base_query = base_query.order_by(order_column.desc(), Issue.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Issue.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@user_type.field("createdIssues")
+def resolve_user_created_issues(
+    user,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the createdIssues field to return an IssueConnection for issues created by this user.
+    """
+    session: Session = info.context["session"]
+
+    # Build base query for issues created by this user
+    base_query = session.query(Issue).filter(Issue.creatorId == user.id)
+
+    # Filter archived issues unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Issue.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        validate_issue_filter(filter)
+        base_query = apply_issue_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Issue, order_field)
+    if last or before:
+        base_query = base_query.order_by(order_column.desc(), Issue.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Issue.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
+@user_type.field("delegatedIssues")
+def resolve_user_delegated_issues(
+    user,
+    info,
+    after=None,
+    before=None,
+    filter=None,
+    first=None,
+    includeArchived=False,
+    last=None,
+    orderBy="createdAt",
+):
+    """
+    Resolve the delegatedIssues field to return an IssueConnection for issues delegated to this user.
+    """
+    session: Session = info.context["session"]
+
+    # Build base query for issues delegated to this user
+    base_query = session.query(Issue).filter(Issue.delegateId == user.id)
+
+    # Filter archived issues unless includeArchived is True
+    if not includeArchived:
+        base_query = base_query.filter(Issue.archivedAt.is_(None))
+
+    # Apply custom filter if provided
+    if filter:
+        validate_issue_filter(filter)
+        base_query = apply_issue_filter(base_query, filter)
+
+    # Determine order field
+    order_field = orderBy if orderBy in ["createdAt", "updatedAt"] else "createdAt"
+
+    # Apply cursor-based pagination
+    if after:
+        cursor_data = decode_cursor(after)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column > cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id > cursor_id),
+            )
+        )
+
+    if before:
+        cursor_data = decode_cursor(before)
+        cursor_field_value = cursor_data["field"]
+        cursor_id = cursor_data["id"]
+
+        if order_field in ["createdAt", "updatedAt"]:
+            cursor_field_value = datetime.fromisoformat(cursor_field_value)
+
+        order_column = getattr(Issue, order_field)
+        base_query = base_query.filter(
+            or_(
+                order_column < cursor_field_value,
+                and_(order_column == cursor_field_value, Issue.id < cursor_id),
+            )
+        )
+
+    # Apply ordering
+    order_column = getattr(Issue, order_field)
+    if last or before:
+        base_query = base_query.order_by(order_column.desc(), Issue.id.desc())
+    else:
+        base_query = base_query.order_by(order_column.asc(), Issue.id.asc())
+
+    # Determine limit
+    limit = first if first else (last if last else 50)
+
+    # Fetch limit + 1 to detect if there are more pages
+    items = base_query.limit(limit + 1).all()
+
+    # Use the centralized pagination helper
+    return apply_pagination(items, after, before, first, last, order_field)
+
+
 # Helper functions for cursor-based pagination
 def encode_cursor(item, order_field="createdAt"):
     """Encode a cursor for pagination"""
