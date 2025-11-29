@@ -398,7 +398,7 @@ class LogicalReplicationService:
         """
         Register a run to receive replication events for a schema.
 
-        No slot creation - just registers the schema -> run mapping.
+        Ensures the replication worker is running before registering.
         """
         if not target_schema:
             raise ValueError("target_schema is required for single-slot replication")
@@ -413,7 +413,10 @@ class LogicalReplicationService:
         )
 
         with self._lock:
+            if not self._started:
+                self._start_worker()
             self._active_runs[target_schema] = run_info
+            self._last_activity = time.time()
 
         logger.debug(
             "Registered replication for schema %s (env=%s run=%s)",

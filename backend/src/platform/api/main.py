@@ -82,7 +82,7 @@ def create_app():
     # Create on-demand maintenance service (replaces cleanup + pool_refill)
     maintenance_idle_timeout = int(environ.get("MAINTENANCE_IDLE_TIMEOUT", 300))
     maintenance_cycle_interval = int(environ.get("MAINTENANCE_CYCLE_INTERVAL", 10))
-    maintenance_concurrency = int(environ.get("POOL_REFILL_CONCURRENCY", 5))
+    maintenance_concurrency = int(environ.get("POOL_REFILL_CONCURRENCY", 10))
     maintenance_service = EnvironmentMaintenanceService(
         session_manager=sessions,
         environment_handler=environment_handler,
