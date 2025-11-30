@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import logging
 from datetime import datetime
 import time
@@ -419,7 +420,8 @@ async def init_environment(request: Request) -> JSONResponse:
     logger.debug(f"init_environment setup took {t1 - t0:.2f}s")
 
     try:
-        result = core.create_environment(
+        result = await asyncio.to_thread(
+            core.create_environment,
             template_schema=schema,
             ttl_seconds=body.ttlSeconds or 1800,
             created_by=principal_id,
@@ -593,10 +595,11 @@ async def start_run(request: Request) -> JSONResponse:
     replication_service = getattr(request.app.state, "replication_service", None)
     if replication_service:
         try:
-            slot_name = replication_service.start_stream(
+            slot_name = await asyncio.to_thread(
+                replication_service.start_stream,
                 environment_id=run.environment_id,
                 run_id=run.id,
-                target_schema=rte.schema,  # Filter to only capture changes from test schema
+                target_schema=rte.schema,
             )
             run.replication_slot = slot_name
             run.replication_plugin = replication_service.plugin
@@ -671,7 +674,8 @@ async def evaluate_run(request: Request) -> JSONResponse:
 
     if replication_service and run.replication_slot:
         try:
-            replication_service.stop_stream(
+            await asyncio.to_thread(
+                replication_service.stop_stream,
                 environment_id=run.environment_id,
                 run_id=run.id,
                 target_schema=rte.schema,
@@ -685,14 +689,16 @@ async def evaluate_run(request: Request) -> JSONResponse:
     try:
         diff_timer = time.perf_counter()
         if use_journal:
-            diff_payload = core_eval.compute_diff_from_journal(
+            diff_payload = await asyncio.to_thread(
+                core_eval.compute_diff_from_journal,
                 environment_id=str(run.environment_id),
                 run_id=str(run.id),
             )
         else:
             if run.before_snapshot_suffix is None:
                 raise ValueError("before snapshot missing")
-            diff_payload = core_eval.compute_diff(
+            diff_payload = await asyncio.to_thread(
+                core_eval.compute_diff,
                 schema=rte.schema,
                 environment_id=str(run.environment_id),
                 before_suffix=run.before_snapshot_suffix,
@@ -711,7 +717,8 @@ async def evaluate_run(request: Request) -> JSONResponse:
             session_manager=request.app.state.sessions,
         )
         logger.debug(f"Differ: {differ}")
-        differ.store_diff(
+        await asyncio.to_thread(
+            differ.store_diff,
             diff_payload,
             before_suffix=run.before_snapshot_suffix or "journal",
             after_suffix=after_suffix,

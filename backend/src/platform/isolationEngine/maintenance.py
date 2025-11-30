@@ -117,7 +117,7 @@ class EnvironmentMaintenanceService:
             logger.error("Maintenance loop error: %s", exc, exc_info=True)
         finally:
             self._running = False
-            logger.info("Maintenance service stopped - Neon can scale to zero")
+            logger.info("Maintenance service stopped")
 
     async def _run_cleanup_cycle(self) -> bool:
         """Run one cleanup phase (mark or delete). Returns True if work was done."""

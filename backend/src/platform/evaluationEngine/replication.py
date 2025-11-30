@@ -363,7 +363,7 @@ class LogicalReplicationService:
             # Don't join here - we're in a thread, avoid deadlock
             self._worker = None
         self._started = False
-        logger.info("Replication service stopped - Neon can scale to zero")
+        logger.info("Replication service stopped")
 
     def start(self) -> None:
         """Start the global replication service (for backward compat / manual start)."""
