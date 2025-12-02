@@ -3,7 +3,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import time
 from typing import Optional
 
 import httpx
@@ -15,13 +14,10 @@ logger = logging.getLogger(__name__)
 
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development").lower()
 CONTROL_PLANE_URL = os.getenv("CONTROL_PLANE_URL")
-CONTROL_PLANE_TIMEOUT = float(os.getenv("CONTROL_PLANE_TIMEOUT", "10.0"))
-API_KEY_CACHE_TTL = int(os.getenv("API_KEY_CACHE_TTL", "300"))
+CONTROL_PLANE_TIMEOUT = float(os.getenv("CONTROL_PLANE_TIMEOUT", "20.0"))
 
 _http_client: httpx.AsyncClient | None = None
 _http_client_lock = asyncio.Lock()
-
-_api_key_cache: dict[str, tuple[str, float]] = {}  # api_key -> (user_id, expires_at)
 
 
 def is_dev_mode() -> bool:
@@ -44,26 +40,11 @@ async def _get_http_client() -> httpx.AsyncClient:
     return _http_client
 
 
-def _get_cached_user_id(api_key: str) -> str | None:
-    """Get cached user_id for API key if still valid."""
-    if api_key in _api_key_cache:
-        user_id, expires_at = _api_key_cache[api_key]
-        if time.time() < expires_at:
-            return user_id
-        else:
-            del _api_key_cache[api_key]
-    return None
-
-
-def _cache_user_id(api_key: str, user_id: str) -> None:
-    """Cache user_id for API key."""
-    _api_key_cache[api_key] = (user_id, time.time() + API_KEY_CACHE_TTL)
-
-
 async def validate_with_control_plane(api_key: str, action: str = "api_request") -> str:
     """
     Validate API key with control plane and return principal_id.
 
+    Every request hits the control plane for use tracking.
 
     Args:
         api_key: The API key to validate
@@ -71,12 +52,6 @@ async def validate_with_control_plane(api_key: str, action: str = "api_request")
     """
     if not CONTROL_PLANE_URL:
         raise RuntimeError("CONTROL_PLANE_URL not configured for production mode")
-
-    # Check cache first (skip for environment_created to always track usage)
-    if action == "api_request":
-        cached_user_id = _get_cached_user_id(api_key)
-        if cached_user_id:
-            return cached_user_id
 
     try:
         client = await _get_http_client()
@@ -88,9 +63,7 @@ async def validate_with_control_plane(api_key: str, action: str = "api_request")
         if response.status_code == 200:
             data = response.json()
             if data.get("valid"):
-                user_id = data["user_id"]
-                _cache_user_id(api_key, user_id)
-                return user_id
+                return data["user_id"]
             else:
                 raise PermissionError(data.get("reason", "access denied"))
         elif response.status_code == 401:
