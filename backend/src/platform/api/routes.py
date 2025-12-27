@@ -724,16 +724,19 @@ async def evaluate_run(request: Request) -> JSONResponse:
             after_suffix=after_suffix,
         )
         if body.expectedOutput:
-            compiled_spec = body.expectedOutput
-            logger.debug(f"Using expectedOutput from request: {compiled_spec}")
+            raw_spec = body.expectedOutput
+            logger.debug(f"Using expectedOutput from request: {raw_spec}")
         elif run.test_id:
-            spec = session.query(Test).filter(Test.id == run.test_id).one()
-            compiled_spec = spec.expected_output
-            logger.debug(f"Using expected_output from test: {spec.name}")
+            test_obj = session.query(Test).filter(Test.id == run.test_id).one()
+            raw_spec = test_obj.expected_output
+            logger.debug(f"Using expected_output from test: {test_obj.name}")
         else:
             # No assertions - return empty evaluation
-            compiled_spec = {"assertions": []}
+            raw_spec = {"assertions": []}
             logger.debug("No expectedOutput or test_id - using empty assertions")
+
+        # Compile the spec to normalize predicates (e.g., "to": true -> "to": {"eq": true})
+        compiled_spec = core_eval.compile(raw_spec)
 
         evaluation = core_eval.evaluate(
             compiled_spec=compiled_spec,

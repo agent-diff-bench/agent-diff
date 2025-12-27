@@ -12,6 +12,7 @@ from sqlalchemy import (
     Enum,
     UniqueConstraint,
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 
@@ -112,6 +113,7 @@ class Message(Base):
     )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False)
     message_text: Mapped[str | None] = mapped_column(Text)
+    blocks: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.now)
 
     channel: Mapped["Channel"] = relationship(back_populates="messages")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Any, Literal, Mapping, Sequence
+import json
 import re
 
 
@@ -50,16 +51,23 @@ def _matches_predicate(value: Any, pred: Mapping[str, Any]) -> bool:
         except TypeError:
             return False
     if op == "contains":
+        # Handle JSONB (dict/list) by converting to JSON string (compact, no spaces)
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value, separators=(",", ":"))
         return (
             isinstance(value, str) and isinstance(expected, str) and expected in value
         )
     if op == "not_contains":
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value, separators=(",", ":"))
         return (
             isinstance(value, str)
             and isinstance(expected, str)
             and expected not in value
         )
     if op == "i_contains":
+        if isinstance(value, (dict, list)):
+            value = json.dumps(value, separators=(",", ":"))
         return (
             isinstance(value, str)
             and isinstance(expected, str)

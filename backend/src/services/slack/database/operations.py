@@ -230,6 +230,7 @@ def send_message(
     message_text: str,
     parent_id: Optional[str] = None,
     created_at: Optional[datetime] = None,
+    blocks: Optional[list] = None,
 ):
     user = session.get(User, user_id)
     if user is None:
@@ -250,6 +251,7 @@ def send_message(
         user_id=user_id,
         message_text=message_text,
         parent_id=parent_id,
+        blocks=blocks,
         **({"created_at": created_at} if created_at is not None else {}),
     )
     session.add(message)
@@ -263,6 +265,7 @@ def send_direct_message(
     recipient_id: str,
     team_id: str | None = None,
     created_at: Optional[datetime] = None,
+    blocks: Optional[list] = None,
 ):
     sender = session.get(User, sender_id)
     recipient = session.get(User, recipient_id)
@@ -281,6 +284,7 @@ def send_direct_message(
         channel_id=dm_channel.channel_id,
         user_id=sender_id,
         message_text=message_text,
+        blocks=blocks,
         **({"created_at": created_at} if created_at is not None else {}),
     )
     session.add(message)
@@ -337,11 +341,18 @@ def remove_emoji_reaction(session: Session, user_id: str, reaction_id: str):
     return reaction
 
 
-def update_message(session: Session, message_id: str, text: str) -> Message:
+def update_message(
+    session: Session,
+    message_id: str,
+    text: str,
+    blocks: Optional[list] = None,
+) -> Message:
     message = session.get(Message, message_id)
     if message is None:
         raise ValueError("Message not found")
     message.message_text = text
+    if blocks is not None:
+        message.blocks = blocks
     return message
 
 

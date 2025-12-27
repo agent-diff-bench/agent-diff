@@ -226,6 +226,100 @@ def _has_content(value: Any) -> bool:
     return True
 
 
+def _blocks_to_mrkdwn(blocks: list) -> str:
+    """Extract text from Block Kit blocks and convert to mrkdwn format.
+
+    Matches Slack's behavior of auto-generating text from blocks.
+    Bold -> *text*, Italic -> _text_, Strike -> ~text~, Code -> `text`
+    """
+    if not blocks:
+        return ""
+
+    parts: list[str] = []
+
+    for block in blocks:
+        block_type = block.get("type", "")
+
+        if block_type == "rich_text":
+            for element in block.get("elements", []):
+                element_type = element.get("type", "")
+
+                if element_type == "rich_text_section":
+                    for item in element.get("elements", []):
+                        parts.append(_element_to_mrkdwn(item))
+
+                elif element_type == "rich_text_list":
+                    style = element.get("style", "bullet")
+                    for idx, list_item in enumerate(element.get("elements", [])):
+                        prefix = f"{idx + 1}. " if style == "ordered" else "• "
+                        item_texts = [
+                            _element_to_mrkdwn(el)
+                            for el in list_item.get("elements", [])
+                        ]
+                        parts.append(prefix + "".join(item_texts))
+
+                elif element_type == "rich_text_preformatted":
+                    code_parts = [
+                        _element_to_mrkdwn(item, in_code=True)
+                        for item in element.get("elements", [])
+                    ]
+                    parts.append("```" + "".join(code_parts) + "```")
+
+                elif element_type == "rich_text_quote":
+                    quote_parts = [
+                        _element_to_mrkdwn(item) for item in element.get("elements", [])
+                    ]
+                    parts.append(">" + "".join(quote_parts))
+
+        elif block_type == "section":
+            text_obj = block.get("text", {})
+            if text_obj.get("type") == "mrkdwn":
+                parts.append(text_obj.get("text", ""))
+            elif text_obj.get("type") == "plain_text":
+                parts.append(text_obj.get("text", ""))
+
+    return "\n".join(parts) if parts else ""
+
+
+def _element_to_mrkdwn(item: dict, in_code: bool = False) -> str:
+    """Convert a single element to mrkdwn format."""
+    item_type = item.get("type", "")
+
+    if item_type == "text":
+        text = item.get("text", "")
+        if in_code:
+            return text
+        style = item.get("style", {})
+        if style.get("bold"):
+            text = f"*{text}*"
+        if style.get("italic"):
+            text = f"_{text}_"
+        if style.get("strike"):
+            text = f"~{text}~"
+        if style.get("code"):
+            text = f"`{text}`"
+        return text
+
+    elif item_type == "user":
+        user_id = item.get("user_id", "")
+        return f"<@{user_id}>"
+
+    elif item_type == "channel":
+        channel_id = item.get("channel_id", "")
+        return f"<#{channel_id}>"
+
+    elif item_type == "link":
+        url = item.get("url", "")
+        link_text = item.get("text", url)
+        return f"<{url}|{link_text}>"
+
+    elif item_type == "emoji":
+        name = item.get("name", "")
+        return f":{name}:"
+
+    return ""
+
+
 def _channel_members(session, channel_id: str) -> list[str]:
     return list(
         session.execute(
@@ -704,10 +798,13 @@ async def chat_post_message(request: Request) -> JSONResponse:
     if session.get(ChannelMember, (channel_id, user_id)) is None:
         _slack_error("not_in_channel")
 
+    # Determine message_text: use provided text, or extract from blocks
     if isinstance(text, str) and _has_content(text):
         message_text = text
     elif _has_content(text):
         message_text = str(text)
+    elif blocks is not None:
+        message_text = _blocks_to_mrkdwn(blocks)
     else:
         message_text = ""
 
@@ -717,6 +814,7 @@ async def chat_post_message(request: Request) -> JSONResponse:
         user_id=user_id,
         message_text=message_text,
         parent_id=thread_ts,
+        blocks=blocks,
     )
 
     message_obj: dict[str, Any] = {
@@ -727,8 +825,8 @@ async def chat_post_message(request: Request) -> JSONResponse:
     }
     if _has_content(attachments):
         message_obj["attachments"] = attachments
-    if blocks is not None:
-        message_obj["blocks"] = blocks
+    if message.blocks is not None:
+        message_obj["blocks"] = message.blocks
     if message.parent_id:
         message_obj["thread_ts"] = message.parent_id
 
@@ -786,12 +884,21 @@ async def chat_update(request: Request) -> JSONResponse:
     if msg.user_id != actor_id:
         _slack_error("cant_update_message")
 
-    # Update the message
+    # Determine message_text: use provided text, or extract from blocks
     if _has_content(text):
         message_text = text if isinstance(text, str) else str(text)
-        message = ops.update_message(session=session, message_id=ts, text=message_text)
+    elif blocks is not None:
+        message_text = _blocks_to_mrkdwn(blocks)
     else:
-        message = msg
+        message_text = msg.message_text or ""
+
+    # Update the message
+    message = ops.update_message(
+        session=session,
+        message_id=ts,
+        text=message_text,
+        blocks=blocks,
+    )
 
     response: dict[str, Any] = {
         "ok": True,
@@ -809,8 +916,8 @@ async def chat_update(request: Request) -> JSONResponse:
     message_payload = response["message"]
     if _has_content(attachments):
         message_payload["attachments"] = attachments
-    if blocks is not None:
-        message_payload["blocks"] = blocks
+    if message.blocks is not None:
+        message_payload["blocks"] = message.blocks
     if message.parent_id:
         message_payload["thread_ts"] = message.parent_id
 
@@ -1084,6 +1191,8 @@ async def conversations_history(request: Request) -> JSONResponse:
         }
         if msg.parent_id:
             msg_obj["thread_ts"] = msg.parent_id
+        if msg.blocks is not None:
+            msg_obj["blocks"] = msg.blocks
         message_list.append(msg_obj)
 
     response = {
@@ -1220,6 +1329,9 @@ async def conversations_replies(request: Request) -> JSONResponse:
             payload["unread_count"] = 0
         else:
             payload["parent_user_id"] = _format_user_id(thread_root.user_id)
+
+        if msg.blocks is not None:
+            payload["blocks"] = msg.blocks
 
         messages_payload.append(payload)
 

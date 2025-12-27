@@ -265,6 +265,10 @@
     {
       "channel_id": "C04MNOP3456",
       "user_id": "U01AGENBOT9"
+    },
+    {
+      "channel_id": "C06ALPHADEV",
+      "user_id": "U01AGENBOT9"
     }
   ],
   "messages": [

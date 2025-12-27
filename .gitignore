@@ -238,3 +238,6 @@ backend/src/services/linear/api/resolvers.py.backup
 # Temporary documentation
 backend/FILES_CREATED.md
 third_party/
+slack_credentials.md
+.env
+.env.local

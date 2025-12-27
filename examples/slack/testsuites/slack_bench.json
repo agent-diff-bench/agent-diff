@@ -204,17 +204,18 @@
       "impersonate_user_id": "U01AGENBOT9",
       "assertions": [
         {
-          "diff_type": "updated",
+          "diff_type": "changed",
           "entity": "channels",
           "where": {
             "channel_id": {
               "eq": "C04MNOP3456"
-            },
-            "is_archived": {
-              "eq": true
             }
           },
-          "expected_count": 1
+          "expected_changes": {
+            "is_archived": {
+              "to": true
+            }
+          }
         }
       ]
     },
@@ -1071,7 +1072,7 @@
               "eq": "C03IJKL9012"
             },
             "blocks": {
-              "contains": "\"type\":\"markdown\""
+              "contains": "\"type\":\"mrkdwn\""
             }
           },
           "expected_count": 1
@@ -1160,7 +1161,7 @@
     {
       "id": "test_30",
       "name": "Set Operations: Group Invite based on Topic",
-      "prompt": "Create a new channel called 'auth-force' and invite everyone who has posted about 'login' or 'password' in #engineering.",
+      "prompt": "Create a new channel called 'auth-force' and invite everyone who has posted about 'login' or 'password'.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -1197,7 +1198,7 @@
     {
       "id": "test_32",
       "name": "Constraint Verification (Negative Test)",
-      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Hubert).",
+      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Hubert) via Slack.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
