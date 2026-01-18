@@ -27,6 +27,11 @@ from .base import Base
 from ..utils.enums import BoxItemStatus, BoxTaskAction, BoxTaskCompletionRule
 
 
+def _empty_user_mini() -> dict:
+    """Return an empty user mini dict (used for root folder created_by/modified_by)."""
+    return {"type": "user", "id": "", "name": "", "login": ""}
+
+
 # =============================================================================
 # USER MODEL
 # =============================================================================
@@ -321,6 +326,67 @@ class Folder(Base):
             "name": self.name,
         }
 
+    def to_item_dict(self) -> dict:
+        """Return folder representation for item listings (includes fields returned by list_folder_items)."""
+        return {
+            "type": "folder",
+            "id": self.id,
+            "sequence_id": self.sequence_id,
+            "etag": self.etag,
+            "name": self.name,
+            "description": self.description,
+            "size": self.size,
+            "item_status": self.item_status,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "modified_at": self.modified_at.isoformat() if self.modified_at else None,
+            "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
+            "content_created_at": self.content_created_at.isoformat()
+            if self.content_created_at
+            else None,
+            "content_modified_at": self.content_modified_at.isoformat()
+            if self.content_modified_at
+            else None,
+            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            "modified_by": self.modified_by.to_mini_dict()
+            if self.modified_by
+            else None,
+            "parent": self.parent.to_mini_dict() if self.parent else None,
+            "path_collection": self._get_path_collection(),
+            "folder_upload_email": self.folder_upload_email,
+        }
+
+    def to_search_dict(self) -> dict:
+        """Return folder representation for search results (Box search API format)."""
+        return {
+            "id": self.id,
+            "type": "folder",
+            "name": self.name,
+            "parent": self.parent.to_mini_dict() if self.parent else None,
+            "sequence_id": self.sequence_id,
+            "etag": self.etag,
+            "size": self.size,
+            "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
+            "modified_at": self.modified_at.isoformat() if self.modified_at else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "path_collection": self._get_path_collection(),
+            "modified_by": self.modified_by.to_mini_dict()
+            if self.modified_by
+            else None,
+            "item_status": self.item_status,
+            "content_created_at": self.content_created_at.isoformat()
+            if self.content_created_at
+            else None,
+            "content_modified_at": self.content_modified_at.isoformat()
+            if self.content_modified_at
+            else None,
+            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            "description": self.description or "",
+            "folder_upload_email": self.folder_upload_email,
+            "owned_by": self.owned_by.to_mini_dict() if self.owned_by else None,
+            "purged_at": self.purged_at.isoformat() if self.purged_at else None,
+            "shared_link": self.shared_link,
+        }
+
     def to_dict(self, include_items: bool = False) -> dict:
         """Return full folder representation (FolderFull)."""
         result = {
@@ -345,10 +411,13 @@ class Folder(Base):
             "content_modified_at": self.content_modified_at.isoformat()
             if self.content_modified_at
             else None,
-            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            # For root folder (id=0), Box returns empty user objects instead of null
+            "created_by": self.created_by.to_mini_dict()
+            if self.created_by
+            else _empty_user_mini(),
             "modified_by": self.modified_by.to_mini_dict()
             if self.modified_by
-            else None,
+            else _empty_user_mini(),
             "owned_by": self.owned_by.to_mini_dict() if self.owned_by else None,
             "parent": self.parent.to_mini_dict() if self.parent else None,
             "path_collection": self._get_path_collection(),
@@ -369,13 +438,32 @@ class Folder(Base):
             "is_associated_with_app_item": self.is_associated_with_app_item,
         }
 
+        # Always include item_collection (Box API always returns this for folders)
+        total_count = (
+            len(self.children) + len(self.files) if self.children is not None else 0
+        )
+        # Default order matches Box API behavior
+        default_order = [
+            {"by": "type", "direction": "ASC"},
+            {"by": "name", "direction": "ASC"},
+        ]
         if include_items:
             result["item_collection"] = {
-                "total_count": len(self.children) + len(self.files),
+                "total_count": total_count,
                 "entries": [f.to_mini_dict() for f in self.children]
                 + [f.to_mini_dict() for f in self.files],
                 "offset": 0,
                 "limit": 100,
+                "order": default_order,
+            }
+        else:
+            # Return item_collection with just the count, no entries
+            result["item_collection"] = {
+                "total_count": total_count,
+                "entries": [],
+                "offset": 0,
+                "limit": 100,
+                "order": default_order,
             }
 
         return result
@@ -553,10 +641,75 @@ class File(Base):
         return {
             "type": "file",
             "id": self.id,
+            "file_version": self._get_file_version_dict(),
             "sequence_id": self.sequence_id,
             "etag": self.etag,
             "sha1": self.sha_1,  # API response uses "sha1" not "sha_1"
             "name": self.name,
+        }
+
+    def to_item_dict(self) -> dict:
+        """Return file representation for item listings (includes fields returned by list_folder_items)."""
+        return {
+            "type": "file",
+            "id": self.id,
+            "sequence_id": self.sequence_id,
+            "etag": self.etag,
+            "sha1": self.sha_1,  # API response uses "sha1" not "sha_1"
+            "name": self.name,
+            "description": self.description,
+            "size": self.size,
+            "item_status": self.item_status,
+            "file_version": self._get_file_version_dict(),
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "modified_at": self.modified_at.isoformat() if self.modified_at else None,
+            "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
+            "content_created_at": self.content_created_at.isoformat()
+            if self.content_created_at
+            else None,
+            "content_modified_at": self.content_modified_at.isoformat()
+            if self.content_modified_at
+            else None,
+            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            "modified_by": self.modified_by.to_mini_dict()
+            if self.modified_by
+            else None,
+            "parent": self.parent.to_mini_dict() if self.parent else None,
+            "path_collection": self._get_path_collection(),
+        }
+
+    def to_search_dict(self) -> dict:
+        """Return file representation for search results (Box search API format)."""
+        return {
+            "id": self.id,
+            "type": "file",
+            "name": self.name,
+            "parent": self.parent.to_mini_dict() if self.parent else None,
+            "sequence_id": self.sequence_id,
+            "etag": self.etag,
+            "size": self.size,
+            "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
+            "modified_at": self.modified_at.isoformat() if self.modified_at else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "path_collection": self._get_path_collection(),
+            "modified_by": self.modified_by.to_mini_dict()
+            if self.modified_by
+            else None,
+            "item_status": self.item_status,
+            "content_created_at": self.content_created_at.isoformat()
+            if self.content_created_at
+            else None,
+            "content_modified_at": self.content_modified_at.isoformat()
+            if self.content_modified_at
+            else None,
+            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            "description": self.description or "",
+            "sha1": self.sha_1,
+            "file_version": self._get_file_version_dict(),
+            "folder_upload_email": None,  # Files don't have this, but Box returns it
+            "owned_by": self.owned_by.to_mini_dict() if self.owned_by else None,
+            "purged_at": self.purged_at.isoformat() if self.purged_at else None,
+            "shared_link": self.shared_link,
         }
 
     def to_dict(self) -> dict:
@@ -831,8 +984,19 @@ class Comment(Base):
         "User", back_populates="comments"
     )
 
+    def to_list_dict(self) -> dict:
+        """Return comment representation for list responses (Box API standard)."""
+        return {
+            "type": "comment",
+            "id": self.id,
+            "is_reply_comment": self.is_reply_comment,
+            "message": self.message,
+            "created_by": self.created_by.to_mini_dict() if self.created_by else None,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
     def to_dict(self) -> dict:
-        """Return full comment representation."""
+        """Return full comment representation (for single comment GET)."""
         return {
             "type": "comment",
             "id": self.id,

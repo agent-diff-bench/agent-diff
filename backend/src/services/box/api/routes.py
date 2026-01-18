@@ -155,17 +155,18 @@ def _filter_fields(data: dict, fields: Optional[List[str]]) -> dict:
 
     Box API behavior per SDK documentation:
     - If no fields specified, return standard response (all fields)
-    - If fields specified, return only those fields PLUS 'id' and 'type'
+    - If fields specified, return only those fields PLUS base fields
+    - Base fields always included: id, type, etag (NOT sequence_id)
     """
     if not fields:
         return data
 
-    # Always include id and type (Box API behavior)
+    # Always include base fields (Box API always returns these)
+    base_fields = ["id", "type", "etag"]
     result = {}
-    if "id" in data:
-        result["id"] = data["id"]
-    if "type" in data:
-        result["type"] = data["type"]
+    for bf in base_fields:
+        if bf in data:
+            result[bf] = data[bf]
 
     # Add requested fields
     for field in fields:
@@ -571,7 +572,7 @@ async def create_folder(request: Request) -> Response:
             user_id=user_id,
         )
 
-        folder_data = new_folder.to_dict()
+        folder_data = new_folder.to_dict(include_items=True)
         filtered_data = _filter_fields(folder_data, fields)
 
         return _json_response(filtered_data, status_code=status.HTTP_201_CREATED)
@@ -610,7 +611,10 @@ async def get_folder_by_id(request: Request) -> Response:
         fields = _parse_fields(request)
         if_none_match = request.headers.get("if-none-match")
 
-        folder = ops.get_folder_by_id(session, folder_id)
+        # Load children and files for item_collection
+        folder = ops.get_folder_by_id(
+            session, folder_id, load_children=True, load_files=True
+        )
         if not folder:
             _box_error(
                 BoxErrorCode.NOT_FOUND,
@@ -630,7 +634,8 @@ async def get_folder_by_id(request: Request) -> Response:
         if if_none_match and folder.etag == if_none_match:
             return Response(status_code=status.HTTP_304_NOT_MODIFIED)
 
-        folder_data = folder.to_dict()
+        # Box API always returns item_collection with entries for GET /folders/{id}
+        folder_data = folder.to_dict(include_items=True)
         filtered_data = _filter_fields(folder_data, fields)
 
         return _json_response(filtered_data)
@@ -705,7 +710,13 @@ async def update_folder_by_id(request: Request) -> Response:
             tags=tags,
         )
 
-        folder_data = updated_folder.to_dict()
+        # Re-fetch with children and files for item_collection
+        folder_with_items = ops.get_folder_by_id(
+            session, updated_folder.id, load_children=True, load_files=True
+        )
+        # folder_with_items should never be None since we just updated it
+        assert folder_with_items is not None
+        folder_data = folder_with_items.to_dict(include_items=True)
         filtered_data = _filter_fields(folder_data, fields)
 
         return _json_response(filtered_data)

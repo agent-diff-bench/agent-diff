@@ -1,13 +1,13 @@
 import json
-import os
-import mimetypes
+import hashlib
 from datetime import datetime, timedelta
 from pathlib import Path
-import hashlib
 
-# Configuration
-SOURCE_DIR = Path("examples/box/seeds/filesystem")
-OUTPUT_FILE = Path("examples/box/seeds/box_default.json")
+# Configuration - resolve paths relative to script
+SCRIPT_DIR = Path(__file__).parent.resolve()
+REPO_ROOT = SCRIPT_DIR.parent.parent  # examples/box -> examples -> repo root
+SOURCE_DIR = REPO_ROOT / "examples/box/seeds/filesystem"
+OUTPUT_FILE = REPO_ROOT / "examples/box/seeds/box_default.json"
 
 # Fixed IDs for test reliability (Box uses 10-12 digit numeric strings)
 ADMIN_ID = "27512847635"
@@ -21,7 +21,8 @@ USERS = [
         "type": "user",
         "name": "Admin User",
         "login": "admin@example.com",
-        "created_at": "2024-01-01T00:00:00Z",
+        "created_at": "2026-01-18T00:00:00Z",
+        "modified_at": "2026-01-18T00:00:00Z",
         "status": "active",
         "role": "admin",
     },
@@ -30,7 +31,8 @@ USERS = [
         "type": "user",
         "name": "Sarah Researcher",
         "login": "sarah@example.com",
-        "created_at": "2024-01-01T00:00:00Z",
+        "created_at": "2026-01-18T00:00:00Z",
+        "modified_at": "2026-01-18T00:00:00Z",
         "status": "active",
         "role": "user",
     },
@@ -39,16 +41,21 @@ USERS = [
         "type": "user",
         "name": "John Viewer",
         "login": "john@example.com",
-        "created_at": "2024-01-01T00:00:00Z",
+        "created_at": "2026-01-18T00:00:00Z",
+        "modified_at": "2026-01-18T00:00:00Z",
         "status": "active",
         "role": "user",
     },
 ]
 
 
-def generate_id(prefix, path_str):
-    """Generate a deterministic numeric ID from a string path."""
-    hash_obj = hashlib.md5(path_str.encode())
+def generate_id(prefix: str, path_str: str) -> str:
+    """Generate a deterministic numeric ID from a prefix and path string.
+
+    The prefix is included in the hash to avoid collisions between different
+    entity types (e.g., a folder and file with the same path).
+    """
+    hash_obj = hashlib.md5(f"{prefix}:{path_str}".encode())
     # Take first 10 digits of int representation
     return str(int(hash_obj.hexdigest(), 16))[:10]
 
@@ -79,10 +86,14 @@ def scan_directory(path: Path, parent_id="0"):
                 "parent_id": parent_id,
                 "created_at": created_at,
                 "modified_at": created_at,
+                "created_by_id": ADMIN_ID,
+                "modified_by_id": ADMIN_ID,
                 "owned_by_id": ADMIN_ID,
                 "description": f"Folder for {item.name}",
                 "item_status": "active",
                 "size": 0,
+                "sequence_id": "0",  # Real Box API returns "0" for new folders
+                "etag": "0",  # Real Box API returns "0" for new folders
             }
             items["folders"].append(folder)
 
@@ -104,6 +115,8 @@ def scan_directory(path: Path, parent_id="0"):
                 "parent_id": parent_id,
                 "created_at": created_at,
                 "modified_at": created_at,
+                "created_by_id": ADMIN_ID,
+                "modified_by_id": ADMIN_ID,
                 "owned_by_id": ADMIN_ID,
                 "size": size,
                 "extension": item.suffix.lstrip("."),
@@ -111,6 +124,8 @@ def scan_directory(path: Path, parent_id="0"):
                 "version_number": "1",
                 "comment_count": 0,
                 "item_status": "active",
+                "sequence_id": "0",  # Real Box API returns "0" for new files
+                "etag": "0",  # Real Box API returns "0" for new files
             }
             items["files"].append(file_obj)
 
@@ -127,7 +142,7 @@ def scan_directory(path: Path, parent_id="0"):
                 "modified_at": created_at,
                 "modified_by_id": ADMIN_ID,
                 "version_number": "1",
-                "local_path": str(item),  # Path to read content from during seeding
+                "local_path": str(item.relative_to(REPO_ROOT)),
             }
             items["file_versions"].append(file_version)
 
@@ -198,10 +213,27 @@ def main():
     print(f"Scanning {SOURCE_DIR}...")
     content = scan_directory(SOURCE_DIR)
 
+    # Root folder (ID "0") must exist for other folders to reference as parent
+    # Real Box API returns null for most root folder fields
+    root_folder = {
+        "id": "0",
+        "type": "folder",
+        "name": "All Files",
+        "parent_id": None,  # Root has no parent
+        "created_at": None,  # Real Box API returns null
+        "modified_at": None,  # Real Box API returns null
+        "owned_by_id": ADMIN_ID,
+        "description": "",
+        "item_status": "active",
+        "size": 0,
+        "sequence_id": None,
+        "etag": None,
+    }
+
     # Structure for the seed file
     seed_data = {
         "box_users": USERS,
-        "box_folders": content["folders"],
+        "box_folders": [root_folder] + content["folders"],
         "box_files": content["files"],
         "box_file_versions": content["file_versions"],
         # "box_file_contents": [], # Skipping binary content in JSON
@@ -210,11 +242,18 @@ def main():
         "box_hubs": [
             {
                 "id": "999999",
-                "type": "hub",
-                "name": "Research Project Hub",
+                "type": "hubs",  # Box uses "hubs" not "hub"
+                "title": "Research Project Hub",  # Schema uses 'title' not 'name'
+                "description": "Hub for research project files",
                 "created_by_id": ADMIN_ID,
+                "updated_by_id": ADMIN_ID,
                 "created_at": datetime.now().isoformat(),
-                "status": "active",
+                "updated_at": datetime.now().isoformat(),
+                "is_ai_enabled": True,
+                "can_non_owners_invite": True,
+                "can_shared_link_be_created": True,
+                "is_collaboration_restricted_to_enterprise": False,
+                "view_count": 0,
             }
         ],
         "box_hub_items": [],

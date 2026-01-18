@@ -3,6 +3,7 @@ Box Database Operations - CRUD operations for all Box entities.
 """
 
 import hashlib
+import re
 from datetime import datetime
 from typing import Optional, Literal, cast
 
@@ -50,12 +51,26 @@ ALLOWED_SORT_FIELDS = frozenset(
         "name",
         "id",
         "size",
+        "date",
         "created_at",
         "modified_at",
         "content_created_at",
         "content_modified_at",
     }
 )
+
+# Map sort field aliases to actual DB columns
+SORT_FIELD_ALIASES = {
+    "date": "modified_at",
+}
+
+# Allowed sort directions
+ALLOWED_SORT_DIRECTIONS = frozenset({"ASC", "DESC"})
+
+# Regex for invalid folder/file name characters (Box doesn't allow emojis)
+INVALID_NAME_PATTERN = re.compile(
+    r"[\x00-\x1f/\\]|[\U00010000-\U0010FFFF]"
+)  # Control chars, slashes, emojis
 
 
 class _Unset:
@@ -184,7 +199,8 @@ def get_folder_by_id(
     if load_children:
         stmt = stmt.options(joinedload(Folder.children))
     if load_files:
-        stmt = stmt.options(joinedload(Folder.files))
+        # Also load file versions for file_version in to_mini_dict()
+        stmt = stmt.options(joinedload(Folder.files).joinedload(File.versions))
 
     return session.execute(stmt).scalars().first()
 
@@ -212,6 +228,16 @@ def ensure_root_folder(session: Session, user_id: str) -> Folder:
     return root
 
 
+def _validate_item_name(name: str) -> None:
+    """Validate folder/file name according to Box API rules."""
+    if INVALID_NAME_PATTERN.search(name):
+        raise BoxAPIError(
+            code=BoxErrorCode.ITEM_NAME_INVALID,
+            message="Names cannot contain non-printable ASCII, / or \\, names with trailing spaces, or . and ..",
+            status_code=400,
+        )
+
+
 def create_folder(
     session: Session,
     *,
@@ -222,6 +248,9 @@ def create_folder(
     description: Optional[str] = None,
 ) -> Folder:
     """Create a new folder."""
+    # Validate folder name
+    _validate_item_name(name)
+
     # Validate parent exists
     parent = get_folder_by_id(session, parent_id)
     if not parent:
@@ -334,11 +363,21 @@ def update_folder(
         )
 
         if existing:
-            raise conflict_error(
-                "Item with the same name already exists",
-                conflicts=[
-                    {"type": "folder", "id": existing.id, "name": existing.name}
-                ],
+            raise BoxAPIError(
+                code=BoxErrorCode.ITEM_NAME_IN_USE,
+                message="Item with the same name already exists",
+                status_code=409,
+                context_info={
+                    "conflicts": [
+                        {
+                            "type": "folder",
+                            "id": existing.id,
+                            "sequence_id": existing.sequence_id,
+                            "etag": existing.etag,
+                            "name": existing.name,
+                        }
+                    ]
+                },
             )
         folder.name = name
 
@@ -354,6 +393,27 @@ def update_folder(
         # Check if new_parent is a descendant of this folder (would create a cycle)
         if _is_descendant_of(session, parent_id, folder_id):
             raise bad_request_error("Cannot move folder into its own descendant")
+        # Check for name conflict in new parent folder
+        existing = (
+            session.execute(
+                select(Folder).where(
+                    and_(
+                        Folder.parent_id == parent_id,
+                        Folder.name == folder.name,
+                        Folder.id != folder_id,
+                    )
+                )
+            )
+            .scalars()
+            .first()
+        )
+        if existing:
+            raise conflict_error(
+                "Item with the same name already exists",
+                conflicts=[
+                    {"type": "folder", "id": existing.id, "name": existing.name}
+                ],
+            )
         folder.parent_id = parent_id
     if tags is not None:
         folder.tags = tags
@@ -395,11 +455,28 @@ def list_folder_items(
     Box API returns folders first, then files, each sorted by the specified field.
     This matches the real Box API behavior.
     """
+    # Validate limit (Box rejects negative values)
+    if limit < 0:
+        raise bad_request_error("Invalid value for 'limit'. Must be non-negative.")
+
+    # Validate offset (Box rejects negative values)
+    if offset < 0:
+        raise bad_request_error("Invalid value for 'offset'. Must be non-negative.")
+
+    # Validate sort_direction
+    if sort_direction.upper() not in ALLOWED_SORT_DIRECTIONS:
+        raise bad_request_error(
+            f"Invalid value for 'direction'. Must be one of: {', '.join(sorted(ALLOWED_SORT_DIRECTIONS))}"
+        )
+
     # Validate sort_by against allowed fields to prevent AttributeError
     if sort_by not in ALLOWED_SORT_FIELDS:
         raise bad_request_error(
             f"Invalid sort field '{sort_by}'. Allowed: {', '.join(sorted(ALLOWED_SORT_FIELDS))}"
         )
+
+    # Resolve sort field aliases (e.g., 'date' -> 'modified_at')
+    actual_sort_by = SORT_FIELD_ALIASES.get(sort_by, sort_by)
 
     folder = get_folder_by_id(session, folder_id)
     if not folder:
@@ -430,6 +507,22 @@ def list_folder_items(
     )
     total_count = folders_count + files_count
 
+    # Box rejects offset values that exceed total_count
+    if offset > 0 and offset >= total_count:
+        raise BoxAPIError(
+            code=BoxErrorCode.BAD_REQUEST,
+            message="Bad Request",
+            context_info={
+                "errors": [
+                    {
+                        "reason": "invalid_parameter",
+                        "name": "offset",
+                        "message": f"Invalid value '{offset}'.",
+                    }
+                ]
+            },
+        )
+
     # Determine which items to fetch based on offset
     # Box returns folders first, then files
     entries = []
@@ -454,9 +547,11 @@ def list_folder_items(
         )
 
         if sort_direction.upper() == "DESC":
-            folders_query = folders_query.order_by(getattr(Folder, sort_by).desc())
+            folders_query = folders_query.order_by(
+                getattr(Folder, actual_sort_by).desc()
+            )
         else:
-            folders_query = folders_query.order_by(getattr(Folder, sort_by))
+            folders_query = folders_query.order_by(getattr(Folder, actual_sort_by))
 
         folders = session.execute(folders_query).scalars().all()
         entries.extend([f.to_mini_dict() for f in folders])
@@ -473,6 +568,9 @@ def list_folder_items(
 
         files_query = (
             select(File)
+            .options(
+                joinedload(File.versions)
+            )  # Load versions for file_version in to_mini_dict
             .where(
                 and_(
                     File.parent_id == folder_id,
@@ -484,11 +582,11 @@ def list_folder_items(
         )
 
         if sort_direction.upper() == "DESC":
-            files_query = files_query.order_by(getattr(File, sort_by).desc())
+            files_query = files_query.order_by(getattr(File, actual_sort_by).desc())
         else:
-            files_query = files_query.order_by(getattr(File, sort_by))
+            files_query = files_query.order_by(getattr(File, actual_sort_by))
 
-        files = session.execute(files_query).scalars().all()
+        files = session.execute(files_query).scalars().unique().all()
         entries.extend([f.to_mini_dict() for f in files])
 
     return {
@@ -689,6 +787,25 @@ def update_file(
         new_parent = get_folder_by_id(session, parent_id)
         if not new_parent:
             raise not_found_error("folder", parent_id)
+        # Check for name conflict in new parent folder
+        existing = (
+            session.execute(
+                select(File).where(
+                    and_(
+                        File.parent_id == parent_id,
+                        File.name == file.name,
+                        File.id != file_id,
+                    )
+                )
+            )
+            .scalars()
+            .first()
+        )
+        if existing:
+            raise conflict_error(
+                "Item with the same name already exists",
+                conflicts=[{"type": "file", "id": existing.id, "name": existing.name}],
+            )
         file.parent_id = parent_id
     if tags is not None:
         file.tags = tags
@@ -916,7 +1033,7 @@ def list_file_comments(
 
     return {
         "total_count": total_count,
-        "entries": [c.to_dict() for c in comments],
+        "entries": [c.to_list_dict() for c in comments],
         "offset": offset,
         "limit": limit,
     }
@@ -1083,6 +1200,20 @@ def create_task(
     completion_rule: str = BoxTaskCompletionRule.ALL_ASSIGNEES.value,
 ) -> Task:
     """Create a task on a file."""
+    # Validate action
+    valid_actions = {a.value for a in BoxTaskAction}
+    if action not in valid_actions:
+        raise bad_request_error(
+            f"Invalid action '{action}'. Must be one of: {', '.join(sorted(valid_actions))}"
+        )
+
+    # Validate completion_rule
+    valid_rules = {r.value for r in BoxTaskCompletionRule}
+    if completion_rule not in valid_rules:
+        raise bad_request_error(
+            f"Invalid completion_rule '{completion_rule}'. Must be one of: {', '.join(sorted(valid_rules))}"
+        )
+
     file = get_file_by_id(session, file_id)
     if not file:
         raise not_found_error("file", file_id)
@@ -1374,12 +1505,23 @@ def search_content(
 
     # Search files
     if "file" in content_types:
-        file_query = select(File).where(
-            and_(
-                File.item_status == BoxItemStatus.ACTIVE.value,
-                or_(
-                    File.name.ilike(f"%{query}%"), File.description.ilike(f"%{query}%")
-                ),
+        file_query = (
+            select(File)
+            .options(
+                joinedload(File.parent),
+                joinedload(File.created_by),
+                joinedload(File.modified_by),
+                joinedload(File.owned_by),
+                joinedload(File.versions),
+            )
+            .where(
+                and_(
+                    File.item_status == BoxItemStatus.ACTIVE.value,
+                    or_(
+                        File.name.ilike(f"%{query}%"),
+                        File.description.ilike(f"%{query}%"),
+                    ),
+                )
             )
         )
 
@@ -1391,27 +1533,36 @@ def search_content(
         if ancestor_folder_ids:
             file_query = file_query.where(File.parent_id.in_(ancestor_folder_ids))
 
-        files = session.execute(file_query).scalars().all()
-        results.extend([f.to_mini_dict() for f in files])
+        files = session.execute(file_query).scalars().unique().all()
+        results.extend([f.to_search_dict() for f in files])
 
     # Search folders
     if "folder" in content_types:
-        folder_query = select(Folder).where(
-            and_(
-                Folder.item_status == BoxItemStatus.ACTIVE.value,
-                Folder.id != ROOT_FOLDER_ID,
-                or_(
-                    Folder.name.ilike(f"%{query}%"),
-                    Folder.description.ilike(f"%{query}%"),
-                ),
+        folder_query = (
+            select(Folder)
+            .options(
+                joinedload(Folder.parent),
+                joinedload(Folder.created_by),
+                joinedload(Folder.modified_by),
+                joinedload(Folder.owned_by),
+            )
+            .where(
+                and_(
+                    Folder.item_status == BoxItemStatus.ACTIVE.value,
+                    Folder.id != ROOT_FOLDER_ID,
+                    or_(
+                        Folder.name.ilike(f"%{query}%"),
+                        Folder.description.ilike(f"%{query}%"),
+                    ),
+                )
             )
         )
 
         if ancestor_folder_ids:
             folder_query = folder_query.where(Folder.parent_id.in_(ancestor_folder_ids))
 
-        folders = session.execute(folder_query).scalars().all()
-        results.extend([f.to_mini_dict() for f in folders])
+        folders = session.execute(folder_query).scalars().unique().all()
+        results.extend([f.to_search_dict() for f in folders])
 
     # Paginate
     total_count = len(results)

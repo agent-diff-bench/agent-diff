@@ -11,10 +11,14 @@ Usage:
 """
 
 import os
+import re
 import sys
 import json
 from pathlib import Path
 from uuid import uuid4
+
+# Pattern for safe SQL identifiers (letters, digits, underscores, starting with letter/underscore)
+SAFE_IDENTIFIER_PATTERN = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
@@ -40,12 +44,16 @@ TABLE_ORDER = [
 def create_schema(conn, schema_name: str):
     """Create a PostgreSQL schema.
 
-    Uses double-quoted identifiers to handle schema names with special characters.
+    Validates schema name is a safe SQL identifier to ensure consistency
+    with unquoted usage elsewhere (e.g., schema.table in INSERT statements).
     """
-    # Use double-quoted identifiers for PostgreSQL to safely handle special chars
-    quoted_name = f'"{schema_name}"'
-    conn.execute(text(f"DROP SCHEMA IF EXISTS {quoted_name} CASCADE"))
-    conn.execute(text(f"CREATE SCHEMA {quoted_name}"))
+    if not SAFE_IDENTIFIER_PATTERN.match(schema_name):
+        raise ValueError(
+            f"Invalid schema name '{schema_name}': must start with letter/underscore "
+            "and contain only letters, digits, underscores"
+        )
+    conn.execute(text(f"DROP SCHEMA IF EXISTS {schema_name} CASCADE"))
+    conn.execute(text(f"CREATE SCHEMA {schema_name}"))
 
 
 def create_tables(conn, schema_name: str):

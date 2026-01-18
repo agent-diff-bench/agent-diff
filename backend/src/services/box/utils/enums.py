@@ -48,6 +48,7 @@ class BoxErrorCode(str, Enum):
 
     # Box-specific error codes
     ITEM_NAME_INVALID = "item_name_invalid"
+    ITEM_NAME_IN_USE = "item_name_in_use"
     ITEM_NAME_TOO_LONG = "item_name_too_long"
     INSUFFICIENT_SCOPE = "insufficient_scope"
     ACCESS_DENIED_INSUFFICIENT_PERMISSIONS = "access_denied_insufficient_permissions"
