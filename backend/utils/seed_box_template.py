@@ -50,17 +50,43 @@ def create_tables(conn, schema_name: str):
     Base.metadata.create_all(conn_with_schema, checkfirst=True)
 
 
+def _validate_identifier(identifier: str, allowed_set: set[str], label: str) -> str:
+    """Validate that an identifier is in the allowed set to prevent SQL injection."""
+    if identifier not in allowed_set:
+        raise ValueError(
+            f"Invalid {label}: {identifier}. Must be one of: {allowed_set}"
+        )
+    return identifier
+
+
 def insert_seed_data(conn, schema_name: str, seed_data: dict):
-    """Insert seed data into tables using dynamic SQL.
+    """Insert seed data into tables using parameterized SQL.
+
+    Validates table names and column names against SQLAlchemy metadata
+    to prevent SQL injection through externally controlled values.
 
     Args:
         conn: Database connection
-        schema_name: Target schema name
+        schema_name: Target schema name (must match a known pattern)
         seed_data: Dict mapping table names to lists of records
     """
+    # Validate schema name matches expected pattern (box_* prefixed)
+    if not schema_name.startswith("box_") and schema_name not in ("public",):
+        raise ValueError(f"Invalid schema_name pattern: {schema_name}")
+
+    # Get valid table and column names from SQLAlchemy metadata
+    valid_tables = set(TABLE_ORDER)
+    valid_columns_per_table = {
+        table.name: set(col.name for col in table.columns)
+        for table in Base.metadata.tables.values()
+    }
+
     for table_name in TABLE_ORDER:
         if table_name not in seed_data:
             continue
+
+        # Validate table name
+        _validate_identifier(table_name, valid_tables, "table_name")
 
         records = seed_data[table_name]
         if not records:
@@ -68,7 +94,15 @@ def insert_seed_data(conn, schema_name: str, seed_data: dict):
 
         print(f"  Inserting {len(records)} {table_name}...")
 
+        # Get valid columns for this table
+        valid_columns = valid_columns_per_table.get(table_name, set())
+
         for record in records:
+            # Validate all column names in the record
+            for col_name in record.keys():
+                _validate_identifier(col_name, valid_columns, f"column in {table_name}")
+
+            # Build SQL with validated identifiers
             columns = ", ".join(record.keys())
             placeholders = ", ".join([f":{k}" for k in record.keys()])
             sql = f"INSERT INTO {schema_name}.{table_name} ({columns}) VALUES ({placeholders})"
@@ -190,7 +224,7 @@ def main():
 
         print(f"\n All {1 + len(seed_files)} Box template(s) created successfully\n")
     else:
-        print(f"\n Box base template created successfully (no seed files found)\n")
+        print("\n Box base template created successfully (no seed files found)\n")
 
 
 if __name__ == "__main__":

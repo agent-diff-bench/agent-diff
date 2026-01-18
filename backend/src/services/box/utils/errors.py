@@ -16,6 +16,8 @@ ERROR_STATUS_MAP: dict[BoxErrorCode, int] = {
     BoxErrorCode.ACCEPTED: status.HTTP_202_ACCEPTED,
     BoxErrorCode.NO_CONTENT: status.HTTP_204_NO_CONTENT,
     BoxErrorCode.NOT_MODIFIED: status.HTTP_304_NOT_MODIFIED,
+    # Redirect
+    BoxErrorCode.REDIRECT: status.HTTP_302_FOUND,
     # Client errors
     BoxErrorCode.BAD_REQUEST: status.HTTP_400_BAD_REQUEST,
     BoxErrorCode.UNAUTHORIZED: status.HTTP_401_UNAUTHORIZED,

@@ -836,17 +836,17 @@ def list_file_comments(
     if not file:
         raise not_found_error("file", file_id)
 
-    # Count total
+    # Count total (use file_id which always references the file)
     total_count = (
-        session.execute(select(func.count()).where(Comment.item_id == file_id)).scalar()
+        session.execute(select(func.count()).where(Comment.file_id == file_id)).scalar()
         or 0
     )
 
-    # Get comments
+    # Get comments (use file_id to get all comments on this file, including replies)
     comments = (
         session.execute(
             select(Comment)
-            .where(Comment.item_id == file_id)
+            .where(Comment.file_id == file_id)
             .order_by(Comment.created_at.desc())
             .offset(offset)
             .limit(limit)
@@ -881,16 +881,24 @@ def create_comment(
     - item.type: 'file' or 'comment'
     - message: The comment text
     - tagged_message: Optional message with @mentions
+
+    For FK integrity, we always store file_id separately.
+    For replies, file_id is resolved from the parent comment.
     """
-    # Validate the target item exists
+    # Validate the target item exists and resolve file_id
+    is_reply = False
     if item_type == "file":
         file = get_file_by_id(session, item_id)
         if not file:
             raise not_found_error("file", item_id)
+        file_id = item_id
     elif item_type == "comment":
         parent_comment = get_comment_by_id(session, item_id)
         if not parent_comment:
             raise not_found_error("comment", item_id)
+        # Resolve the file_id from the parent comment
+        file_id = parent_comment.file_id
+        is_reply = True
     else:
         raise bad_request_error(
             f"Invalid item_type: {item_type}. Must be 'file' or 'comment'."
@@ -900,8 +908,10 @@ def create_comment(
         id=comment_id or generate_comment_id(),
         message=message,
         tagged_message=tagged_message,
-        item_id=item_id,
+        file_id=file_id,  # Always references the file for FK integrity
+        item_id=item_id,  # References file or parent comment for Box API semantics
         item_type=item_type,
+        is_reply_comment=is_reply,
         created_by_id=user_id,
     )
     session.add(comment)

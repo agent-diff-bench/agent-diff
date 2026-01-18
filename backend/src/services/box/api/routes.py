@@ -434,9 +434,11 @@ async def download_file(request: Request) -> Response:
                 "Could not find the specified resource",
             )
 
-        # Build redirect URL (relative path within our API)
+        # Build redirect URL using request's base URL to get full mount path
         # This matches Box's pattern of redirecting to a different URL for actual download
-        download_url = f"/files/{file_id}/download"
+        # Extract the base path from request URL (e.g., /api/env/{env_id}/services/box/2.0)
+        base_url = str(request.url).split("/files/")[0]
+        download_url = f"{base_url}/files/{file_id}/download"
         if version:
             download_url += f"?version={version}"
 
@@ -758,29 +760,26 @@ async def list_folder_items(request: Request) -> Response:
         if not folder and folder_id != "0":
             _box_error(BoxErrorCode.NOT_FOUND, "Not Found")
 
-        # Get items
-        items, total_count = ops.list_folder_items(
+        # Get items - returns a dict with total_count, entries, offset, limit, order
+        result = ops.list_folder_items(
             session,
             folder_id,
             limit=limit,
             offset=offset,
+            sort_by=sort,
+            sort_direction=direction,
         )
 
-        # Build entries
-        entries = []
-        for item in items:
-            item_data = (
-                item.to_mini_dict() if hasattr(item, "to_mini_dict") else item.to_dict()
-            )
-            if fields:
-                item_data = _filter_fields(item_data, fields)
-            entries.append(item_data)
+        # Apply field filtering if requested
+        entries = result["entries"]
+        if fields:
+            entries = [_filter_fields(item, fields) for item in entries]
 
         response_data = {
-            "total_count": total_count,
+            "total_count": result["total_count"],
             "entries": entries,
-            "offset": offset,
-            "limit": limit,
+            "offset": result["offset"],
+            "limit": result["limit"],
             "order": [
                 {"by": "type", "direction": "ASC"},
                 {"by": sort, "direction": direction},
@@ -1601,11 +1600,17 @@ async def manage_hub_items(request: Request) -> Response:
                             "item": {"type": item_type, "id": item_id},
                         }
                     )
-                # Note: remove_item_from_hub would need to be implemented
-                # for now, we only support add
+                # Note: Remote MCP only exposes add_items_to_hub, not remove_item_from_hub.
                 else:
-                    results.append(
-                        {"status": "error", "message": "Remove not yet implemented"}
+                    return JSONResponse(
+                        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                        content={
+                            "type": "error",
+                            "status": 501,
+                            "code": "not_implemented",
+                            "message": "Remove operation is not implemented. Remote MCP only supports add_items_to_hub.",
+                            "request_id": generate_request_id(),
+                        },
                     )
             except BoxAPIError as e:
                 results.append({"status": "error", "message": e.message})

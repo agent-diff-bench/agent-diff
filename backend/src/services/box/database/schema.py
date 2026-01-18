@@ -542,7 +542,7 @@ class File(Base):
         back_populates="file",
         order_by="FileVersion.version_number.desc()",
     )
-    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="item")
+    comments: Mapped[List["Comment"]] = relationship("Comment", back_populates="file")
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="item")
 
     # Indexes
@@ -782,6 +782,10 @@ class Comment(Base):
 
     ID format: 9-digit numeric string (e.g., "694434571")
     Based on Box SDK CommentFull schema.
+
+    For replies:
+    - file_id: Always references the underlying file (for FK integrity)
+    - item_id/item_type: References the parent comment (for Box API semantics)
     """
 
     __tablename__ = "box_comments"
@@ -796,10 +800,15 @@ class Comment(Base):
         Text
     )  # Message with @mentions
 
-    # Item reference (currently only files)
-    item_id: Mapped[str] = mapped_column(
+    # File reference (always points to the file, even for replies)
+    # This maintains FK integrity for both direct comments and replies
+    file_id: Mapped[str] = mapped_column(
         String(20), ForeignKey("box_files.id"), index=True
     )
+
+    # Item reference (for Box API semantics: file for direct comments, comment for replies)
+    # Note: No FK constraint because item_id can reference either files or comments
+    item_id: Mapped[str] = mapped_column(String(20), index=True)
     item_type: Mapped[str] = mapped_column(String(20), default="file")
 
     # Reply info
@@ -817,7 +826,7 @@ class Comment(Base):
     )
 
     # Relationships
-    item: Mapped["File"] = relationship("File", back_populates="comments")
+    file: Mapped["File"] = relationship("File", back_populates="comments")
     created_by: Mapped[Optional["User"]] = relationship(
         "User", back_populates="comments"
     )
