@@ -13,14 +13,39 @@
             "trashed_at",
             "etag",
             "sequence_id",
-            "sha1"
+            "sha1",
+            "file_version",
+            "path_collection",
+            "created_by",
+            "modified_by",
+            "owned_by"
         ]
     },
     "tests": [
         {
+            "id": "level0_users_get_me",
+            "name": "Level 0: Get Me",
+            "prompt": "Call `box_users_get_me` to get the current user ID, then create a folder named 'User_<ID>' (replace <ID> with the actual ID) in the root.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "User_27512847635"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
             "id": "level0_folder_create",
             "name": "Level 0: Create Folder Call",
-            "prompt": "Call `box_folder_create_tool` to create a folder named 'Test_Folder_0' with parent_folder_id '0'.",
+            "prompt": "Call `box_folders_create` to create a folder named 'Test_Folder_0' with parent_id '0'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -38,27 +63,160 @@
             ]
         },
         {
-            "id": "level1_search_file",
-            "name": "Level 1: Search for file",
-            "prompt": "Search for files with name containing 'fomcminutes'",
+            "id": "level0_search",
+            "name": "Level 0: Search Call",
+            "prompt": "Call `box_search` with query 'census' and type 'file'. Rename the first file found in the results to 'found_census_item'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
-            "assertions": []
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "found_census_item"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "found_census_item"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_csv_rename_folder_from_cpi",
+            "name": "Level 4: Rename Folder from CSV (CPI)",
+            "prompt": "In the investments area, locate the folder that contains macroeconomic CSV datasets (it includes a huge CPI/price indexes CSV and a transport registrations CSV). Find the CPI/price indexes CSV for December 2025, download/read it, and extract the first data row values for Series_reference and Series_title_1. Rename the macro-data folder to `macro_<Series_reference>` + `_` + `<Series_title_1>`, but replace '.' with '_' in the Series_reference. Then add a comment on that folder: `series=<Series_reference>; title=<Series_title_1>`.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1973339758"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "macro_CPIM_SE901_Food"
+                            }
+                        }
+                    }
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "1973339758"
+                        },
+                        "message": {
+                            "contains": "CPIM.SE901"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level0_folders_list",
+            "name": "Level 0: List Folder Items",
+            "prompt": "Call `box_folders_list_items` for folder ID '5610825569' (investments). If there are more than 0 items, create a folder 'List_Success' inside it.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "List_Success"
+                        },
+                        "parent_id": {
+                            "eq": "5610825569"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level1_get_me_natural",
+            "name": "Level 1: Get Current User",
+            "prompt": "Find out who I am logged in as, and create a folder named exactly equal to my user name in the root directory.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Admin User"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level1_search_fomc",
+            "name": "Level 1: Search for FOMC",
+            "prompt": "Search for files with 'fomc' in the name. Add a comment 'Relevant' to the first file found.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "message": {
+                            "eq": "Relevant"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
         },
         {
             "id": "level1_get_file_info",
-            "name": "Level 1: Get file info",
-            "prompt": "Get information about the file 'goog-10-q-q2-2025.pdf' (ID 1517335716)",
+            "name": "Level 1: Get File Info",
+            "prompt": "Get information about the file 'goog-10-q-q2-2025.pdf' (ID 2748861636). Add a comment to it saying 'Size checked'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
-            "assertions": []
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "2748861636"
+                        },
+                        "message": {
+                            "eq": "Size checked"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
         },
         {
             "id": "level1_create_folder",
-            "name": "Level 1: Create folder",
-            "prompt": "Create a new folder named 'Analysis_2026' inside the 'investments' folder (ID 2217923455)",
+            "name": "Level 1: Create Folder",
+            "prompt": "Create a new folder named 'Analysis_2026' inside the 'investments' folder (ID 5610825569).",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -71,7 +229,7 @@
                             "eq": "Analysis_2026"
                         },
                         "parent_id": {
-                            "eq": "2217923455"
+                            "eq": "5610825569"
                         }
                     },
                     "expected_count": 1
@@ -80,8 +238,8 @@
         },
         {
             "id": "level1_rename_folder",
-            "name": "Level 1: Rename folder",
-            "prompt": "Rename the 'macroeconomics' folder (ID 1533390929) to 'Global Economics'",
+            "name": "Level 1: Rename Folder",
+            "prompt": "Rename the 'macroeconomics' folder (ID 1973339758) to 'Global Economics'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -91,7 +249,7 @@
                     "entity": "box_folders",
                     "where": {
                         "id": {
-                            "eq": "1533390929"
+                            "eq": "1973339758"
                         }
                     },
                     "expected_changes": {
@@ -106,8 +264,8 @@
         },
         {
             "id": "level1_move_file",
-            "name": "Level 1: Move file",
-            "prompt": "Move the file 'transport-april-2025-csv.csv' (ID 2087591570) into the 'investments' folder (ID 2217923455)",
+            "name": "Level 1: Move File",
+            "prompt": "Move the file 'transport-april-2025-csv.csv' (ID 1421498350) into the 'investments' folder (ID 5610825569).",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -117,13 +275,13 @@
                     "entity": "box_files",
                     "where": {
                         "id": {
-                            "eq": "2087591570"
+                            "eq": "1421498350"
                         }
                     },
                     "expected_changes": {
                         "parent_id": {
                             "to": {
-                                "eq": "2217923455"
+                                "eq": "5610825569"
                             }
                         }
                     }
@@ -132,8 +290,8 @@
         },
         {
             "id": "level1_add_comment",
-            "name": "Level 1: Add comment",
-            "prompt": "Add a comment 'Needs review' to the folder 'investments' (ID 2217923455)",
+            "name": "Level 1: Add Comment",
+            "prompt": "Add a comment 'Needs review' to the folder 'investments' (ID 5610825569).",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -146,7 +304,7 @@
                             "contains": "Needs review"
                         },
                         "item_id": {
-                            "eq": "2217923455"
+                            "eq": "5610825569"
                         }
                     },
                     "expected_count": 1
@@ -155,8 +313,8 @@
         },
         {
             "id": "level1_create_task",
-            "name": "Level 1: Create task",
-            "prompt": "Create a task 'Verify data' for file 'transport-april-2025-csv.csv' (ID 2087591570)",
+            "name": "Level 1: Create Task",
+            "prompt": "Create a task 'Verify data' for file 'transport-april-2025-csv.csv' (ID 1421498350).",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -169,7 +327,7 @@
                             "eq": "Verify data"
                         },
                         "item_id": {
-                            "eq": "2087591570"
+                            "eq": "1421498350"
                         }
                     },
                     "expected_count": 1
@@ -177,18 +335,9 @@
             ]
         },
         {
-            "id": "level1_list_items",
-            "name": "Level 1: List folder items",
-            "prompt": "List all items in the 'investments' folder (ID 2217923455)",
-            "type": "actionEval",
-            "seed_template": "box_default",
-            "impersonate_user_id": "27512847635",
-            "assertions": []
-        },
-        {
             "id": "level1_create_hub",
             "name": "Level 1: Create Hub",
-            "prompt": "Create a new Box Hub titled 'Research Center'",
+            "prompt": "Create a new Box Hub titled 'Research Center'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -206,9 +355,107 @@
             ]
         },
         {
+            "id": "level1_download_file",
+            "name": "Level 1: Check File Access",
+            "prompt": "Verify '2001 crisis notes.txt' (ID 5696874158) is accessible by renaming it to '2001_accessible.txt'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "2001_accessible.txt"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level1_lock_file",
+            "name": "Level 1: Lock File",
+            "prompt": "Lock the file '2001 crisis notes.txt' (ID 5696874158) to prevent editing.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "lock": {
+                            "to": {
+                                "not_eq": null
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level1_create_delete_folder",
+            "name": "Level 1: Create Folder (No Delete Available)",
+            "prompt": "Create a folder named 'Temp_Delete' in the root. Since delete may not be available, rename it to 'Temp_Deleted' to mark it as cleaned up.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Temp_Deleted"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level1_get_folder_info",
+            "name": "Level 1: Get Folder Info",
+            "prompt": "Get details for the 'investments' folder (ID 5610825569) and change its description to 'Audit Complete'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "5610825569"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "eq": "Audit Complete"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
             "id": "level2_organize_files",
-            "name": "Level 2: Organize Files (Create + Move)",
-            "prompt": "Create a new folder named 'Finance_Reports' inside 'investments' (ID 2217923455), and then move the file 'goog-10-q-q2-2025.pdf' (ID 1517335716) into it.",
+            "name": "Level 2: Create and Move",
+            "prompt": "Create a new folder named 'Finance_Reports' inside 'investments' (ID 5610825569), and then move the file 'goog-10-q-q2-2025.pdf' (ID 2748861636) into it.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -228,13 +475,13 @@
                     "entity": "box_files",
                     "where": {
                         "id": {
-                            "eq": "1517335716"
+                            "eq": "2748861636"
                         }
                     },
                     "expected_changes": {
                         "parent_id": {
                             "to": {
-                                "not_eq": "0"
+                                "not_eq": "5610825569"
                             }
                         }
                     }
@@ -242,9 +489,9 @@
             ]
         },
         {
-            "id": "level2_review_process",
-            "name": "Level 2: Review Process (Comment + Task)",
-            "prompt": "Add a comment 'Please review this report' to the file 'fomcminutes20250319.pdf' (ID 7034650271) and then create a task 'Review content' for the same file.",
+            "id": "level2_review_loop",
+            "name": "Level 2: Comment and Task",
+            "prompt": "In the history area, find the plain-text study notes about Argentina's 2001 economic crisis. Add a comment 'Please review this note' to that file and then create a task 'Review content' for the same file.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -254,7 +501,7 @@
                     "entity": "box_comments",
                     "where": {
                         "item_id": {
-                            "eq": "7034650271"
+                            "eq": "5696874158"
                         }
                     },
                     "expected_count": 1
@@ -264,7 +511,7 @@
                     "entity": "box_tasks",
                     "where": {
                         "item_id": {
-                            "eq": "7034650271"
+                            "eq": "5696874158"
                         }
                     },
                     "expected_count": 1
@@ -274,7 +521,7 @@
         {
             "id": "level2_rename_move",
             "name": "Level 2: Rename and Move",
-            "prompt": "Rename the file 'transport-april-2025-csv.csv' (ID 2087591570) to 'transport_data_v1.csv' and move it to the 'macroeconomics' folder (ID 1533390929).",
+            "prompt": "Rename the file 'transport-april-2025-csv.csv' (ID 1421498350) to 'transport_v2.csv' and move it to the 'macroeconomics' folder (ID 1973339758).",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -284,18 +531,18 @@
                     "entity": "box_files",
                     "where": {
                         "id": {
-                            "eq": "2087591570"
+                            "eq": "1421498350"
                         }
                     },
                     "expected_changes": {
                         "name": {
                             "to": {
-                                "eq": "transport_data_v1.csv"
+                                "eq": "transport_v2.csv"
                             }
                         },
                         "parent_id": {
                             "to": {
-                                "eq": "1533390929"
+                                "eq": "1973339758"
                             }
                         }
                     }
@@ -303,8 +550,133 @@
             ]
         },
         {
-            "id": "level3_find_organize",
-            "name": "Level 3: Find and Organize (Metadata)",
+            "id": "level4_csv_upload_named_from_transport",
+            "name": "Level 4: Upload TXT named from CSV (Transport)",
+            "prompt": "In the same macro-data folder, find the transport registrations CSV (it has columns like Series_reference, Period, Data_value). Download/read it and take the first data row values for Series_reference and Period. Upload a new small TXT file into the macro-data folder named `transport_<Series_reference>_<Period>.txt`, but replace '.' with '_' in both fields. The file content should include the extracted Series_reference, Period, and Data_value from that first row.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "transport_TPTA_S22IA_1970_12.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1973339758"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level2_hub_setup",
+            "name": "Level 2: Hub Setup",
+            "prompt": "Create a Hub named 'Economic Data' and add the 'macroeconomics' folder (ID 1973339758) to it.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "name": {
+                            "eq": "Economic Data"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "item_id": {
+                            "eq": "1973339758"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level2_find_download",
+            "name": "Level 2: Find and Move",
+            "prompt": "Find the file named 'interviewing tips FINAL.txt'. If found, move it to the 'investments' folder (ID 5610825569).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "interviewing tips FINAL.txt"
+                        }
+                    },
+                    "expected_changes": {
+                        "parent_id": {
+                            "to": {
+                                "eq": "5610825569"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level2_nested_folders",
+            "name": "Level 2: Nested Folders",
+            "prompt": "Create a folder 'Project_Beta' in root, then create a subfolder 'Docs' inside it, and move 'interviewing tips FINAL.txt' (ID 1364279594) into 'Docs'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Project_Beta"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Docs"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "1364279594"
+                        }
+                    },
+                    "expected_changes": {
+                        "parent_id": {
+                            "to": {
+                                "not_eq": "1088403890"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_find_move_all",
+            "name": "Level 3: Find and Move All",
             "prompt": "Find all files with 'fomc' in their name. Create a new folder named 'FOMC_Reports' in the root directory, and move all found files into it.",
             "type": "actionEval",
             "seed_template": "box_default",
@@ -339,9 +711,9 @@
             ]
         },
         {
-            "id": "level3_contextual_task",
-            "name": "Level 3: Contextual Task (Metadata)",
-            "prompt": "I recall seeing a Google 10-K report in the investments folder. Please find it and create a task on it saying 'Extract revenue numbers'.",
+            "id": "level3_find_task",
+            "name": "Level 3: Find and Task",
+            "prompt": "Find the 'goog-10-q-q2-2025.pdf' file and create a task on it saying 'Extract Revenue'.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -351,7 +723,7 @@
                     "entity": "box_tasks",
                     "where": {
                         "message": {
-                            "eq": "Extract revenue numbers"
+                            "eq": "Extract Revenue"
                         }
                     },
                     "expected_count": 1
@@ -359,48 +731,9 @@
             ]
         },
         {
-            "id": "level3_hub_management",
-            "name": "Level 3: Hub Management",
-            "prompt": "Create a new Hub called 'Economic Data' and add the 'macroeconomics' folder (ID 1533390929) to it.",
-            "type": "actionEval",
-            "seed_template": "box_default",
-            "impersonate_user_id": "27512847635",
-            "assertions": [
-                {
-                    "diff_type": "added",
-                    "entity": "box_hubs",
-                    "where": {
-                        "name": {
-                            "eq": "Economic Data"
-                        }
-                    },
-                    "expected_count": 1
-                },
-                {
-                    "diff_type": "added",
-                    "entity": "box_hub_items",
-                    "where": {
-                        "item_id": {
-                            "eq": "1533390929"
-                        }
-                    },
-                    "expected_count": 1
-                }
-            ]
-        },
-        {
-            "id": "level4_content_tag",
-            "name": "Level 4: Content Analysis (Tagging)",
-            "prompt": "Read the file '2001 crisis notes.txt' (ID 1506937596). If it mentions 'Argentina', add the tag 'Latin_America' to it.",
-            "type": "actionEval",
-            "seed_template": "box_default",
-            "impersonate_user_id": "27512847635",
-            "assertions": []
-        },
-        {
-            "id": "level4_content_summary",
-            "name": "Level 4: Content Summary",
-            "prompt": "Read the file 'transport-april-2025-csv.csv' (ID 2087591570). Count the number of lines in the CSV and add a comment to the file with the number.",
+            "id": "level3_count_comment",
+            "name": "Level 3: Count and Comment",
+            "prompt": "Count how many files are in the 'investments' folder (ID 5610825569) and post a comment on the folder with the count.",
             "type": "actionEval",
             "seed_template": "box_default",
             "impersonate_user_id": "27512847635",
@@ -410,7 +743,631 @@
                     "entity": "box_comments",
                     "where": {
                         "item_id": {
-                            "eq": "2087591570"
+                            "eq": "5610825569"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level3_list_rename",
+            "name": "Level 3: List and Rename",
+            "prompt": "List items in the main history folder. Find the plain-text notes about Argentina's 2001 economic crisis and rename that file to EXACTLY '2001_crisis_notes_checked.txt' (ensure there is only one .txt extension; do NOT rename it to '...txt.txt').",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "2001_crisis_notes_checked.txt"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_search_rename_folder",
+            "name": "Level 3: Search and Rename Folder",
+            "prompt": "In the macroeconomics area, there is a dataset folder that contains dozens of 2018 Census CSV files (national highlights / totals by topic). Find that dataset folder and rename it to 'Census_2018_Data'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "9782984299"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "Census_2018_Data"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_read_tag_content",
+            "name": "Level 4: Read and Tag Content",
+            "prompt": "Find the plain-text study notes about Argentina's 2001 economic crisis, download/read the file content, and if it mentions 'Argentina', add the tag 'Latin_America' to that file.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "tags": {
+                            "contains": "Latin_America"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_read_csv_comment",
+            "name": "Level 4: Read CSV and Comment",
+            "prompt": "Find the transport dataset CSV from April 2025 (in the investments/macroeconomics area). Download/read it, count the total number of lines (INCLUDING the header), and add a comment to the file exactly in the format: `Line count: 44761`.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "1421498350"
+                        },
+                        "message": {
+                            "eq": "Line count: 44761"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level4_read_summarize",
+            "name": "Level 4: Read and Summarize",
+            "prompt": "Read 'interviewing tips FINAL.txt' (ID 1364279594). Post a ONE-SENTENCE comment summarizing ONLY the 'BEFORE THE INTERVIEW' section. The comment MUST include these exact phrases: 'informed consent', 'backup batteries', 'open-ended questions'.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "1364279594"
+                        },
+                        "message": {
+                            "contains": "informed consent"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "1364279594"
+                        },
+                        "message": {
+                            "contains": "backup batteries"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "1364279594"
+                        },
+                        "message": {
+                            "contains": "open-ended questions"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level4_read_create_task",
+            "name": "Level 4: Read and Create Task",
+            "prompt": "Find the plain-text study notes about Argentina's 2001 economic crisis, download/read it, and create a task 'Update based on notes' for that file.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "eq": "Update based on notes"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level4_search_read_move",
+            "name": "Level 4: Search Read Move",
+            "prompt": "Search for 'crisis', read the first text file found, and if it contains the year '2001', move it into the main history folder.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "parent_id": {
+                            "to": {
+                                "eq": "1660804823"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_read_csv_rename",
+            "name": "Level 4: Read CSV and Rename",
+            "prompt": "Read 'transport-april-2025-csv.csv' (ID 1421498350). If the header contains 'Date', rename the file to 'transport_verified.csv'.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "1421498350"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "transport_verified.csv"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_read_task_rapport",
+            "name": "Level 4: Read and Task Rapport",
+            "prompt": "Read 'interviewing tips FINAL.txt' (ID 1364279594). If you find the word 'rapport', create a task 'Practice rapport' on the file.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "1364279594"
+                        },
+                        "message": {
+                            "eq": "Practice rapport"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level3_ambiguous_sorting",
+            "name": "Level 3: Ambiguous Sorting",
+            "prompt": "Look at the files in the 'investments' folder. Rename the smallest file to 'smallest_file' (keep extension) and the largest file to 'largest_file' (keep extension).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "2748861636"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "smallest_file.pdf"
+                            }
+                        }
+                    }
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "1421498350"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "largest_file.csv"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_ambiguous_folder_deletion",
+            "name": "Level 3: Ambiguous Folder Selection (No Delete)",
+            "prompt": "Create a folder named 'Backup' in the root directory, and another folder named 'Backup' inside the 'investments' folder. Then, rename the 'Backup' folder that is inside 'investments' to 'Backup_in_investments' (do not touch the root one).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Backup"
+                        },
+                        "parent_id": {
+                            "eq": "0"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "parent_id": {
+                            "eq": "5610825569"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "Backup_in_investments"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_deduplication",
+            "name": "Level 3: Deduplication Strategy",
+            "prompt": "Create a file named 'goog-10-q-q2-2025.txt' inside the 'investments' folder. Then scan 'investments' for files with the same base name (ignoring extension). If you find duplicates, rename the PDF version to 'goog-10-q-q2-2025.DUPLICATE.pdf'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "goog-10-q-q2-2025.txt"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "2748861636"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "goog-10-q-q2-2025.DUPLICATE.pdf"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_conditional_size_rename",
+            "name": "Level 3: Conditional Logic (Size)",
+            "prompt": "Check the size of the file named 'transport-april-2025-csv.csv' inside 'investments'. If it's larger than 1MB, rename it to 'large_transport.csv', otherwise rename it to 'small_transport.csv'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "1421498350"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "large_transport.csv"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_remove_duplicate_buenos_aires",
+            "name": "Level 3: Remove Duplicate (Buenos Aires)",
+            "prompt": "In the history area, open the 'Buenos Aires' folder and identify any duplicate markdown files that appear to be copies of the same Dirty War class notes. Use clues like near-identical filenames and identical file size to decide which one is the duplicate copy. Keep the canonical original and delete/trash only the duplicate.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "3320893579"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_typo_fix_search",
+            "name": "Level 3: Typo Fix Search",
+            "prompt": "In the history readings, find the ethics note whose filename misspells either 'judgment' or 'history'. Fix the spelling in the filename (do not change the content).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "moral judgement in histroy.md"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "moral judgment in histroy.md"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_sort_misfiled_history_reading",
+            "name": "Level 3: Sort Misfiled Reading",
+            "prompt": "In the personal_final history area, there is a digital humanities reading that was stored directly under the main 'history' folder instead of under 'readings/digital humanities'. Find the misfiled text reading about digital history methods and move it into the 'digital humanities' folder under 'readings'.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "2797160615"
+                        }
+                    },
+                    "expected_changes": {
+                        "parent_id": {
+                            "to": {
+                                "eq": "7905906319"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level3_extension_cleanup",
+            "name": "Level 3: Extension Cleanup",
+            "prompt": "Find the Buenos Aires note that is marked as a draft in its filename. Rename it to remove the 'DRAFT' marker and change the extension from .md to .txt (no download/reupload needed; this is just a rename).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "memory politics notes DRAFT.md"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "memory politics notes.txt"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_hard_reasoning_archive",
+            "name": "Level 4: Hard Reasoning Archive",
+            "prompt": "Read 'intro to hist methods.md'. If it mentions 'methodology', create a folder named 'Methodology_Archive' and move all files with 'method' in their name into it.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Methodology_Archive"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "contains": "method"
+                        }
+                    },
+                    "expected_changes": {
+                        "parent_id": {
+                            "to": {
+                                "not_eq": "0"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level1_delete_folder_trash",
+            "name": "Level 1: Delete Folder (Trash)",
+            "prompt": "Create a folder named 'Temp_ToTrash' in the root directory, then delete it (Box-style delete/trash).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Temp_ToTrash"
+                        },
+                        "item_status": {
+                            "eq": "trashed"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level1_delete_file_trash",
+            "name": "Level 1: Upload and Delete File (Trash)",
+            "prompt": "Upload a small text file named 'tmp_delete_me.txt' to the root folder with content 'delete-me'. Then delete the file (Box-style trash).",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "tmp_delete_me.txt"
+                        },
+                        "item_status": {
+                            "eq": "trashed"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ]
+        },
+        {
+            "id": "level3_typo_fix_computational",
+            "name": "Level 3: Typo Fix (Computational)",
+            "prompt": "In the history readings under digital humanities, there is a markdown file whose filename misspells the word 'computational' (letters swapped). Find it (try a couple search queries) and fix the typo in the filename without changing the content.",
+            "type": "actionEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "3266469077"
+                        }
+                    },
+                    "expected_changes": {
+                        "name": {
+                            "to": {
+                                "eq": "computational approaches to hist research.md"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "id": "level4_read_extract_slogan",
+            "name": "Level 4: Read and Extract Slogan",
+            "prompt": "Find the plain-text study notes about Argentina's 2001 economic crisis (in the history area). Download/read the file and identify the protest slogan used during the December uprising. Post a comment on that file with the exact slogan text.",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Que se vayan todos"
                         }
                     },
                     "expected_count": 1
