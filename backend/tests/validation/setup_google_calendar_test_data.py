@@ -76,6 +76,10 @@ class GoogleCalendarSetup:
         tomorrow_ny = today_ny + timedelta(days=1)
         day_after_ny = today_ny + timedelta(days=2)
         next_week_ny = today_ny + timedelta(days=7)
+        
+        # UTC-based datetimes for events that use UTC timezone
+        today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow = today + timedelta(days=1)
 
         events_to_create = [
             # Event 1: Team Standup - Daily recurring event (like seed event_001)

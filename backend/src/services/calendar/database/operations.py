@@ -1,8 +1,11 @@
 # Database operations for Google Calendar API Replica
 # CRUD operations for all Calendar API resources
 
+import logging
 from datetime import datetime, timezone, timedelta
 from typing import Any, Optional
+
+logger = logging.getLogger(__name__)
 from sqlalchemy.orm import Session
 from sqlalchemy import select, and_, or_, func, update, delete
 from sqlalchemy.exc import IntegrityError
@@ -91,9 +94,9 @@ def create_user(
         )
         session.add(entry)
 
-        # Create owner ACL rule
+        # Create owner ACL rule (include calendar_id in rule id for uniqueness)
         acl_rule = AclRule(
-            id=generate_acl_rule_id("user", email),
+            id=generate_acl_rule_id("user", email, calendar_id=email),
             calendar_id=email,
             role=AccessRole.owner,
             scope_type=AclScopeType.user,
@@ -823,8 +826,12 @@ def list_events(
                     time_max=max_dt,
                     max_instances=max_results,
                 )
-            except Exception:
-                # Skip if recurrence expansion fails
+            except Exception as e:
+                # Log and skip if recurrence expansion fails
+                # Keep broad exception to maintain graceful degradation (matching Google's behavior)
+                logger.warning(
+                    "Failed to expand recurrence for event %s: %s", master.id, e
+                )
                 continue
             
             # Create instance objects
@@ -1144,7 +1151,6 @@ def get_event_instances(
     event_id: str,
     user_id: str,
     max_results: int = 250,
-    page_token: Optional[str] = None,
     time_min: Optional[str] = None,
     time_max: Optional[str] = None,
 ) -> tuple[list[Event], Optional[str], Optional[str]]:
@@ -1153,6 +1159,9 @@ def get_event_instances(
 
     Returns a tuple of (instances, next_page_token, next_sync_token).
     Each instance has recurringEventId and originalStartTime set.
+    
+    Note: page_token is not used as instances are computed dynamically
+    from recurrence rules rather than paginated from stored data.
     """
     from ..core.utils import expand_recurrence, format_rfc3339, parse_rfc3339
     from datetime import datetime, timedelta, timezone
@@ -1609,7 +1618,8 @@ def query_free_busy(
 
             calendars_result[original_cal_id] = {"busy": busy}
 
-        except Exception:
+        except Exception as e:
+            logger.exception("Error querying free/busy for calendar %s", cal_id)
             calendars_result[original_cal_id] = {
                 "errors": [
                     {

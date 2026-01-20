@@ -1764,14 +1764,13 @@ async def events_instances(request: Request) -> JSONResponse:
     calendar_entry = get_calendar_list_entry(session, user_id, calendar_id)
     access_role = calendar_entry.access_role.value if calendar_entry else "reader"
     
-    # Get instances
+    # Get instances (page_token not used - instances computed from recurrence rules)
     instances, next_page_token, next_sync_token = get_event_instances(
         session=session,
         calendar_id=calendar_id,
         event_id=event_id,
         user_id=user_id,
         max_results=max_results,
-        page_token=page_token,
         time_min=time_min,
         time_max=time_max,
     )
@@ -1798,6 +1797,7 @@ async def events_instances(request: Request) -> JSONResponse:
         default_reminders=default_reminders,
         access_role=access_role,
         max_attendees=max_attendees,
+        time_zone=time_zone,
     )
     
     return JSONResponse(content=response_data, status_code=status.HTTP_200_OK)

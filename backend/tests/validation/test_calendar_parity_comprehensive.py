@@ -244,12 +244,15 @@ class ComprehensiveCalendarParityTester:
             print(f"  ✓ Created replica recurring event: {self.replica_recurring_event_id}")
 
         # 5. Create an all-day event
-        tomorrow = (now + timedelta(days=2)).strftime("%Y-%m-%d")
+        # Google Calendar uses exclusive end dates, so a single-day event on day X
+        # has start.date = X and end.date = X+1
+        all_day_start = (now + timedelta(days=2)).strftime("%Y-%m-%d")
+        all_day_end = (now + timedelta(days=3)).strftime("%Y-%m-%d")  # Exclusive end date
         all_day_body = {
             "summary": "All Day Parity Test",
             "description": "All day event for testing",
-            "start": {"date": tomorrow},
-            "end": {"date": tomorrow},
+            "start": {"date": all_day_start},
+            "end": {"date": all_day_end},
         }
 
         google_status, google_all_day, _ = self.google_api("POST", "/calendars/primary/events", body=all_day_body)

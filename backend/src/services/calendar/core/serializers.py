@@ -946,12 +946,13 @@ def serialize_event_instances(
     default_reminders: Optional[list[dict[str, Any]]] = None,
     access_role: Optional[str] = None,
     max_attendees: Optional[int] = None,
+    time_zone: Optional[str] = None,
 ) -> dict[str, Any]:
     """Serialize event instances (same as events list)."""
     result: dict[str, Any] = {
         "kind": "calendar#events",
         "items": [
-            serialize_event(e, user_email, max_attendees) for e in events
+            serialize_event(e, user_email, max_attendees, time_zone=time_zone) for e in events
         ],
     }
     
