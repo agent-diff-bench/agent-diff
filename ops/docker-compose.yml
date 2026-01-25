@@ -43,6 +43,7 @@ services:
           echo '=== Seeding database ===' &&
           python utils/seed_slack_template.py &&
           python utils/seed_linear_template.py &&
+          python utils/seed_box_template.py &&
           python utils/seed_tests.py;
         else
           echo '=== Skipping seed (use SEED=true to enable) ===';
@@ -74,6 +75,7 @@ services:
           echo '=== Seeding database ===' &&
           python utils/seed_slack_template.py &&
           python utils/seed_linear_template.py &&
+          python utils/seed_box_template.py &&
           python utils/seed_tests.py;
         else
           echo '=== Skipping seed (use SEED=true to enable) ===';

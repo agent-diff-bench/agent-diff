@@ -29,4 +29,4 @@ create-migration: ## Create Alembic migration (usage: make create-migration MESS
 	docker exec -w /app ops-backend-1 alembic revision --autogenerate -m "$(MESSAGE)"
 
 seed: ## Run seed scripts
-	docker exec -w /app ops-backend-1 sh -c "python utils/seed_slack_template.py && python utils/seed_linear_template.py && python utils/seed_tests.py"
+	docker exec -w /app ops-backend-1 sh -c "python utils/seed_slack_template.py && python utils/seed_linear_template.py && python utils/seed_box_template.py && python utils/seed_tests.py"

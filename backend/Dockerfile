@@ -28,6 +28,7 @@ RUN echo '#!/bin/sh\n\
     echo "=== Seeding database ==="\n\
     python utils/seed_slack_template.py\n\
     python utils/seed_linear_template.py\n\
+    python utils/seed_box_template.py\n\
     python utils/seed_tests.py\n\
     else\n\
     echo "=== Skipping seed (set SEED=true to enable) ==="\n\
