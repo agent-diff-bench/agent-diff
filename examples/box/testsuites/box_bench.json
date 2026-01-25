@@ -428,8 +428,7 @@
                         }
                     }
                 }
-            ],
-            "prompt": "Count how many files are in the 'investments' folder and set the folder's description to the count."
+            ]
         },
         {
             "id": "test_13",

@@ -11,6 +11,7 @@ Session and user management follows Slack patterns:
 
 from __future__ import annotations
 
+import json
 from typing import Any, List, NoReturn, Optional
 
 from starlette.requests import Request
@@ -26,7 +27,11 @@ from src.services.box.utils import (
     BoxErrorCode,
     generate_request_id,
 )
-from src.services.box.utils.errors import BoxAPIError, ERROR_STATUS_MAP
+from src.services.box.utils.errors import (
+    BoxAPIError,
+    ERROR_STATUS_MAP,
+    bad_request_error,
+)
 
 
 # Session & User Management
@@ -132,6 +137,20 @@ def _error_response(error: BoxAPIError) -> JSONResponse:
         status_code=error.status_code,
         request_id=error.request_id,
     )
+
+
+async def _parse_json_body(request: Request) -> dict[str, Any]:
+    """
+    Parse JSON body from request with proper error handling.
+
+    Returns a Box-style 400 error for malformed JSON instead of 500.
+    """
+    try:
+        return await request.json()
+    except json.JSONDecodeError as e:
+        raise bad_request_error(f"Could not parse JSON body: {e.msg}")
+    except ValueError as e:
+        raise bad_request_error(f"Invalid request body: {str(e)}")
 
 
 # Field Filtering (Box API feature)
@@ -341,7 +360,7 @@ async def update_file_by_id(request: Request) -> Response:
         if_match = request.headers.get("if-match")
 
         # Parse request body
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         # Get file to check existence and etag
         file = ops.get_file_by_id(session, file_id)
@@ -616,7 +635,7 @@ async def create_folder(request: Request) -> Response:
         user_id = _principal_user_id(request)
         fields = _parse_fields(request)
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         name = body.get("name")
         parent = body.get("parent", {})
@@ -753,7 +772,7 @@ async def update_folder_by_id(request: Request) -> Response:
         fields = _parse_fields(request)
         if_match = request.headers.get("if-match")
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         folder = ops.get_folder_by_id(session, folder_id)
         if not folder:
@@ -1272,7 +1291,7 @@ async def create_comment(request: Request) -> Response:
         user_id = _principal_user_id(request)
         fields = _parse_fields(request)
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         # Extract item info
         item = body.get("item", {})
@@ -1454,7 +1473,7 @@ async def create_task(request: Request) -> Response:
         user_id = _principal_user_id(request)
         fields = _parse_fields(request)
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         # Extract item info
         item = body.get("item", {})
@@ -1606,7 +1625,7 @@ async def create_hub(request: Request) -> Response:
         user_id = _principal_user_id(request)
         fields = _parse_fields(request)
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         title = body.get("title")
         description = body.get("description")
@@ -1698,7 +1717,7 @@ async def update_hub_by_id(request: Request) -> Response:
         hub_id = request.path_params["hub_id"]
         fields = _parse_fields(request)
 
-        body = await request.json()
+        body = await _parse_json_body(request)
 
         hub = ops.update_hub(
             session,
@@ -1806,7 +1825,7 @@ async def manage_hub_items(request: Request) -> Response:
         user_id = _principal_user_id(request)
         hub_id = request.path_params["hub_id"]
 
-        body = await request.json()
+        body = await _parse_json_body(request)
         operations = body.get("operations", [])
 
         if not operations:

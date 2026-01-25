@@ -113,6 +113,8 @@ class Message(Base):
     )
     user_id: Mapped[str] = mapped_column(ForeignKey("users.user_id"), nullable=False)
     message_text: Mapped[str | None] = mapped_column(Text)
+    type: Mapped[str | None] = mapped_column(String(50), default="message")
+    ts: Mapped[str | None] = mapped_column(String(50))
     blocks: Mapped[list | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.now)
 
