@@ -11,6 +11,9 @@ from typing import Any, Optional, TypeVar, cast
 from dateutil import parser as date_parser
 from dateutil.rrule import rrule, rrulestr
 
+# Replica clock: fixed "now" to keep behavior deterministic in tests.
+REPLICA_NOW_RFC3339 = "2018-06-17T00:00:00-07:00"
+
 
 # ============================================================================
 # ID GENERATION
@@ -104,7 +107,7 @@ def generate_resource_id() -> str:
 
 def generate_sync_token() -> str:
     """Generate a unique sync token."""
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S%f")
+    timestamp = calendar_now().strftime("%Y%m%d%H%M%S%f")
     random_part = secrets.token_urlsafe(16)
     return f"sync_{timestamp}_{random_part}"
 
@@ -167,6 +170,11 @@ def parse_rfc3339(value: str) -> datetime:
     return date_parser.isoparse(value)
 
 
+def calendar_now() -> datetime:
+    """Return the replica's fixed current time (UTC)."""
+    return parse_rfc3339(REPLICA_NOW_RFC3339)
+
+
 def format_rfc3339(dt: datetime) -> str:
     """
     Format a datetime as RFC3339 string.
@@ -193,7 +201,7 @@ def format_date(dt: datetime) -> str:
 
 def now_rfc3339() -> str:
     """Get current UTC time as RFC3339 string."""
-    return format_rfc3339(datetime.now(timezone.utc))
+    return format_rfc3339(calendar_now())
 
 
 def is_all_day_event(start: dict[str, Any], end: dict[str, Any]) -> bool:
@@ -394,9 +402,18 @@ def expand_recurrence(
         max_instances: Maximum number of instances to return
 
     Returns:
-        List of datetime objects for each instance
+        List of datetime objects for each instance (always timezone-aware UTC)
     """
     from dateutil.rrule import rruleset
+
+    # Normalize all datetimes to be timezone-aware (UTC)
+    # This prevents TypeError when comparing naive and aware datetimes
+    if start.tzinfo is None:
+        start = start.replace(tzinfo=timezone.utc)
+    if time_min.tzinfo is None:
+        time_min = time_min.replace(tzinfo=timezone.utc)
+    if time_max.tzinfo is None:
+        time_max = time_max.replace(tzinfo=timezone.utc)
 
     rset = rruleset()
 
@@ -412,11 +429,17 @@ def expand_recurrence(
             # Parse RDATE and add each date to the ruleset
             rdates = _parse_rdate_exdate(rule_str)
             for rdt in rdates:
+                # Normalize to UTC if naive
+                if rdt.tzinfo is None:
+                    rdt = rdt.replace(tzinfo=timezone.utc)
                 rset.rdate(rdt)
         elif rule_str.startswith("EXDATE"):
             # Parse EXDATE and exclude each date from the ruleset
             exdates = _parse_rdate_exdate(rule_str)
             for exdt in exdates:
+                # Normalize to UTC if naive
+                if exdt.tzinfo is None:
+                    exdt = exdt.replace(tzinfo=timezone.utc)
                 rset.exdate(exdt)
 
     # Get instances within range
@@ -488,6 +511,96 @@ def build_free_busy_response(
     if groups:
         response["groups"] = groups
     return response
+
+
+# ============================================================================
+# RECURRING INSTANCE ID HANDLING
+# ============================================================================
+
+
+def parse_instance_id(event_id: str) -> tuple[str, Optional[str]]:
+    """
+    Parse an event ID to detect if it's a recurring instance.
+
+    Google Calendar uses a specific format for recurring event instances:
+    - Master event: "abc123"
+    - Instance: "abc123_20180618T100000Z" (appends original start time)
+
+    Returns: (base_event_id, original_start_time_str or None)
+
+    Examples:
+    - "abc123" → ("abc123", None)
+    - "abc123_20180618T100000Z" → ("abc123", "20180618T100000Z")
+    - "abc123_20180618T100000" → ("abc123", "20180618T100000Z")  # Z normalized
+    """
+    import re
+    # Check for instance ID pattern: base_id_YYYYMMDDTHHMMSS with optional Z
+    # Accept both formats for robustness (some clients may omit the Z suffix)
+    match = re.match(r'^(.+)_(\d{8}T\d{6})(Z?)$', event_id)
+    if match:
+        time_part = match.group(2)
+        z_suffix = match.group(3)
+        # Always return with Z suffix (normalize to UTC format)
+        time_str = time_part + "Z" if not z_suffix else time_part + z_suffix
+        return match.group(1), time_str
+    return event_id, None
+
+
+def format_instance_id(base_event_id: str, start_datetime: datetime) -> str:
+    """
+    Generate an instance ID from base event ID and start datetime.
+    
+    Args:
+        base_event_id: The master recurring event ID
+        start_datetime: The start time of this instance
+        
+    Returns:
+        Instance ID in format: "{base_id}_{YYYYMMDDTHHMMSSZ}"
+    """
+    # Convert to UTC if needed
+    if start_datetime.tzinfo is None:
+        start_datetime = start_datetime.replace(tzinfo=timezone.utc)
+    else:
+        start_datetime = start_datetime.astimezone(timezone.utc)
+    
+    time_str = start_datetime.strftime('%Y%m%dT%H%M%SZ')
+    return f"{base_event_id}_{time_str}"
+
+
+def parse_original_start_time(time_str: str) -> datetime:
+    """
+    Parse YYYYMMDDTHHMMSS[Z] format to datetime (UTC).
+
+    Args:
+        time_str: Time string in format "20180618T100000Z" or "20180618T100000"
+
+    Returns:
+        datetime with UTC timezone
+    """
+    # Handle both formats: with and without Z suffix
+    if time_str.endswith("Z"):
+        return datetime.strptime(time_str, '%Y%m%dT%H%M%SZ').replace(tzinfo=timezone.utc)
+    else:
+        return datetime.strptime(time_str, '%Y%m%dT%H%M%S').replace(tzinfo=timezone.utc)
+
+
+def build_original_start_time(dt: datetime, time_zone: Optional[str] = None) -> dict[str, Any]:
+    """
+    Build an originalStartTime structure for a recurring event exception.
+    
+    Args:
+        dt: The original scheduled start datetime
+        time_zone: Optional timezone name
+        
+    Returns:
+        Dict with dateTime and optional timeZone
+    """
+    result: dict[str, Any] = {
+        "dateTime": format_rfc3339(dt),
+    }
+    if time_zone:
+        result["timeZone"] = time_zone
+    return result
 
 
 # ============================================================================

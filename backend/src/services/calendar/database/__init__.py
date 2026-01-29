@@ -1,5 +1,5 @@
 # Database models and operations for Calendar API
-from .db import engine, Session, session
+from .db import engine, Session, ScopedSession, get_session
 from .schema import (
     User,
     Calendar,
@@ -44,6 +44,10 @@ from .operations import (
     move_event,
     quick_add_event,
     get_event_instances,
+    # Recurring instance operations
+    update_recurring_instance,
+    delete_recurring_instance,
+    get_or_create_instance,
     # ACL operations
     create_acl_rule,
     get_acl_rule,
@@ -69,7 +73,8 @@ __all__ = [
     # Database
     "engine",
     "Session",
-    "session",
+    "ScopedSession",
+    "get_session",
     # Base
     "Base",
     "User",
@@ -102,6 +107,9 @@ __all__ = [
     "move_event",
     "quick_add_event",
     "get_event_instances",
+    "update_recurring_instance",
+    "delete_recurring_instance",
+    "get_or_create_instance",
     "create_acl_rule",
     "get_acl_rule",
     "list_acl_rules",

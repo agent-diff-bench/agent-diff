@@ -42,6 +42,8 @@ from .utils import (
     parse_date,
     format_date,
     now_rfc3339,
+    calendar_now,
+    REPLICA_NOW_RFC3339,
     is_all_day_event,
     extract_datetime,
     PageToken,
@@ -52,6 +54,11 @@ from .utils import (
     validate_event_id,
     validate_calendar_id,
     normalize_calendar_id,
+    # Recurring instance helpers
+    parse_instance_id,
+    format_instance_id,
+    parse_original_start_time,
+    build_original_start_time,
 )
 
 from .serializers import (
@@ -144,6 +151,11 @@ __all__ = [
     "validate_event_id",
     "validate_calendar_id",
     "normalize_calendar_id",
+    # Recurring instance helpers
+    "parse_instance_id",
+    "format_instance_id",
+    "parse_original_start_time",
+    "build_original_start_time",
     # Serializers
     "serialize_calendar",
     "serialize_calendar_list",

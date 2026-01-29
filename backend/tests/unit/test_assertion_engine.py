@@ -133,6 +133,39 @@ class TestRowMatching:
         assert _row_matches_where(row, {"user.id": {"eq": "U123"}})
         assert not _row_matches_where(row, {"user.id": {"eq": "U456"}})
 
+    def test_row_matches_jsonb_nested_field(self):
+        """Test JSONB-like nested structures similar to calendar events."""
+        row = {
+            "id": "event_123",
+            "summary": "Test Event",
+            "start": {
+                "dateTime": "2018-06-18T08:00:00",
+                "timeZone": "America/Los_Angeles"
+            },
+            "end": {
+                "dateTime": "2018-06-18T09:00:00",
+                "timeZone": "America/Los_Angeles"
+            }
+        }
+        # Test accessing nested timeZone
+        assert _row_matches_where(row, {"start.timeZone": {"eq": "America/Los_Angeles"}})
+        assert _row_matches_where(row, {"end.timeZone": {"eq": "America/Los_Angeles"}})
+        assert not _row_matches_where(row, {"start.timeZone": {"eq": "Europe/London"}})
+        
+        # Test accessing nested dateTime
+        assert _row_matches_where(row, {"start.dateTime": {"contains": "2018-06-18T08:00"}})
+        
+        # Test deeply nested doesn't exist returns None and fails match
+        assert not _row_matches_where(row, {"start.nonexistent": {"eq": "value"}})
+        
+        # Test multiple nested conditions together
+        where = {
+            "summary": {"contains": "Test"},
+            "start.timeZone": {"eq": "America/Los_Angeles"},
+            "end.dateTime": {"contains": "09:00"}
+        }
+        assert _row_matches_where(row, where)
+
 
 class TestIgnoreSets:
     def test_global_ignores(self):

@@ -3,6 +3,6 @@
     "pythonVersion": "3.14",
     "venv": ".venv",
     "extraPaths": [
-        "backend/src"
+        "backend"
     ]
 }

@@ -17,6 +17,7 @@ from ..database.schema import (
     Setting,
     Channel,
 )
+from .utils import calendar_now
 
 
 # ============================================================================
@@ -44,14 +45,18 @@ def _convert_time_object(
     target_tz: Optional[str],
 ) -> dict[str, Any]:
     """
-    Convert a start/end time object to a different timezone.
+    Convert a start/end time object to a different timezone for display.
+    
+    Following Google Calendar API behavior:
+    - dateTime is converted to the target timezone (with offset like -08:00)
+    - timeZone field preserves the ORIGINAL event's timezone
     
     Args:
         time_obj: Dict with 'dateTime' and optional 'timeZone', or 'date' for all-day
-        target_tz: Target timezone name (e.g., 'America/New_York')
+        target_tz: Target timezone name (e.g., 'America/New_York') for display
     
     Returns:
-        Updated time object with dateTime converted to target timezone
+        Updated time object with dateTime converted but original timeZone preserved
     """
     if target_tz is None or "date" in time_obj:
         # No conversion for all-day events or if no target timezone
@@ -80,13 +85,21 @@ def _convert_time_object(
             # If no timezone, assume UTC
             dt = dt.replace(tzinfo=timezone.utc)
         
-        # Convert to target timezone
+        # Convert to target timezone for display
         dt_converted = dt.astimezone(target_zone)
         
-        return {
+        # Build result - preserve original timeZone if present
+        result = {
             "dateTime": dt_converted.isoformat(),
-            "timeZone": target_tz,
         }
+        
+        # IMPORTANT: Preserve the ORIGINAL event's timeZone field
+        # This matches Google Calendar API behavior where the event's
+        # timezone is preserved even when display timezone differs
+        if "timeZone" in time_obj:
+            result["timeZone"] = time_obj["timeZone"]
+        
+        return result
     except (ValueError, TypeError):
         # Failed to parse - return original
         return time_obj
@@ -518,9 +531,16 @@ def serialize_events_list(
     default_reminders: Optional[list[dict[str, Any]]] = None,
     access_role: Optional[str] = None,
     max_attendees: Optional[int] = None,
+    time_zone: Optional[str] = None,
 ) -> dict[str, Any]:
     """
     Serialize a list of Events for events.list response.
+    
+    Args:
+        events: List of Event ORM models
+        user_email: Current user's email
+        time_zone: Target timezone for event times display (passed to serialize_event)
+        ... (other args)
     
     Response format:
     {
@@ -540,7 +560,7 @@ def serialize_events_list(
     result: dict[str, Any] = {
         "kind": "calendar#events",
         "items": [
-            serialize_event(e, user_email, max_attendees) for e in events
+            serialize_event(e, user_email, max_attendees, time_zone=time_zone) for e in events
         ],
     }
     
@@ -566,10 +586,10 @@ def serialize_events_list(
             result["updated"] = _format_datetime(latest_update)
         else:
             # Events exist but none have updated_at - use current time
-            result["updated"] = _format_datetime(datetime.now(timezone.utc))
+            result["updated"] = _format_datetime(calendar_now())
     else:
         # For empty lists, use current time (Google always includes this)
-        result["updated"] = _format_datetime(datetime.now(timezone.utc))
+        result["updated"] = _format_datetime(calendar_now())
     
     if next_page_token:
         result["nextPageToken"] = next_page_token

@@ -45,6 +45,8 @@ from ..database import (
     move_event,
     quick_add_event,
     get_event_instances,
+    update_recurring_instance,
+    delete_recurring_instance,
     # ACL operations
     get_acl_rule,
     list_acl_rules,
@@ -97,10 +99,12 @@ from ..core import (
     generate_calendar_id,
     generate_event_id,
     generate_ical_uid,
+    parse_instance_id,
     generate_etag,
     generate_channel_id,
     generate_resource_id,
     etags_match,
+    REPLICA_NOW_RFC3339,
 )
 
 
@@ -714,7 +718,11 @@ async def calendar_list_list(request: Request) -> JSONResponse:
     show_deleted = params.get("showDeleted", "").lower() == "true"
     show_hidden = params.get("showHidden", "").lower() == "true"
     sync_token = params.get("syncToken")
-    
+
+    # Validate: syncToken and minAccessRole cannot be used together
+    if sync_token and min_access_role:
+        raise ValidationError("syncToken and minAccessRole cannot be specified together")
+
     # List calendar entries
     entries, next_page_token, next_sync_token = list_calendar_list_entries(
         session=session,
@@ -1016,18 +1024,20 @@ async def calendar_list_watch(request: Request) -> JSONResponse:
     channel_type = body.get("type")
     if not channel_type:
         raise RequiredFieldError("type")
-    
+    if channel_type != "web_hook":
+        raise ValidationError(f"Invalid channel type: {channel_type}. Must be 'web_hook'.")
+
     address = body.get("address")
     if not address:
         raise RequiredFieldError("address")
-    
+
     # Create watch channel (simplified implementation)
     # In a real implementation, this would set up push notifications
     from ..database.schema import Channel
-    
+
     resource_id = generate_resource_id()
     expiration = body.get("expiration")
-    
+
     channel = Channel(
         id=channel_id,
         resource_id=resource_id,
@@ -1103,7 +1113,35 @@ async def events_list(request: Request) -> JSONResponse:
     updated_min = params.get("updatedMin")
     ical_uid = params.get("iCalUID")
     max_attendees = parse_optional_int_param(params, "maxAttendees")
-    
+    time_zone = params.get("timeZone")
+
+    # Validate: syncToken cannot be used with certain other parameters
+    if sync_token:
+        incompatible_params = []
+        if ical_uid:
+            incompatible_params.append("iCalUID")
+        if order_by:
+            incompatible_params.append("orderBy")
+        if q:
+            incompatible_params.append("q")
+        if time_min:
+            incompatible_params.append("timeMin")
+        if time_max:
+            incompatible_params.append("timeMax")
+        if updated_min:
+            incompatible_params.append("updatedMin")
+        if incompatible_params:
+            raise ValidationError(
+                f"syncToken cannot be used with: {', '.join(incompatible_params)}"
+            )
+
+    # Validate: orderBy='startTime' requires singleEvents=true
+    if order_by == "startTime" and not single_events:
+        raise ValidationError("orderBy='startTime' is only available when singleEvents is true")
+
+    if not time_min:
+        time_min = REPLICA_NOW_RFC3339
+
     # Get calendar list entry for access role and default reminders
     calendar_entry = get_calendar_list_entry(session, user_id, calendar_id)
     access_role = calendar_entry.access_role.value if calendar_entry else "reader"
@@ -1146,6 +1184,7 @@ async def events_list(request: Request) -> JSONResponse:
         default_reminders=default_reminders,
         access_role=access_role,
         max_attendees=max_attendees,
+        time_zone=time_zone,
     )
     
     return JSONResponse(content=response_data, status_code=status.HTTP_200_OK)
@@ -1248,7 +1287,16 @@ async def events_insert(request: Request) -> JSONResponse:
     
     # Get user email for creator/organizer
     user_email = get_user_email(request) or f"{user_id}@calendar.local"
-    
+
+    # Normalize originalStartTime - may be string or dict
+    original_start_time = body.get("originalStartTime")
+    if original_start_time and isinstance(original_start_time, str):
+        # Convert string to proper time object format
+        original_start_time = {
+            "dateTime": original_start_time,
+            "timeZone": start.get("timeZone", "UTC"),
+        }
+
     # Create event
     event = create_event(
         session=session,
@@ -1265,6 +1313,7 @@ async def events_insert(request: Request) -> JSONResponse:
         color_id=body.get("colorId"),
         visibility=body.get("visibility"),
         transparency=body.get("transparency"),
+        status=body.get("status"),
         attendees=body.get("attendees"),
         reminders=body.get("reminders"),
         extended_properties=body.get("extendedProperties"),
@@ -1276,6 +1325,9 @@ async def events_insert(request: Request) -> JSONResponse:
         guests_can_see_other_guests=body.get("guestsCanSeeOtherGuests", True),
         anyone_can_add_self=body.get("anyoneCanAddSelf", False),
         event_id=body.get("id"),  # Client can provide ID
+        # Support exception event creation via POST (non-standard but useful)
+        recurring_event_id=body.get("recurringEventId"),
+        original_start_time=original_start_time,
     )
     
     # Parse optional response parameters
@@ -1342,34 +1394,65 @@ async def events_update(request: Request) -> JSONResponse:
     # Get user email
     user_email = get_user_email(request) or f"{user_id}@calendar.local"
     
-    # Update event (full replacement)
-    event = update_event(
-        session=session,
-        calendar_id=calendar_id,
-        event_id=event_id,
-        user_id=user_id,
-        summary=body.get("summary"),
-        description=body.get("description"),
-        location=body.get("location"),
-        start=start,
-        end=end,
-        end_time_unspecified=body.get("endTimeUnspecified", False),
-        recurrence=body.get("recurrence"),
-        color_id=body.get("colorId"),
-        visibility=body.get("visibility"),
-        transparency=body.get("transparency"),
-        attendees=body.get("attendees"),
-        reminders=body.get("reminders"),
-        extended_properties=body.get("extendedProperties"),
-        conference_data=body.get("conferenceData"),
-        attachments=body.get("attachments"),
-        source=body.get("source"),
-        guests_can_invite_others=body.get("guestsCanInviteOthers", True),
-        guests_can_modify=body.get("guestsCanModify", False),
-        guests_can_see_other_guests=body.get("guestsCanSeeOtherGuests", True),
-        anyone_can_add_self=body.get("anyoneCanAddSelf", False),
-        sequence=body.get("sequence"),
-    )
+    # Check if this is a recurring event instance
+    base_id, original_time_str = parse_instance_id(event_id)
+    
+    if original_time_str:
+        # This is a recurring instance - create/update an exception
+        event = update_recurring_instance(
+            session=session,
+            calendar_id=calendar_id,
+            instance_id=event_id,
+            user_id=user_id,
+            user_email=user_email,
+            summary=body.get("summary"),
+            description=body.get("description"),
+            location=body.get("location"),
+            start=start,
+            end=end,
+            color_id=body.get("colorId"),
+            visibility=body.get("visibility"),
+            transparency=body.get("transparency"),
+            attendees=body.get("attendees"),
+            reminders=body.get("reminders"),
+            extended_properties=body.get("extendedProperties"),
+            conference_data=body.get("conferenceData"),
+            hangout_link=body.get("hangoutLink"),
+            guests_can_invite_others=body.get("guestsCanInviteOthers", True),
+            guests_can_modify=body.get("guestsCanModify", False),
+            guests_can_see_other_guests=body.get("guestsCanSeeOtherGuests", True),
+            anyone_can_add_self=body.get("anyoneCanAddSelf", False),
+        )
+    else:
+        # Regular event - use standard update (full replacement)
+        event = update_event(
+            session=session,
+            calendar_id=calendar_id,
+            event_id=event_id,
+            user_id=user_id,
+            summary=body.get("summary"),
+            description=body.get("description"),
+            location=body.get("location"),
+            start=start,
+            end=end,
+            end_time_unspecified=body.get("endTimeUnspecified", False),
+            recurrence=body.get("recurrence"),
+            color_id=body.get("colorId"),
+            visibility=body.get("visibility"),
+            transparency=body.get("transparency"),
+            status=body.get("status"),
+            attendees=body.get("attendees"),
+            reminders=body.get("reminders"),
+            extended_properties=body.get("extendedProperties"),
+            conference_data=body.get("conferenceData"),
+            attachments=body.get("attachments"),
+            source=body.get("source"),
+            guests_can_invite_others=body.get("guestsCanInviteOthers", True),
+            guests_can_modify=body.get("guestsCanModify", False),
+            guests_can_see_other_guests=body.get("guestsCanSeeOtherGuests", True),
+            anyone_can_add_self=body.get("anyoneCanAddSelf", False),
+            sequence=body.get("sequence"),
+        )
     
     # Parse optional response parameters
     max_attendees = parse_optional_int_param(params, "maxAttendees")
@@ -1441,6 +1524,7 @@ async def events_patch(request: Request) -> JSONResponse:
         "colorId": "color_id",
         "visibility": "visibility",
         "transparency": "transparency",
+        "status": "status",
         "attendees": "attendees",
         "reminders": "reminders",
         "extendedProperties": "extended_properties",
@@ -1458,14 +1542,28 @@ async def events_patch(request: Request) -> JSONResponse:
         if json_key in body:
             update_kwargs[python_key] = body[json_key]
     
-    # Patch event
-    event = patch_event(
-        session=session,
-        calendar_id=calendar_id,
-        event_id=event_id,
-        user_id=user_id,
-        **update_kwargs,
-    )
+    # Check if this is a recurring event instance
+    base_id, original_time_str = parse_instance_id(event_id)
+    
+    if original_time_str:
+        # This is a recurring instance - create/update an exception
+        event = update_recurring_instance(
+            session=session,
+            calendar_id=calendar_id,
+            instance_id=event_id,
+            user_id=user_id,
+            user_email=user_email,
+            **update_kwargs,
+        )
+    else:
+        # Regular event - use standard patch
+        event = patch_event(
+            session=session,
+            calendar_id=calendar_id,
+            event_id=event_id,
+            user_id=user_id,
+            **update_kwargs,
+        )
     
     # Parse optional response parameters
     max_attendees = parse_optional_int_param(params, "maxAttendees")
@@ -1488,11 +1586,12 @@ async def events_delete(request: Request) -> JSONResponse:
     """
     DELETE /calendars/{calendarId}/events/{eventId}
     
-    Deletes an event.
+    Deletes an event. For recurring event instances, creates a cancelled
+    exception event.
     
     Parameters:
     - calendarId (path): Calendar identifier
-    - eventId (path): Event identifier
+    - eventId (path): Event identifier (can be instance ID like "abc_20180618T100000Z")
     
     Query Parameters:
     - sendUpdates: Who to send notifications (all, externalOnly, none)
@@ -1505,13 +1604,18 @@ async def events_delete(request: Request) -> JSONResponse:
     # Normalize calendar ID
     calendar_id = resolve_calendar_id(request, calendar_id)
     
-    # Get existing event
-    event = get_event(session, calendar_id, event_id, user_id)
-    if event is None:
-        raise EventNotFoundError(event_id)
+    # Check if this is a recurring event instance
+    base_id, original_time_str = parse_instance_id(event_id)
     
-    # Delete event
-    delete_event(session, calendar_id, event_id, user_id)
+    if original_time_str:
+        # This is a recurring instance - create cancelled exception
+        delete_recurring_instance(session, calendar_id, event_id, user_id)
+    else:
+        # Regular event - verify exists then delete
+        event = get_event(session, calendar_id, event_id, user_id)
+        if event is None:
+            raise EventNotFoundError(event_id)
+        delete_event(session, calendar_id, event_id, user_id)
     
     return JSONResponse(content=None, status_code=status.HTTP_204_NO_CONTENT)
 
@@ -1551,13 +1655,18 @@ async def events_import(request: Request) -> JSONResponse:
     ical_uid = body.get("iCalUID")
     if not ical_uid:
         raise RequiredFieldError("iCalUID")
-    
+
     start = body.get("start")
     end = body.get("end")
     if not start:
         raise RequiredFieldError("start")
     if not end:
         raise RequiredFieldError("end")
+
+    # Validate eventType - only 'default' events may be imported
+    event_type = body.get("eventType", "default")
+    if event_type != "default":
+        raise ValidationError(f"Only events with eventType 'default' may be imported. Got: '{event_type}'")
     
     # Get user email
     user_email = get_user_email(request) or f"{user_id}@calendar.local"
@@ -1760,11 +1869,13 @@ async def events_instances(request: Request) -> JSONResponse:
     time_max = params.get("timeMax")
     time_zone = params.get("timeZone")
     max_attendees = parse_optional_int_param(params, "maxAttendees")
-    
+    show_deleted = params.get("showDeleted", "false").lower() == "true"
+    original_start = params.get("originalStart")
+
     # Get calendar list entry for access role
     calendar_entry = get_calendar_list_entry(session, user_id, calendar_id)
     access_role = calendar_entry.access_role.value if calendar_entry else "reader"
-    
+
     # Get instances (page_token not used - instances computed from recurrence rules)
     instances, next_page_token, next_sync_token = get_event_instances(
         session=session,
@@ -1774,6 +1885,8 @@ async def events_instances(request: Request) -> JSONResponse:
         max_results=max_results,
         time_min=time_min,
         time_max=time_max,
+        show_deleted=show_deleted,
+        original_start=original_start,
     )
     
     # Get user email
@@ -1837,17 +1950,19 @@ async def events_watch(request: Request) -> JSONResponse:
     channel_type = body.get("type")
     if not channel_type:
         raise RequiredFieldError("type")
-    
+    if channel_type != "web_hook":
+        raise ValidationError(f"Invalid channel type: {channel_type}. Must be 'web_hook'.")
+
     address = body.get("address")
     if not address:
         raise RequiredFieldError("address")
-    
+
     # Create watch channel
     from ..database.schema import Channel
-    
+
     resource_id = generate_resource_id()
     expiration = body.get("expiration")
-    
+
     channel = Channel(
         id=channel_id,
         resource_id=resource_id,
@@ -2017,6 +2132,14 @@ async def acl_insert(request: Request) -> JSONResponse:
     if not role:
         raise RequiredFieldError("role")
     
+    # Validate role value matches Google Calendar API
+    valid_roles = {"none", "freeBusyReader", "reader", "writer", "owner"}
+    if role not in valid_roles:
+        raise ValidationError(
+            f"Invalid role value: '{role}'. Must be one of: {', '.join(sorted(valid_roles))}",
+            field="role"
+        )
+    
     scope = body.get("scope")
     if not scope:
         raise RequiredFieldError("scope")
@@ -2025,7 +2148,12 @@ async def acl_insert(request: Request) -> JSONResponse:
     if not scope_type:
         raise RequiredFieldError("scope.type")
     
-    scope_value = scope.get("value")  # Optional for "default" scope type
+    # Support both "value" and "emailAddress" (some agents use the wrong field name)
+    scope_value = scope.get("value") or scope.get("emailAddress")
+    
+    # Validate that scope.value is required for non-default scope types
+    if scope_type != "default" and not scope_value:
+        raise RequiredFieldError("scope.value")
     
     # Create ACL rule
     rule = create_acl_rule(
@@ -2092,6 +2220,14 @@ async def acl_update(request: Request) -> JSONResponse:
     if not role:
         raise RequiredFieldError("role")
     
+    # Validate role value matches Google Calendar API
+    valid_roles = {"none", "freeBusyReader", "reader", "writer", "owner"}
+    if role not in valid_roles:
+        raise ValidationError(
+            f"Invalid role value: '{role}'. Must be one of: {', '.join(sorted(valid_roles))}",
+            field="role"
+        )
+    
     # Update ACL rule
     rule = update_acl_rule(
         session=session,
@@ -2154,7 +2290,15 @@ async def acl_patch(request: Request) -> JSONResponse:
     # Build update kwargs - only include fields present in body
     update_kwargs: dict[str, Any] = {}
     if "role" in body:
-        update_kwargs["role"] = body["role"]
+        role = body["role"]
+        # Validate role value matches Google Calendar API
+        valid_roles = {"none", "freeBusyReader", "reader", "writer", "owner"}
+        if role not in valid_roles:
+            raise ValidationError(
+                f"Invalid role value: '{role}'. Must be one of: {', '.join(sorted(valid_roles))}",
+                field="role"
+            )
+        update_kwargs["role"] = role
     
     # Update ACL rule
     rule = update_acl_rule(
@@ -2245,17 +2389,19 @@ async def acl_watch(request: Request) -> JSONResponse:
     channel_type = body.get("type")
     if not channel_type:
         raise RequiredFieldError("type")
-    
+    if channel_type != "web_hook":
+        raise ValidationError(f"Invalid channel type: {channel_type}. Must be 'web_hook'.")
+
     address = body.get("address")
     if not address:
         raise RequiredFieldError("address")
-    
+
     # Create watch channel
     from ..database.schema import Channel
-    
+
     resource_id = generate_resource_id()
     expiration = body.get("expiration")
-    
+
     channel = Channel(
         id=channel_id,
         resource_id=resource_id,
@@ -2524,17 +2670,19 @@ async def settings_watch(request: Request) -> JSONResponse:
     channel_type = body.get("type")
     if not channel_type:
         raise RequiredFieldError("type")
-    
+    if channel_type != "web_hook":
+        raise ValidationError(f"Invalid channel type: {channel_type}. Must be 'web_hook'.")
+
     address = body.get("address")
     if not address:
         raise RequiredFieldError("address")
-    
+
     # Create watch channel
     from ..database.schema import Channel
-    
+
     resource_id = generate_resource_id()
     expiration = body.get("expiration")
-    
+
     channel = Channel(
         id=channel_id,
         resource_id=resource_id,

@@ -5,7 +5,7 @@ import json
 import re
 
 
-Kind = Literal["added", "removed", "changed", "unchanged"]
+Kind = Literal["added", "removed", "changed"]
 Bucket = Literal["inserts", "deletes", "updates"]
 
 
@@ -245,45 +245,6 @@ class AssertionEngine:
                     entity,
                     diff_type,
                 )
-
-            elif diff_type == "unchanged":
-                ins = [
-                    r
-                    for r in (diff.get("inserts", []) or [])
-                    if r.get("__table__") == entity and _row_matches_where(r, where)
-                ]
-                dels = [
-                    r
-                    for r in (diff.get("deletes", []) or [])
-                    if r.get("__table__") == entity and _row_matches_where(r, where)
-                ]
-                ups = [
-                    r
-                    for r in (diff.get("updates", []) or [])
-                    if r.get("__table__") == entity
-                    and (
-                        _row_matches_where(r.get("after", {}), where)
-                        or _row_matches_where(r.get("before", {}), where)
-                    )
-                ]
-                total = len(ins) + len(dels) + len(ups)
-                expected = a.get("expected_count")
-                if expected is None:
-                    if total != 0:
-                        self._add_failure(
-                            failures,
-                            failed_indexes,
-                            idx,
-                            f"assertion#{idx} {entity} expected no changes but found {total}",
-                        )
-                else:
-                    if not self._count_matches(expected, total):
-                        self._add_failure(
-                            failures,
-                            failed_indexes,
-                            idx,
-                            f"assertion#{idx} {entity} expected count {expected} but got {total} (unchanged)",
-                        )
 
             else:
                 self._add_failure(

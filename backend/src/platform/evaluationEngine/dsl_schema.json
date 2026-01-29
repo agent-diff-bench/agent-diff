@@ -79,8 +79,7 @@
                     "enum": [
                         "added",
                         "removed",
-                        "changed",
-                        "unchanged"
+                        "changed"
                     ],
                     "description": "Type of change to check for"
                 },
@@ -176,9 +175,7 @@
                     "if": {
                         "properties": {
                             "diff_type": {
-                                "enum": [
-                                    "changed"
-                                ]
+                                "const": "changed"
                             }
                         }
                     },

@@ -188,6 +188,11 @@ class BaseExecutorProxy:
                 "https://upload.box.com",
                 f"{self.base_url}/api/env/{environment_id}/services/box",
             ),
+            # Google Calendar API
+            (
+                "https://www.googleapis.com/calendar/v3",
+                f"{self.base_url}/api/env/{environment_id}/services/calendar",
+            )
         ]
 
     def _run_code(
@@ -1004,6 +1009,8 @@ curl() {{
             modified_arg="${{arg//https:\\/\\/upload.box.com\\/api\\/2.0/{self.base_url}/api/env/{self.environment_id}/services/box/2.0}}"
         elif [[ "$arg" == *"https://upload.box.com"* ]]; then
             modified_arg="${{arg//https:\\/\\/upload.box.com/{self.base_url}/api/env/{self.environment_id}/services/box}}"
+        elif [[ "$arg" == *"https://www.googleapis.com/calendar/v3"* ]]; then
+            modified_arg="${{arg//https:\\/\\/www.googleapis.com\\/calendar\\/v3/{self.base_url}/api/env/{self.environment_id}/services/calendar}}"
         fi
 
         new_args+=("$modified_arg")
@@ -1057,7 +1064,7 @@ def _format_execution_result(
 def create_openai_tool(executor: BaseExecutorProxy):
     """Create execution tool for OpenAI Agents SDK."""
     try:
-        from agents import function_tool
+        from agents import function_tool  # type: ignore[import-not-found]
     except ImportError:
         raise ImportError(
             "OpenAI Agents SDK not installed. Install with: pip install openai-agents"
@@ -1099,7 +1106,7 @@ def create_openai_tool(executor: BaseExecutorProxy):
 def create_langchain_tool(executor: BaseExecutorProxy):
     """Create execution tool for LangChain."""
     try:
-        from langchain.tools import tool
+        from langchain.tools import tool  # type: ignore[import-not-found]
     except ImportError:
         raise ImportError(
             "LangChain not installed. Install with: pip install langchain"
@@ -1147,7 +1154,7 @@ def create_langchain_tool(executor: BaseExecutorProxy):
 def create_smolagents_tool(executor: BaseExecutorProxy):
     """Create execution tool for Hugging Face smolagents."""
     try:
-        from smolagents import Tool
+        from smolagents import Tool  # type: ignore[import-not-found]
     except ImportError:
         raise ImportError(
             "smolagents not installed. Install with: pip install smolagents"

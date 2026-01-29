@@ -81,6 +81,9 @@ COMMON_REACTIONS = {
     "1000",  # 100% perfect
     "catjam",  # vibing
     "keanu-thanks",  # thanks
+    "art",  # art / creative
+    "honey_pot",  # honey / sweet
+    "sunrise",  # sunrise / dawn
 }
 
 

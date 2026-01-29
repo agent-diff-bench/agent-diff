@@ -1,0 +1,1235 @@
+{
+
+    "teams": {
+        "operation_type": "query",
+        "description": "All teams whose issues can be accessed by the user. This might be different from `administrableTeams`, which also includes teams whose settings can be changed by the user.",
+        "arguments": {
+            "filter": {
+                "type": "TeamFilter",
+                "required": false,
+                "description": "Filter returned teams."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "issues": {
+        "operation_type": "query",
+        "description": "All issues.",
+        "arguments": {
+            "filter": {
+                "type": "IssueFilter",
+                "required": false,
+                "description": "Filter returned issues."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "issue": {
+        "operation_type": "query",
+        "description": "Get a single issue by ID.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The UUID of the issue to retrieve."
+            }
+        }
+    },
+
+    "workflowStates": {
+        "operation_type": "query",
+        "description": "All issue workflow states.",
+        "arguments": {
+            "filter": {
+                "type": "WorkflowStateFilter",
+                "required": false,
+                "description": "Filter returned workflow states."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "users": {
+        "operation_type": "query",
+        "description": "All users for the organization.",
+        "arguments": {
+            "filter": {
+                "type": "UserFilter",
+                "required": false,
+                "description": "Filter returned users."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "includeDisabled": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should query return disabled/suspended users (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "issueCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new issue.",
+        "arguments": {
+            "input": {
+                "type": "IssueCreateInput",
+                "required": true,
+                "description": "The issue object to create.",
+                "fields": {
+                    "assigneeId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the user to assign the issue to."
+                    },
+                    "completedAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "The date when the issue was completed (e.g. if importing from another system). Must be a date in the past and after createdAt date. Cannot be provided with an incompatible workflow state."
+                    },
+                    "createAsUser": {
+                        "type": "String",
+                        "required": false,
+                        "description": "Create issue as a user with the provided name. This option is only available to OAuth applications creating issues in `actor=app` mode."
+                    },
+                    "createdAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "The date when the issue was created (e.g. if importing from another system). Must be a date in the past. If none is provided, the backend will generate the time as now."
+                    },
+                    "cycleId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The cycle associated with the issue."
+                    },
+                    "delegateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the agent user to delegate the issue to."
+                    },
+                    "description": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The issue description in markdown format."
+                    },
+                    "descriptionData": {
+                        "type": "JSON",
+                        "required": false,
+                        "description": "[Internal] The issue description as a Prosemirror document."
+                    },
+                    "displayIconUrl": {
+                        "type": "String",
+                        "required": false,
+                        "description": "Provide an external user avatar URL. Can only be used in conjunction with the `createAsUser` options. This option is only available to OAuth applications creating comments in `actor=app` mode."
+                    },
+                    "dueDate": {
+                        "type": "TimelessDate",
+                        "required": false,
+                        "description": "The date at which the issue is due."
+                    },
+                    "estimate": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The estimated complexity of the issue."
+                    },
+                    "id": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+                    },
+                    "labelIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the issue labels associated with this ticket."
+                    },
+                    "lastAppliedTemplateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The ID of the last template applied to the issue."
+                    },
+                    "parentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the parent issue. Can be a UUID or issue identifier (e.g., 'LIN-123')."
+                    },
+                    "preserveSortOrderOnCreate": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the passed sort order should be preserved."
+                    },
+                    "priority": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low."
+                    },
+                    "prioritySortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue related to other issues, when ordered by priority."
+                    },
+                    "projectId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The project associated with the issue."
+                    },
+                    "projectMilestoneId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The project milestone associated with the issue."
+                    },
+                    "referenceCommentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The comment the issue is referencing."
+                    },
+                    "slaBreachesAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "[Internal] The timestamp at which an issue will be considered in breach of SLA."
+                    },
+                    "slaStartedAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "[Internal] The timestamp at which the issue's SLA was started."
+                    },
+                    "slaType": {
+                        "type": "SLADayCountType",
+                        "required": false,
+                        "description": "The SLA day count type for the issue. Whether SLA should be business days only or calendar days (default)."
+                    },
+                    "sortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue related to other issues."
+                    },
+                    "sourceCommentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The comment the issue is created from."
+                    },
+                    "sourcePullRequestCommentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "[Internal] The pull request comment the issue is created from."
+                    },
+                    "stateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The team state of the issue."
+                    },
+                    "subIssueSortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue in parent's sub-issue list."
+                    },
+                    "subscriberIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the users subscribing to this ticket."
+                    },
+                    "teamId": {
+                        "type": "String",
+                        "required": true,
+                        "description": "The identifier of the team associated with the issue."
+                    },
+                    "templateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of a template the issue should be created from. If other values are provided in the input, they will override template values."
+                    },
+                    "title": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The title of the issue."
+                    },
+                    "useDefaultTemplate": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether to use the default template for the team. When set to true, the default template of this team based on user's membership will be applied."
+                    }
+                }
+            }
+        }
+    },
+
+    "issueUpdate": {
+        "operation_type": "mutation",
+        "description": "Updates an issue.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the issue to update."
+            },
+            "input": {
+                "type": "IssueUpdateInput",
+                "required": true,
+                "description": "A partial issue object to update the issue with.",
+                "fields": {
+                    "addedLabelIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the issue labels to be added to this issue."
+                    },
+                    "assigneeId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the user to assign the issue to."
+                    },
+                    "autoClosedByParentClosing": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the issue was automatically closed because its parent issue was closed."
+                    },
+                    "cycleId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The cycle associated with the issue."
+                    },
+                    "delegateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the agent user to delegate the issue to."
+                    },
+                    "description": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The issue description in markdown format."
+                    },
+                    "descriptionData": {
+                        "type": "JSON",
+                        "required": false,
+                        "description": "[Internal] The issue description as a Prosemirror document."
+                    },
+                    "dueDate": {
+                        "type": "TimelessDate",
+                        "required": false,
+                        "description": "The date at which the issue is due."
+                    },
+                    "estimate": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The estimated complexity of the issue."
+                    },
+                    "labelIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the issue labels associated with this ticket."
+                    },
+                    "lastAppliedTemplateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The ID of the last template applied to the issue."
+                    },
+                    "parentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the parent issue. Can be a UUID or issue identifier (e.g., 'LIN-123')."
+                    },
+                    "priority": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The priority of the issue. 0 = No priority, 1 = Urgent, 2 = High, 3 = Normal, 4 = Low."
+                    },
+                    "prioritySortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue related to other issues, when ordered by priority."
+                    },
+                    "projectId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The project associated with the issue."
+                    },
+                    "projectMilestoneId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The project milestone associated with the issue."
+                    },
+                    "removedLabelIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the issue labels to be removed from this issue."
+                    },
+                    "slaBreachesAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "[Internal] The timestamp at which an issue will be considered in breach of SLA."
+                    },
+                    "slaStartedAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "[Internal] The timestamp at which the issue's SLA was started."
+                    },
+                    "slaType": {
+                        "type": "SLADayCountType",
+                        "required": false,
+                        "description": "The SLA day count type for the issue. Whether SLA should be business days only or calendar days (default)."
+                    },
+                    "snoozedById": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the user who snoozed the issue."
+                    },
+                    "snoozedUntilAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "The time until an issue will be snoozed in Triage view."
+                    },
+                    "sortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue related to other issues."
+                    },
+                    "stateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The team state of the issue."
+                    },
+                    "subIssueSortOrder": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The position of the issue in parent's sub-issue list."
+                    },
+                    "subscriberIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "The identifiers of the users subscribing to this ticket."
+                    },
+                    "teamId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the team associated with the issue."
+                    },
+                    "title": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The issue title."
+                    },
+                    "trashed": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the issue has been trashed."
+                    }
+                }
+            }
+        }
+    },
+
+    "commentCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new comment.",
+        "arguments": {
+            "input": {
+                "type": "CommentCreateInput",
+                "required": true,
+                "description": "The comment object to create.",
+                "fields": {
+                    "body": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The comment content in markdown format."
+                    },
+                    "bodyData": {
+                        "type": "JSON",
+                        "required": false,
+                        "description": "[Internal] The comment content as a Prosemirror document."
+                    },
+                    "createAsUser": {
+                        "type": "String",
+                        "required": false,
+                        "description": "Create comment as a user with the provided name. This option is only available to OAuth applications creating comments in `actor=app` mode."
+                    },
+                    "createOnSyncedSlackThread": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Flag to indicate this comment should be created on the issue's synced Slack comment thread. If no synced Slack comment thread exists, the mutation will fail."
+                    },
+                    "createdAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "The date when the comment was created (e.g. if importing from another system). Must be a date in the past. If none is provided, the backend will generate the time as now."
+                    },
+                    "displayIconUrl": {
+                        "type": "String",
+                        "required": false,
+                        "description": "Provide an external user avatar URL. Can only be used in conjunction with the `createAsUser` options. This option is only available to OAuth applications creating comments in `actor=app` mode."
+                    },
+                    "doNotSubscribeToIssue": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Flag to prevent auto subscription to the issue the comment is created on."
+                    },
+                    "documentContentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The document content to associate the comment with."
+                    },
+                    "id": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+                    },
+                    "initiativeUpdateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The initiative update to associate the comment with."
+                    },
+                    "issueId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The issue to associate the comment with. Can be a UUID or issue identifier (e.g., 'LIN-123')."
+                    },
+                    "parentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The parent comment under which to nest a current comment."
+                    },
+                    "postId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The post to associate the comment with."
+                    },
+                    "projectUpdateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The project update to associate the comment with."
+                    },
+                    "quotedText": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The text that this comment references. Only defined for inline comments."
+                    },
+                    "subscriberIds": {
+                        "type": "[String!]",
+                        "required": false,
+                        "description": "[INTERNAL] The identifiers of the users subscribing to this comment thread."
+                    }
+                }
+            }
+        }
+    },
+
+    "teamCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new team. The user who creates the team will automatically be added as a member to the newly created team.",
+        "arguments": {
+            "copySettingsFromTeamId": {
+                "type": "String",
+                "required": false,
+                "description": "The team id to copy settings from, if any."
+            },
+            "input": {
+                "type": "TeamCreateInput",
+                "required": true,
+                "description": "The team object to create.",
+                "fields": {
+                    "autoArchivePeriod": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "Period after which closed and completed issues are automatically archived, in months. 0 means disabled."
+                    },
+                    "autoClosePeriod": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "Period after which issues are automatically closed, in months."
+                    },
+                    "autoCloseStateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The canceled workflow state which auto closed issues will be set to."
+                    },
+                    "color": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The color of the team."
+                    },
+                    "cycleCooldownTime": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The cooldown time after each cycle in weeks."
+                    },
+                    "cycleDuration": {
+                        "type": "Int",
+                        "required": false,
+                        "description": "The duration of each cycle in weeks."
+                    },
+                    "cycleIssueAutoAssignCompleted": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Auto assign completed issues to current active cycle setting."
+                    },
+                    "cycleIssueAutoAssignStarted": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Auto assign started issues to current active cycle setting."
+                    },
+                    "cycleLockToActive": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Only allow issues issues with cycles in Active Issues."
+                    },
+                    "cycleStartDay": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "The day of the week that a new cycle starts."
+                    },
+                    "cyclesEnabled": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the team uses cycles."
+                    },
+                    "defaultIssueEstimate": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "What to use as an default estimate for unestimated issues."
+                    },
+                    "defaultProjectTemplateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the default project template of this team."
+                    },
+                    "defaultTemplateForMembersId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the default template for members of this team."
+                    },
+                    "defaultTemplateForNonMembersId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the default template for non-members of this team."
+                    },
+                    "description": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The description of the team."
+                    },
+                    "groupIssueHistory": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether to group recent issue history entries."
+                    },
+                    "icon": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The icon of the team."
+                    },
+                    "id": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+                    },
+                    "inheritIssueEstimation": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the team should inherit estimation settings from its parent. Only applies to sub-teams."
+                    },
+                    "inheritProductIntelligenceScope": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "[Internal] Whether the team should inherit its product intelligence scope from its parent. Only applies to sub-teams."
+                    },
+                    "inheritWorkflowStatuses": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "[Internal] Whether the team should inherit workflow statuses from its parent."
+                    },
+                    "issueEstimationAllowZero": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether to allow zeros in issues estimates."
+                    },
+                    "issueEstimationExtended": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether to add additional points to the estimate scale."
+                    },
+                    "issueEstimationType": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The issue estimation type to use. Must be one of 'notUsed', 'exponential', 'fibonacci', 'linear', 'tShirt'."
+                    },
+                    "key": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The key of the team. If not given, the key will be generated based on the name of the team."
+                    },
+                    "markedAsDuplicateWorkflowStateId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The workflow state into which issues are moved when they are marked as a duplicate of another issue."
+                    },
+                    "name": {
+                        "type": "String",
+                        "required": true,
+                        "description": "The name of the team."
+                    },
+                    "parentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The parent team ID."
+                    },
+                    "private": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Internal. Whether the team is private or not."
+                    },
+                    "productIntelligenceScope": {
+                        "type": "ProductIntelligenceScope",
+                        "required": false,
+                        "description": "[Internal] The scope of product intelligence suggestion data for the team."
+                    },
+                    "requirePriorityToLeaveTriage": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether an issue needs to have a priority set before leaving triage."
+                    },
+                    "setIssueSortOrderOnStateChange": {
+                        "type": "String",
+                        "required": false,
+                        "description": "Whether to move issues to bottom of the column when changing state."
+                    },
+                    "timezone": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The timezone of the team."
+                    },
+                    "triageEnabled": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether triage mode is enabled for the team."
+                    },
+                    "upcomingCycleCount": {
+                        "type": "Float",
+                        "required": false,
+                        "description": "How many upcoming cycles to create."
+                    }
+                }
+            }
+        }
+    },
+
+    "issueLabelCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new label.",
+        "arguments": {
+            "replaceTeamLabels": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether to replace all team-specific labels with the same name with this newly created workspace label (default: false)."
+            },
+            "input": {
+                "type": "IssueLabelCreateInput",
+                "required": true,
+                "description": "The issue label to create.",
+                "fields": {
+                    "color": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The color of the label."
+                    },
+                    "description": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The description of the label."
+                    },
+                    "id": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+                    },
+                    "isGroup": {
+                        "type": "Boolean",
+                        "required": false,
+                        "description": "Whether the label is a group."
+                    },
+                    "name": {
+                        "type": "String",
+                        "required": true,
+                        "description": "The name of the label."
+                    },
+                    "parentId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The identifier of the parent label."
+                    },
+                    "retiredAt": {
+                        "type": "DateTime",
+                        "required": false,
+                        "description": "When the label was retired."
+                    },
+                    "teamId": {
+                        "type": "String",
+                        "required": false,
+                        "description": "The team associated with the label. If not given, the label will be associated with the entire workspace."
+                    }
+                }
+            }
+        }
+    },
+
+    "issueLabels": {
+        "operation_type": "query",
+        "description": "All issue labels.",
+        "arguments": {
+            "filter": {
+                "type": "IssueLabelFilter",
+                "required": false,
+                "description": "Filter returned issue labels."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "comments": {
+        "operation_type": "query",
+        "description": "All comments.",
+        "arguments": {
+            "filter": {
+                "type": "CommentFilter",
+                "required": false,
+                "description": "Filter returned comments."
+            },
+            "first": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to forward paginate (used with after). Defaults to 50."
+            },
+            "after": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with first for forward pagination."
+            },
+            "last": {
+                "type": "Int",
+                "required": false,
+                "description": "The number of items to backward paginate (used with before). Defaults to 50."
+            },
+            "before": {
+                "type": "String",
+                "required": false,
+                "description": "A cursor to be used with last for backward pagination."
+            },
+            "includeArchived": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Should archived resources be included (default: false)."
+            },
+            "orderBy": {
+                "type": "PaginationOrderBy",
+                "required": false,
+                "description": "By which field should the pagination order by. Available options are createdAt (default) and updatedAt."
+            }
+        }
+    },
+
+    "commentUpdate": {
+        "operation_type": "mutation",
+        "description": "Updates a comment.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the comment to update."
+            },
+            "input": {
+                "type": "CommentUpdateInput",
+                "required": true,
+                "description": "A partial comment object to update the comment with."
+            },
+            "skipEditedAt": {
+                "type": "Boolean",
+                "required": false,
+                "description": "[INTERNAL] Flag to prevent setting editedAt when updating bodyData (used for background uploads)."
+            }
+        },
+        "input_fields": {
+            "body": {
+                "type": "String",
+                "required": false,
+                "description": "The comment content."
+            },
+            "bodyData": {
+                "type": "JSON",
+                "required": false,
+                "description": "[Internal] The comment content as a Prosemirror document."
+            },
+            "doNotSubscribeToIssue": {
+                "type": "Boolean",
+                "required": false,
+                "description": "[INTERNAL] Flag to prevent auto subscription to the issue the comment is updated on."
+            },
+            "quotedText": {
+                "type": "String",
+                "required": false,
+                "description": "The text that this comment references. Only defined for inline comments."
+            },
+            "resolvingCommentId": {
+                "type": "String",
+                "required": false,
+                "description": "[INTERNAL] The child comment that resolves this thread."
+            },
+            "resolvingUserId": {
+                "type": "String",
+                "required": false,
+                "description": "[INTERNAL] The user who resolved this thread."
+            },
+            "subscriberIds": {
+                "type": "[String]",
+                "required": false,
+                "description": "[INTERNAL] The identifiers of the users subscribing to this comment."
+            }
+        }
+    },
+
+    "commentDelete": {
+        "operation_type": "mutation",
+        "description": "Deletes a comment.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the comment to delete."
+            }
+        }
+    },
+
+    "issueLabelUpdate": {
+        "operation_type": "mutation",
+        "description": "Updates a label.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the label to update."
+            },
+            "input": {
+                "type": "IssueLabelUpdateInput",
+                "required": true,
+                "description": "A partial label object to update."
+            },
+            "replaceTeamLabels": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether to replace all team-specific labels with the same name with this updated workspace label (default: false)."
+            }
+        },
+        "input_fields": {
+            "color": {
+                "type": "String",
+                "required": false,
+                "description": "The color of the label."
+            },
+            "description": {
+                "type": "String",
+                "required": false,
+                "description": "The description of the label."
+            },
+            "isGroup": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Whether the label is a group."
+            },
+            "name": {
+                "type": "String",
+                "required": false,
+                "description": "The name of the label."
+            },
+            "parentId": {
+                "type": "String",
+                "required": false,
+                "description": "The identifier of the parent label."
+            },
+            "retiredAt": {
+                "type": "DateTime",
+                "required": false,
+                "description": "When the label was retired."
+            }
+        }
+    },
+
+    "workflowStateCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new state, adding it to the workflow of a team.",
+        "arguments": {
+            "input": {
+                "type": "WorkflowStateCreateInput",
+                "required": true,
+                "description": "The state to create."
+            }
+        },
+        "input_fields": {
+            "color": {
+                "type": "String",
+                "required": true,
+                "description": "The color of the state."
+            },
+            "description": {
+                "type": "String",
+                "required": false,
+                "description": "The description of the state."
+            },
+            "id": {
+                "type": "String",
+                "required": false,
+                "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+            },
+            "name": {
+                "type": "String",
+                "required": true,
+                "description": "The name of the state."
+            },
+            "position": {
+                "type": "Float",
+                "required": false,
+                "description": "The position of the state."
+            },
+            "teamId": {
+                "type": "String",
+                "required": true,
+                "description": "The team associated with the state."
+            },
+            "type": {
+                "type": "String",
+                "required": true,
+                "description": "The workflow type."
+            }
+        }
+    },
+
+    "workflowStateArchive": {
+        "operation_type": "mutation",
+        "description": "Archives a state. Only states with issues that have all been archived can be archived.",
+        "arguments": {
+            "id": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the state to archive."
+            }
+        }
+    },
+
+    "teamMembershipCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new team membership.",
+        "arguments": {
+            "input": {
+                "type": "TeamMembershipCreateInput",
+                "required": true,
+                "description": "The team membership object to create."
+            }
+        },
+        "input_fields": {
+            "id": {
+                "type": "String",
+                "required": false,
+                "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+            },
+            "owner": {
+                "type": "Boolean",
+                "required": false,
+                "description": "Internal. Whether the user is the owner of the team."
+            },
+            "sortOrder": {
+                "type": "Float",
+                "required": false,
+                "description": "The position of the item in the users list."
+            },
+            "teamId": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the team associated with the membership."
+            },
+            "userId": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the user associated with the membership."
+            }
+        }
+    },
+
+    "issueRelationCreate": {
+        "operation_type": "mutation",
+        "description": "Creates a new issue relation.",
+        "arguments": {
+            "input": {
+                "type": "IssueRelationCreateInput",
+                "required": true,
+                "description": "The issue relation to create."
+            },
+            "overrideCreatedAt": {
+                "type": "DateTime",
+                "required": false,
+                "description": "Used by client undo operations. Should not be set directly."
+            }
+        },
+        "input_fields": {
+            "id": {
+                "type": "String",
+                "required": false,
+                "description": "The identifier in UUID v4 format. If none is provided, the backend will generate one."
+            },
+            "issueId": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the issue that is related to another issue. Can be a UUID or issue identifier (e.g., 'LIN-123')."
+            },
+            "relatedIssueId": {
+                "type": "String",
+                "required": true,
+                "description": "The identifier of the related issue. Can be a UUID or issue identifier (e.g., 'LIN-123')."
+            },
+            "type": {
+                "type": "IssueRelationType",
+                "required": true,
+                "description": "The type of relation of the issue to the related issue. Valid values: blocks, duplicate, related."
+            }
+        }
+    }
+}
