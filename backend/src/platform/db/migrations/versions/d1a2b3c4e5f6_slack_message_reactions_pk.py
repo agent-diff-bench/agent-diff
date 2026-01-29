@@ -111,7 +111,13 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Revert to the old primary key structure (reaction_type only)."""
+    """Revert to the old primary key structure (reaction_type only).
+
+    Note: The original schema had reaction_type as the sole PK, which was broken
+    (only allowed one of each reaction type globally). We don't restore the
+    redundant unique constraint that was also present, as it served no purpose
+    when reaction_type alone was the PK.
+    """
     conn = op.get_bind()
     schemas = _fetch_slack_schemas(conn)
 
@@ -130,18 +136,10 @@ def downgrade() -> None:
                 )
             )
 
-        # Re-add the old primary key on reaction_type only
+        # Re-add the old (broken) primary key on reaction_type only
         conn.execute(
             text(
                 f'ALTER TABLE {schema_q}."message_reactions" '
                 f"ADD PRIMARY KEY (reaction_type)"
-            )
-        )
-
-        # Re-add the unique constraint
-        conn.execute(
-            text(
-                f'ALTER TABLE {schema_q}."message_reactions" '
-                f'ADD CONSTRAINT uq_message_reaction UNIQUE (message_id, user_id, reaction_type)'
             )
         )
