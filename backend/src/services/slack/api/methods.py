@@ -1065,7 +1065,12 @@ async def conversations_list(request: Request) -> JSONResponse:
         )
         for ch in user_channels:
             # Add private channels if requested
-            if ch.is_private and not ch.is_dm and not ch.is_gc and "private_channel" in requested_types:
+            if (
+                ch.is_private
+                and not ch.is_dm
+                and not ch.is_gc
+                and "private_channel" in requested_types
+            ):
                 all_channels.append(ch)
             # Add DMs if requested
             elif ch.is_dm and "im" in requested_types:
@@ -2178,11 +2183,7 @@ async def reactions_remove(request: Request) -> JSONResponse:
     if not found:
         _slack_error("no_reaction")
 
-    ops.remove_emoji_reaction(
-        session=session,
-        user_id=actor,
-        reaction_id=found.reaction_type,
-    )
+    session.delete(found)
     return _json_response({"ok": True})
 
 
