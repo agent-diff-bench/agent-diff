@@ -11,6 +11,7 @@ from pydantic import BaseModel
 class Service(str, Enum):
     slack = "slack"
     linear = "linear"
+    calendar = "calendar"
     box = "box"
 
 

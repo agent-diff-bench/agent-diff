@@ -733,6 +733,8 @@ class IssueRelation(Base):
     issueId: Mapped[str] = mapped_column(ForeignKey("issues.id"), nullable=False)
     relatedIssueId: Mapped[str] = mapped_column(ForeignKey("issues.id"), nullable=False)
     type: Mapped[str] = mapped_column(String, nullable=False)
+    issueTitle: Mapped[Optional[str]] = mapped_column(String, nullable=True)
+    relatedIssueTitle: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     updatedAt: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     issue: Mapped[Issue] = relationship(

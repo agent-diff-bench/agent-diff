@@ -1,0 +1,2114 @@
+{
+    "GET /calendars/{calendarId}/events/{eventId}": {
+        "description": "Returns an event based on its Google Calendar ID. To retrieve an event using its iCalendar ID, call the events.list method using the iCalUID parameter.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                },
+                "eventId": {
+                    "type": "string", 
+                    "required": true,
+                    "description": "Event identifier."
+                }
+            },
+            "query": {
+                "alwaysIncludeEmail": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available."
+                },
+                "maxAttendees": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Time zone used in the response. The default is the time zone of the calendar."
+                }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/events": {
+        "description": "Creates an event.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                }
+            },
+            "query": {
+                "conferenceDataVersion": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Version number of conference data supported by the API client. Version 0 assumes no conference data support. Version 1 enables support for copying of ConferenceData as well as for creating new conferences. The default is 0. Acceptable values are 0 to 1, inclusive."
+                },
+                "maxAttendees": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned."
+                },
+                "sendNotifications": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated. Please use sendUpdates instead. Whether to send notifications about the creation of the new event. The default is false."
+                },
+                "sendUpdates": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Whether to send notifications about the creation of the new event. Note that some emails might still be sent. The default is false."
+                },
+                "supportsAttachments": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether API client performing operation supports event attachments. The default is False."
+                }
+            },
+            "body": {
+                "start": {
+                    "type": "object",
+                    "required": true,
+                    "description": "The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.",
+                    "properties": {
+                        "date": {
+                            "type": "date",
+                            "description": "The date, in the format 'yyyy-mm-dd', if this is an all-day event."
+                        },
+                        "dateTime": {
+                            "type": "datetime",
+                            "description": "The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone."
+                        },
+                        "timeZone": {
+                            "type": "string",
+                            "description": "The time zone in which the time is specified (IANA Time Zone Database name, e.g. 'Europe/Zurich'). For recurring events this field is required."
+                        }
+                    }
+                },
+                "end": {
+                    "type": "object",
+                    "required": true,
+                    "description": "The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.",
+                    "properties": {
+                        "date": {
+                            "type": "date",
+                            "description": "The date, in the format 'yyyy-mm-dd', if this is an all-day event."
+                        },
+                        "dateTime": {
+                            "type": "datetime",
+                            "description": "The time, as a combined date-time value (formatted according to RFC3339). A time zone offset is required unless a time zone is explicitly specified in timeZone."
+                        },
+                        "timeZone": {
+                            "type": "string",
+                            "description": "The time zone in which the time is specified (IANA Time Zone Database name, e.g. 'Europe/Zurich'). For recurring events this field is required."
+                        }
+                    }
+                },
+                "summary": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Title of the event."
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Description of the event. Can contain HTML."
+                },
+                "location": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Geographic location of the event as free-form text."
+                },
+                "colorId": {
+                    "type": "string",
+                    "required": false,
+                    "description": "The color of the event. This is an ID referring to an entry in the event section of the colors definition."
+                },
+                "id": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Opaque identifier of the event. If not specified, it will be automatically generated by the server. Must be between 5 and 1024 characters, using base32hex encoding (lowercase letters a-v and digits 0-9)."
+                },
+                "status": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Status of the event. Possible values: 'confirmed' (default), 'tentative', 'cancelled'."
+                },
+                "visibility": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Visibility of the event. Possible values: 'default', 'public', 'private', 'confidential'."
+                },
+                "transparency": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Whether the event blocks time on the calendar. Possible values: 'opaque' (busy, default), 'transparent' (available)."
+                },
+                "eventType": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Specific type of the event. Cannot be modified after creation. Possible values: 'birthday', 'default', 'focusTime', 'outOfOffice', 'workingLocation'."
+                },
+                "recurrence": {
+                    "type": "array",
+                    "required": false,
+                    "description": "List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event, as specified in RFC5545."
+                },
+                "attendees": {
+                    "type": "array",
+                    "required": false,
+                    "description": "The attendees of the event.",
+                    "items": {
+                        "email": {
+                            "type": "string",
+                            "required": true,
+                            "description": "The attendee's email address. Required when adding an attendee. Must be a valid email address as per RFC5322."
+                        },
+                        "displayName": {
+                            "type": "string",
+                            "required": false,
+                            "description": "The attendee's name, if available."
+                        },
+                        "optional": {
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Whether this is an optional attendee. Default is False."
+                        },
+                        "resource": {
+                            "type": "boolean",
+                            "required": false,
+                            "description": "Whether the attendee is a resource. Default is False."
+                        },
+                        "responseStatus": {
+                            "type": "string",
+                            "required": false,
+                            "description": "The attendee's response status. Possible values: 'needsAction' (recommended for new events), 'declined', 'tentative', 'accepted'."
+                        },
+                        "comment": {
+                            "type": "string",
+                            "required": false,
+                            "description": "The attendee's response comment."
+                        },
+                        "additionalGuests": {
+                            "type": "integer",
+                            "required": false,
+                            "description": "Number of additional guests. Default is 0."
+                        }
+                    }
+                },
+                "reminders": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Information about the event's reminders.",
+                    "properties": {
+                        "useDefault": {
+                            "type": "boolean",
+                            "description": "Whether the default reminders of the calendar apply to the event."
+                        },
+                        "overrides": {
+                            "type": "array",
+                            "description": "List of reminders specific to the event. Maximum 5 override reminders.",
+                            "items": {
+                                "method": {
+                                    "type": "string",
+                                    "required": true,
+                                    "description": "The method used by this reminder. Possible values: 'email', 'popup'."
+                                },
+                                "minutes": {
+                                    "type": "integer",
+                                    "required": true,
+                                    "description": "Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes)."
+                                }
+                            }
+                        }
+                    }
+                },
+                "conferenceData": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Conference-related information, such as details of a Google Meet conference. To create new conference details use the createRequest field. Set conferenceDataVersion query parameter to 1 to persist changes."
+                },
+                "attachments": {
+                    "type": "array",
+                    "required": false,
+                    "description": "File attachments for the event.",
+                    "items": {
+                        "fileUrl": {
+                            "type": "string",
+                            "required": true,
+                            "description": "URL link to the attachment. For Google Drive file attachments use the same format as in alternateLink property of the Files resource in the Drive API."
+                        }
+                    }
+                },
+                "extendedProperties": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Extended properties of the event.",
+                    "properties": {
+                        "private": {
+                            "type": "object",
+                            "description": "Properties that are private to the copy of the event that appears on this calendar."
+                        },
+                        "shared": {
+                            "type": "object",
+                            "description": "Properties that are shared between copies of the event on other attendees' calendars."
+                        }
+                    }
+                },
+                "source": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Source from which the event was created.",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Title of the source; for example a title of a web page or an email subject."
+                        },
+                        "url": {
+                            "type": "string",
+                            "description": "URL of the source pointing to a resource. The URL scheme must be HTTP or HTTPS."
+                        }
+                    }
+                },
+                "guestsCanInviteOthers": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether attendees other than the organizer can invite others to the event. Default is True."
+                },
+                "guestsCanModify": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether attendees other than the organizer can modify the event. Default is False."
+                },
+                "guestsCanSeeOtherGuests": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether attendees other than the organizer can see who the event's attendees are. Default is True."
+                },
+                "anyoneCanAddSelf": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether anyone can invite themselves to the event (deprecated). Default is False."
+                },
+                "sequence": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Sequence number as per iCalendar."
+                },
+                "originalStartTime": {
+                    "type": "object",
+                    "required": false,
+                    "description": "For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId.",
+                    "properties": {
+                        "date": {
+                            "type": "date",
+                            "description": "The date, in the format 'yyyy-mm-dd', if this is an all-day event."
+                        },
+                        "dateTime": {
+                            "type": "datetime",
+                            "description": "The time, as a combined date-time value (formatted according to RFC3339)."
+                        },
+                        "timeZone": {
+                            "type": "string",
+                            "description": "The time zone in which the time is specified (IANA Time Zone Database name)."
+                        }
+                    }
+                },
+                "workingLocationProperties": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Working location event data. Used if eventType is 'workingLocation'.",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "required": true,
+                            "description": "Type of the working location. Possible values: 'homeOffice', 'officeLocation', 'customLocation'. Required when adding working location properties."
+                        },
+                        "homeOffice": {
+                            "type": "any",
+                            "description": "If present, specifies that the user is working at home."
+                        },
+                        "officeLocation": {
+                            "type": "object",
+                            "description": "If present, specifies that the user is working from an office.",
+                            "properties": {
+                                "buildingId": {
+                                    "type": "string",
+                                    "description": "An optional building identifier."
+                                },
+                                "floorId": {
+                                    "type": "string",
+                                    "description": "An optional floor identifier."
+                                },
+                                "floorSectionId": {
+                                    "type": "string",
+                                    "description": "An optional floor section identifier."
+                                },
+                                "deskId": {
+                                    "type": "string",
+                                    "description": "An optional desk identifier."
+                                },
+                                "label": {
+                                    "type": "string",
+                                    "description": "The office name that's displayed in Calendar Web and Mobile clients."
+                                }
+                            }
+                        },
+                        "customLocation": {
+                            "type": "object",
+                            "description": "If present, specifies that the user is working from a custom location.",
+                            "properties": {
+                                "label": {
+                                    "type": "string",
+                                    "description": "An optional extra label for additional information."
+                                }
+                            }
+                        }
+                    }
+                },
+                "focusTimeProperties": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Focus Time event data. Used if eventType is 'focusTime'."
+                },
+                "outOfOfficeProperties": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Out of office event data. Used if eventType is 'outOfOffice'."
+                },
+                "birthdayProperties": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Birthday or special event data. Used if eventType is 'birthday'. Immutable.",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "description": "Type of birthday or special event. Possible values: 'anniversary', 'birthday' (default), 'custom', 'other', 'self'. The Calendar API only supports creating events with type 'birthday'."
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/acl": {
+        "description": "Creates an access control rule.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                }
+            },
+            "query": {
+                "sendNotifications": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to send notifications about the calendar sharing change. Optional. The default is True."
+                }
+            }
+        },
+        "body": {
+            "role": {
+                "type": "string",
+                "required": true,
+                "description": "The role assigned to the scope. Possible values are: 'none' (no access), 'freeBusyReader' (read access to free/busy information), 'reader' (read access to the calendar), 'writer' (read and write access to the calendar), 'owner' (manager access to the calendar)."
+            },
+            "scope": {
+                "type": "object",
+                "required": true,
+                "description": "The extent to which calendar access is granted by this ACL rule.",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "required": true,
+                        "description": "The type of the scope. Possible values are: 'default' (public scope), 'user' (single user), 'group' (a group), 'domain' (a domain)."
+                    },
+                    "value": {
+                        "type": "string",
+                        "required": false,
+                        "description": "The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type 'default'."
+                    }
+                }
+            }
+        }
+    },
+    "PATCH /calendars/{calendarId}/events/{eventId}": {
+        "description": "Updates an event. This method supports patch semantics. Note that each patch request consumes three quota units; prefer using a get followed by an update. The field values you specify replace the existing values. Fields that you don't specify in the request remain unchanged. Array fields, if specified, overwrite the existing arrays; this discards any previous array elements.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                },
+                "eventId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Event identifier."
+                }
+            },
+            "query": {
+                "alwaysIncludeEmail": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available."
+                },
+                "conferenceDataVersion": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0. Acceptable values are 0 to 1, inclusive."
+                },
+                "maxAttendees": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned."
+                },
+                "sendNotifications": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated. Please use sendUpdates instead. Whether to send notifications about the event update. The default is false."
+                },
+                "sendUpdates": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Guests who should receive notifications about the event update (for example, title changes, etc.)."
+                },
+                "supportsAttachments": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether API client performing operation supports event attachments. The default is False."
+                }
+            },
+            "body": {
+                "summary": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Title of the event."
+                },
+                "description": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Description of the event. Can contain HTML."
+                },
+                "location": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Geographic location of the event as free-form text."
+                },
+                "start": {
+                    "type": "object",
+                    "required": false,
+                    "description": "The (inclusive) start time of the event.",
+                    "properties": {
+                        "date": {
+                            "type": "date",
+                            "description": "The date, in the format 'yyyy-mm-dd', if this is an all-day event."
+                        },
+                        "dateTime": {
+                            "type": "datetime",
+                            "description": "The time, as a combined date-time value (formatted according to RFC3339)."
+                        },
+                        "timeZone": {
+                            "type": "string",
+                            "description": "The time zone in which the time is specified (IANA Time Zone Database name)."
+                        }
+                    }
+                },
+                "end": {
+                    "type": "object",
+                    "required": false,
+                    "description": "The (exclusive) end time of the event.",
+                    "properties": {
+                        "date": {
+                            "type": "date",
+                            "description": "The date, in the format 'yyyy-mm-dd', if this is an all-day event."
+                        },
+                        "dateTime": {
+                            "type": "datetime",
+                            "description": "The time, as a combined date-time value (formatted according to RFC3339)."
+                        },
+                        "timeZone": {
+                            "type": "string",
+                            "description": "The time zone in which the time is specified (IANA Time Zone Database name)."
+                        }
+                    }
+                },
+                "attendees": {
+                    "type": "array",
+                    "required": false,
+                    "description": "The attendees of the event.",
+                    "items": {
+                        "email": {
+                            "type": "string",
+                            "description": "The attendee's email address."
+                        },
+                        "displayName": {
+                            "type": "string",
+                            "description": "The attendee's name."
+                        },
+                        "optional": {
+                            "type": "boolean",
+                            "description": "Whether this is an optional attendee."
+                        },
+                        "responseStatus": {
+                            "type": "string",
+                            "description": "The attendee's response status: 'needsAction', 'declined', 'tentative', 'accepted'."
+                        }
+                    }
+                },
+                "recurrence": {
+                    "type": "array",
+                    "required": false,
+                    "description": "List of RRULE, EXRULE, RDATE and EXDATE lines for a recurring event, as specified in RFC5545."
+                },
+                "colorId": {
+                    "type": "string",
+                    "required": false,
+                    "description": "The color of the event. This is an ID referring to an entry in the event section of the colors definition."
+                },
+                "reminders": {
+                    "type": "object",
+                    "required": false,
+                    "description": "Information about the event's reminders.",
+                    "properties": {
+                        "useDefault": {
+                            "type": "boolean",
+                            "description": "Whether the default reminders of the calendar apply to the event."
+                        },
+                        "overrides": {
+                            "type": "array",
+                            "description": "List of reminders specific to the event.",
+                            "items": {
+                                "method": {
+                                    "type": "string",
+                                    "description": "The method used by this reminder: 'email' or 'popup'."
+                                },
+                                "minutes": {
+                                    "type": "integer",
+                                    "description": "Number of minutes before the start of the event when the reminder should trigger."
+                                }
+                            }
+                        }
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Status of the event: 'confirmed', 'tentative', or 'cancelled'."
+                },
+                "visibility": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Visibility of the event: 'default', 'public', 'private', or 'confidential'."
+                },
+                "transparency": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Whether the event blocks time on the calendar: 'opaque' (busy) or 'transparent' (available)."
+                }
+            }
+        }
+    },
+    "POST /freeBusy": {
+        "description": "Returns free/busy information for a set of calendars.",
+        "parameters": {
+            "path": {},
+            "query": {},
+            "body": {
+                "timeMin": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "The start of the interval for the query formatted as per RFC3339."
+                },
+                "timeMax": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "The end of the interval for the query formatted as per RFC3339."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Time zone used in the response. The default is UTC."
+                },
+                "groupExpansionMax": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximal number of calendar identifiers to be provided for a single group. An error is returned for a group with more members than this value. Maximum value is 100."
+                },
+                "calendarExpansionMax": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximal number of calendars for which FreeBusy information is to be provided. Maximum value is 50."
+                },
+                "items": {
+                    "type": "array",
+                    "required": false,
+                    "description": "List of calendars and/or groups to query.",
+                    "items": {
+                        "id": {
+                            "type": "string",
+                            "description": "The identifier of a calendar or a group."
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "GET /calendars/{calendarId}": {
+        "description": "Returns metadata for a calendar.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                }
+            },
+            "query": {}
+        }
+    },
+    "GET /calendars/{calendarId}/events": {
+        "description": "Returns events on the specified calendar.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                }
+            },
+            "query": {
+                "alwaysIncludeEmail": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated and ignored."
+                },
+                "eventTypes": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Event types to return. Can be repeated multiple times. Acceptable values: 'birthday', 'default', 'focusTime', 'fromGmail', 'outOfOffice', 'workingLocation'. If unset, returns all event types."
+                },
+                "iCalUID": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Specifies an event ID in the iCalendar format to be provided in the response. Use this to search for an event by its iCalendar ID."
+                },
+                "maxAttendees": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "The maximum number of attendees to include in the response. If there are more than the specified number of attendees, only the participant is returned."
+                },
+                "maxResults": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum number of events returned on one result page. By default the value is 250 events. The page size can never be larger than 2500 events."
+                },
+                "orderBy": {
+                    "type": "string",
+                    "required": false,
+                    "description": "The order of the events returned in the result. Acceptable values: 'startTime' (only available when singleEvents is True), 'updated'. The default is an unspecified, stable order."
+                },
+                "pageToken": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Token specifying which result page to return."
+                },
+                "privateExtendedProperty": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Extended properties constraint specified as propertyName=value. Matches only private properties. Can be repeated multiple times."
+                },
+                "q": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Free text search terms to find events that match these terms in fields like summary, description, location, attendee's displayName/email, organizer's displayName/email, and working location properties."
+                },
+                "sharedExtendedProperty": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Extended properties constraint specified as propertyName=value. Matches only shared properties. Can be repeated multiple times."
+                },
+                "showDeleted": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to include deleted events (with status equals 'cancelled') in the result. The default is False."
+                },
+                "showHiddenInvitations": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to include hidden invitations in the result. The default is False."
+                },
+                "singleEvents": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to expand recurring events into instances and only return single one-off events and instances of recurring events, but not the underlying recurring events themselves. The default is False."
+                },
+                "syncToken": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. Makes the result contain only entries that have changed since then. Cannot be used with iCalUID, orderBy, privateExtendedProperty, q, sharedExtendedProperty, timeMin, timeMax, or updatedMin."
+                },
+                "timeMax": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "Upper bound (exclusive) for an event's start time to filter by. Must be an RFC3339 timestamp with mandatory time zone offset. If timeMin is set, timeMax must be greater than timeMin."
+                },
+                "timeMin": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "Lower bound (exclusive) for an event's end time to filter by. Must be an RFC3339 timestamp with mandatory time zone offset. If timeMax is set, timeMin must be smaller than timeMax."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Time zone used in the response. The default is the time zone of the calendar."
+                },
+                "updatedMin": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "Lower bound for an event's last modification time (as a RFC3339 timestamp) to filter by. When specified, entries deleted since this time will always be included regardless of showDeleted."
+                }
+            }
+        }
+    },
+    "DELETE /calendars/{calendarId}/events/{eventId}": {
+        "description": "Deletes an event.",
+        "parameters": {
+            "path": {
+                "calendarId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Calendar identifier. To retrieve calendar IDs call the calendarList.list method. If you want to access the primary calendar of the currently logged in user, use the 'primary' keyword."
+                },
+                "eventId": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Event identifier."
+                }
+            },
+            "query": {
+                "sendNotifications": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Deprecated. Please use sendUpdates instead. Whether to send notifications about the deletion of the event. The default is false."
+                },
+                "sendUpdates": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Guests who should receive notifications about the deletion of the event."
+                }
+            }
+        }
+    },
+    "GET /users/me/calendarList": {
+        "description": "Returns the calendars on the user's calendar list.",
+        "parameters": {
+            "path": {},
+            "query": {
+                "maxResults": {
+                    "type": "integer",
+                    "required": false,
+                    "description": "Maximum number of entries returned on one result page. By default the value is 100 entries. The page size can never be larger than 250 entries."
+                },
+                "minAccessRole": {
+                    "type": "string",
+                    "required": false,
+                    "description": "The minimum access role for the user in the returned entries. The default is no restriction. Acceptable values: 'freeBusyReader', 'owner', 'reader', 'writer'."
+                },
+                "pageToken": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Token specifying which result page to return."
+                },
+                "showDeleted": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to include deleted calendar list entries in the result. The default is False."
+                },
+                "showHidden": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to show hidden entries. The default is False."
+                },
+                "syncToken": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Token obtained from the nextSyncToken field returned on the last page of results from the previous list request. Makes the result contain only entries that have changed since then. Cannot be specified together with minAccessRole."
+                }
+            }
+        }
+    },
+    "POST /calendars": {
+        "description": "Creates a secondary calendar. The authenticated user for the request is made the data owner of the new calendar.",
+        "parameters": {
+            "path": {},
+            "query": {},
+            "body": {
+                "summary": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Title of the calendar."
+                }
+            }
+        }
+    },
+    "POST /users/me/calendarList": {
+        "description": "Inserts an existing calendar into the user's calendar list (subscribes to it). Used for adding shared calendars, public calendars, or resource calendars to your list.",
+        "parameters": {
+            "query": {
+            "colorRgbFormat": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to use foregroundColor/backgroundColor fields (RGB hex) instead of colorId. Default: false."
+            }
+            },
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "Identifier of the calendar to subscribe to (calendar ID or email)."
+            },
+            "colorId": {
+                "type": "string",
+                "required": false,
+                "description": "Color ID (1-24) from the calendar colors palette."
+            },
+            "backgroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Main color in hex format '#0088aa'. Requires colorRgbFormat=true."
+            },
+            "foregroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Text color in hex format '#ffffff'. Requires colorRgbFormat=true."
+            },
+            "hidden": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to hide the calendar from the list. Default: false."
+            },
+            "selected": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether calendar content shows in the UI. Default: false."
+            },
+            "summaryOverride": {
+                "type": "string",
+                "required": false,
+                "description": "Custom display name for this calendar (user-specific)."
+            },
+            "defaultReminders": {
+                "type": "array",
+                "required": false,
+                "description": "Default reminders for events on this calendar.",
+                "items": {
+                "method": { "type": "string", "enum": ["email", "popup"] },
+                "minutes": { "type": "integer", "minimum": 0, "maximum": 40320 }
+                }
+            },
+            "notificationSettings": {
+                "type": "object",
+                "required": false,
+                "description": "Notification preferences for this calendar.",
+                "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                    "type": { "type": "string", "enum": ["eventCreation", "eventChange", "eventCancellation", "eventResponse", "agenda"] },
+                    "method": { "type": "string", "enum": ["email"] }
+                    }
+                }
+                }
+            }
+        }
+        }
+    },
+    "PATCH /users/me/calendarList/{calendarId}": {
+        "description": "Updates an existing calendar on the user's calendar list. Supports patch semantics - only specified fields are updated. Consumes 3 quota units (prefer GET + UPDATE for efficiency).",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "query": {
+            "colorRgbFormat": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to use foregroundColor/backgroundColor fields (RGB hex). Default: false."
+            }
+            },
+            "body": {
+            "colorId": {
+                "type": "string",
+                "required": false,
+                "description": "Color ID (1-24) from the calendar colors palette."
+            },
+            "backgroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Main color in hex format '#0088aa'. Requires colorRgbFormat=true."
+            },
+            "foregroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Text color in hex format '#ffffff'. Requires colorRgbFormat=true."
+            },
+            "hidden": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to hide the calendar from the list."
+            },
+            "selected": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether calendar content shows in the UI."
+            },
+            "summaryOverride": {
+                "type": "string",
+                "required": false,
+                "description": "Custom display name for this calendar."
+            },
+            "defaultReminders": {
+                "type": "array",
+                "required": false,
+                "description": "Default reminders. If specified, overwrites existing array."
+            },
+            "notificationSettings": {
+                "type": "object",
+                "required": false,
+                "description": "Notification preferences."
+            }
+            }
+        }
+    },
+    "GET /calendars/{calendarId}/acl": {
+        "description": "Returns the rules in the access control list for the calendar. Used to find existing permissions and rule IDs (formatted as 'user:email', 'group:email', 'domain:name', or 'default') for updates/deletes.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "query": {
+            "maxResults": {
+                "type": "integer",
+                "required": false,
+                "description": "Maximum number of entries returned."
+            },
+            "pageToken": {
+                "type": "string",
+                "required": false,
+                "description": "Token for retrieving the next page of results."
+            },
+            "showDeleted": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to include deleted ACL rules (role='none'). Default: false."
+            },
+            "syncToken": {
+                "type": "string",
+                "required": false,
+                "description": "Token for incremental sync, returning only changed entries since last sync."
+            }
+            }
+        }
+    },
+    "DELETE /calendars/{calendarId}/acl/{ruleId}": {
+        "description": "Deletes an access control rule, removing a user/group/domain's access to the calendar. Deletion is immediate and permanent. Cannot delete owner's own access.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            },
+            "ruleId": {
+                "type": "string",
+                "required": true,
+                "description": "ACL rule identifier. Format: 'user:email@example.com', 'group:group@example.com', 'domain:example.com', or 'default'. Obtained from GET /calendars/{calendarId}/acl."
+            }
+            }
+        }
+    },
+    "GET /users/me/settings/{setting}": {
+        "description": "Returns a single user setting by ID. Settings with default values may not be returned.",
+        "parameters": {
+            "path": {
+            "setting": {
+                "type": "string",
+                "required": true,
+                "description": "Setting ID. Valid values: autoAddHangouts, dateFieldOrder, defaultEventLength, format24HourTime, hideInvitations, hideWeekends, locale, remindOnRespondedEventsOnly, showDeclinedEvents, timezone, useKeyboardShortcuts, weekStart."
+            }
+            }
+        }
+    },
+    "POST /users/me/settings/watch": {
+        "description": "Watch for changes to user Settings resources. Creates a notification channel that sends push notifications to a webhook URL when settings change. Channels expire (typically ~1 week) and must be renewed.",
+        "parameters": {
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "Unique channel identifier (UUID recommended). Max 64 characters. Echoed in X-Goog-Channel-Id header of notifications."
+            },
+            "type": {
+                "type": "string",
+                "required": true,
+                "value": "web_hook",
+                "description": "Must be 'web_hook'."
+            },
+            "address": {
+                "type": "string",
+                "required": true,
+                "description": "HTTPS URL to receive notifications. Must have valid SSL certificate."
+            },
+            "token": {
+                "type": "string",
+                "required": false,
+                "description": "Arbitrary string (max 256 chars) for validation/routing. Echoed in X-Goog-Channel-Token header."
+            },
+            "expiration": {
+                "type": "long",
+                "required": false,
+                "description": "Unix timestamp (ms) when channel should expire. Server may impose earlier expiration."
+            },
+            "params": {
+                "type": "object",
+                "required": false,
+                "properties": {
+                "ttl": {
+                    "type": "string",
+                    "description": "Time-to-live in seconds."
+                }
+                }
+            }
+            }
+        }
+    },
+    "PATCH /calendars/{calendarId}": {
+        "description": "Updates metadata for a calendar (summary, description, location, timezone). Supports patch semantics - only specified fields are updated. Consumes 3 quota units (prefer GET + UPDATE for efficiency).",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "body": {
+            "summary": {
+                "type": "string",
+                "required": false,
+                "description": "Title of the calendar."
+            },
+            "description": {
+                "type": "string",
+                "required": false,
+                "description": "Description of the calendar."
+            },
+            "location": {
+                "type": "string",
+                "required": false,
+                "description": "Geographic location as free-form text."
+            },
+            "timeZone": {
+                "type": "string",
+                "required": false,
+                "description": "IANA timezone identifier (e.g., 'Europe/Warsaw', 'Asia/Kolkata')."
+            }
+            }
+        }
+    },
+    "DELETE /users/me/calendarList/{calendarId}": {
+        "description": "Removes a calendar from the user's calendar list (unsubscribes). Does NOT delete the calendar itself - only removes it from the user's view. The calendar and its events remain intact for other users.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier to remove from the list."
+            }
+            }
+        }
+    },
+    "GET /calendars/{calendarId}/events/{eventId}/instances": {
+        "description": "Returns instances of a specified recurring event. Use this to get individual occurrences that can then be modified (creating exceptions) or cancelled. Each instance has its own ID for PATCH/DELETE operations.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            },
+            "eventId": {
+                "type": "string",
+                "required": true,
+                "description": "Recurring event identifier (the parent event ID, not an instance ID)."
+            }
+            },
+            "query": {
+            "timeMin": {
+                "type": "datetime",
+                "required": false,
+                "description": "Lower bound (exclusive) for instance start time. RFC3339 timestamp."
+            },
+            "timeMax": {
+                "type": "datetime",
+                "required": false,
+                "description": "Upper bound (exclusive) for instance start time. RFC3339 timestamp."
+            },
+            "timeZone": {
+                "type": "string",
+                "required": false,
+                "description": "IANA timezone for times in response. Defaults to calendar timezone."
+            },
+            "maxResults": {
+                "type": "integer",
+                "required": false,
+                "description": "Maximum number of instances to return."
+            },
+            "pageToken": {
+                "type": "string",
+                "required": false,
+                "description": "Token for retrieving next page of results."
+            },
+            "showDeleted": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to include cancelled instances. Default: false."
+            },
+            "originalStart": {
+                "type": "string",
+                "required": false,
+                "description": "Original start time of specific instance to retrieve."
+            },
+            "maxAttendees": {
+                "type": "integer",
+                "required": false,
+                "description": "Maximum attendees to include per instance."
+            }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/events/import": {
+        "description": "Imports an event by adding a private copy of an existing event to a calendar. Used for calendar migration and syncing with external calendaring systems. Unlike 'insert', requires an iCalUID and preserves the event's identity across systems. Only events with eventType 'default' may be imported.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "query": {
+            "conferenceDataVersion": {
+                "type": "integer",
+                "required": false,
+                "description": "Version of conference data supported. 0 = no support (default), 1 = enables ConferenceData copying/creation. Values: 0-1."
+            },
+            "supportsAttachments": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether client supports event attachments. Default: false."
+            }
+            },
+            "body": {
+            "iCalUID": {
+                "type": "string",
+                "required": true,
+                "description": "Event unique identifier as defined in RFC5545. Used to uniquely identify events across calendaring systems. Must be supplied when importing. Note: iCalUID and id are not identical - in recurring events, all occurrences share the same iCalUID but have different ids."
+            },
+            "start": {
+                "type": "object",
+                "required": true,
+                "description": "Start time of the event.",
+                "properties": {
+                "date": {
+                    "type": "date",
+                    "required": false,
+                    "description": "Date in 'yyyy-mm-dd' format for all-day events."
+                },
+                "dateTime": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "RFC3339 timestamp. Requires timezone offset unless timeZone specified."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "IANA timezone (e.g., 'America/New_York')."
+                }
+                }
+            },
+            "end": {
+                "type": "object",
+                "required": true,
+                "description": "End time of the event.",
+                "properties": {
+                "date": {
+                    "type": "date",
+                    "required": false,
+                    "description": "Date in 'yyyy-mm-dd' format for all-day events."
+                },
+                "dateTime": {
+                    "type": "datetime",
+                    "required": false,
+                    "description": "RFC3339 timestamp. Requires timezone offset unless timeZone specified."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "required": false,
+                    "description": "IANA timezone (e.g., 'America/New_York')."
+                }
+                }
+            },
+            "summary": {
+                "type": "string",
+                "required": false,
+                "description": "Title of the event."
+            },
+            "description": {
+                "type": "string",
+                "required": false,
+                "description": "Description of the event. Can contain HTML."
+            },
+            "location": {
+                "type": "string",
+                "required": false,
+                "description": "Geographic location as free-form text."
+            },
+            "organizer": {
+                "type": "object",
+                "required": false,
+                "description": "Event organizer. Writable only when importing (read-only for insert/update).",
+                "properties": {
+                "email": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Organizer's email address (RFC5322 format)."
+                },
+                "displayName": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Organizer's display name."
+                }
+                }
+            },
+            "attendees": {
+                "type": "array",
+                "required": false,
+                "description": "List of attendees.",
+                "items": {
+                "type": "object",
+                "properties": {
+                    "email": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Attendee's email address."
+                    },
+                    "displayName": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Attendee's display name."
+                    },
+                    "responseStatus": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Response status: 'needsAction', 'declined', 'tentative', 'accepted'."
+                    },
+                    "optional": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether optional attendee. Default: false."
+                    }
+                }
+                }
+            },
+            "recurrence": {
+                "type": "array",
+                "required": false,
+                "description": "RRULE, EXRULE, RDATE, EXDATE lines per RFC5545 for recurring events.",
+                "items": {
+                "type": "string"
+                }
+            },
+            "sequence": {
+                "type": "integer",
+                "required": false,
+                "description": "Sequence number as per iCalendar specification."
+            },
+            "status": {
+                "type": "string",
+                "required": false,
+                "description": "Event status: 'confirmed' (default), 'tentative', 'cancelled'."
+            },
+            "transparency": {
+                "type": "string",
+                "required": false,
+                "description": "Whether event blocks time: 'opaque' (busy, default), 'transparent' (available)."
+            },
+            "visibility": {
+                "type": "string",
+                "required": false,
+                "description": "Visibility: 'default', 'public', 'private', 'confidential'."
+            },
+            "colorId": {
+                "type": "string",
+                "required": false,
+                "description": "Color ID from the event colors definition (1-11)."
+            },
+            "reminders": {
+                "type": "object",
+                "required": false,
+                "description": "Reminder settings.",
+                "properties": {
+                "useDefault": {
+                    "type": "boolean",
+                    "required": false,
+                    "description": "Whether to use calendar's default reminders."
+                },
+                "overrides": {
+                    "type": "array",
+                    "required": false,
+                    "description": "Custom reminders (max 5).",
+                    "items": {
+                    "type": "object",
+                    "properties": {
+                        "method": {
+                        "type": "string",
+                        "required": true,
+                        "description": "Reminder method: 'email' or 'popup'."
+                        },
+                        "minutes": {
+                        "type": "integer",
+                        "required": true,
+                        "description": "Minutes before event (0-40320)."
+                        }
+                    }
+                    }
+                }
+                }
+            }
+            }
+        }
+    },
+    "PUT /calendars/{calendarId}/events/{eventId}": {
+        "description": "Updates an event by fully replacing the entire event resource. Does NOT support patch semantics - always updates the entire event. Unspecified fields will be cleared/reset. For partial updates, use PATCH or perform GET followed by UPDATE with etags for atomicity.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            },
+            "eventId": {
+                "type": "string",
+                "required": true,
+                "description": "Event identifier."
+            }
+            },
+            "query": {
+            "sendUpdates": {
+                "type": "string",
+                "required": false,
+                "description": "Who receives notifications: 'all', 'externalOnly', 'none'."
+            },
+            "sendNotifications": {
+                "type": "boolean",
+                "required": false,
+                "description": "Deprecated. Use sendUpdates instead."
+            },
+            "maxAttendees": {
+                "type": "integer",
+                "required": false,
+                "description": "Max attendees to include in response."
+            },
+            "conferenceDataVersion": {
+                "type": "integer",
+                "required": false,
+                "description": "Conference data version: 0 (no support) or 1 (enabled). Default: 0."
+            },
+            "supportsAttachments": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether client supports attachments. Default: false."
+            }
+            },
+            "body": {
+            "start": {
+                "type": "object",
+                "required": true,
+                "description": "Start time (required for full replace).",
+                "properties": {
+                "date": { "type": "date", "required": false, "description": "All-day event date (yyyy-mm-dd)." },
+                "dateTime": { "type": "datetime", "required": false, "description": "RFC3339 timestamp." },
+                "timeZone": { "type": "string", "required": false, "description": "IANA timezone." }
+                }
+            },
+            "end": {
+                "type": "object",
+                "required": true,
+                "description": "End time (required for full replace).",
+                "properties": {
+                "date": { "type": "date", "required": false, "description": "All-day event date (yyyy-mm-dd)." },
+                "dateTime": { "type": "datetime", "required": false, "description": "RFC3339 timestamp." },
+                "timeZone": { "type": "string", "required": false, "description": "IANA timezone." }
+                }
+            },
+            "summary": {
+                "type": "string",
+                "required": false,
+                "description": "Event title. Will be cleared if not provided."
+            },
+            "description": {
+                "type": "string",
+                "required": false,
+                "description": "Event description. Will be cleared if not provided."
+            },
+            "location": {
+                "type": "string",
+                "required": false,
+                "description": "Event location. Will be cleared if not provided."
+            },
+            "colorId": {
+                "type": "string",
+                "required": false,
+                "description": "Event color ID."
+            },
+            "attendees": {
+                "type": "array",
+                "required": false,
+                "description": "Attendee list. Will be cleared if not provided.",
+                "items": {
+                "type": "object",
+                "properties": {
+                    "email": { "type": "string", "required": true },
+                    "displayName": { "type": "string", "required": false },
+                    "responseStatus": { "type": "string", "required": false },
+                    "optional": { "type": "boolean", "required": false }
+                }
+                }
+            },
+            "recurrence": {
+                "type": "array",
+                "required": false,
+                "description": "RRULE lines for recurring events.",
+                "items": { "type": "string" }
+            },
+            "reminders": {
+                "type": "object",
+                "required": false,
+                "description": "Reminder settings.",
+                "properties": {
+                "useDefault": { "type": "boolean", "required": false },
+                "overrides": { "type": "array", "required": false }
+                }
+            },
+            "visibility": {
+                "type": "string",
+                "required": false,
+                "description": "Visibility: 'default', 'public', 'private', 'confidential'."
+            },
+            "transparency": {
+                "type": "string",
+                "required": false,
+                "description": "'opaque' (busy) or 'transparent' (available)."
+            },
+            "status": {
+                "type": "string",
+                "required": false,
+                "description": "'confirmed', 'tentative', 'cancelled'."
+            }
+            }
+        }
+    },
+    "DELETE /calendars/{calendarId}": {
+        "description": "Permanently deletes a secondary calendar. Cannot delete primary calendar - use calendars.clear to remove all events from primary instead. This action is irreversible and removes the calendar for all users who have access.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Cannot be 'primary' - primary calendars cannot be deleted."
+            }
+            }
+        }
+    },
+    "GET /calendars/{calendarId}/acl/{ruleId}": {
+        "description": "Returns a specific access control rule for a calendar. Use this to check the role assigned to a particular user, group, or domain without listing all ACL rules.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            },
+            "ruleId": {
+                "type": "string",
+                "required": true,
+                "description": "ACL rule identifier. Format: 'user:{email}', 'group:{email}', 'domain:{domain}', or 'default'."
+            }
+            }
+        },
+        "response": {
+            "kind": {
+            "type": "string",
+            "description": "Type of resource: 'calendar#aclRule'."
+            },
+            "etag": {
+            "type": "string",
+            "description": "ETag of the resource."
+            },
+            "id": {
+            "type": "string",
+            "description": "Identifier of the ACL rule (same as ruleId)."
+            },
+            "role": {
+            "type": "string",
+            "description": "The role assigned. Values: 'none', 'freeBusyReader', 'reader', 'writer', 'owner'."
+            },
+            "scope": {
+            "type": "object",
+            "description": "The extent to which access is granted.",
+            "properties": {
+                "type": {
+                "type": "string",
+                "description": "Scope type: 'default', 'user', 'group', 'domain'."
+                },
+                "value": {
+                "type": "string",
+                "description": "Email address, group, or domain name. Omitted for 'default' scope."
+                }
+            }
+            }
+        }
+    },
+    "GET /users/me/settings": {
+        "description": "Returns all user settings for the authenticated user. Settings represent preferences users can change from the Calendar UI, such as timezone, locale, and display options. Note: Settings with default values might not be returned.",
+        "parameters": {
+            "query": {
+            "maxResults": {
+                "type": "integer",
+                "required": false,
+                "description": "Maximum number of settings to return."
+            },
+            "pageToken": {
+                "type": "string",
+                "required": false,
+                "description": "Token for retrieving next page of results."
+            },
+            "syncToken": {
+                "type": "string",
+                "required": false,
+                "description": "Token for incremental sync. Returns only settings changed since last sync."
+            }
+            }
+        },
+        "response": {
+            "kind": {
+            "type": "string",
+            "description": "Type of collection: 'calendar#settings'."
+            },
+            "etag": {
+            "type": "string",
+            "description": "ETag of the collection."
+            },
+            "nextPageToken": {
+            "type": "string",
+            "description": "Token for next page. Omitted if no more results."
+            },
+            "nextSyncToken": {
+            "type": "string",
+            "description": "Token for incremental sync. Omitted if more pages available."
+            },
+            "items": {
+            "type": "array",
+            "description": "List of user settings.",
+            "items": {
+                "type": "object",
+                "properties": {
+                "kind": {
+                    "type": "string",
+                    "description": "'calendar#setting'"
+                },
+                "etag": {
+                    "type": "string",
+                    "description": "ETag of the setting."
+                },
+                "id": {
+                    "type": "string",
+                    "description": "Setting identifier (e.g., 'timezone', 'locale')."
+                },
+                "value": {
+                    "type": "string",
+                    "description": "Setting value."
+                }
+                }
+            }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/events/quickAdd": {
+        "description": "Creates an event based on a simple text string using natural language parsing. Google parses the text to extract event details like title, date, time, and duration. Useful for quick event creation without structured data.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "query": {
+            "text": {
+                "type": "string",
+                "required": true,
+                "description": "The text describing the event to be created. Examples: 'Dinner with John tomorrow at 7pm', 'Meeting June 28 at 9:30am for 30 minutes', 'Team standup every Monday at 9am'."
+            },
+            "sendUpdates": {
+                "type": "string",
+                "required": false,
+                "description": "Who receives notifications: 'all', 'externalOnly', 'none'."
+            },
+            "sendNotifications": {
+                "type": "boolean",
+                "required": false,
+                "description": "Deprecated. Use sendUpdates instead."
+            }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/events/watch": {
+        "description": "Creates a notification channel to watch for changes to events on a calendar. When events are created, updated, or deleted, Google sends a POST to your webhook URL. Notifications indicate something changed but don't include event details - use incremental sync to fetch changes.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            },
+            "query": {
+            "eventTypes": {
+                "type": "array",
+                "required": false,
+                "description": "Filter to specific event types: 'default', 'focusTime', 'outOfOffice', 'workingLocation', 'fromGmail'.",
+                "items": { "type": "string" }
+            }
+            },
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "Unique channel identifier (UUID recommended). Max 64 characters."
+            },
+            "type": {
+                "type": "string",
+                "required": true,
+                "description": "Must be 'web_hook'."
+            },
+            "address": {
+                "type": "string",
+                "required": true,
+                "description": "HTTPS URL to receive notifications. Must be registered in Google Cloud Console."
+            },
+            "token": {
+                "type": "string",
+                "required": false,
+                "description": "Arbitrary string sent with notifications for verification. Max 256 characters."
+            },
+            "expiration": {
+                "type": "long",
+                "required": false,
+                "description": "Unix timestamp (ms) when channel expires. Default ~1 week."
+            },
+            "params": {
+                "type": "object",
+                "required": false,
+                "description": "Additional parameters.",
+                "properties": {
+                "ttl": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Time-to-live in seconds."
+                }
+                }
+            }
+            }
+        }
+    },
+    "GET /users/me/calendarList/{calendarId}": {
+        "description": "Returns a specific calendar from the user's calendar list. Use this to check if a user is subscribed to a calendar and view their personalized settings for it (color, visibility, reminders, etc.).",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the user's primary calendar."
+            }
+            }
+        }
+    },
+    "PUT /users/me/calendarList/{calendarId}": {
+        "description": "Updates an existing calendar on the user's calendar list by fully replacing the entry. Unlike PATCH, unspecified fields may be reset to defaults. Use GET followed by PUT for atomic updates with etags.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier."
+            }
+            },
+            "query": {
+            "colorRgbFormat": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to use backgroundColor/foregroundColor fields (true) or colorId field (false). Default: false."
+            }
+            },
+            "body": {
+            "summaryOverride": {
+                "type": "string",
+                "required": false,
+                "description": "User's custom title for this calendar."
+            },
+            "colorId": {
+                "type": "string",
+                "required": false,
+                "description": "Color ID from calendar colors palette (1-24)."
+            },
+            "backgroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Background color as hex (#rrggbb). Requires colorRgbFormat=true."
+            },
+            "foregroundColor": {
+                "type": "string",
+                "required": false,
+                "description": "Foreground color as hex (#rrggbb). Requires colorRgbFormat=true."
+            },
+            "hidden": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether calendar is hidden from the list."
+            },
+            "selected": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether calendar content is shown in the calendar UI."
+            },
+            "defaultReminders": {
+                "type": "array",
+                "required": false,
+                "description": "Default reminders for events. Will be cleared if not specified.",
+                "items": {
+                "type": "object",
+                "properties": {
+                    "method": { "type": "string", "description": "'email' or 'popup'" },
+                    "minutes": { "type": "integer", "description": "Minutes before event (0-40320)" }
+                }
+                }
+            },
+            "notificationSettings": {
+                "type": "object",
+                "required": false,
+                "description": "Notification settings for the calendar.",
+                "properties": {
+                "notifications": {
+                    "type": "array",
+                    "items": {
+                    "type": "object",
+                    "properties": {
+                        "type": { "type": "string", "description": "'eventCreation', 'eventChange', 'eventCancellation', 'eventResponse', 'agenda'" },
+                        "method": { "type": "string", "description": "'email'" }
+                    }
+                    }
+                }
+                }
+            }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/events/{eventId}/move": {
+        "description": "Moves an event to another calendar, changing the event's organizer to the destination calendar owner. Only default events can be moved; birthday, focusTime, fromGmail, outOfOffice, and workingLocation events cannot be moved.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier of the SOURCE calendar where the event currently resides."
+            },
+            "eventId": {
+                "type": "string",
+                "required": true,
+                "description": "Event identifier to move."
+            }
+            },
+            "query": {
+            "destination": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier of the TARGET calendar where the event will be moved to."
+            },
+            "sendUpdates": {
+                "type": "string",
+                "required": false,
+                "description": "Guests who should receive notifications about the move.",
+                "enum": ["all", "externalOnly", "none"],
+                "default": "none"
+            }
+        }
+        }
+    },
+    "POST /calendars/{calendarId}/clear": {
+        "description": "Clears a calendar by deleting all events associated with it. The calendar itself is preserved. Designed primarily for primary calendars.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier. Use 'primary' for the authenticated user's primary calendar."
+            }
+            },
+            "body": "None - do not supply a request body"
+        }
+    },
+    "GET /colors": {
+        "description": "Returns the color definitions for calendars and events. Provides both calendar colors (for calendarList entries) and event colors (for individual events).",
+        "parameters": {
+            "path": "None",
+            "query": "None",
+            "body": "None"
+        }
+    },
+    "PATCH /calendars/{calendarId}/acl/{ruleId}": {
+        "description": "Updates an access control rule using patch semantics. Only specified fields are modified; unspecified fields remain unchanged.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier."
+            },
+            "ruleId": {
+                "type": "string",
+                "required": true,
+                "description": "ACL rule identifier (e.g., 'user:email@example.com')."
+            }
+            },
+            "query": {
+            "sendNotifications": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to send notifications about the sharing change. No notifications on access removal. Default: true."
+            }
+            },
+            "body": {
+            "role": {
+                "type": "string",
+                "required": false,
+                "description": "The role to assign.",
+                "enum": ["none", "freeBusyReader", "reader", "writer", "owner"]
+            }
+            }
+        }
+    },
+    "POST /channels/stop": {
+        "description": "Stop watching resources through a notification channel. Use to cancel push notifications when no longer needed or before channel expiration.",
+        "parameters": {
+            "path": "None",
+            "query": "None",
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "The channel ID you specified when creating the watch."
+            },
+            "resourceId": {
+                "type": "string",
+                "required": true,
+                "description": "The resourceId returned by the watch method when the channel was created."
+            }
+            }
+        }
+    },
+    "PUT /calendars/{calendarId}/acl/{ruleId}": {
+        "description": "Updates an access control rule by fully replacing it. Unlike PATCH, this replaces the entire rule. Use for complete rule replacement.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier."
+            },
+            "ruleId": {
+                "type": "string",
+                "required": true,
+                "description": "ACL rule identifier (e.g., 'user:salma@test.com')."
+            }
+            },
+            "query": {
+            "sendNotifications": {
+                "type": "boolean",
+                "required": false,
+                "description": "Whether to send notifications about the sharing change. No notifications on access removal. Default: true."
+            }
+            },
+            "body": {
+            "role": {
+                "type": "string",
+                "required": true,
+                "description": "The role to assign.",
+                "enum": ["none", "freeBusyReader", "reader", "writer", "owner"]
+            },
+            "scope": {
+                "type": "object",
+                "required": true,
+                "description": "The extent to which calendar access is granted.",
+                "properties": {
+                "type": {
+                    "type": "string",
+                    "required": true,
+                    "enum": ["default", "user", "group", "domain"]
+                },
+                "value": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Email address (user/group) or domain name. Omitted for 'default' type."
+                }
+                }
+            }
+            }
+        }
+    },
+    "POST /calendars/{calendarId}/acl/watch": {
+        "description": "Watch for changes to ACL resources on a specific calendar. Receive push notifications when access control rules are added, modified, or removed.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier."
+            }
+            },
+            "query": "None",
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "Unique channel ID (UUID recommended, max 64 chars). Must be unique across all channels."
+            },
+            "type": {
+                "type": "string",
+                "required": true,
+                "description": "Type of delivery mechanism. Must be 'web_hook'."
+            },
+            "address": {
+                "type": "string",
+                "required": true,
+                "description": "HTTPS URL where notifications are delivered. Must be registered in GCP Console."
+            },
+            "token": {
+                "type": "string",
+                "required": false,
+                "description": "Arbitrary string for verification (max 256 chars). Returned in X-Goog-Channel-Token header."
+            },
+            "params": {
+                "type": "object",
+                "required": false,
+                "properties": {
+                "ttl": {
+                    "type": "string",
+                    "description": "Time-to-live in seconds for the channel."
+                }
+                }
+            }
+            }
+        }
+    },
+    "POST /users/me/calendarList/watch": {
+        "description": "Watch for changes to CalendarList resources. Receive push notifications when calendars are added, removed, or modified in the user's calendar list.",
+        "parameters": {
+            "path": "None (account-wide)",
+            "query": "None",
+            "body": {
+            "id": {
+                "type": "string",
+                "required": true,
+                "description": "Unique channel ID (UUID recommended, max 64 chars). Must be unique across all channels."
+            },
+            "type": {
+                "type": "string",
+                "required": true,
+                "description": "Type of delivery mechanism. Must be 'web_hook'."
+            },
+            "address": {
+                "type": "string",
+                "required": true,
+                "description": "HTTPS URL where notifications are delivered. Must be registered in GCP Console."
+            },
+            "token": {
+                "type": "string",
+                "required": false,
+                "description": "Arbitrary string for verification (max 256 chars). Returned in X-Goog-Channel-Token header."
+            },
+            "params": {
+                "type": "object",
+                "required": false,
+                "properties": {
+                "ttl": {
+                    "type": "string",
+                    "description": "Time-to-live in seconds for the channel."
+                }
+                }
+            }
+            }
+        }
+    },
+    "PUT /calendars/{calendarId}": {
+        "description": "Updates metadata for a calendar by fully replacing it. Unlike PATCH, this replaces the entire calendar metadata. Unspecified fields may be reset to defaults.",
+        "parameters": {
+            "path": {
+            "calendarId": {
+                "type": "string",
+                "required": true,
+                "description": "Calendar identifier."
+            }
+            },
+            "query": "None",
+            "body": {
+            "summary": {
+                "type": "string",
+                "required": true,
+                "description": "Title of the calendar."
+            },
+            "description": {
+                "type": "string",
+                "required": false,
+                "description": "Description of the calendar."
+            },
+            "location": {
+                "type": "string",
+                "required": false,
+                "description": "Geographic location of the calendar."
+            },
+            "timeZone": {
+                "type": "string",
+                "required": false,
+                "description": "IANA timezone (e.g., 'America/Los_Angeles')."
+            }
+            }
+        }
+    }
+}

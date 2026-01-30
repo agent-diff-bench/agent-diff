@@ -195,13 +195,16 @@ class GlobalReplicationWorker(threading.Thread):
                     run_info.run_id.hex[:8],
                 )
 
+                oldkeys = change.get("oldkeys", {})
                 before = self._zip_columns(
-                    change.get("oldkeys", {}).get("keynames"),
-                    change.get("oldkeys", {}).get("keyvalues"),
+                    oldkeys.get("keynames"),
+                    oldkeys.get("keyvalues"),
+                    oldkeys.get("keytypes"),
                 )
                 after = self._zip_columns(
                     change.get("columnnames"),
                     change.get("columnvalues"),
+                    change.get("columntypes"),
                 )
                 primary_key = self._primary_key_from_change(change, before, after)
                 self.writer.write(
@@ -233,11 +236,36 @@ class GlobalReplicationWorker(threading.Thread):
 
     @staticmethod
     def _zip_columns(
-        names: list[str] | None, values: list[Any] | None
+        names: list[str] | None,
+        values: list[Any] | None,
+        types: list[str] | None = None,
     ) -> dict[str, Any] | None:
+        """
+        Zip column names with values, parsing JSON/JSONB values as dicts.
+        
+        wal2json outputs JSONB columns as quoted strings, not parsed JSON.
+        We need to detect JSON/JSONB types and parse them for proper nested access.
+        """
         if not names or not values:
             return None
-        return {name: values[idx] for idx, name in enumerate(names)}
+        
+        result: dict[str, Any] = {}
+        for idx, name in enumerate(names):
+            value = values[idx]
+            
+            # Check if this column is JSON/JSONB and parse it
+            if types and idx < len(types):
+                col_type = types[idx].lower()
+                if col_type in ("json", "jsonb") and isinstance(value, str):
+                    try:
+                        value = json.loads(value)
+                    except json.JSONDecodeError:
+                        # Keep as string if not valid JSON
+                        pass
+            
+            result[name] = value
+        
+        return result
 
     @staticmethod
     def _primary_key_from_change(
@@ -253,7 +281,9 @@ class GlobalReplicationWorker(threading.Thread):
         if oldkeys:
             return (
                 GlobalReplicationWorker._zip_columns(
-                    oldkeys.get("keynames"), oldkeys.get("keyvalues")
+                    oldkeys.get("keynames"),
+                    oldkeys.get("keyvalues"),
+                    oldkeys.get("keytypes"),
                 )
                 or {}
             )

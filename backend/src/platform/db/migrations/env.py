@@ -7,6 +7,7 @@ from sqlalchemy import engine_from_config, pool
 
 from src.platform.db.schema import PlatformBase
 from src.services.slack.database.base import Base as SlackBase
+from src.services.calendar.database.base import Base as CalendarBase
 
 # Load .env file if available (not needed in Docker where env vars are passed directly)
 try:
@@ -25,6 +26,7 @@ if config.config_file_name is not None:
 target_metadata = [
     PlatformBase.metadata,
     SlackBase.metadata,
+    CalendarBase.metadata,
 ]
 
 

@@ -46,7 +46,7 @@ import base64
 import json
 import re
 import uuid
-from datetime import datetime, timezone, timedelta
+from datetime import date, datetime, timezone, timedelta
 
 from ariadne import ObjectType
 
@@ -95,6 +95,45 @@ def parse_datetime_literal(ast, variable_values=None):
     return parse_datetime_value(value)
 
 
+# TimelessDate scalar serializer (for date-only fields like dueDate)
+timelessdate_scalar = ScalarType("TimelessDate")
+
+
+@timelessdate_scalar.serializer
+def serialize_timelessdate(value):
+    """Serialize Python date to ISO 8601 date string (YYYY-MM-DD)."""
+    if value is None:
+        return None
+    if isinstance(value, date) and not isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, datetime):
+        return value.date().isoformat()
+    if isinstance(value, str):
+        return value  # Already serialized
+    raise ValueError(f"Cannot serialize {type(value)} as TimelessDate")
+
+
+@timelessdate_scalar.value_parser
+def parse_timelessdate_value(value):
+    """Parse ISO 8601 date string to Python date."""
+    if value is None:
+        return None
+    if isinstance(value, date) and not isinstance(value, datetime):
+        return value
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, str):
+        return date.fromisoformat(value)
+    raise ValueError(f"Cannot parse {type(value)} as TimelessDate")
+
+
+@timelessdate_scalar.literal_parser
+def parse_timelessdate_literal(ast, variable_values=None):
+    """Parse GraphQL literal value."""
+    value = ast.value
+    return parse_timelessdate_value(value)
+
+
 # Export query and mutation objects for use in schema binding
 __all__ = [
     "query",
@@ -103,10 +142,11 @@ __all__ = [
     "team_type",
     "user_type",
     "datetime_scalar",
+    "timelessdate_scalar",
 ]
 
 # Convenience export for all bindables
-bindables = [query, mutation, issue_type, team_type, user_type, datetime_scalar]
+bindables = [query, mutation, issue_type, team_type, user_type, datetime_scalar, timelessdate_scalar]
 
 
 @issue_type.field("labels")
@@ -13573,12 +13613,27 @@ def resolve_issueRelationCreate(obj, info, **kwargs):
         # Generate timestamps
         now = override_created_at if override_created_at else datetime.now(timezone.utc)
 
+        # Look up issue titles for denormalization (used for assertion checking)
+        issue = session.query(Issue).filter_by(id=issue_id).first()
+        related_issue = session.query(Issue).filter_by(id=related_issue_id).first()
+
+        # Validate both issues exist before creating relation
+        if issue is None:
+            raise Exception(f"Issue not found: {issue_id}")
+        if related_issue is None:
+            raise Exception(f"Related issue not found: {related_issue_id}")
+
+        issue_title = issue.title
+        related_issue_title = related_issue.title
+
         # Create the IssueRelation entity
         issue_relation = IssueRelation(
             id=issue_relation_id,
             issueId=issue_id,
             relatedIssueId=related_issue_id,
             type=relation_type,
+            issueTitle=issue_title,
+            relatedIssueTitle=related_issue_title,
             createdAt=now,
             updatedAt=now,
             archivedAt=None,
@@ -13626,10 +13681,24 @@ def resolve_issueRelationUpdate(obj, info, **kwargs):
 
         # Update fields if provided in input
         if "issueId" in input_data:
-            issue_relation.issueId = input_data["issueId"]
+            new_issue_id = input_data["issueId"]
+            if new_issue_id != issue_relation.issueId:
+                # Validate issue exists before mutating
+                new_issue = session.query(Issue).filter_by(id=new_issue_id).first()
+                if not new_issue:
+                    raise Exception(f"Issue with id '{new_issue_id}' not found")
+                issue_relation.issueId = new_issue_id
+                issue_relation.issueTitle = new_issue.title
 
         if "relatedIssueId" in input_data:
-            issue_relation.relatedIssueId = input_data["relatedIssueId"]
+            new_related_issue_id = input_data["relatedIssueId"]
+            if new_related_issue_id != issue_relation.relatedIssueId:
+                # Validate related issue exists before mutating
+                new_related_issue = session.query(Issue).filter_by(id=new_related_issue_id).first()
+                if not new_related_issue:
+                    raise Exception(f"Issue with id '{new_related_issue_id}' not found")
+                issue_relation.relatedIssueId = new_related_issue_id
+                issue_relation.relatedIssueTitle = new_related_issue.title
 
         if "type" in input_data:
             issue_relation.type = input_data["type"]
