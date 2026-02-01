@@ -144,6 +144,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.*
 .envrc
 .venv
 env/
@@ -239,5 +240,8 @@ backend/src/services/linear/api/resolvers.py.backup
 backend/FILES_CREATED.md
 third_party/
 slack_credentials.md
-.env
-.env.local
+local_experiments/
+.claude/settings.local.json
+.claude/**
+!.claude/CLAUDE.md
+!.claude/settings.json

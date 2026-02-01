@@ -1040,13 +1040,21 @@ def list_events(
 
                 all_events.append(instance)
         
+        # Helper to normalize datetime to timezone-aware for comparison
+        def _normalize_dt(dt: Optional[datetime]) -> datetime:
+            if dt is None:
+                return datetime.min.replace(tzinfo=timezone.utc)
+            if dt.tzinfo is None:
+                return dt.replace(tzinfo=timezone.utc)
+            return dt
+
         # Sort combined results
         if order_by == "startTime":
-            all_events.sort(key=lambda e: (e.start_datetime or datetime.min.replace(tzinfo=timezone.utc), e.id))
+            all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
         elif order_by == "updated":
-            all_events.sort(key=lambda e: (e.updated_at or datetime.min.replace(tzinfo=timezone.utc), e.id), reverse=True)
+            all_events.sort(key=lambda e: (_normalize_dt(e.updated_at), e.id), reverse=True)
         else:
-            all_events.sort(key=lambda e: (e.start_datetime or datetime.min.replace(tzinfo=timezone.utc), e.id))
+            all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
         
         # Apply pagination to combined results (offset already decoded above)
         paginated_events = all_events[offset:offset + max_results + 1]
