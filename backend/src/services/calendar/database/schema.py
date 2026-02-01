@@ -8,6 +8,7 @@ from sqlalchemy import (
     String,
     Text,
     Integer,
+    BigInteger,
     Boolean,
     DateTime,
     ForeignKey,
@@ -630,8 +631,8 @@ class Channel(Base):
         String(1000), nullable=False
     )  # Webhook callback URL
     expiration: Mapped[Optional[int]] = mapped_column(
-        Integer, nullable=True
-    )  # Unix timestamp ms
+        BigInteger, nullable=True
+    )  # Unix timestamp ms (requires BigInteger for ms since epoch)
     token: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     params: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     # Whether payload is wanted for notifications

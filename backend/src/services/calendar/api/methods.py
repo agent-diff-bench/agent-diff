@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import timezone
 from typing import Any, Callable, Awaitable, Optional
 from functools import wraps
 
@@ -105,7 +106,71 @@ from ..core import (
     generate_resource_id,
     etags_match,
     REPLICA_NOW_RFC3339,
+    parse_rfc3339,
 )
+
+
+# ============================================================================
+# WATCH EXPIRATION PARSING
+# ============================================================================
+
+
+def parse_watch_expiration(expiration: Any) -> Optional[int]:
+    """
+    Parse expiration value for watch channels.
+
+    Google Calendar API accepts expiration as milliseconds since Unix epoch.
+    Some clients may send ISO date strings which need to be converted.
+
+    Args:
+        expiration: The expiration value (int, string int, or ISO date string)
+
+    Returns:
+        Expiration in milliseconds since epoch, or None if not provided
+
+    Raises:
+        ValidationError: If the expiration format is invalid
+    """
+    if expiration is None:
+        return None
+
+    # If already an int, return as-is
+    if isinstance(expiration, int):
+        return expiration
+
+    # If it's a string, try to parse it
+    if isinstance(expiration, str):
+        expiration = expiration.strip()
+        if not expiration:
+            return None
+
+        # Try parsing as integer (milliseconds)
+        try:
+            return int(expiration)
+        except ValueError:
+            pass
+
+        # Try parsing as ISO date string
+        try:
+            dt = parse_rfc3339(expiration)
+            # If datetime is naive, assume UTC
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            # Convert to milliseconds since epoch
+            return int(dt.timestamp() * 1000)
+        except (ValueError, AttributeError):
+            pass
+
+        # Invalid format
+        raise ValidationError(
+            f"Invalid expiration format: {expiration}. "
+            "Expected milliseconds since epoch or ISO 8601 date string."
+        )
+
+    raise ValidationError(
+        f"Invalid expiration type: {type(expiration).__name__}. "
+        "Expected integer or string."
+    )
 
 
 # ============================================================================
@@ -1036,7 +1101,7 @@ async def calendar_list_watch(request: Request) -> JSONResponse:
     from ..database.schema import Channel
 
     resource_id = generate_resource_id()
-    expiration = body.get("expiration")
+    expiration_ms = parse_watch_expiration(body.get("expiration"))
 
     channel = Channel(
         id=channel_id,
@@ -1044,7 +1109,7 @@ async def calendar_list_watch(request: Request) -> JSONResponse:
         resource_uri=f"/users/me/calendarList",
         type=channel_type,
         address=address,
-        expiration=int(expiration) if expiration else None,
+        expiration=expiration_ms,
         token=body.get("token"),
         params=body.get("params"),
         payload=body.get("payload", False),
@@ -1961,7 +2026,7 @@ async def events_watch(request: Request) -> JSONResponse:
     from ..database.schema import Channel
 
     resource_id = generate_resource_id()
-    expiration = body.get("expiration")
+    expiration_ms = parse_watch_expiration(body.get("expiration"))
 
     channel = Channel(
         id=channel_id,
@@ -1969,7 +2034,7 @@ async def events_watch(request: Request) -> JSONResponse:
         resource_uri=f"/calendars/{calendar_id}/events",
         type=channel_type,
         address=address,
-        expiration=int(expiration) if expiration else None,
+        expiration=expiration_ms,
         token=body.get("token"),
         params=body.get("params"),
         payload=body.get("payload", False),
@@ -2400,7 +2465,7 @@ async def acl_watch(request: Request) -> JSONResponse:
     from ..database.schema import Channel
 
     resource_id = generate_resource_id()
-    expiration = body.get("expiration")
+    expiration_ms = parse_watch_expiration(body.get("expiration"))
 
     channel = Channel(
         id=channel_id,
@@ -2408,7 +2473,7 @@ async def acl_watch(request: Request) -> JSONResponse:
         resource_uri=f"/calendars/{calendar_id}/acl",
         type=channel_type,
         address=address,
-        expiration=int(expiration) if expiration else None,
+        expiration=expiration_ms,
         token=body.get("token"),
         user_id=user_id,  # Track ownership
         params=body.get("params"),
@@ -2681,7 +2746,7 @@ async def settings_watch(request: Request) -> JSONResponse:
     from ..database.schema import Channel
 
     resource_id = generate_resource_id()
-    expiration = body.get("expiration")
+    expiration_ms = parse_watch_expiration(body.get("expiration"))
 
     channel = Channel(
         id=channel_id,
@@ -2689,7 +2754,7 @@ async def settings_watch(request: Request) -> JSONResponse:
         resource_uri=f"/users/{user_id}/settings",
         type=channel_type,
         address=address,
-        expiration=int(expiration) if expiration else None,
+        expiration=expiration_ms,
         token=body.get("token"),
         params=body.get("params"),
         payload=body.get("payload", False),

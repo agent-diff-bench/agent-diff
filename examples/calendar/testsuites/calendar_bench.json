@@ -10,7 +10,9 @@
       "etag",
       "html_link",
       "ical_uid",
-      "sequence"
+      "sequence",
+      "start_datetime",
+      "end_datetime"
     ]
   },
   "tests": [
@@ -151,20 +153,27 @@
             "summary": {
               "contains": "Compost Communion"
             },
-            "attendees": {
-              "contains": "dariush@test.com"
-            },
             "calendar_id": {
               "eq": "cal_harvest_schedule"
             },
             "start.dateTime": {
-              "contains": "2018-06-24T09:00"
+              "contains": "2018-06-23"
             },
             "end.dateTime": {
-              "contains": "2018-06-24T11:00"
+              "contains": "2018-06-23"
             },
             "start.timeZone": {
               "eq": "Asia/Tokyo"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "dariush@test.com"
             }
           },
           "expected_count": 1
@@ -649,9 +658,6 @@
             "description": {
               "i_contains": "spare bulbs"
             },
-            "attendees": {
-              "contains": "takeshi@test.com"
-            },
             "calendar_id": {
               "eq": "cal_celluloid_dreams"
             },
@@ -663,6 +669,16 @@
             },
             "start.timeZone": {
               "eq": "Asia/Tokyo"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "takeshi@test.com"
             }
           },
           "expected_count": 1
@@ -682,7 +698,20 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "changed",
@@ -780,10 +809,10 @@
             "calendar_id": {
               "eq": "cal_symposium_curiosity"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-18T08:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-18T09:00"
             },
             "start.timeZone": {
@@ -802,11 +831,14 @@
             "calendar_id": {
               "eq": "cal_symposium_curiosity"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-19T15:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-19T17:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -842,7 +874,20 @@
                 "contains": "Annex of Temporal Studies"
               }
             }
-          }
+          },
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "added",
@@ -900,19 +945,16 @@
             "summary": {
               "contains": "DJ Nebula"
             },
-            "attendees": {
-              "i_contains": "yuna@test.com"
-            },
             "calendar_id": {
               "eq": "cal_thunderwave_festival"
             },
             "location": {
               "contains": "Ethereal Meadow"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-17T05:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-17T07:00"
             },
             "start.timeZone": {
@@ -923,16 +965,20 @@
         },
         {
           "diff_type": "added",
-          "entity": "calendar_events",
+          "entity": "calendar_event_attendees",
           "where": {
-            "summary": {
-              "contains": "DJ Nebula"
-            },
-            "attendees": {
-              "i_contains": "petro@test.com"
-            },
-            "calendar_id": {
-              "eq": "cal_thunderwave_festival"
+            "email": {
+              "eq": "yuna@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "petro@test.com"
             }
           },
           "expected_count": 1
@@ -1009,20 +1055,27 @@
             "summary": {
               "contains": "Sasquatch Migration"
             },
-            "attendees": {
-              "i_contains": "mateusz@test.com"
-            },
             "calendar_id": {
               "eq": "cal_cryptozoology_summit"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-18T09:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-18T10:00"
             },
             "start.timeZone": {
               "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "mateusz@test.com"
             }
           },
           "expected_count": 1
@@ -1037,11 +1090,14 @@
             "calendar_id": {
               "eq": "cal_cryptozoology_summit"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-18T14:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-18T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1117,11 +1173,14 @@
             "summary": {
               "contains": "Paradox Prevention Seminar"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-20T14:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-20T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1211,17 +1270,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T14:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T14:15"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1236,17 +1295,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T14:15"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T14:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1261,17 +1320,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T14:30"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T14:45"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1286,17 +1345,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T14:45"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T15:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1311,17 +1370,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T15:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T15:15"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1336,17 +1395,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T15:15"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T15:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1361,17 +1420,17 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T15:30"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T15:45"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1386,20 +1445,30 @@
             "location": {
               "contains": "Dune Pavilion B"
             },
-            "attendees": {
-              "contains": "ananya@test.com"
-            },
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T15:45"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "ananya@test.com"
+            }
+          },
+          "expected_count": 8
         },
         {
           "diff_type": "added",
@@ -1411,7 +1480,7 @@
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-18T15:00"
             },
             "start.timeZone": {
@@ -1430,11 +1499,14 @@
             "calendar_id": {
               "eq": "cal_mirage_menagerie"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T19:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T20:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -1948,10 +2020,10 @@
             "location": {
               "contains": "Willow Glade Observation Ring"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-19T19:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-19T20:00"
             },
             "start.timeZone": {
@@ -1970,10 +2042,10 @@
             "summary": {
               "contains": "Bioluminescent Microscopy Workshop"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23T19:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-23T20:00"
             },
             "start.timeZone": {
@@ -2077,10 +2149,10 @@
             "calendar_id": {
               "eq": "cal_clockwork_tinkerers_guild"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-22T18:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-22T19:00"
             },
             "start.timeZone": {
@@ -2102,10 +2174,10 @@
             "calendar_id": {
               "eq": "cal_clockwork_tinkerers_guild"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-29T19:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-29T20:00"
             },
             "description": {
@@ -2146,11 +2218,14 @@
             "calendar_id": {
               "eq": "cal_clockwork_tinkerers_guild"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-07-06T18:00"
             },
             "status": {
               "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": {
@@ -2168,10 +2243,10 @@
             "calendar_id": {
               "eq": "cal_clockwork_tinkerers_guild"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-07-07T12:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-07-07T13:00"
             },
             "start.timeZone": {
@@ -2230,7 +2305,7 @@
             "summary": {
               "contains": "Moon-Shell Rebinding"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-07-03T09:00"
             },
             "status": {
@@ -2238,6 +2313,9 @@
             },
             "recurrence": {
               "contains": "FREQ=MONTHLY"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -2265,11 +2343,14 @@
             "summary": {
               "contains": "Moon-Shell Rebinding"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-09-04T09:00"
             },
             "status": {
               "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": {
@@ -2284,11 +2365,14 @@
             "summary": {
               "contains": "Moon-Shell Rebinding"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-08-07T11:00"
             },
             "description": {
               "i_contains": "storm-surge delay"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -2300,8 +2384,11 @@
             "summary": {
               "contains": "Ink Tide Inventory"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-07-15T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -2383,7 +2470,7 @@
             "summary": {
               "contains": "Dawn Bell Rite"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-18T05:30"
             },
             "status": {
@@ -2391,6 +2478,9 @@
             },
             "recurrence": {
               "contains": "FREQ=DAILY"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -2424,11 +2514,14 @@
             "summary": {
               "contains": "Dawn Bell Rite"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-23"
             },
             "status": {
               "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": {
@@ -2446,11 +2539,14 @@
             "summary": {
               "contains": "Dawn Bell Rite"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-20T06:30"
             },
             "description": {
               "i_contains": "storm quiet hours"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -2486,11 +2582,18 @@
             "summary": {
               "contains": "Glassmoth Conservatory Candle-Lighting"
             },
-            "attendees": {
-              "contains": "ngozi@test.com"
-            },
             "location": {
               "contains": "Hothouse Lantern Atrium"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "ngozi@test.com"
             }
           },
           "expected_count": 1
@@ -2536,10 +2639,10 @@
             "summary": {
               "contains": "Saffron Dusk Feather-Mending"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-22T18:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-22T19:00"
             },
             "start.timeZone": {
@@ -2599,10 +2702,10 @@
             "summary": {
               "contains": "Quartzloom Spore Cataloging"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-21T09:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-21T10:00"
             },
             "start.timeZone": {
@@ -2666,17 +2769,7 @@
                 "contains": "2018-06-24T14:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-06-24T14:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-06-24T15:00"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-06-24T15:00"
               }
@@ -2687,7 +2780,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "changed",
@@ -2732,10 +2836,10 @@
             "summary": {
               "contains": "Emberglass Kiln Glow"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-25T19:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-25T20:30"
             },
             "start.timeZone": {
@@ -2770,10 +2874,10 @@
             "summary": {
               "contains": "Fogloom Archive Lantern Check"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-26T20:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-26T20:45"
             },
             "start.timeZone": {
@@ -2830,17 +2934,7 @@
                 "contains": "2018-06-27T15:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-06-27T15:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-06-27T16:00"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-06-27T16:00"
               }
@@ -2851,7 +2945,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         }
       ],
       "metadata": {
@@ -2925,16 +3030,31 @@
     },
     {
       "id": "test_26",
-      "name": "Mistforge Observatory - settings check only",
-      "prompt": "Please list my calendar settings so I can confirm my timezone and date/time formats before I reply to Sana (sana@test.com).",
+      "name": "Mistforge Observatory - settings check and watch",
+      "prompt": "Please list my calendar settings so I can confirm my timezone and date/time formats before I reply to Sana (sana@test.com). Also, set up a watch on my settings so I get notified of any changes.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
-      "assertions": [],
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
       "metadata": {
-        "min_tool_calls": 1,
+        "min_tool_calls": 2,
         "tools_required": [
-          "settings.list"
+          "settings.list",
+          "settings.watch"
         ]
       }
     },
@@ -2981,17 +3101,7 @@
                 "contains": "2018-06-28T06:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-06-28T06:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-06-28T06:45"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-06-28T06:45"
               }
@@ -3007,7 +3117,17 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         }
       ],
       "metadata": {
@@ -3036,10 +3156,10 @@
             "summary": {
               "contains": "Copperseed Archive dusting"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-28T09:30"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-28T10:00"
             },
             "start.timeZone": {
@@ -3198,10 +3318,10 @@
             "summary": {
               "contains": "Emberwharf Tide Log"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-29T17:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-29T17:30"
             },
             "start.timeZone": {
@@ -3302,7 +3422,8 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": ["status", "sequence", "updated_at"]
         },
         {
           "diff_type": "added",
@@ -3349,7 +3470,8 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": {"min": 1},
+          "description": "All events on this calendar should be cleared (cancelled)"
         },
         {
           "diff_type": "changed",
@@ -3670,12 +3792,12 @@
             }
           },
           "expected_changes": {
-            "start_datetime": {
+            "start": {
               "to": {
                 "contains": "2018-06-29T16:00"
               }
             },
-            "end_datetime": {
+            "end": {
               "to": {
                 "contains": "2018-06-29T17:00"
               }
@@ -3686,7 +3808,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         }
       ],
       "metadata": {
@@ -4025,10 +4158,10 @@
             "summary": {
               "contains": "Ashline Relay Briefing"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-28T15:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-28T16:00"
             },
             "start.timeZone": {
@@ -4091,12 +4224,12 @@
                 "contains": "RRULE:FREQ=WEEKLY;BYDAY=MO"
               }
             },
-            "start_datetime": {
+            "start": {
               "to": {
                 "contains": "2018-07-02T19:00"
               }
             },
-            "end_datetime": {
+            "end": {
               "to": {
                 "contains": "2018-07-02T20:00"
               }
@@ -4107,7 +4240,17 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "added",
@@ -4186,10 +4329,10 @@
             "summary": {
               "contains": "Saltglass Alignment"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-30T22:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-30T22:30"
             },
             "start.timeZone": {
@@ -4285,10 +4428,10 @@
             "location": {
               "contains": "Brine Archive Hall"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-30T14:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-30T15:00"
             },
             "start.timeZone": {
@@ -4355,10 +4498,10 @@
             "summary": {
               "contains": "Bronze Fret Alignment"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-06-30T10:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-06-30T11:00"
             },
             "start.timeZone": {
@@ -4867,17 +5010,7 @@
                 "contains": "2018-07-01T09:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-07-01T09:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-07-01T10:30"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-07-01T10:30"
               }
@@ -4888,7 +5021,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "changed",
@@ -5076,17 +5220,7 @@
                 "contains": "2018-07-02T20:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-07-02T20:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-07-02T21:00"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-07-02T21:00"
               }
@@ -5097,7 +5231,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "changed",
@@ -5188,17 +5333,7 @@
                 "contains": "2018-07-03T10:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-07-03T10:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-07-03T11:00"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-07-03T11:00"
               }
@@ -5209,7 +5344,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "changed",
@@ -5315,14 +5461,17 @@
             "summary": {
               "contains": "Tideglass Ledger Seal"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-07-04T13:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-07-04T14:00"
             },
             "location": {
               "contains": "Seawick Vault"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
             }
           },
           "expected_count": 1
@@ -5379,7 +5528,18 @@
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "transparency",
+            "visibility"
+          ]
         },
         {
           "diff_type": "added",
@@ -5506,7 +5666,7 @@
             "end": {
               "contains": "2018-08-23"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-08-23"
             }
           },
@@ -5598,23 +5758,25 @@
                 "contains": "2018-09-17T10:00"
               }
             },
-            "start_datetime": {
-              "to": {
-                "contains": "2018-09-17T10:00"
-              }
-            },
             "end": {
-              "to": {
-                "contains": "2018-09-17T11:00"
-              }
-            },
-            "end_datetime": {
               "to": {
                 "contains": "2018-09-17T11:00"
               }
             }
           },
-          "expected_count": 1
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "location",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
         }
       ],
       "metadata": {
@@ -5838,10 +6000,10 @@
             "calendar_id": {
               "eq": "test.user@test.com"
             },
-            "start_datetime": {
+            "start.dateTime": {
               "contains": "2018-08-01T09:00"
             },
-            "end_datetime": {
+            "end.dateTime": {
               "contains": "2018-08-01T09:30"
             },
             "start.timeZone": {

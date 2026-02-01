@@ -603,6 +603,13 @@ def create_event(
     start_date = start.get("date")
     end_date = end.get("date")
 
+    # Extract organizer/creator fields from kwargs to allow override (e.g., for import)
+    # Use provided values if present, otherwise default to current user
+    # This matches Google Calendar API behavior where imports preserve original organizer
+    organizer_email = kwargs.pop("organizer_email", None) or user.email
+    organizer_display_name = kwargs.pop("organizer_display_name", None) or user.display_name
+    organizer_self = organizer_email == user.email
+
     event = Event(
         id=event_id,
         calendar_id=calendar.id,
@@ -623,9 +630,9 @@ def create_event(
         creator_display_name=user.display_name,
         creator_self=True,
         organizer_id=user_id,
-        organizer_email=user.email,
-        organizer_display_name=user.display_name,
-        organizer_self=True,
+        organizer_email=organizer_email,
+        organizer_display_name=organizer_display_name,
+        organizer_self=organizer_self,
         etag=generate_etag(f"{event_id}:1"),
         **{k: v for k, v in kwargs.items() if hasattr(Event, k)},
     )
@@ -633,7 +640,10 @@ def create_event(
 
     # Add attendees
     if attendees:
-        for attendee_data in attendees:
+        for idx, attendee_data in enumerate(attendees):
+            # Validate email is required for attendees (per Google Calendar API)
+            if "email" not in attendee_data or not attendee_data["email"]:
+                raise RequiredFieldError(f"attendees[{idx}].email")
             attendee = EventAttendee(
                 event_id=event_id,
                 email=attendee_data["email"],
@@ -1030,13 +1040,21 @@ def list_events(
 
                 all_events.append(instance)
         
+        # Helper to normalize datetime to timezone-aware for comparison
+        def _normalize_dt(dt: Optional[datetime]) -> datetime:
+            if dt is None:
+                return datetime.min.replace(tzinfo=timezone.utc)
+            if dt.tzinfo is None:
+                return dt.replace(tzinfo=timezone.utc)
+            return dt
+
         # Sort combined results
         if order_by == "startTime":
-            all_events.sort(key=lambda e: (e.start_datetime or datetime.min.replace(tzinfo=timezone.utc), e.id))
+            all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
         elif order_by == "updated":
-            all_events.sort(key=lambda e: (e.updated_at or datetime.min.replace(tzinfo=timezone.utc), e.id), reverse=True)
+            all_events.sort(key=lambda e: (_normalize_dt(e.updated_at), e.id), reverse=True)
         else:
-            all_events.sort(key=lambda e: (e.start_datetime or datetime.min.replace(tzinfo=timezone.utc), e.id))
+            all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
         
         # Apply pagination to combined results (offset already decoded above)
         paginated_events = all_events[offset:offset + max_results + 1]
@@ -1127,7 +1145,10 @@ def update_event(
         )
         # Add new attendees
         user = session.get(User, user_id)
-        for attendee_data in kwargs["attendees"]:
+        for idx, attendee_data in enumerate(kwargs["attendees"]):
+            # Validate email is required for attendees (per Google Calendar API)
+            if "email" not in attendee_data or not attendee_data["email"]:
+                raise RequiredFieldError(f"attendees[{idx}].email")
             attendee = EventAttendee(
                 event_id=event_id,
                 email=attendee_data["email"],
@@ -2009,13 +2030,21 @@ def get_event_instances(
                 all_instances.append(exc)
 
     # Expand recurrence rules to get instance dates
-    instance_dates = expand_recurrence(
-        recurrence=master.recurrence,
-        start=start_dt,
-        time_min=min_dt,
-        time_max=max_dt,
-        max_instances=max_results,
-    )
+    try:
+        instance_dates = expand_recurrence(
+            recurrence=master.recurrence,
+            start=start_dt,
+            time_min=min_dt,
+            time_max=max_dt,
+            max_instances=max_results,
+        )
+    except Exception as e:
+        # Log and return empty if recurrence expansion fails
+        # Keep broad exception to maintain graceful degradation (matching Google's behavior)
+        logger.warning(
+            "Failed to expand recurrence for event %s in get_instances: %s", master.id, e
+        )
+        return [], None, None
 
     # Calculate event duration
     duration = timedelta(hours=1)  # Default
