@@ -300,7 +300,7 @@
           "entity": "messages",
           "where": {
             "parent_id": {
-              "eq": "1700173200.000456"
+              "eq": "1706115500.000001"
             },
             "channel_id": {
               "eq": "C01ABCD1234"
@@ -427,7 +427,7 @@
           "entity": "message_reactions",
           "where": {
             "message_id": {
-              "eq": "1700173200.000456"
+              "eq": "1706115500.000001"
             },
             "user_id": {
               "eq": "U01AGENBOT9"
@@ -1680,20 +1680,7 @@
               "eq": "C03IJKL9012"
             },
             "message_text": {
-              "contains": "frontend"
-            }
-          },
-          "expected_count": 1
-        },
-        {
-          "diff_type": "added",
-          "entity": "messages",
-          "where": {
-            "channel_id": {
-              "eq": "C03IJKL9012"
-            },
-            "message_text": {
-              "contains": "Flash"
+              "contains": "Gemini"
             }
           },
           "expected_count": 1
