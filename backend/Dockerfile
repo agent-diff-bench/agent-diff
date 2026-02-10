@@ -18,9 +18,6 @@ RUN uv pip install --system -r pyproject.toml
 # Copy application code
 COPY . .
 
-# Copy seed data and test suites from repo root (needed by seed scripts)
-COPY ../examples /examples
-
 # Create startup script
 RUN echo '#!/bin/sh\n\
     set -e\n\
