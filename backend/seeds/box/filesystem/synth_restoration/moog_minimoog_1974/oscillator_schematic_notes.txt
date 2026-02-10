@@ -1,0 +1,41 @@
+OSCILLATOR CIRCUIT ANALYSIS
+===========================
+Moog Minimoog Model D - Oscillator Section
+Reference: Service Manual Rev 2.1 (1975)
+
+OSCILLATOR 1 (VCO-1)
+--------------------
+Core IC: CA3046 transistor array
+Temperature compensation: Tempco resistor R17
+CV input: 1V/octave standard
+Range: 0.1 Hz to 20 kHz (with range switch)
+
+Key Components:
+- Q1, Q2: Matched pair in CA3046
+- R15: 100K scale trimmer
+- R16: 10K high-frequency tracking
+- C21, C22: Timing capacitors (critical - use film type)
+
+KNOWN ISSUES (Serial 10000-11000)
+---------------------------------
+1. Oscillator drift after warmup - typically stabilizes after 15 minutes
+2. High-frequency tracking error above 5 kHz
+3. Sawtooth core bleedthrough on triangle output
+
+CALIBRATION PROCEDURE
+---------------------
+1. Allow 30-minute warmup
+2. Set OSC 1 to A-440 reference
+3. Adjust R15 for 1V/octave tracking
+4. Check at C2 (523.25 Hz) and C5 (1046.50 Hz)
+5. Fine-tune R16 for high-frequency accuracy
+
+RESTORATION STATUS
+------------------
+[ ] Temperature compensation verified
+[ ] Scale trim completed  
+[ ] Drift test (30 min warmup) - PENDING
+[ ] All octaves tracking within 5 cents
+
+Document Version: 1.2
+Last Updated: December 2025

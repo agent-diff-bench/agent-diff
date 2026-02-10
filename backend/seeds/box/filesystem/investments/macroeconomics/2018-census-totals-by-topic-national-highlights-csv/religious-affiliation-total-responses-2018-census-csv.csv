@@ -1,0 +1,167 @@
+"Code","Religious_affiliation","Census_usually_resident_population_count"
+"00000","No Religion",2264601
+"10100","Buddhism nfd",44355
+"10101","Zen Buddhism",1401
+"10102","Mahayana Buddhism",1026
+"10103","Nichiren Buddhism",768
+"10104","Theravada Buddhism",4851
+"10105","Vajrayana Buddhism",327
+"10199","Buddhism nec",51
+"20000","Christian nfd",307926
+"20100","Adventist nfd",378
+"20102","Seventh Day Adventist",17799
+"20103","Worldwide Church of God",279
+"20199","Adventist nec",54
+"20201","Anglican",314913
+"20301","Chinese Christian",6660
+"20302","Korean Christian",3543
+"20400","Baptist nfd",35967
+"20401","Bible Baptist",846
+"20402","Independent Baptist",1218
+"20403","Reformed Baptist",987
+"20499","Baptist nec",12
+"20500","Brethren nfd",1551
+"20502","Open Brethren",5640
+"20503","Plymouth or Exclusive Brethren",6822
+"20599","Brethren nec",147
+"20600","Catholicism nfd",173016
+"20601","Roman Catholic",295743
+"20602","Chaldean Catholic",534
+"20603","Maronite Catholic",96
+"20604","Melkite Catholic",33
+"20605","Syro-Malabar Catholic",483
+"20606","Ukrainian Catholic",39
+"20699","Catholicism nec",1086
+"20700","Church of Christ nfd",1302
+"20701","Associated Churches of Christ",1176
+"20799","Other Church of Christ and Churches of Christ nec",780
+"20801","Evangelical",4554
+"20802","Born Again",33486
+"20803","Fundamentalist",87
+"20804","Independent Evangelical Churches",750
+"20901","Jehovah's Witnesses",20061
+"21001","Latter-day Saints",54123
+"21101","Lutheran",3585
+"21200","Methodist nfd",52734
+"21201","Tongan Methodist",11169
+"21202","Nazarene",564
+"21203","Wesleyan Methodist",4623
+"21299","Methodist nec",3657
+"21300","Orthodox nfd",4503
+"21301","Assyrian Orthodox",327
+"21302","Coptic Orthodox",546
+"21303","Greek Orthodox",3162
+"21304","Russian Orthodox",2952
+"21305","Serbian Orthodox",936
+"21399","Orthodox nec",1440
+"21400","Pentecostal nfd",22296
+"21401","ACTS Churches",5460
+"21402","Assemblies of God",14883
+"21403","Christian Fellowship",18042
+"21404","Christian Outreach",1554
+"21405","Christian Revival Crusade",576
+"21406","Elim",3018
+"21407","Full Gospel",1017
+"21408","Independent Pentecostal",954
+"21409","New Life",3132
+"21410","Revival Centres",180
+"21411","United Pentecostal",690
+"21412","Vineyard Christian Fellowship",3399
+"21413","Arise Church",1641
+"21414","Commonwealth Covenant Church",3
+"21415","City Impact Church",441
+"21416","Destiny Church",1722
+"21417","Equippers Church",705
+"21499","Pentecostal nec",1911
+"21501","Presbyterian",221199
+"21502","Congregational",3513
+"21503","Cook Island Congregational",1698
+"21504","Samoan Congregational",7932
+"21505","Reformed",5418
+"21506","Chinese Presbyterian",327
+"21507","Korean Presbyterian",2820
+"21600","Protestant nfd",8544
+"21701","Salvation Army",7929
+"21801","Uniting/Union Church",3624
+"21802","Ecumenical",69
+"29901","Christian and Missionary Alliance",2094
+"29902","Christian Science",639
+"29903","Church of God",1458
+"29905","Liberal Catholic",2115
+"29906","Metropolitan Community Church",63
+"29908","Religious Society of Friends (Quaker)",954
+"29909","Unitarian",354
+"29910","Christadelphian",1758
+"29911","Jesus Follower",1575
+"29999","Christian nec",642
+"30100","Hinduism nfd",121644
+"30101","Hare Krishna",645
+"30102","Yoga",327
+"30103","Arya Samaj",36
+"30199","Hinduism nec",882
+"40100","Islam nfd",57276
+"40101","Sufi",162
+"40102","Shi'a",651
+"40103","Sunni",2961
+"40104","Ahmadiyya Muslim",369
+"40199","Islam nec",36
+"50100","Judaism nfd",3348
+"50101","Conservative Judaism",327
+"50102","Orthodox Judaism",792
+"50103","Reformed Judaism",807
+"60000","Māori Religions, Beliefs and Philosophies nfd",3699
+"60101","Ratana",43821
+"60201","Ringatū",12336
+"60901","Paimarire",1194
+"60999","Māori Religions, Beliefs and Philosophies nec",1584
+"70000","New Age nfd",363
+"70101","Church of Scientology",321
+"70200","Nature and Earth Based Religions nfd",807
+"70201","Animist",273
+"70202","Druid",189
+"70203","Pantheist",453
+"70204","Wiccan",1482
+"70205","Pagan",2730
+"70299","Nature and Earth Based Religions nec",648
+"70301","Satanism",1149
+"70401","Spiritualist",8262
+"70901","Rastafarianism",1707
+"70999","Other New Age Religions nec",1311
+"80000","Other Religions, Beliefs and Philosophies nfd",1434
+"80101","Baha'i",2925
+"80200","Chinese Religions nfd",276
+"80201","Confucianism",99
+"80202","Taoism",1098
+"80299","Chinese Religions nec",18
+"80301","Jainism",612
+"80400","Japanese Religion nfd",33
+"80401","Mahikari",138
+"80402","Shinto",387
+"80403","Tenrikyo",12
+"80499","Japanese Religion nec",18
+"80601","Sikhism",40908
+"80701","Theism",2607
+"80702","Deism",150
+"80801","Zoroastrian",1068
+"80901","Unification Church (Moonist)",93
+"81001","Jedi",20409
+"81101","Atheism",7068
+"81102","Agnosticism",6516
+"81103","Cao Dai",6
+"81104","Church of the Flying Spaghetti Monster",4248
+"81105","Falun Gong",105
+"81106","Humanism",663
+"81107","Libertarianism",9
+"81108","Maoism",6
+"81109","Marxism",12
+"81110","Rationalism",9
+"81111","Socialism",15
+"81199","Other Religions, Beliefs and Philosophies nec",297
+"94444","Don't know",0
+"95555","Object to answering",312795
+"97777","Religion unidentifiable",0
+"98888","Response outside scope",0
+"99999","Not stated",0
+"TotalStated","Total stated",4699755
+"TotalResponse","Total responses",4732641
+"Total","Total",4699755

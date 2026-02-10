@@ -1,0 +1,36 @@
+CONSERVATION LAB HUMIDITY LOG
+=============================
+Quarter: Q3 2025 (July - September)
+Location: Vault A, Special Collections
+Monitoring Device: Hobo MX1101
+
+DAILY READINGS (Selected)
+-------------------------
+Date        Time    RH%     Temp°C    Notes
+---------------------------------------------------------
+2025-07-01  09:00   52.1    21.5      Summer high
+2025-07-15  09:00   53.8    22.0      Heat wave period
+2025-07-15  17:00   54.2    22.3      Near upper limit
+2025-08-01  09:00   51.5    21.2      Cooling system boost
+2025-08-15  09:00   50.3    20.8      Stabilizing
+2025-09-01  09:00   49.2    20.5      Fall transition
+2025-09-15  09:00   48.8    20.2      Normal
+2025-09-30  17:00   48.5    20.0      Quarter end
+
+QUARTERLY STATISTICS
+--------------------
+Average RH: 51.1%
+Average Temp: 21.1°C
+Readings outside tolerance (45-55% RH): 2
+Days with alerts: 3 (July heat wave)
+
+BOOKS TREATED THIS QUARTER: 23
+
+Treatment Breakdown:
+- Binding repair: 8 volumes
+- Foxing treatment: 7 volumes
+- Humidity damage remediation: 5 volumes
+- Preventive conservation: 3 volumes
+
+Logged by: Dr. Margaret Chen
+Conservation Lab Director

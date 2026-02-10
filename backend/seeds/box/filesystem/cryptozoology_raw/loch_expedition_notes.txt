@@ -1,0 +1,50 @@
+CRYPTOZOOLOGY FIELD REPORT
+==========================
+
+Expedition: Scottish Highlands Monitoring
+Location: Loch Ness, Inverness-shire, Scotland
+Date: February 2-9, 2025
+Lead Researcher: Dr. Ian McAllister
+
+SUMMARY
+-------
+Week-long monitoring operation utilizing sonar array deployment and 
+surface observation protocols. Primary objective: verification of 
+reported anomalies from civilian witnesses in January 2025.
+
+EQUIPMENT DEPLOYED
+------------------
+- Lowrance HDS-16 Live sonar units (x4)
+- Underwater ROV with 4K camera system
+- Surface thermal imaging station
+- Hydrophone array for acoustic monitoring
+
+OBSERVATIONS
+------------
+February 4, 2025, 14:23 GMT:
+Sonar anomaly detected at depth of 78 meters. Large return signature 
+approximately 12 meters in length. Object displayed non-ballistic 
+movement pattern inconsistent with known fish species or debris.
+
+February 6, 2025, 03:17 GMT:
+Secondary sonar contact at 45 meters depth. Duration: 3 minutes 
+22 seconds before signal loss. Estimated velocity: 8-10 knots.
+
+EVIDENCE STATUS
+---------------
+Despite multiple sonar contacts, no photographic evidence obtained 
+during this expedition. ROV deployment on February 5th was aborted 
+due to equipment malfunction (propulsion failure at 35m depth).
+
+Water turbidity significantly higher than anticipated, limiting 
+visual range to approximately 2-3 meters even with auxiliary lighting.
+
+CONCLUSIONS
+-----------
+Sonar data suggests presence of large aquatic fauna not catalogued 
+in official records. However, without visual confirmation, findings 
+remain inconclusive. Recommend summer expedition when visibility 
+conditions improve.
+
+Submitted by: Dr. Ian McAllister
+Reviewed by: Prof. Marcus Chen, Field Operations Director

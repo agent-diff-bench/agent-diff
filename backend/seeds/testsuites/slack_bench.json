@@ -1,0 +1,1396 @@
+{
+  "id": "slack-bench",
+  "name": "Slack Bench",
+  "description": "Benchmark tests for Slack MCP operations",
+  "service": "slack",
+  "ignore_fields": {
+    "global": [
+      "created_at",
+      "updated_at"
+    ]
+  },
+  "tests": [
+    {
+      "id": "test_1",
+      "name": "Send message to general channel",
+      "prompt": "Send a 'hello' message to the general channel",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "hello"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_2",
+      "name": "Send direct message",
+      "prompt": "Send a DM to John saying 'Can we sync later?'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "sync later"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_3",
+      "name": "Send direct message Artem, and Hubert (Create group conversation + send message)",
+      "prompt": "Send a DM (group conversation not channel) to Artem and Hubert saying 'Hey, I've took a look at the presentation and I have some questions. Can you help me?'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "presentation and I have some questions"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_gc": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_4",
+      "name": "Create a new channel",
+      "prompt": "Create a new channel called 'rl-project'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "i_contains": "rl-project"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_5",
+      "name": "Add user to channel",
+      "prompt": "Add Morgan Stanley to the 'random' channel",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U05MORGAN23"
+            },
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_6",
+      "name": "Create a new channel and add user to it ",
+      "prompt": "Create a new channel called 'rl-project' and add Morgan Stanley to it",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "i_contains": "rl-project"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U05MORGAN23"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_6a",
+      "name": "Remove user from channel",
+      "prompt": "Remove John from the #random channel",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "removed",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "user_id": {
+              "eq": "U02JOHNDOE1"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_6b",
+      "name": "Archive a channel",
+      "prompt": "Archive the #growth channel",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C04MNOP3456"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "to": true
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "test_7",
+      "name": "Reply in a thread",
+      "prompt": "Reply 'Next monday.' to the most recent message in #general",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "parent_id": {
+              "eq": "1700173200.000456"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "Next monday"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_8",
+      "name": "Reply in a thread",
+      "prompt": "Reply 'Next monday.' to the to MCP deployment questions in #general",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "parent_id": {
+              "eq": "1700173200.000456"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "Next monday"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_9",
+      "name": "Add emoji reaction",
+      "prompt": "React with :thumbsup: to the question about lunch in #random",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1699572000.000789"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "thumbsup"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_10",
+      "name": "Add emoji reaction",
+      "prompt": "React with :thumbsup: to the most recent posted message in #general",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1700173200.000456"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "thumbsup"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_11",
+      "name": "Update channel topic",
+      "prompt": "Change the #general channel topic to 'Weekly standup discussions'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_changes": {
+            "topic_text": {
+              "to": {
+                "contains": "Weekly standup"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "test_12",
+      "name": "Edit existing message",
+      "prompt": "Find the message that says 'Hey team' and edit it to say 'Hello everyone'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_id": {
+              "eq": "1699564800.000123"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "Hello everyone"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "test_13",
+      "name": "Mention user in message",
+      "prompt": "Post to #general mentioning Artem with text 'Please review the pull request'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "<@U02ARTEM23>"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_14",
+      "name": "Multi-channel send",
+      "prompt": "Send 'System maintenance tonight at 10pm' to both #general and #random",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "message_text": {
+              "contains": "maintenance"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "message_text": {
+              "contains": "maintenance"
+            },
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_15",
+      "name": "Delete old message",
+      "prompt": "Delete the message about new feature you posted in #general",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "new feature"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_16",
+      "name": "Forward messages to another channel",
+      "prompt": "Copy the two questions from #random and post them both to #general",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "lunch"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "message_text": {
+              "contains": "Gemini"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_17",
+      "name": "Search messages in a channel and combine results into a new message as DM",
+      "prompt": "Search for all messages (4 messages) in the #engineering channel related to login issues and combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            },
+            "channel_id": {
+              "regex": "^D"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U06HUBERT23"
+            },
+            "channel_id": {
+              "regex": "^D"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "channel_id": {
+              "regex": "^D"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "channel_id": {
+              "regex": "^D"
+            },
+            "message_text": {
+              "contains": "500 errors"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "channel_id": {
+              "regex": "^D"
+            },
+            "message_text": {
+              "contains": "invalid_grant"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "channel_id": {
+              "regex": "^D"
+            },
+            "message_text": {
+              "contains": "login rate limit"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "channel_id": {
+              "regex": "^D"
+            },
+            "message_text": {
+              "contains": "login endpoint"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_18",
+      "name": "Search messages in multiple channels and combine results into a new message as DM",
+      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U06HUBERT23"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "500 errors"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "invalid_grant"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "login rate limit"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "login endpoint"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "captcha"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "empty password"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_19",
+      "name": "Search messages in multiple channels and edit message in a channel with the combined results",
+      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Edit the message in the #engineering channel you sent before without details about issues and add the details about the issues and improvements. Do not change the meaning/ woring of the original messages just combine them.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "500 errors"
+              }
+            }
+          }
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "invalid_grant"
+              }
+            }
+          }
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "login rate limit"
+              }
+            }
+          }
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "login endpoint"
+              }
+            }
+          }
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "captcha"
+              }
+            }
+          }
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_id": {
+              "eq": "1700143200.000999"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "empty password"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "test_20",
+      "name": "Edit a thread message",
+      "prompt": "You've replied to one of the messages with a bad joke. Edit it, for 'I will make a proposal for auth improvements tommorow EOD'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "parent_id": {
+              "eq": "1700143200.000999"
+            },
+            "message_id": {
+              "eq": "1700153200.000999"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "proposal for auth improvements tommorow EOD"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "test_21",
+      "name": "Rich Text: Basic Formatting (Bold/Italic)",
+      "prompt": "Send a message to #general saying 'Attention' in bold and 'check logs' in italics. Use Slack Block Kit rich_text blocks with style attributes (bold:true, italic:true).",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "rich_text_section"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "\"bold\":true"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "\"italic\":true"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_22",
+      "name": "Rich Text: Bulleted List",
+      "prompt": "Send a bulleted list to #random with three items: 'Bagels', 'Coffee', and 'Donuts'. Use Slack Block Kit rich_text blocks with rich_text_list (style:bullet).",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "blocks": {
+              "contains": "rich_text_list"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "blocks": {
+              "contains": "\"style\":\"bullet\""
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_23",
+      "name": "Rich Text: Code Block and Numbered List",
+      "prompt": "Do two things using Slack Block Kit: 1) Send a code snippet to #engineering containing `{\"status\": 200}` using rich_text_preformatted element, and 2) Send a numbered list to #general with items 'Phase 1' and 'Phase 2' using rich_text_list with style:ordered.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "blocks": {
+              "contains": "rich_text_preformatted"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "rich_text_list"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_24",
+      "name": "Rich Text: Block Quote",
+      "prompt": "Quote the text 'To be or not to be' in the #random channel. Use Slack Block Kit rich_text blocks with rich_text_quote element.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "blocks": {
+              "contains": "rich_text_quote"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_26",
+      "name": "Table Block Generation",
+      "prompt": "Send a table to #growth with headers 'Metric' and 'Value', and one row of data: 'DAU', '1500'. Use Slack Block Kit with a table block type.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C04MNOP3456"
+            },
+            "blocks": {
+              "contains": "\"type\":\"table\""
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C04MNOP3456"
+            },
+            "blocks": {
+              "contains": "DAU"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_27",
+      "name": "Markdown Block (Direct)",
+      "prompt": "Send a markdown formatted message to #engineering with a header 'Daily Report' and a bold item '**All Systems Go**'. Use Slack Block Kit with a markdown block type.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "blocks": {
+              "contains": "\"type\":\"mrkdwn\""
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_28",
+      "name": "Rich Text: User Mention",
+      "prompt": "Mention @Artem in #general using Slack Block Kit rich_text blocks with a user element type containing Artem's user ID.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "\"type\":\"user\""
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "blocks": {
+              "contains": "U02ARTEM23"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_29",
+      "name": "Chained Reasoning: Search and DM",
+      "prompt": "Find the user who complained about 'captcha' in #general and send them a DM saying 'I am looking into this.'",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "looking into this"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U06HUBERT23"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_30",
+      "name": "Set Operations: Group Invite based on Topic",
+      "prompt": "Create a new channel called 'auth-force' and invite everyone who has posted about 'login' or 'password'.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "contains": "auth-force"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "in": [
+                "U01AGENBOT9",
+                "U02JOHNDOE1",
+                "U03ROBERT23",
+                "U05MORGAN23",
+                "U02ARTEM23",
+                "U06HUBERT23"
+              ]
+            }
+          },
+          "expected_count": 6
+        }
+      ]
+    },
+    {
+      "id": "test_32",
+      "name": "Constraint Verification (Negative Test)",
+      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Hubert) via Slack.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "find"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U06HUBERT23"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_33",
+      "name": "Information Synthesis",
+      "prompt": "Who are the admins of the 'Test Workspace'? Reply with their names in #random.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "message_text": {
+              "contains": "Robert"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "message_text": {
+              "contains": "Morgan"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_34",
+      "name": "Ambiguity Resolution (Contextual User)",
+      "prompt": "Invite the Morgan who is NOT an admin to #random.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U05MORGAN23"
+            },
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_35",
+      "name": "Ambiguity Resolution (Contextual Channel)",
+      "prompt": "Post 'Status update: Alpha is on track' to the alpha dev channel.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            },
+            "message_text": {
+              "contains": "Status update"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_36",
+      "name": "Cross-channel Summarization",
+      "prompt": "Summarize the discussion about 'Gemini' in #random and post the summary to #engineering.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_text": {
+              "contains": "frontend"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            },
+            "message_text": {
+              "contains": "Flash"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_37",
+      "name": "Conditional Logic",
+      "prompt": "Check the discussion in #growth. If the team decided to double down on Reddit, react with :rocket: to the message proposing it.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_default",
+      "impersonate_user_id": "U01AGENBOT9",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1700300240.000005"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "rocket"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    }
+  ]
+}

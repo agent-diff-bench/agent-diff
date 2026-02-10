@@ -1,0 +1,41 @@
+CAPACITOR REPLACEMENT LOG
+=========================
+Unit: Moog Minimoog Model D
+Serial: 10847
+Year: 1974
+Restoration Started: November 2025
+
+POWER SUPPLY SECTION
+--------------------
+Date        Location    Original         Replacement      Status
+------------------------------------------------------------------------
+2025-11-15  C1          Sprague 1000µF   Nichicon 1000µF  ✓ Complete
+2025-11-15  C2          Sprague 1000µF   Nichicon 1000µF  ✓ Complete
+2025-11-16  C3          Unknown 470µF    Panasonic 470µF  ✓ Complete
+2025-11-16  C4          Unknown 470µF    Panasonic 470µF  ✓ Complete
+
+OSCILLATOR BOARD
+----------------
+Date        Location    Original         Replacement      Status
+------------------------------------------------------------------------
+2025-11-20  C21         Film 0.1µF       WIMA 0.1µF       ✓ Complete
+2025-11-20  C22         Film 0.1µF       WIMA 0.1µF       ✓ Complete
+2025-11-21  C23         Film 0.047µF     WIMA 0.047µF     ✓ Complete
+2025-11-22  C47         Elec 47µF        [PENDING]        ⚠ Needs replacement
+
+FILTER SECTION
+--------------
+Date        Location    Original         Replacement      Status
+------------------------------------------------------------------------
+2025-11-25  C31         Film 0.01µF      Vishay 0.01µF    ✓ Complete
+2025-11-25  C32         Film 0.01µF      Vishay 0.01µF    ✓ Complete
+
+NOTES
+-----
+- All electrolytic capacitors showing ESR drift replaced
+- Film capacitors replaced only if showing physical damage
+- Original Sprague caps saved for documentation
+- C47 showing 15% capacitance loss - replacement ordered
+
+Technician: Marcus Webb
+Contact: marcus@synthrepair.studio

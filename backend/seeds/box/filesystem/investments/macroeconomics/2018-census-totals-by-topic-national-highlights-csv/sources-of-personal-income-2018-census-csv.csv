@@ -1,0 +1,18 @@
+"Code","Sources_of_personal_income","Census_usually_resident_population_count_aged_15_years_and_over"
+"00","No source of income during that time",238551
+"01","Wages, salary, commissions, bonuses etc paid by my employer",2283054
+"02","Self-employment or business I own and work in",557667
+"03","Interest, dividends, rent, other investments",633951
+"04","Regular payments from ACC or a private work accident insurer",62157
+"05","New Zealand Superannuation or Veteran's Pension",652659
+"06","Other superannuation, pensions, or annuities (other than NZ Superannuation, Veteran's Pension or war pensions)",90756
+"07","Jobseeker Support",232956
+"08","Sole Parent Support",60102
+"09","Supported Living Payment",66795
+"10","Student Allowance",86655
+"11","Other government benefits, government income support payments, war pensions or paid parental leave",143394
+"12","Other sources of income, including support payments from people who do not live in my household",56562
+"99","Not stated",6954
+"TotalStated","Total stated",3769398
+"TotalResponse","Total responses",5165262
+"Total","Total",3776355

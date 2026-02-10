@@ -1,0 +1,28 @@
+Research Ethics Guidelines
+
+1. INFORMED CONSENT
+   - All participants must provide voluntary informed consent
+   - Consent forms must be written in clear, understandable language
+   - Participants have the right to withdraw at any time
+
+2. CONFIDENTIALITY
+   - Protect participant privacy and data security
+   - Anonymize data where possible
+   - Secure storage of sensitive information
+
+3. AVOIDING HARM
+   - Minimize risks to participants
+   - Provide appropriate debriefing
+   - Have support resources available if needed
+
+4. SCIENTIFIC INTEGRITY
+   - Report findings accurately and completely
+   - Acknowledge limitations of the study
+   - Avoid fabrication, falsification, and plagiarism
+
+5. CONFLICTS OF INTEREST
+   - Disclose any potential conflicts
+   - Maintain objectivity in research design and analysis
+   - Separate personal interests from scientific conclusions
+
+These guidelines should be reviewed and followed for all research involving human subjects.

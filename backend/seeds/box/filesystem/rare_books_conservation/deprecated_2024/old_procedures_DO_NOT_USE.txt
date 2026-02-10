@@ -1,0 +1,6 @@
+[DEPRECATED - DO NOT USE]
+
+This folder contains outdated procedures from 2024.
+These have been superseded by current protocols.
+
+Scheduled for deletion after audit completion.

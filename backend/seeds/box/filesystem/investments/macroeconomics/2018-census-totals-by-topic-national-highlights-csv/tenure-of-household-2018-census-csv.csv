@@ -1,0 +1,14 @@
+"Code","Tenure_of_household","Households_in_occupied_private_dwellings"
+"10","Dwelling owned or partly owned, mortgage arrangements not further defined",76989
+"11","Dwelling owned or partly owned, mortgage payments made",459414
+"12","Dwelling owned or partly owned, mortgage payments not made",310974
+"20","Dwelling not owned and not held in a family trust, rental arrangements not further defined",1806
+"21","Dwelling not owned and not held in a family trust, rent payments made",527853
+"22","Dwelling not owned and not held in a family trust, rent payments not made",56472
+"30","Dwelling held in a family trust, mortgage arrangements not further defined",23535
+"31","Dwelling held in a family trust, mortgage payments made",87663
+"32","Dwelling held in a family trust, mortgage payments not made",108354
+"77","Response unidentifiable",0
+"99","Not stated",726
+"TotalStated","Total stated",1653060
+"Total","Total",1653792

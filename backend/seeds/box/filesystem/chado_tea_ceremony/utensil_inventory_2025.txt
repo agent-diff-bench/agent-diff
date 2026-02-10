@@ -1,0 +1,53 @@
+CHADO UTENSIL INVENTORY
+茶道具目録 2025
+======================
+
+Last Audit: October 2025
+Storage Location: Mizuya (水屋) preparation room
+
+CHAWAN (茶碗) - TEA BOWLS
+-------------------------
+ID      Name                    Origin          Condition   Season
+-------------------------------------------------------------------
+CW-001  Black Raku              Kyoto           Excellent   Winter
+CW-002  Hagi-yaki               Yamaguchi       Good        All
+CW-003  Shino-yaki              Mino            Fair        Spring
+CW-004  Karatsu                 Saga            Excellent   Summer
+CW-005  Oribe                   Mino            Good        All
+CW-006  Bizen                   Okayama         Excellent   Autumn
+
+CHASEN (茶筅) - WHISKS
+----------------------
+ID      Type            Material        Uses Remaining
+------------------------------------------------------
+CS-001  Kazuho (80本)   White bamboo    ~50
+CS-002  Kazuho (80本)   Purple bamboo   ~30
+CS-003  Araho (36本)    White bamboo    NEW
+
+CHASHAKU (茶杓) - SCOOPS  
+-------------------------
+ID      Carver              Material    Notes
+---------------------------------------------
+SH-001  Unknown (Edo)       Bamboo      Antique, ceremonial only
+SH-002  Tanaka Sensei       Bamboo      Daily use
+SH-003  Student made        Bamboo      Practice
+
+KAMA (釜) - KETTLES
+-------------------
+ID      Style           Weight      Last Cleaned
+------------------------------------------------
+KM-001  Ashiya-gama     4.2kg       November 2025
+KM-002  Tenmyo          3.8kg       September 2025
+
+NATSUME (棗) - TEA CADDIES
+--------------------------
+ID      Design              Lacquer     Season
+----------------------------------------------
+NT-001  Pine and crane      Black       Winter/New Year
+NT-002  Cherry blossom      Red         Spring
+NT-003  Moon and grass      Gold        Autumn
+
+NOTE: All utensils require thorough cleaning before Hatsugama ceremony.
+Please verify chasen condition - purple bamboo whisk showing wear.
+
+Inventory Manager: Yamamoto-san

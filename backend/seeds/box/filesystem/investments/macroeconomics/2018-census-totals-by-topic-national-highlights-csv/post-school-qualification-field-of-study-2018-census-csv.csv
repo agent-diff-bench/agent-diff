@@ -1,0 +1,450 @@
+"Code","Post-school_qualification_field_of_study","Census_usually_resident_population_count_aged_15_years_and_over"
+"000000","No Post-School Qualification",1689069
+"010000","Natural and Physical Sciences not further defined",7143
+"010100","Mathematical Sciences not further defined",147
+"010101","Mathematics",12135
+"010103","Statistics",2601
+"010199","Mathematical Sciences not elsewhere classified",0
+"010300","Physics and Astronomy not further defined",36
+"010301","Physics",4257
+"010303","Astronomy",129
+"010500","Chemical Sciences not further defined",4083
+"010501","Organic Chemistry",1983
+"010503","Inorganic Chemistry",1119
+"010599","Chemical Sciences not elsewhere classified",1470
+"010700","Earth Sciences not further defined",693
+"010701","Atmospheric Sciences",207
+"010703","Geology",3621
+"010705","Geophysics",360
+"010707","Geochemistry",99
+"010709","Soil Science",411
+"010711","Hydrology",138
+"010713","Oceanography",150
+"010799","Earth Sciences not elsewhere classified",363
+"010900","Biological Sciences not further defined",1059
+"010901","Biochemistry and Cell Biology",8844
+"010903","Botany",1740
+"010905","Ecology and Evolution",1923
+"010907","Marine Science",1695
+"010909","Genetics",936
+"010911","Microbiology",2718
+"010913","Human Biology",2514
+"010915","Zoology",3729
+"010916","Neuroscience",579
+"010999","Biological Sciences not elsewhere classified",216
+"019900","Other Natural and Physical Sciences not further defined",6
+"019901","Medical Science",2076
+"019903","Forensic Science",462
+"019905","Food Science and Biotechnology",3828
+"019907","Pharmacology",834
+"019909","Laboratory Technology",3783
+"019999","Natural and Physical Sciences not elsewhere classified",3396
+"020000","Information Technology not further defined",9681
+"020100","Computer Science not further defined",19827
+"020101","Formal Language Theory",6
+"020103","Computer Applications and Programming",2223
+"020105","Computational Theory",42
+"020107","Compiler Construction",0
+"020109","Algorithms",3
+"020111","Data Structures",15
+"020113","Networks and Communications",1524
+"020115","Multimedia Computing Science",1269
+"020117","Operating Systems",249
+"020119","Artificial Intelligence",105
+"020199","Computer Science not elsewhere classified",21
+"020300","Information Systems not further defined",2271
+"020301","Conceptual Modelling",9
+"020303","Database Management",81
+"020305","Systems Analysis and Design",2319
+"020307","Decision Support Systems",2829
+"020399","Information Systems not elsewhere classified",5355
+"029900","Other Information Technology not further defined",6
+"029901","Security Science",27
+"029999","Information Technology not elsewhere classified",567
+"030000","Engineering and Related Technologies not further defined",11730
+"030100","Manufacturing, Engineering and Technology not further defined",615
+"030101","Manufacturing Engineering",1827
+"030103","Printing",4977
+"030105","Textile Making",999
+"030107","Garment Making",2193
+"030108","Plastics Processing Technology",309
+"030109","Footwear Making",198
+"030111","Wood Machining and Turning",102
+"030113","Cabinet Making",3120
+"030115","Furniture Upholstery and Renovation",441
+"030117","Furniture Polishing",33
+"030199","Manufacturing Engineering and Technology not elsewhere classified.",348
+"030300","Process and Resources Engineering not further defined",3
+"030301","Chemical Engineering",4008
+"030303","Mining and Resources Engineering",1086
+"030304","Wood Based Manufacturing",219
+"030305","Materials Engineering",1326
+"030306","Ceramics, Industrial Glass and Rubber Manufacturing",0
+"030307","Food (excluding Seafood) Processing Technology",2823
+"030308","Seafood Processing",69
+"030399","Process and Resources Engineering not elsewhere classified",486
+"030500","Automotive Engineering and Technology not further defined",1089
+"030501","Automotive Engineering",11073
+"030503","Vehicle Mechanics",17241
+"030505","Automotive Electrics and Electronics",1563
+"030507","Automotive Vehicle  Refinishing",633
+"030509","Automotive Body Construction",576
+"030511","Panel Beating",3822
+"030513","Upholstery and Vehicle Trimming",189
+"030515","Automotive Vehicle Operations",1473
+"030599","Automotive Engineering and Technology not elsewhere classified",207
+"030700","Mechanical and Industrial Engineering and Technology not further defined",1080
+"030701","Mechanical Engineering",26316
+"030703","Industrial Engineering",3498
+"030705","Toolmaking",1077
+"030707","Metal Fitting, Turning and Machining",5754
+"030709","Sheetmetal Working",1134
+"030711","Boiler-making and Welding",5859
+"030713","Metal Casting and Pattern Making",303
+"030715","Precision Metalworking",798
+"030717","Plant and Machine Operations",1443
+"030799","Mechanical and Industrial Engineering & Technology not elsewhere classified",1086
+"030900","Civil Engineering not further defined",15186
+"030901","Construction Engineering",660
+"030903","Structural Engineering",2052
+"030905","Building Services Engineering",183
+"030907","Water and Sanitary Engineering",153
+"030909","Transport Engineering",294
+"030910","Road Construction",135
+"030911","Geotechnical Engineering",261
+"030913","Ocean Engineering",42
+"030999","Civil Engineering not elsewhere classified",72
+"031100","Geomatic Engineering not further defined",39
+"031101","Surveying",3264
+"031103","Mapping Science",108
+"031199","Geomatic Engineering not elsewhere classified",141
+"031300","Electrical and Electronic Engineering and Technology not further defined",1284
+"031301","Electrical Engineering",30696
+"031303","Electronic Engineering",2679
+"031305","Computer Engineering",11565
+"031307","Communications Technologies",5451
+"031309","Communications Equipment Installation and Maintenance",5397
+"031311","Power Line Installation and Maintenance",1950
+"031313","Electrical Fitting, Electrical Mechanics",4260
+"031315","Refrigeration, Heating and Air Conditioning",2436
+"031317","Electronic Equipment Servicing",1416
+"031399","Electrical and Electronic Engineering  and Technology not elsewhere classified",732
+"031500","Aerospace Engineering and Technology not further defined",3
+"031501","Aerospace Engineering",633
+"031503","Aircraft Maintenance Engineering",3528
+"031505","Aircraft Operation",4161
+"031507","Air Traffic Control",351
+"031599","Aerospace Engineering and Technology not elsewhere classified",0
+"031700","Maritime Engineering and Technology not further defined",3
+"031701","Maritime Engineering",2592
+"031703","Marine Construction",1161
+"031705","Marine Craft Operation",2370
+"031799","Maritime Engineering and Technology not elsewhere classified",117
+"039900","Other Engineering and Related Technologies not further defined",3
+"039901","Environmental Engineering",4836
+"039902","Orthotics and Prosthetics",108
+"039903","Biomedical Engineering",396
+"039905","Fire Technology and Rescue Services",1245
+"039907","Rail Operations",156
+"039909","Cleaning",210
+"039999","Engineering and Related Technologies  not elsewhere classified",519
+"040000","Architecture and Building not further defined",27
+"040100","Architecture and Urban Environment not further defined",24
+"040101","Architecture",11766
+"040103","Urban Design and Regional Planning",2124
+"040105","Landscape Architecture",2499
+"040107","Interior and Environmental Design",3075
+"040199","Architecture and Urban Environment not elsewhere classified",33
+"040300","Building not further defined",3708
+"040301","Building Science and Technology",597
+"040303","Building Construction Management",12819
+"040305","Building Surveying (Inspection)",411
+"040307","Building Construction Economics (including Quantity Surveying)",2295
+"040309","Bricklaying and Stonemasonry",1344
+"040311","Carpentry and Joinery",26475
+"040313","Ceiling, Wall and Floor Fixing",312
+"040315","Roof Fixing",612
+"040317","Plastering",1071
+"040319","Furnishing Installation",0
+"040321","Floor Coverings",834
+"040323","Glazing",912
+"040325","Painting, Decorating, Sign Writing and Other Finishes",4848
+"040327","Plumbing, Gasfitting and Drainlaying",9426
+"040329","Scaffolding and Rigging",801
+"040399","Building not elsewhere classified",57
+"050000","Agriculture, Environmental and Related Studies not further defined",6
+"050100","Agriculture not further defined",4545
+"050101","Agricultural Science",7380
+"050103","Wool and Fibre Science",519
+"050104","Beekeeping",219
+"050105","Animal Husbandry",8124
+"050106","Crop Production",24
+"050108","Equine Trades",108
+"050110","Wool and Fibre Harvesting",411
+"050112","General Land Skills",15
+"050199","Agriculture not elsewhere classified",135
+"050300","Horticulture and Viticulture not further defined",6
+"050301","Horticulture",12888
+"050303","Viticulture",1299
+"050500","Forestry Studies not further defined",15
+"050501","Forestry Studies",3873
+"050502","Solid Wood Processing",645
+"050700","Fisheries Studies not further defined",3
+"050701","Aquaculture",210
+"050702","Seafood Harvesting (Fishing)",537
+"050799","Fisheries  Studies not elsewhere classified",12
+"050900","Environmental Studies not further defined",234
+"050901","Land, Parks and Wildlife Management",1455
+"050902","Environmental Sustainability",327
+"050999","Environmental Studies not elsewhere classified",798
+"059900","Other Agriculture, Environmental and Related Studies not further defined",3
+"059901","Pest and Weed Control",270
+"059999","Agriculture, Environmental and Related Studies not elsewhere classified",24
+"060000","Health not further defined",4533
+"060100","Medical Studies not further defined",594
+"060101","General Medicine",13326
+"060103","Surgery",945
+"060105","Psychiatry",684
+"060107","Obstetrics and Gynaecology",345
+"060109","Paediatrics",381
+"060111","Anaesthesiology",792
+"060113","Pathology",330
+"060115","Radiology",768
+"060117","Internal Medicine",435
+"060119","General Practice Medicine",1260
+"060199","Medical Studies not elsewhere classified",804
+"060300","Nursing not further defined",111
+"060301","Nursing",71634
+"060303","Midwifery",4395
+"060308","Health Care Assistant",5823
+"060399","Nursing not elsewhere classified",237
+"060501","Pharmacy",8667
+"060700","Dental Studies not further defined",654
+"060701","Dentistry",4341
+"060704","Dental Hygiene and Therapy",2337
+"060705","Dental Technology",588
+"060799","Dental Studies not elsewhere classified",261
+"060900","Optical Science not further defined",33
+"060901","Optometry",1011
+"060903","Optical Technology",69
+"060999","Optical Science not elsewhere classified",3
+"061100","Veterinary Studies not further defined",291
+"061101","Veterinary Science",3591
+"061103","Veterinary Assisting",5058
+"061199","Veterinary Studies not elsewhere classified",9
+"061300","Public Health not further defined",1590
+"061301","Occupational Health and Safety",2616
+"061303","Environmental Health",426
+"061304","Hauora (Māori Health)",150
+"061307","Health Education,  Promotion, Counselling",429
+"061309","Community Health",405
+"061311","Epidemiology",207
+"061399","Public Health not elsewhere classified",81
+"061501","Medical Imaging Technology (Radiography) and Radiation Therapy",2781
+"061700","Rehabilitation Therapies not further defined",609
+"061701","Physiotherapy",5805
+"061703","Occupational Therapy",3450
+"061705","Chiropractic and Osteopathy",1044
+"061707","Speech Pathology",1359
+"061709","Audiology",579
+"061711","Massage Therapy",2805
+"061713","Podiatry",456
+"061799","Rehabilitation Therapies not elsewhere classified",273
+"061900","Complementary Therapies not further defined",93
+"061901","Naturopathy and Homeopathy",1197
+"061903","Acupuncture",402
+"061905","Traditional Chinese Medicine",345
+"061999","Complementary Therapies not elsewhere classified",687
+"069900","Other Health not further defined",0
+"069901","Nutrition and Dietetics",2589
+"069903","Human Movement and Sports Science",3045
+"069905","Paramedical Studies",2232
+"069907","First Aid",222
+"069999","Health not elsewhere classified",12051
+"070000","Education not further defined",17148
+"070100","Teacher Education not further defined",15762
+"070101","Teacher Education: Early Childhood (Pre-Service)",27840
+"070103","Teacher Education: Primary (Pre-Service)",42717
+"070105","Teacher Education: Secondary (Pre-Service)",10689
+"070106","Teacher Education:  Tertiary",936
+"070108","Teacher Education: General (Pre-Service)",0
+"070113","Teacher Education: Special Education",5691
+"070115","English Language Teaching(ESOL/EFL)",2334
+"070116","Te Mātauranga Māori me te Whakangungu (Māori Education)",207
+"070118","Bilingual Early Childhood Teacher Training (Pre-Service)",6
+"070120","Immersion Early Childhood Teacher Training (Pre-Service)",27
+"070122","Bilingual Primary Teacher Training (Pre-Service)",24
+"070124","Immersion Primary Teacher Training (Pre-Service)",12
+"070126","Bilingual Secondary Teacher Training (Pre-Service)",0
+"070128","Immersion Secondary Teacher Training (Pre-Service)",0
+"070130","Teacher Professional Development",3852
+"070199","Teacher Education not elsewhere classified",17796
+"070300","Curriculum and Education Studies not further defined",0
+"070301","Curriculum Studies",96
+"070303","Education Studies",648
+"079900","Other Education not further defined",0
+"079999","Education not elsewhere classified",2229
+"080000","Management and Commerce not further defined",819
+"080100","Accountancy not further defined",3
+"080101","Accounting",56331
+"080199","Accountancy not elsewhere classified",6
+"080300","Business and Management not further defined",20187
+"080301","Business Management",92919
+"080303","Human Resource Management",7992
+"080305","Personal Management Training",1383
+"080307","Organisation Management",588
+"080309","Industrial Relations",414
+"080311","International Business",3972
+"080312","Education Administration",816
+"080313","Public and Health Care Administration",2187
+"080315","Project Management",1872
+"080317","Quality Management",552
+"080319","Hospitality Management",9651
+"080320","Racing and Gaming Management",9
+"080321","Farm Management and Agribusiness",7947
+"080323","Tourism Management",4218
+"080399","Business and Management not elsewhere classified",11247
+"080500","Sales and Marketing not further defined",720
+"080501","Sales",3141
+"080503","Real Estate",5163
+"080505","Marketing",14115
+"080507","Advertising",1251
+"080509","Public Relations",1113
+"080599","Sales and Marketing not elsewhere classified",492
+"080701","Tourism Studies",15369
+"080900","Office Administration not further defined",96
+"080901","General Office Administration",14049
+"080904","Text and Information Processing",2751
+"080999","Office Administration not elsewhere classified",882
+"081100","Banking, Finance and Related Fields not further defined",606
+"081101","Banking and Finance",10311
+"081103","Insurance and Actuarial Studies",2253
+"081105","Investment and Securities",579
+"081199","Banking, Finance and Related Fields not elsewhere classified",177
+"089900","Other Management and Commerce not further defined",3
+"089901","Purchasing, Warehousing and Distribution",2661
+"089903","Valuation",2544
+"089905","e-Commerce",495
+"089999","Management and Commerce not elsewhere classified",21
+"090000","Society and Culture not further defined",3072
+"090100","Political Science and Policy Studies not further defined",27
+"090101","Political Science",7914
+"090103","Policy Studies",2178
+"090300","Studies in Human Society not further defined",252
+"090301","Sociology",4938
+"090303","Anthropology",3273
+"090305","History",10251
+"090306","Art History",2238
+"090307","Archaeology",459
+"090308","Classics",996
+"090309","Human Geography",8322
+"090314","Tikanga - Māori Customs",3429
+"090316","Women's Studies",222
+"090399","Studies in Human Society not elsewhere classified",285
+"090500","Human Welfare Studies and Services not further defined",1422
+"090501","Social Work",18006
+"090502","Children's Services",174
+"090503","Nannying and Early Childhood Care",3408
+"090505","Youth Work",861
+"090507","Support for the Older Person",2454
+"090509","Care for People with Disabilities",561
+"090511","Community Client Care",1119
+"090513","Counselling",5127
+"090515","Welfare Studies",33
+"090599","Human Welfare Studies and Services not elsewhere classified",450
+"090700","Behavioural Science not further defined",60
+"090701","Psychology",22707
+"090799","Behavioural Science not elsewhere classified",72
+"090900","Law not further defined",13935
+"090901","Business and Commercial Law",7296
+"090903","Constitutional Law",435
+"090905","Criminal Law",1533
+"090907","Family Law",1128
+"090909","International Law",876
+"090911","Taxation Law",429
+"090913","Legal Practice",429
+"090999","Law not elsewhere classified",144
+"091100","Justice and Law Enforcement not further defined",765
+"091101","Justice Administration",108
+"091103","Legal Studies",2067
+"091105","Police Studies",3012
+"091199","Justice and Law Enforcement not elsewhere classified",192
+"091300","Librarianship, Information Management and Curatorial Studies not further defined",0
+"091301","Librarianship and Information Management",4275
+"091303","Curatorial Studies",453
+"091500","Language and Literature not further defined",759
+"091501","English Language",8937
+"091502","Te Reo Māori",3555
+"091504","Foreign Languages",7065
+"091506","English for Speakers of Other Languages",486
+"091519","Translating and Interpreting",756
+"091521","Linguistics",2607
+"091523","Literature",6588
+"091599","Language and Literature not elsewhere classified",102
+"091700","Philosophy and Religious Studies not further defined",15
+"091701","Philosophy",2949
+"091703","Religious Studies",8538
+"091900","Economics and Econometrics not further defined",33
+"091901","Economics",11955
+"091903","Econometrics",60
+"092100","Sport and Recreation not further defined",1104
+"092101","Sport and Recreation Activities",8181
+"092103","Sports Coaching, Playing, Officiating and Instructing",3999
+"092199","Sport and Recreation not elsewhere classified",45
+"099900","Other Society and Culture not further defined",0
+"099901","Community, Whanau, Family and Consumer Studies",1392
+"099902","Cultural Studies",219
+"099903","Criminology",1926
+"099905","Security Services",1917
+"099999","Society and Culture not elsewhere classified",846
+"100000","Creative Arts not further defined",6429
+"100100","Performing Arts not further defined",1794
+"100101","Music",6966
+"100103","Drama and Theatre Studies",2904
+"100105","Dance",1062
+"100106","Ngā Mahi a Rēhia (Māori Performing Arts)",549
+"100199","Performing Arts not elsewhere classified",24
+"100300","Visual Arts and Crafts not further defined",2556
+"100301","Fine Arts",7629
+"100303","Photography",2958
+"100305","Crafts",417
+"100306","Mana Whakairo (Māori Carving)",177
+"100307","Jewellery Making",687
+"100309","Floristry",1395
+"100399","Visual Arts and Crafts not elsewhere classified",1350
+"100500","Graphic and Design Studies not further defined",3822
+"100501","Graphic Arts and Design Studies",13008
+"100503","Textile Design",615
+"100505","Fashion Design",4359
+"100506","Ngā Mahi a te Whare Pora (Māori Weaving)",234
+"100599","Graphic and Design Studies not elsewhere classified",105
+"100700","Communication and Media Studies not further defined",4590
+"100701","Audio Visual Studies",6552
+"100703","Journalism, Communication and Media Studies",7200
+"100705","Written Communication",1581
+"100707","Verbal Communication",108
+"100709","Multimedia Studies",2223
+"100799","Communication and Media Studies not elsewhere classified",942
+"109900","Other Creative Arts not further defined",27
+"109999","Creative Arts not elsewhere classified",24
+"110000","Food, Hospitality and Personal Services not further defined",6
+"110100","Food and Hospitality not further defined",51
+"110101","Hospitality",8751
+"110103","Food and Beverage Service",1314
+"110105","Butchery",4638
+"110107","Baking and Pastry Making",3207
+"110109","Cookery",16452
+"110111","Food Hygiene",351
+"110199","Food and Hospitality not elsewhere classified",93
+"110300","Personal Services not further defined",1719
+"110301","Beauty Therapy",7959
+"110303","Hairdressing",15222
+"110399","Personal Services not elsewhere classified",75
+"333333","Field of Study Not Given (Although Level of Attainment Given)",331608
+"444444","Don't know",552
+"555555","Refused to answer",96
+"777777","Response unidentifiable",2031
+"888888","Response outside scope",4194
+"999999","Not stated",263106
+"TotalStated","Total stated",3506376
+"Total","Total",3776355

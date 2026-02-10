@@ -1,0 +1,51 @@
+CONDITION REPORT - INCUNABULA COLLECTION
+========================================
+Collection: Pre-1501 Printed Books
+Assessment Date: September 2025
+Assessor: Dr. Margaret Chen
+
+COLLECTION OVERVIEW
+-------------------
+Total volumes: 47
+Assessed this cycle: 47
+Requiring immediate attention: 3
+Stable condition: 41
+Recently treated: 3
+
+PRIORITY ITEMS
+--------------
+
+1. Nuremberg Chronicle (1493)
+   Condition: FAIR
+   Issues: Binding deterioration, 2 loose gatherings
+   Recommended: Full rebinding within 6 months
+   Estimated cost: $4,500
+
+2. Euclid's Elements (1482)
+   Condition: POOR
+   Issues: Severe foxing pp. 12-28, water damage spine
+   Recommended: Immediate conservation treatment
+   Estimated cost: $3,200
+   
+3. Dante's Commedia (1472)
+   Condition: FAIR
+   Issues: Red rot on cover leather
+   Recommended: Leather consolidation
+   Estimated cost: $1,800
+
+SUMMARY STATISTICS
+------------------
+Books in Excellent condition: 12
+Books in Good condition: 29
+Books in Fair condition: 4
+Books in Poor condition: 2
+
+Total estimated conservation budget needed: $15,750
+
+NOTES
+-----
+- Humidity stable throughout assessment period
+- No new pest activity detected
+- Recommend quarterly re-assessment for Priority items
+
+Next assessment scheduled: March 2026

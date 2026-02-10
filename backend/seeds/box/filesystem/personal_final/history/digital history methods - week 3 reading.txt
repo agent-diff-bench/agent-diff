@@ -1,0 +1,85 @@
+COMPUTATIONAL APPROACHES TO HISTORICAL RESEARCH
+================================================
+
+THE DIGITAL TURN IN HISTORY
+---------------------------
+Over the past two decades, historians have increasingly turned to 
+computational methods to analyze large collections of sources that 
+would be impossible to read manually. This "digital turn" raises 
+both exciting possibilities and significant methodological questions.
+
+
+KEY METHODS
+-----------
+
+Text Mining and Topic Modeling
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Text mining allows researchers to identify patterns across thousands 
+of documents. Topic modeling algorithms can reveal thematic clusters 
+in large corpora, helping historians identify:
+  - Shifts in political discourse over time
+  - Networks of influence in correspondence
+  - Changes in terminology and concepts
+
+Network Analysis
+~~~~~~~~~~~~~~~~
+By mapping relationships between individuals, organizations, or ideas, 
+network analysis reveals structures invisible to traditional reading:
+  - Correspondence networks among intellectuals
+  - Trade relationships between cities
+  - Citation patterns in scholarly communities
+
+Geographic Information Systems (GIS)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Spatial analysis adds a geographic dimension to historical questions:
+  - Mapping migration patterns
+  - Visualizing urban development
+  - Tracking the spread of epidemics
+
+
+METHODOLOGICAL CONSIDERATIONS
+-----------------------------
+
+The Problem of Selection
+~~~~~~~~~~~~~~~~~~~~~~~~
+Digital archives are not neutral repositories. Digitization projects 
+reflect funding priorities, institutional interests, and technical 
+constraints. What gets digitized—and what remains in dusty folders—
+shapes what computational methods can find.
+
+Distant Reading vs. Close Reading
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Franco Moretti's concept of "distant reading" proposes analyzing 
+literature at scale, identifying patterns across hundreds or thousands 
+of texts. Critics argue this sacrifices the nuance that close reading 
+provides. Most digital historians now advocate combining both approaches.
+
+Black Box Algorithms
+~~~~~~~~~~~~~~~~~~~~
+Many computational tools operate as "black boxes"—historians use them 
+without fully understanding how they work. This raises questions about 
+replicability and interpretation. Best practice demands transparency 
+about methods and their limitations.
+
+
+PRACTICAL CONSIDERATIONS
+------------------------
+Before embarking on a digital history project, consider:
+
+  1. DATA QUALITY - Are your sources machine-readable? What cleaning 
+     is required?
+  2. SCALE - Is computational analysis necessary, or would traditional 
+     methods suffice?
+  3. INTERPRETATION - How will you move from patterns to historical 
+     arguments?
+  4. PRESERVATION - Will your methods and data be accessible to future 
+     researchers?
+
+
+CONCLUSION
+----------
+Digital methods are tools, not magic. They can reveal patterns and 
+suggest hypotheses, but historical interpretation still requires human 
+judgment, contextual knowledge, and critical thinking. The most 
+successful digital history projects combine computational power with 
+traditional scholarly skills.

@@ -1,0 +1,16 @@
+"Code","Main_types_of_heating","Occupied_private_dwellings_"
+"00","No heating used",60819
+"01","Heat pump",723792
+"02","Electric heater",675018
+"03","Fixed gas heater",179571
+"04","Portable gas heater",96570
+"05","Wood burner",494841
+"06","Pellet fire",15093
+"07","Coal burner",18813
+"08","Other types of heating",45132
+"77","Response unidentifiable",8946
+"88","Response outside scope",8457
+"99","Not stated",128913
+"TotalStated","Total stated",1529661
+"TotalResponse","Total responses",2309652
+"Total","Total",1664313

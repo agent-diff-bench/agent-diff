@@ -161,8 +161,15 @@ def insert_seed_data(conn, schema_name: str, seed_data: dict) -> SeedStats:
         for version_record in seed_data["box_file_versions"]:
             if "local_path" in version_record:
                 local_path = version_record.pop("local_path")
-                repo_root = Path(__file__).parent.parent.parent
-                file_path = repo_root / local_path
+                backend_root = Path(__file__).parent.parent
+                # Try backend/seeds/ first (Docker), fall back to repo root (local dev)
+                # local_path is like "examples/box/seeds/filesystem/..."
+                # In backend/seeds/ it becomes "seeds/box/filesystem/..."
+                remapped = local_path.replace("examples/box/seeds/", "seeds/box/", 1)
+                file_path = backend_root / remapped
+                if not file_path.exists():
+                    repo_root = backend_root.parent
+                    file_path = repo_root / local_path
 
                 if file_path.exists():
                     try:
@@ -338,7 +345,7 @@ def main():
         print("Running in STRICT mode - will fail on any file loading errors")
 
     engine = create_engine(db_url)
-    seeds_dir = Path(__file__).parent.parent.parent / "examples" / "box" / "seeds"
+    seeds_dir = Path(__file__).parent.parent / "seeds" / "box"
 
     all_ok = True
 

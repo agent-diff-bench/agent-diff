@@ -242,7 +242,10 @@ def main():
         sys.exit(1)
 
     engine = create_engine(db_url)
-    seeds_dir = Path(__file__).parent.parent.parent / "examples" / "linear" / "seeds"
+    # Try backend/seeds/ first (Docker), fall back to repo root (local dev)
+    seeds_dir = Path(__file__).parent.parent / "seeds" / "linear"
+    if not seeds_dir.exists():
+        seeds_dir = Path(__file__).parent.parent.parent / "examples" / "linear" / "seeds"
 
     # Create empty base template
     create_template(engine, "linear_base")

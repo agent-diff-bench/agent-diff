@@ -1,0 +1,25 @@
+"Code","Number_of_rooms","Occupied_private_dwellings"
+"01","One room",3711
+"02","Two rooms",10203
+"03","Three rooms",51981
+"04","Four rooms",135111
+"05","Five rooms",235251
+"06","Six rooms",436599
+"07","Seven rooms",318141
+"08","Eight rooms",222825
+"09","Nine rooms",122301
+"10","Ten rooms",55923
+"11","Eleven rooms",25533
+"12","Twelve rooms",13029
+"13","Thirteen rooms",7053
+"14","Fourteen rooms",4251
+"15","Fifteen rooms",3099
+"16","Sixteen rooms",2340
+"17","Seventeen rooms",1527
+"18","Eighteen rooms",1047
+"19","Nineteen rooms",654
+"20","Twenty or more rooms",12723
+"77","Response unidentifiable",93
+"99","Not stated",912
+"TotalStated","Total stated",1663305
+"Total","Total",1664313
