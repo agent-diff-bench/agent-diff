@@ -1,0 +1,11 @@
+"Code","Number_of_motor_vehicles","Households_in_occupied_private_dwellings"
+"00","No motor vehicle",100302
+"01","One motor vehicle",514992
+"02","Two motor vehicles",598062
+"03","Three motor vehicles",194910
+"04","Four motor vehicles",73143
+"05","Five or more motor vehicles",35889
+"77","Response unidentifiable",7506
+"99","Not stated",128988
+"TotalStated","Total stated",1517298
+"Total","Total",1653792

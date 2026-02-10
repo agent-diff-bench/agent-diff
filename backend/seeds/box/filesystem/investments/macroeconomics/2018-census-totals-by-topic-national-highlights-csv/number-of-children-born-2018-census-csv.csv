@@ -1,0 +1,18 @@
+"Code","Number_of_children_born","Female_census_usually_resident_population_count_aged_15_years_and_over"
+"00","No children",550587
+"01","One child",229866
+"02","Two children",469818
+"03","Three children",286560
+"04","Four children",123609
+"05","Five children",46617
+"06","Six children",19851
+"07","Seven children",8934
+"08","Eight children",4563
+"09","Nine children",2577
+"10","Ten or more children",2778
+"55","Object to answering",40005
+"77","Response unidentifiable",0
+"88","Response outside scope",549
+"99","Not stated",143943
+"TotalStated","Total stated",1785759
+"Total","Total",1930248

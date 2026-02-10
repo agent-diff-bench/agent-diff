@@ -248,3 +248,7 @@ local_experiments/
 
 experiments/kdd 2026
 
+
+# outputs from `prime eval run`
+./outputs
+./environments/*/outputs

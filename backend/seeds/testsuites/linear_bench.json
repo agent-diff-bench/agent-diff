@@ -1,0 +1,3677 @@
+{
+  "id": "linear-bench",
+  "name": "Linear Bench",
+  "description": "Benchmark tests for Linear MCP operations",
+  "service": "linear",
+  "ignore_fields": {
+    "global": [
+      "created_at",
+      "updated_at",
+      "updatedAt",
+      "createdAt",
+      "editedAt"
+    ]
+  },
+  "tests": [
+    {
+      "id": "test_0",
+      "name": "Create a new issue",
+      "prompt": "Create a new issue in the Engineering team titled 'Fix login bug' ",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "login bug"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "teams",
+          "issueCreate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_1",
+      "name": "Create a new issue",
+      "prompt": "Create a new issue in the Engineering team titled 'Fix login bug' with high priority",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "login bug"
+            },
+            "priority": {
+              "eq": 2.0
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "teams",
+          "issueCreate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_2",
+      "name": "Update issue status to In Progress",
+      "prompt": "Move issue ENG-1 to 'In Progress' status",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "6963a682-5967-477a-9afc-0b8a5b70b070"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "workflowStates",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_3",
+      "name": "Assign issue to user",
+      "prompt": "Assign issue ENG-2 to John Doe",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-2"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "from": {
+                "eq": "03b0809e-713e-44ee-95de-b7a198b135ac"
+              },
+              "to": {
+                "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "users",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_4",
+      "name": "Add comment to issue",
+      "prompt": "Add a comment to issue ENG-1 saying 'I am working on this now'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "c6e168e3-fed4-45d0-b03f-a1c1f89ee7ab"
+            },
+            "body": {
+              "contains": "working on this"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "commentCreate"
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_5",
+      "name": "Create a new team",
+      "prompt": "Create a new team called 'Design'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Design"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Backlog"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "teamCreate"
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_6",
+      "name": "Change issue priority to Urgent",
+      "prompt": "Change the priority of issue ENG-1 to Urgent",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "priority": {
+              "to": {
+                "eq": 1.0
+              }
+            },
+            "priorityLabel": {
+              "to": {
+                "eq": "Urgent"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_7",
+      "name": "Create issue with assignee and description",
+      "prompt": "Create a new issue 'Improve performance' in Engineering team, assign to John, with description 'Optimize database queries'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "performance"
+            },
+            "assigneeId": {
+              "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+            },
+            "description": {
+              "contains": "database queries"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "teams",
+          "users",
+          "issueCreate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_8",
+      "name": "Update issue description",
+      "prompt": "Update the description of issue ENG-1 to include 'Root cause: session timeout issue'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "session timeout"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_9",
+      "name": "Create multiple issues in batch",
+      "prompt": "Create three new issues in the Engineering team: 'Update documentation', 'Refactor API endpoints', and 'Add unit tests'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            }
+          },
+          "expected_count": 3
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "teams",
+          "issueCreate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_10",
+      "name": "Complete issue (move to Done)",
+      "prompt": "Mark issue ENG-1 as completed",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "4334c4ee-405c-4d2c-bf25-4dcb7a8c0512"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "workflowStates",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_11",
+      "name": "Create a new label",
+      "prompt": "Create a new label called 'Bugs' ",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "Bugs"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "issueLabelCreate"
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_12",
+      "name": "Apply Bugs label to login issue",
+      "prompt": "Add the newly created 'Bugs' label to the Engineering login issue currently assigned to John Doe.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "c6e168e3-fed4-45d0-b03f-a1c1f89ee7ab"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issueLabels",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_13",
+      "name": "Add UX label to onboarding issue",
+      "prompt": "Add the 'UX' label to the onboarding dashboard issue that Sarah Smith owns.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "5c62f29d-0f6a-4c4d-9d25-52293e2a8d4f"
+            },
+            "issue_label_id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issueLabels",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_14",
+      "name": "Update login issue title",
+      "prompt": "Rename the Engineering issue describing intermittent login failures to 'Fix login bug - follow up'.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "title": {
+              "to": {
+                "contains": "follow up"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_15",
+      "name": "Tag commented issue with RL label",
+      "prompt": "Add the 'RL' label to the login issue that John Doe recently commented on.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "c6e168e3-fed4-45d0-b03f-a1c1f89ee7ab"
+            },
+            "issue_label_id": {
+              "eq": "8f01ce9d-1433-4c4c-969d-21ca3bf2718f"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "users",
+          "comments",
+          "issueLabels",
+          "issueUpdate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_16",
+      "name": "Move ENG-2 to In Review",
+      "prompt": "Move issue ENG-2 to 'In Review'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-2"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "4379b3d7-1143-4aa4-a3a6-da0c436e73b6"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "workflowStates",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_17",
+      "name": "Reassign ENG-3 to Sarah",
+      "prompt": "Assign ENG-3 to Sarah Smith",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-3"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "03b0809e-713e-44ee-95de-b7a198b135ac"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "users",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_18",
+      "name": "Create issue with labels UX and Urgent",
+      "prompt": "Create a new Engineering issue 'Polish navigation' with labels 'UX' and 'Urgent'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "Polish navigation"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": {
+            "min": 2
+          }
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "teams",
+          "issueLabels",
+          "issueCreate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_19",
+      "name": "Add a comment to ENG-3",
+      "prompt": "Add a comment to ENG-3: 'Please add logs for the error path'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "87c1d2f3-66c4-4dd0-bc93-1b99d04dc374"
+            },
+            "body": {
+              "contains": "error path"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "commentCreate"
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_20",
+      "name": "Update seeded comment on ENG-1",
+      "prompt": "Update the seeded comment on ENG-1 to: 'Updated: working on a fix and adding tests'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "e10f59c3-7a49-4d52-8dba-8c8602f8c807"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "Updated: working on a fix"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "comments",
+          "commentUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_21",
+      "name": "Delete seeded comment on ENG-1",
+      "prompt": "Delete the seeded comment on ENG-1",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "e10f59c3-7a49-4d52-8dba-8c8602f8c807"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "from": {
+                "exists": false
+              },
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "comments",
+          "commentDelete"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_22",
+      "name": "Batch create issues with labels",
+      "prompt": "Create two Engineering issues: 'Update onboarding docs' (label UX) and 'Add circuit breaker' (label Urgent)",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "onboarding docs"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            },
+            "title": {
+              "contains": "circuit breaker"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": {
+            "min": 2
+          }
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "teams",
+          "issueLabels",
+          "issueCreate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_23",
+      "name": "Move ENG-1 to Canceled",
+      "prompt": "Cancel issue ENG-1 (set its status to Canceled)",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "d4f59a6d-33cb-45d1-8f4e-3e57536f912d"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issues",
+          "workflowStates",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_24",
+      "name": "Create temporary label and apply to ENG-2",
+      "prompt": "Create a new label 'Backend' and add it to ENG-2",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "Backend"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "5c62f29d-0f6a-4c4d-9d25-52293e2a8d4f"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "issueLabelCreate",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_25",
+      "name": "Rename a label",
+      "prompt": "Rename the label 'UX' to 'User Experience'",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "name": {
+              "to": {
+                "eq": "User Experience"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "issueLabels",
+          "issueLabelUpdate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_26",
+      "name": "Remove assignee from ENG-1",
+      "prompt": "Unassign ENG-1 so it has no assignee",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "exists": false
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_27",
+      "name": "Create State, Issue, and Comment flow",
+      "prompt": "Add a new workflow state for the product team called 'Done'. Then, create a new issue in this team called 'Mini-demo', mark it as done, and add a comment to it saying 'Marking it as done because Hubert already prepped the demo but forgot to create an issue'.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Done"
+            },
+            "teamId": {
+              "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "eq": "Mini-demo"
+            },
+            "teamId": {
+              "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Hubert already prepped"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "teams",
+          "workflowStateCreate",
+          "issueCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_28",
+      "name": "Remove workflow state",
+      "prompt": "Remove the 'Duplicate' workflow state from the Engineering team.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "ab04ec5f-1292-48b0-9426-50d354957357"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "from": {
+                "exists": false
+              },
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "workflowStates",
+          "workflowStateArchive"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_29",
+      "name": "Resolve duplicate issues (requires creating state)",
+      "prompt": "Find duplicated issues regarding 'trace analysis' in the Product team and mark the 2nd one (the newer one) as a duplicate.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Duplicate"
+            },
+            "teamId": {
+              "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "PROD-2"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "from": {
+                "eq": "0fde0f94-ee5f-4a37-ad23-a3acd0080c57"
+              },
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "teams",
+          "issues",
+          "workflowStateCreate",
+          "issueUpdate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_30",
+      "name": "Add member to team",
+      "prompt": "Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "userId": {
+              "eq": "b55072d7-ccaa-43cd-8ab7-3dca324e3294"
+            },
+            "teamId": {
+              "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "teams",
+          "teamMembershipCreate"
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_31",
+      "name": "Edit comment with link",
+      "prompt": "Please edit the comment (id: e6a0f6c4-4d0e-4f4c-9a54-444444444444) about open telemetry and include the link 'https://smith.langchain.com/' as an example.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "e6a0f6c4-4d0e-4f4c-9a54-444444444444"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "smith.langchain.com"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "commentUpdate"
+        ],
+        "task_horizon": 1,
+        "operation_type": "U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_32",
+      "name": "Vacation Handoff (Conditional Batch Reassignment)",
+      "prompt": "John Doe is going on vacation. Reassign all of his 'Urgent' issues to Sarah Smith, but leave his non-urgent work as is.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-3"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "from": {
+                "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+              },
+              "to": {
+                "eq": "03b0809e-713e-44ee-95de-b7a198b135ac"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-1"
+            }
+          },
+          "expected_count": 0,
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "users",
+          "issueLabels",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_33",
+      "name": "Cross-Team Issue Migration",
+      "prompt": "The 'Polish onboarding dashboard UX' issue was filed in Engineering by mistake. Move it to the Product team and reset its status to 'In Review'.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-2"
+            }
+          },
+          "expected_changes": {
+            "teamId": {
+              "from": {
+                "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+              },
+              "to": {
+                "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+              }
+            },
+            "stateId": {
+              "to": {
+                "eq": "31d46818-d16d-4279-90e6-a7bab45561c0"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "issues",
+          "teams",
+          "workflowStates",
+          "issueUpdate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_34",
+      "name": "Create Follow-up Task from Incident Comments",
+      "prompt": "Read the comments on the 'production incident' ticket. Create a new Engineering ticket titled 'Fix 500 errors in eval runner' with a description based on the analysis in the comments. Mark this new ticket as being blocked by ENG-3.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Fix 500 errors"
+            },
+            "description": {
+              "contains": "agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "issues",
+          "comments",
+          "teams",
+          "issueCreate",
+          "issueRelationCreate"
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+R+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_35",
+      "name": "Load Balancer (Logic & Aggregation)",
+      "prompt": "Assign the 'email sign-in' ticket to the Engineering team member who currently has the fewest assigned issues. If there is a tie, pick anyone with the lowest count.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-6"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "b55072d7-ccaa-43cd-8ab7-3dca324e3294"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "teams",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_36",
+      "name": "Label Migration (Batch & Sequence)",
+      "prompt": "We are replacing the 'RL' label with a new 'AI' label. Create a new label named 'AI'. Find all tickets with the 'RL' label, tag them with 'AI', and remove the 'RL' label.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "AI"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "b4f5130f-5c1b-4bc0-a8f6-60a22b0adf5e"
+            },
+            "issue_label_id": {
+              "eq": "8f01ce9d-1433-4c4c-969d-21ca3bf2718f"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {
+            "issue_id": {
+              "eq": "b4f5130f-5c1b-4bc0-a8f6-60a22b0adf5e"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "issueLabelCreate",
+          "issueLabels",
+          "issues",
+          "issueUpdate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_37",
+      "name": "SLA Enforcement (Dates & States)",
+      "prompt": "Find any Engineering tickets in 'In Progress' that were created before Jan 2nd, 2025. Move them back to 'Todo' and add a comment: 'Demoted due to lack of progress'.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "ENG-3"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "741f29ae-cfb3-4b8a-a1f8-c5161c842366"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "87c1d2f3-66c4-4dd0-bc93-1b99d04dc374"
+            },
+            "body": {
+              "contains": "Demoted"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "teams",
+          "workflowStates",
+          "issues",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_39",
+      "name": "Issue Decomposition (Hierarchy)",
+      "prompt": "Break down the 'SSO' ticket into two sub-issues: 'Frontend Implementation' (assigned to Sarah) and 'Backend API' (assigned to John). Ensure the previous ticket is set as the parent for both.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "parentId": {
+              "eq": "7d3f21ac-89c1-4f3b-9c2e-4fe3a1b71002"
+            },
+            "assigneeId": {
+              "eq": "03b0809e-713e-44ee-95de-b7a198b135ac"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "parentId": {
+              "eq": "7d3f21ac-89c1-4f3b-9c2e-4fe3a1b71002"
+            },
+            "assigneeId": {
+              "eq": "2dcc8dc2-ca19-475d-9882-3ba5e911e7ec"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "issues",
+          "users",
+          "issueCreate"
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_40",
+      "name": "Dependency Chain Creation",
+      "prompt": "Create three new issues in Engineering: 'Alpha', 'Beta', and 'Gamma'. Configure them as a dependency chain where Alpha blocks Beta, and Beta blocks Gamma.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+            }
+          },
+          "expected_count": 3
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 2
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "teams",
+          "issueCreate",
+          "issueRelationCreate"
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
+      }
+    },
+    {
+      "id": "test_41",
+      "name": "Fermentation Festival Coordination",
+      "prompt": "The community center is hosting the \"Living Cultures Festival\" from Feb 15-19. Create a new team called \"Fermentation Guild\" to coordinate this event. We need to track fermentation timelines carefully.\n\nFirst, add a new workflow state called \"Fermenting\" (color: #8B4513, type: started) to the new team - this will help us track items that are actively culturing.\n\nCreate a label called \"time-critical\" for tasks with strict biological deadlines.\n\nNow for the tricky scheduling: Kenji needs to start his 3-week miso base by January 25th at the latest for it to be ready for the festival tasting on Feb 18th. Create an issue titled \"Prepare Kenji miso base for Feb 18 tasting\" and assign it to Kenji with the time-critical label.\n\nHowever, Fatima needs access to the koji room first to inoculate spores for her amazake demonstration. Create another issue \"Inoculate koji spores for amazake - Fatima\" and set it up so that it blocks Kenji's miso preparation (they share the temperature-controlled koji room and can't run both processes simultaneously).\n\nFinally, add a comment to the miso task that says: \"CULTURE_READY_CHECK: Verify koji colonization complete before rice inoculation. Target temp 86F for 48hrs.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Fermentation Guild"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Fermenting"
+            },
+            "color": {
+              "eq": "#8B4513"
+            },
+            "type": {
+              "eq": "started"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "time-critical"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "miso base"
+            },
+            "assigneeId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "koji spores"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            },
+            "issueTitle": {
+              "contains": "koji spores"
+            },
+            "relatedIssueTitle": {
+              "contains": "miso"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "CULTURE_READY_CHECK"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "teams",
+          "teamCreate",
+          "users",
+          "workflowStateCreate",
+          "issueLabelCreate",
+          "issueCreate",
+          "issueRelationCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_42",
+      "name": "Seed Library Germination Audit",
+      "prompt": "The Seed Library team is conducting its quarterly germination audit. We need to evaluate each donor's success rate and take appropriate action.\n\nFirst, calculate Yuto's germination rate: count how many of his seed packets are in \"Sprouted\" status versus \"Failed\" status, then compute (sprouted / total) × 100. If his rate is 75% or higher AND he has at least 2 different varieties that sprouted, create a new label called \"Seed Guardian\" and apply it to all of his packets as recognition.\n\nNext, handle Nneka's special case: she donated exactly one packet and it's marked as priority 1 (rare heirloom). Regardless of whether it sprouted or failed, move this packet to \"Preserved Collection\" status—the library will attempt tissue culture propagation on rare genetics.\n\nFinally, evaluate Szymon's packets the same way. If his germination rate is below 60%, move all his non-sprouted packets to \"Needs Donor Review\" status and add a comment to each one that reads: \"GERMINATION_AUDIT: X sprouted / Y total = Z% - below 60% threshold\" where X, Y, Z are the actual calculated values.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "Seed Guardian"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": 4
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "SEED-5"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "34567890-bcde-f012-3456-789abcdef012"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "SEED-7"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "45678901-cdef-0123-4567-89abcdef0123"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "identifier": {
+              "eq": "SEED-8"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "45678901-cdef-0123-4567-89abcdef0123"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "GERMINATION_AUDIT:"
+            }
+          },
+          "expected_count": 2
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "issueLabels",
+          "workflowStates",
+          "issueLabelCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 11,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_43",
+      "name": "Forest Mycology Collective Expedition",
+      "prompt": "The Forest Mycology Collective is organizing their autumn foraging expedition. First, create a new team called \"Forest Mycology Collective\" to track all club activities.\n\nCreate a label called \"awaiting-spore-print\" for specimens that need laboratory analysis before identification can be confirmed.\n\nNow set up the expedition: create an issue titled \"Coastal Redwood Reserve Autumn Foray\" and assign it to Haruki as the expedition leader.\n\nDuring the planning phase, we're pre-logging anticipated specimen finds based on last year's survey. Create a specimen issue titled \"Specimen #1: Cantharellus formosus cluster - Sector 7\" and assign it to Priya for documentation. Create another specimen issue \"Specimen #2: Unknown Amanita - requires cross-reference\" and assign it to Dmitri, applying the \"awaiting-spore-print\" label.\n\nThe Amanita identification depends on comparing its spore print against the Cantharellus specimen first (they were found in the same microhabitat and we need to rule out look-alikes). Set up the Amanita issue as blocked by the Cantharellus issue.\n\nFinally, add a field note comment to the Cantharellus specimen that reads: \"FIELD_NOTE_REF: GPS coordinates 41.2132°N, found near fallen Douglas fir. Fruiting body golden-yellow, false gills present, apricot aroma confirmed.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Forest Mycology Collective"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "awaiting-spore-print"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Coastal Redwood Reserve"
+            },
+            "assigneeId": {
+              "eq": "f6a7b8c9-d0e1-2345-0123-789012345678"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Cantharellus formosus"
+            },
+            "assigneeId": {
+              "eq": "b8c9d0e1-f2a3-4567-2345-901234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Amanita"
+            },
+            "assigneeId": {
+              "eq": "a7b8c9d0-e1f2-3456-1234-890123456789"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            },
+            "issueTitle": {
+              "contains": "Cantharellus"
+            },
+            "relatedIssueTitle": {
+              "contains": "Amanita"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "FIELD_NOTE_REF:"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "teams",
+          "teamCreate",
+          "users",
+          "issueLabels",
+          "issueLabelCreate",
+          "issueCreate",
+          "issueUpdate",
+          "issueRelationCreate",
+          "commentCreate"
+        ],
+        "task_horizon": 11,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_44",
+      "name": "Mobile App Release - QA Bug Tracking",
+      "prompt": "The Mobile team is preparing for the v2.5 release and QA has reported some critical bugs that need to be tracked.\n\nFirst, create a new issue titled \"App crashes on login with special characters\" in the Mobile team. This is a high priority bug. Assign it to Marcus.\n\nCreate another issue titled \"Push notifications not working on Android 14\" in the same team and assign it to Aisha.\n\nMove both issues to \"In Progress\" status since the developers are starting work on them immediately.\n\nFinally, add a comment to the login crash issue with the following reproduction steps: \"REPRO_STEPS: 1. Open app 2. Enter username with & or % character 3. Tap login button 4. App crashes to home screen. Tested on iOS 17.2 and Android 14.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "crashes on login"
+            },
+            "assigneeId": {
+              "eq": "c9d0e1f2-a3b4-5678-3456-012345678901"
+            },
+            "stateId": {
+              "eq": "mob-state-inprogress-567890abcdef"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Push notifications"
+            },
+            "assigneeId": {
+              "eq": "d0e1f2a3-b4c5-6789-4567-123456789012"
+            },
+            "stateId": {
+              "eq": "mob-state-inprogress-567890abcdef"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "REPRO_STEPS:"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "teams",
+          "users",
+          "issueLabels",
+          "workflowStates",
+          "issueCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_45",
+      "name": "IT Support Ticket Workflow",
+      "prompt": "The IT Support team received a critical server outage report. Here's the workflow to execute:\n\nFirst, check if a label called \"hardware-failure\" exists. If it doesn't, create it.\n\nCreate a new issue titled \"Server rack B7 unresponsive - power supply failure\" in the IT Support team.\n\nApply the \"hardware-failure\" label to this ticket and assign it to Kofi for initial triage.\n\nAdd a comment to the ticket with this diagnostic entry: \"DIAG_LOG_001: Initial ping test failed. Checked physical connections. PSU indicator light is off. Replacement unit requested from inventory.\"\n\nNow update that same comment to append the following resolution note at the end: \" || UPDATE: PSU replaced at 14:32. Server responding. Monitoring for 24hrs.\"\n\nFinally, update the ticket to change the assignee from Kofi to Elena for post-incident verification, and move the ticket to \"In Review\" status.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "hardware-failure"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Server rack B7"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Server rack B7"
+            }
+          },
+          "expected_count": 1,
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "a3b4c5d6-e7f8-9012-7890-456789012345"
+              }
+            }
+          },
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "DIAG_LOG_001:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "|| UPDATE:"
+            }
+          },
+          "expected_count": 1,
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "|| UPDATE:"
+              }
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "teams",
+          "users",
+          "issueLabels",
+          "issueLabelCreate",
+          "issueCreate",
+          "issueUpdate",
+          "commentCreate",
+          "commentUpdate"
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_46",
+      "name": "Sprint Backlog Cleanup",
+      "prompt": "The Backend team is doing sprint cleanup. Here's what needs to happen:\n\nFirst, find the existing issue about \"database migration\" - we'll need its ID for a dependency.\n\nCreate a new parent issue titled \"Q1 Infrastructure Overhaul\" in the Backend team. This will be our tracking epic.\n\nCreate a sub-issue under that epic titled \"Upgrade Redis cluster to v7\" - make sure to set the parent relationship to the epic you just created.\n\nThe Redis upgrade cannot start until the database migration is complete. Set up the Redis issue as blocked by the database migration issue.\n\nNow, add a standup note comment to the Redis issue that says: \"STANDUP_NOTE: Jamal will start this after migration completes. ETA next Tuesday.\"\n\nWait - that comment was supposed to go on the migration ticket, not the Redis ticket. Delete that comment.\n\nFinally, assign the Redis sub-task to Jamal, and assign the parent epic \"Q1 Infrastructure Overhaul\" to Olga with High priority.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Q1 Infrastructure Overhaul"
+            },
+            "teamId": {
+              "eq": "c2d3e4f5-a6b7-8901-2345-6789abcdef01"
+            },
+            "assigneeId": {
+              "eq": "d6e7f8a9-b0c1-2345-0123-789012345678"
+            },
+            "priority": {
+              "eq": 2.0
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Redis cluster"
+            },
+            "assigneeId": {
+              "eq": "e7f8a9b0-c1d2-3456-1234-890123456789"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            },
+            "issueTitle": {
+              "contains": "database migration"
+            },
+            "relatedIssueTitle": {
+              "contains": "Redis"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "issueCreate",
+          "issueRelationCreate",
+          "commentCreate",
+          "commentDelete",
+          "issueUpdate"
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_47",
+      "name": "Product Launch Coordination",
+      "prompt": "The Launch Coordination team is preparing for the April 1st product release. We need to set up the critical path with proper dependencies and timing.\n\nFirst, create a new workflow state called \"Awaiting Dependency\" (color: #FFA500, type: started) - we'll use this for tasks that are time-blocked by predecessors.\n\nCreate three issues in the Launch Coordination team:\n\n1. \"Complete product documentation for v3.0 launch\" - This is the first domino. Yuki owns this. Due date must be March 22nd because legal needs 5 business days after this completes.\n\n2. \"Legal review of launch materials\" - Svetlana from Legal owns this. Due date is March 29th. This CANNOT start until documentation is complete - set up the blocking relationship.\n\n3. \"Publish marketing campaign assets\" - Kwame owns this. Due date is March 31st (press embargo lifts at 9am that day). This is blocked by legal review completion.\n\nSet up the dependency chain: Documentation blocks Legal Review, and Legal Review blocks Marketing.\n\nFinally, add a comment to the documentation issue that explains the timeline pressure: \"CRITICAL_PATH_NOTE: This task has ZERO slack. If documentation slips past March 22nd, legal review (5 business days) won't complete by March 29th, which blocks marketing from the March 31st embargo lift. Launch date is immovable.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Awaiting Dependency"
+            },
+            "color": {
+              "eq": "#FFA500"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "product documentation"
+            },
+            "teamId": {
+              "eq": "d3e4f5a6-b7c8-9012-3456-789abcdef012"
+            },
+            "assigneeId": {
+              "eq": "f8a9b0c1-d2e3-4567-2345-901234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Legal review"
+            },
+            "teamId": {
+              "eq": "d3e4f5a6-b7c8-9012-3456-789abcdef012"
+            },
+            "assigneeId": {
+              "eq": "b0c1d2e3-f4a5-6789-4567-123456789012"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "marketing campaign"
+            },
+            "teamId": {
+              "eq": "d3e4f5a6-b7c8-9012-3456-789abcdef012"
+            },
+            "assigneeId": {
+              "eq": "a9b0c1d2-e3f4-5678-3456-012345678901"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "CRITICAL_PATH_NOTE:"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 12,
+        "tools_required": [
+          "teams",
+          "users",
+          "workflowStates",
+          "workflowStateCreate",
+          "issueCreate",
+          "issueRelationCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_48",
+      "name": "Research Grant Application Pipeline",
+      "prompt": "The Research team needs to set up the grant application pipeline for the upcoming NIH submission deadline (June 15th).\n\nFirst, find the existing \"IRB Ethics Approval\" issue - this is our starting point and is already in progress.\n\nCreate three new issues in the Research team to complete the pipeline:\n\n1. \"Data Collection Protocol v2\" - Nadia will own this. It cannot begin until ethics approval is complete.\n\n2. \"Pilot Study Design - 50 participant cohort\" - Tomás will lead this. It depends on having the data collection protocol finalized.\n\n3. \"Grant Submission Draft - R01 mechanism\" - Chioma will compile the final submission. This is the last step and depends on pilot study results.\n\nSet up the blocking relationships to enforce the sequential workflow:\n- IRB Ethics Approval blocks Data Collection Protocol\n- Data Collection Protocol blocks Pilot Study Design\n- Pilot Study Design blocks Grant Submission Draft\n\nAfter setting up the dependencies, add a comment to the Grant Submission issue summarizing the critical path: \"PIPELINE_STATUS: This submission depends on completion chain: Ethics (in progress) → Data Protocol (Nadia) → Pilot Study (Tomás) → This draft. Target: June 15th deadline.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Data Collection Protocol"
+            },
+            "teamId": {
+              "eq": "e4f5a6b7-c8d9-0123-4567-89abcdef0123"
+            },
+            "assigneeId": {
+              "eq": "c1d2e3f4-a5b6-7890-5678-234567890123"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Pilot Study"
+            },
+            "teamId": {
+              "eq": "e4f5a6b7-c8d9-0123-4567-89abcdef0123"
+            },
+            "assigneeId": {
+              "eq": "d2e3f4a5-b6c7-8901-6789-345678901234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Grant Submission"
+            },
+            "teamId": {
+              "eq": "e4f5a6b7-c8d9-0123-4567-89abcdef0123"
+            },
+            "assigneeId": {
+              "eq": "e3f4a5b6-c7d8-9012-7890-456789012345"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 3
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "PIPELINE_STATUS:"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "issueCreate",
+          "issueRelationCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_49",
+      "name": "Film Post-Production Pipeline",
+      "prompt": "The Post-Production team is managing the editing pipeline for \"Project Aurora\". Here's what needs to happen:\n\nFirst, find the \"Master Edit Lock\" issue - this is the critical gate that must complete before downstream work can proceed.\n\nCount how many issues are directly blocked by \"Master Edit Lock\". You'll need this exact number for your report.\n\nCreate two new issues in the Post-Production team:\n1. \"Final Color Grade - DCI-P3 Mastering\" - Kenji will handle this. It cannot start until \"Color Grading Phase 1\" is complete.\n2. \"Audio Mix Master - Dolby Atmos\" - Amara will handle this. It depends on \"Sound Design Draft\" being finished.\n\nAdditionally, the colorist needs to lock the final look before audio can be mixed to picture. Set up \"Final Color Grade\" accordingly.\n\nAfter setting up all the new dependencies, add a comment to the \"Master Edit Lock\" issue with a dependency audit in this exact format:\n\n\"DEPENDENCY_AUDIT: Master Edit Lock directly blocks [X] downstream issues. New dependencies added: Final Color Grade (Kenji), Audio Mix Master (Amara). Cross-stream link established between color and audio pipelines.\"\n\nReplace [X] with the actual count of issues directly blocked by Master Edit Lock.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Final Color Grade"
+            },
+            "teamId": {
+              "eq": "f5a6b7c8-d9e0-1234-5678-9abcdef01234"
+            },
+            "assigneeId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Audio Mix Master"
+            },
+            "teamId": {
+              "eq": "f5a6b7c8-d9e0-1234-5678-9abcdef01234"
+            },
+            "assigneeId": {
+              "eq": "f4a5b6c7-d8e9-0123-8901-567890123456"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 3
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "DEPENDENCY_AUDIT:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "directly blocks 4"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "issueCreate",
+          "issueRelationCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_50",
+      "name": "Archaeological Dig Site Coordination - Deadlock Resolution",
+      "prompt": "The Archaeology team is managing the Season 3 excavation at Site Karnak-West. There's a workflow problem blocking progress.\n\nExamine the issues \"Artifact Photography Documentation\" and \"Lab Sample Analysis\". These two issues are in a dependency deadlock - each one is marked as blocking the other, which means neither can proceed.\n\nDetermine which blocking relationship is incorrect. The correct archaeological workflow is: Photography must complete BEFORE samples can go to the lab (you need photos of artifacts in situ before extraction for the record). The reverse relationship (lab blocking photography) was added by mistake and makes no sense.\n\nDelete the incorrect blocking relationship to resolve the deadlock.\n\nNow extend the workflow. Create a new issue called \"Final Site Report Compilation - Season 3\" in the Archaeology team. This report cannot be written until BOTH the photography documentation AND the lab analysis are complete. Set up both as blockers for the report.\n\nAssign the work: Ximena handles photography, Okonkwo handles lab analysis, and Søren compiles the final report.\n\nMove the photography issue to \"In Progress\" now that it's unblocked.\n\nAfter fixing everything, add a comment to the \"Lab Sample Analysis\" issue documenting the fix: \"WORKFLOW_FIX: Removed erroneous blocking relation where Lab was blocking Photography. Correct flow is Photography → Lab (need in-situ photos before extraction). Deadlock resolved. Current chain: Photography → Lab Analysis → Final Report.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issue_relations",
+          "where": {
+            "id": {
+              "eq": "rel-lab-blocks-photo-002"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "from": {
+                "exists": false
+              },
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Final Site Report"
+            },
+            "teamId": {
+              "eq": "a6b7c8d9-e0f1-2345-6789-0abcdef12345"
+            },
+            "assigneeId": {
+              "eq": "c7d8e9f0-a1b2-3456-1234-890123456789"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "arch-issue-photography-001"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "arch-state-inprogress-2345-cdef01"
+              }
+            },
+            "assigneeId": {
+              "to": {
+                "eq": "b6c7d8e9-f0a1-2345-0123-789012345678"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "arch-issue-lab-analysis-002"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "d4e5f6a7-b8c9-0123-def0-456789012345"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "WORKFLOW_FIX:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Deadlock resolved"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "workflowStates",
+          "issueRelationDelete",
+          "issueCreate",
+          "issueRelationCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 13,
+        "operation_type": "search+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_51",
+      "name": "Amateur Astronomy Club - Celestial Event Planning",
+      "prompt": "The Stargazers astronomy club needs to set up their spring celestial events schedule.\n\nCreate a new issue in the Stargazers team titled \"Lyrid Meteor Shower Viewing Party - Peak Night April 22nd\" with description \"Annual club gathering at Dark Sky Preserve. Expected rate: 18 meteors/hour. Radiant rises after midnight in Perseus.\"\n\nAssign this event to Priya as the event coordinator.\n\nApply the \"public-event\" label to this issue since non-members are welcome to attend.\n\nAdd a comment with the viewing logistics: \"OBSERVATION_DETAILS: Meet at Ridgeline Observatory parking lot at 10pm. Bring red flashlights only - no white light. Bogdan will set up the 12-inch Dobsonian for Saturn viewing while we wait for the radiant to rise. Best meteor photography settings: ISO 3200, f/2.8, 20-second exposures pointed northeast.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Lyrid Meteor Shower"
+            },
+            "teamId": {
+              "eq": "b7c8d9e0-f1a2-3456-7890-abcdef123456"
+            },
+            "assigneeId": {
+              "eq": "b8c9d0e1-f2a3-4567-2345-901234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "April 22"
+            },
+            "description": {
+              "contains": "Dark Sky Preserve"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "18 meteors/hour"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_label_issue_association",
+          "where": {},
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "OBSERVATION_DETAILS:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Ridgeline Observatory"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "12-inch Dobsonian"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "teams",
+          "issueLabels",
+          "issueCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_52",
+      "name": "Pottery Studio - Kiln Firing Schedule",
+      "prompt": "The Clay & Fire pottery studio tracks their kiln schedule. Help update the firing queue.\n\nFirst, find the existing issues \"Fatou's Celadon Vase\" and \"Stoneware Bowl Set\" in the Ceramics team.\n\nThe celadon vase is ready to go in the kiln - move it to \"Firing\" status.\n\nThe stoneware bowls have finished their cone 10 firing and need to cool down - move them to \"Cooling\" status.\n\nCreate a new label called \"raku-firing\" for pieces that will use the rapid-cooling technique (we'll apply it to future items).\n\nFinally, add a kiln log comment to the celadon vase issue: \"KILN_LOG: Loaded into kiln #2 at 9:15am. Target: Cone 9 oxidation (~2300°F). Fatou requested slow cooling for crystal development. Do not open kiln door until temp drops below 400°F.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "cer-issue-vase-001"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "cer-state-firing-1234-bcdef012"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "cer-issue-bowls-002"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "cer-state-cooling-2345-cdef0123"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "name": {
+              "eq": "raku-firing"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "KILN_LOG:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Cone 9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "2300"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "crystal development"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "issues",
+          "workflowStates",
+          "issueUpdate",
+          "issueLabelCreate",
+          "commentCreate"
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_53",
+      "name": "Community Garden Plot Management",
+      "prompt": "The Garden Plots team manages our community garden cooperative. It's spring reassignment season and we need to shuffle some plots around.\n\nFirst, find the existing plot issues: \"Plot A7 - Tomatoes\", \"Plot B3 - Herbs\", and \"Plot C1 - Squash\".\n\nLook up gardeners Ines and Rashida - they're involved in this season's reassignments.\n\nCreate a new tracking issue titled \"Spring 2025 Plot Reassignment Tracker\" in the Garden Plots team with description \"Documenting all plot changes for the growing season. Reassignments finalized at March board meeting.\"\n\nNow process the reassignments:\n\n1. Plot A7 (tomatoes) was abandoned when Marcus moved away. Reassign it to Ines and change its status to \"Active\" since she's starting immediately.\n\n2. Ines and Rashida agreed to swap their herb plots. Reassign \"Plot B3 - Herbs\" from Ines to Rashida. Keep the current status unchanged.\n\n3. The squash plot (C1) owner has left the cooperative entirely. Move it to \"Dormant\" status but don't assign anyone yet - we'll offer it at the next meeting.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "Spring 2025"
+            },
+            "teamId": {
+              "eq": "d9e0f1a2-b3c4-5678-9012-cdef01234567"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "gp-issue-a7-tomatoes-001"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "f0a1b2c3-d4e5-6789-4567-123456789012"
+              }
+            },
+            "stateId": {
+              "to": {
+                "eq": "gp-state-active-0003-cdef0123"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "gp-issue-b3-herbs-002"
+            }
+          },
+          "expected_changes": {
+            "assigneeId": {
+              "to": {
+                "eq": "a1b2c3d4-e5f6-7890-5678-234567890123"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "gp-issue-c1-squash-003"
+            }
+          },
+          "expected_changes": {
+            "stateId": {
+              "to": {
+                "eq": "gp-state-dormant-0001-abcdef01"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "teams",
+          "issues",
+          "users",
+          "issueCreate",
+          "issueUpdate"
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_54",
+      "name": "Board Game Café - Tournament Rescheduling Crisis",
+      "prompt": "The Meeple & Brew board game café has a scheduling emergency. The venue for our Catan Regional Championship double-booked us, so we need to reschedule the entire tournament pipeline.\n\nFind the three tournament issues: \"Catan Regional Championship - Spring 2025\", \"Qualifying Round - Top 16 Bracket\", and \"Tournament Registration Deadline\".\n\nThe championship was originally March 15th but must move to March 23rd (8-day delay).\n\nHere's the critical part - the dates are interdependent:\n- The Qualifying Round must happen exactly 7 days before the Championship\n- The Registration Deadline must close exactly 5 days before the Qualifying Round\n\nCalculate and update all three due dates accordingly.\n\nAlso, Yuto was organizing the championship but has a work trip conflict on the new date. Reassign the championship to Adaeze. Keep Henrik on the qualifying round.\n\nAfter updating all dates, add a comment to the championship issue documenting the changes:\n\n\"RESCHEDULE_AUDIT: Venue conflict forced 8-day delay. New timeline calculated:\n- Registration closes: March 11th (was March 3rd)\n- Qualifiers: March 16th (was March 8th)\n- Championship: March 23rd (was March 15th)\nOrganizer handoff: Yuto → Adaeze due to travel conflict.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-championship-001"
+            }
+          },
+          "expected_changes": {
+            "dueDate": {
+              "to": {
+                "eq": "2025-03-23"
+              }
+            },
+            "assigneeId": {
+              "to": {
+                "eq": "d4e5f6a7-b8c9-0123-8901-567890123456"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-qualifying-002"
+            }
+          },
+          "expected_changes": {
+            "dueDate": {
+              "to": {
+                "eq": "2025-03-16"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-registration-003"
+            }
+          },
+          "expected_changes": {
+            "dueDate": {
+              "to": {
+                "eq": "2025-03-11"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "RESCHEDULE_AUDIT:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Yuto"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Adaeze"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "issues",
+          "users",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_55",
+      "name": "Quarterly Resource Allocation Review",
+      "prompt": "The PMO is conducting a Q1 resource allocation review. Here's what needs to happen:\n\nFirst, look at all teams and count how many members each team has.\n\nFind the team with the most members - this is our \"fully staffed\" benchmark.\n\nFor every team that has FEWER members than the benchmark team, create a new issue in that team titled \"Q1 Staffing Request - Need [X] additional team members\" where [X] is the exact difference between that team's member count and the benchmark team's count. Set priority to High for these issues.\n\nAlso, there's a misrouted issue: \"API Documentation Update\" was accidentally created in the Design team but belongs in Engineering. Move it to the Engineering team.\n\nFinally, add a comment to any issue in the Engineering team summarizing the analysis:\n\n\"RESOURCE_AUDIT: Q1 staffing review complete. Engineering has [MAX] members (benchmark). Staffing gaps identified: Product needs [A], Design needs [B], QA needs [C]. Total headcount gap across org: [TOTAL]. Staffing request issues created in all understaffed teams.\"\n\nReplace the bracketed values with the actual numbers from your analysis. Note: [TOTAL] should be the sum of headcount gaps from ALL understaffed teams (not just Product, Design, and QA).",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "res-issue-api-docs-001"
+            }
+          },
+          "expected_changes": {
+            "teamId": {
+              "to": {
+                "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "cdb85540-5065-4346-8aef-ae2b72d6e940"
+            },
+            "title": {
+              "contains": "Staffing Request"
+            },
+            "priority": {
+              "eq": 2
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "f1a2b3c4-d5e6-7890-1234-567890abcdef"
+            },
+            "title": {
+              "contains": "Staffing Request"
+            },
+            "priority": {
+              "eq": 2
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+            },
+            "title": {
+              "contains": "Staffing Request"
+            },
+            "priority": {
+              "eq": 2
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "RESOURCE_AUDIT:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "7 members"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Product needs 4"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Design needs 5"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "QA needs 3"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Total headcount gap across org: 28"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "teams",
+          "issues",
+          "issueUpdate",
+          "issueCreate",
+          "commentCreate"
+        ],
+        "requires_aggregation": true,
+        "requires_max_finding": true,
+        "requires_arithmetic": true,
+        "task_horizon": 12,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "high"
+      }
+    },
+    {
+      "id": "test_56",
+      "name": "Community Guidelines Enforcement - Profanity Audit",
+      "prompt": "The moderation team has flagged the word \"YOLO_BAD\" as inappropriate for our workspace. We need to audit and address any comments containing this term.\n\nFirst, search through all comments to find any that contain \"YOLO_BAD\". Count how many comments contain this word and note their IDs.\n\nCreate a new issue in the Moderation team titled \"Content Cleanup Required - YOLO_BAD audit\" assigned to Saoirse. In the description, include:\n- The exact count of comments found containing \"YOLO_BAD\"\n- A list of the comment IDs that need to be reviewed\n- Use this format: \"AUDIT_RESULT: Found [X] comments containing flagged content. Comment IDs: [id1, id2, ...]\"\n\nFor each issue that has a comment containing \"YOLO_BAD\", add a warning comment: \"MODERATION_NOTICE: A comment on this issue contains content that violates community guidelines. Please review and edit your comment to remove inappropriate language. Ref: YOLO_BAD audit.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "mod-team-001"
+            },
+            "title": {
+              "contains": "Content Cleanup"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "YOLO_BAD"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "assigneeId": {
+              "eq": "mod-user-saoirse-001"
+            },
+            "title": {
+              "contains": "Content Cleanup"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "AUDIT_RESULT:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "Found 3 comments"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "MODERATION_NOTICE:"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "mod-issue-darkmode-001"
+            },
+            "body": {
+              "contains": "MODERATION_NOTICE:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "mod-issue-checkout-001"
+            },
+            "body": {
+              "contains": "MODERATION_NOTICE:"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "comments",
+          "users",
+          "issueCreate",
+          "commentCreate"
+        ],
+        "requires_counting": true,
+        "requires_id_collection": true,
+        "expected_count": 3,
+        "affected_issues": 2,
+        "task_horizon": 11,
+        "operation_type": "search+R+C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_57",
+      "name": "Competitive Pigeon Racing Club - Storm Emergency Protocol",
+      "prompt": "The Wing & Wind pigeon racing club has an emergency. A fast-moving storm system is approaching the race corridor and we need to execute safety protocols.\n\nFirst, find all birds currently marked as \"In Flight\" in the Racing Operations team - these are the ones at risk.\n\nCreate an emergency coordination issue in the Racing Operations team titled \"WEATHER ALERT: Storm cell approaching sector 7 - All birds at risk\" with description \"NWS severe thunderstorm warning issued 14:32 UTC. Wind gusts to 60mph expected. Initiating emergency diversion protocol.\"\n\nFind the bird tracking issue for \"Stormchaser\" (Liora's champion racer, band #2847). Update it to add this to the description: \"DIVERSION ACTIVE: Rerouted to backup loft at coordinates 41.8781° N, 87.6298° W. Amadi's loft confirmed ready to receive.\"\n\nFinally, add a weather advisory comment to the emergency coordination issue:\n\"WEATHER_LOG: Storm tracking update at 14:45 UTC. Cell moving NNE at 35mph. ETA to race corridor: 47 minutes. All handlers notified via SMS. GPS tracking shows 3 birds diverted successfully. Amadi confirming visual on Stormchaser approaching backup loft.\"",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "race-team-001"
+            },
+            "title": {
+              "contains": "WEATHER ALERT"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "title": {
+              "contains": "sector 7"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "NWS"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "60mph"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "race-issue-stormchaser-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "DIVERSION ACTIVE"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "race-issue-stormchaser-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "41.8781"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "WEATHER_LOG:"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "14:45 UTC"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "Amadi confirming"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "WEATHER_LOG:"
+            },
+            "issueId": {
+              "eq": "race-issue-stormchaser-001"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "race-issue-stormchaser-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "87.6298"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "issues",
+          "issueCreate",
+          "issueUpdate",
+          "commentCreate"
+        ],
+        "requires_state_filtering": true,
+        "expected_in_flight_birds": 3,
+        "coordinate_precision_test": true,
+        "task_horizon": 12,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
+      }
+    }
+  ]
+}

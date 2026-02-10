@@ -1,0 +1,514 @@
+"Code","Industry","Employed_census_usually_resident_population_count_aged_15_years_and_over"
+"A011100","Nursery Production (Under Cover)",1191
+"A011200","Nursery Production (Outdoors)",1638
+"A011300","Turf Growing",66
+"A011400","Floriculture Production (Under Cover)",834
+"A011500","Floriculture Production (Outdoors)",132
+"A012100","Mushroom Growing",621
+"A012200","Vegetable Growing (Under Cover)",1326
+"A012300","Vegetable Growing (Outdoors)",4302
+"A013100","Grape Growing",3543
+"A013200","Kiwifruit Growing",2769
+"A013300","Berry Fruit Growing",1116
+"A013400","Apple and Pear Growing",4677
+"A013500","Stone Fruit Growing",600
+"A013600","Citrus Fruit Growing",300
+"A013700","Olive Growing",177
+"A013900","Other Fruit and Tree Nut Growing",2010
+"A014100","Sheep Farming (Specialised)",6813
+"A014200","Beef Cattle Farming (Specialised)",9615
+"A014300","Beef Cattle Feedlots (Specialised)",0
+"A014400","Sheep-Beef Cattle Farming",13311
+"A014500","Grain-Sheep or Grain-Beef Cattle Farming",2382
+"A014600","Rice Growing",0
+"A014900","Other Grain Growing",981
+"A015100","Sugar Cane Growing",0
+"A015200","Cotton Growing",0
+"A015900","Other Crop Growing nec",1380
+"A016000","Dairy Cattle Farming",39264
+"A017100","Poultry Farming (Meat)",1143
+"A017200","Poultry Farming (Eggs)",1179
+"A018000","Deer Farming",813
+"A019100","Horse Farming",1167
+"A019200","Pig Farming",447
+"A019300","Beekeeping",2634
+"A019900","Other Livestock Farming nec",1701
+"A020100","Longline and Rack (Offshore) Aquaculture",528
+"A020200","Caged (Offshore) Aquaculture",87
+"A020300","Onshore Aquaculture",258
+"A030100","Forestry",1740
+"A030200","Logging",4380
+"A041100","Rock Lobster and Crab Potting",306
+"A041200","Prawn Fishing",9
+"A041300","Line Fishing",435
+"A041400","Fish Trawling, Seining and Netting",1161
+"A041900","Other Fishing",966
+"A042000","Hunting and Trapping",177
+"A051000","Forestry Support Services",2382
+"A052100","Cotton Ginning",0
+"A052200","Shearing Services",3222
+"A052900","Other Agriculture and Fishing Support Services",19344
+"totalStated","total",2445141
+"B060000","Coal Mining",549
+"B070000","Oil and Gas Extraction",1149
+"B080100","Iron Ore Mining",168
+"B080200","Bauxite Mining",0
+"B080300","Copper Ore Mining",0
+"B080400","Gold Ore Mining",1119
+"B080500","Mineral Sand Mining",33
+"B080600","Nickel Ore Mining",0
+"B080700","Silver-Lead-Zinc Ore Mining",0
+"B080900","Other Metal Ore Mining",12
+"B091100","Gravel and Sand Quarrying",735
+"B091900","Other Construction Material Mining",1317
+"B099000","Other Non-Metallic Mineral Mining and Quarrying",138
+"B101100","Petroleum Exploration",78
+"B101200","Mineral Exploration",75
+"B109000","Other Mining Support Services",681
+"C111100","Meat Processing",20481
+"C111200","Poultry Processing",3495
+"C111300","Cured Meat and Smallgoods Manufacturing",1665
+"C112000","Seafood Processing",4014
+"C113100","Milk and Cream Processing",2016
+"C113200","Ice Cream Manufacturing",624
+"C113300","Cheese and Other Dairy Product Manufacturing",10287
+"C114000","Fruit and Vegetable Processing",3585
+"C115000","Oil and Fat Manufacturing",486
+"C116100","Grain Mill Product Manufacturing",279
+"C116200","Cereal, Pasta and Baking Mix Manufacturing",624
+"C117100","Bread Manufacturing (Factory based)",2514
+"C117200","Cake and Pastry Manufacturing (Factory based)",1527
+"C117300","Biscuit Manufacturing (Factory based)",828
+"C117400","Bakery Product Manufacturing (Non-factory based)",6243
+"C118100","Sugar Manufacturing",183
+"C118200","Confectionery Manufacturing",1893
+"C119100","Potato, Corn and Other Crisp Manufacturing",336
+"C119200","Prepared Animal and Bird Feed Manufacturing",1689
+"C119900","Other Food Product Manufacturing nec",9033
+"C121100","Soft Drink, Cordial and Syrup Manufacturing",1530
+"C121200","Beer Manufacturing",1632
+"C121300","Spirit Manufacturing",402
+"C121400","Wine and Other Alcoholic Beverage Manufacturing",4239
+"C122000","Cigarette and Tobacco Product Manufacturing",204
+"C131100","Wool Scouring",210
+"C131200","Natural Textile Manufacturing",720
+"C131300","Synthetic Fibre Textile Manufacturing",99
+"C132000","Leather Tanning, Fur Dressing and Leather Product Manufacturing",1401
+"C133100","Textile Floor Covering Manufacturing",765
+"C133200","Rope, Cordage and Twine Manufacturing",135
+"C133300","Cut and Sewn Textile Product Manufacturing",2241
+"C133400","Textile Finishing and Other Textile Product Manufacturing",795
+"C134000","Knitted Product Manufacturing",666
+"C135100","Clothing Manufacturing",2889
+"C135200","Footwear Manufacturing",144
+"C141100","Log Sawmilling",5733
+"C141200","Wood Chipping",51
+"C141300","Timber Resawing and Dressing",1596
+"C149100","Prefabricated Wooden Building Manufacturing",288
+"C149200","Wooden Structural Fitting and Component Manufacturing",6564
+"C149300","Veneer and Plywood Manufacturing",771
+"C149400","Reconstituted Wood Product Manufacturing",945
+"C149900","Other Wood Product Manufacturing nec",2094
+"C151000","Pulp, Paper and Paperboard Manufacturing",2013
+"C152100","Corrugated Paperboard and Paperboard Container Manufacturing",1605
+"C152200","Paper Bag Manufacturing",72
+"C152300","Paper Stationery Manufacturing",240
+"C152400","Sanitary Paper Product Manufacturing",303
+"C152900","Other Converted Paper Product Manufacturing",486
+"C161100","Printing",7614
+"C161200","Printing Support Services",804
+"C162000","Reproduction of Recorded Media",81
+"C170100","Petroleum Refining and Petroleum Fuel Manufacturing",1029
+"C170900","Other Petroleum and Coal Product Manufacturing",246
+"C181100","Industrial Gas Manufacturing",177
+"C181200","Basic Organic Chemical Manufacturing",507
+"C181300","Basic Inorganic Chemical Manufacturing",306
+"C182100","Synthetic Resin and Synthetic Rubber Manufacturing",537
+"C182900","Other Basic Polymer Manufacturing",354
+"C183100","Fertiliser Manufacturing",1119
+"C183200","Pesticide Manufacturing",201
+"C184100","Human Pharmaceutical and Medicinal Product Manufacturing",1929
+"C184200","Veterinary Pharmaceutical and Medicinal Product Manufacturing",843
+"C185100","Cleaning Compound Manufacturing",726
+"C185200","Cosmetic and Toiletry Preparation Manufacturing",807
+"C189100","Photographic Chemical Product Manufacturing",0
+"C189200","Explosives Manufacturing",60
+"C189900","Other Basic Chemical Product Manufacturing nec",348
+"C191100","Polymer Film and Sheet Packaging Material Manufacturing",1551
+"C191200","Rigid and Semi-Rigid Polymer Product Manufacturing",4416
+"C191300","Polymer Foam Product Manufacturing",318
+"C191400","Tyre Manufacturing",231
+"C191500","Adhesive Manufacturing",159
+"C191600","Paint and Coatings Manufacturing",1290
+"C191900","Other Polymer Product Manufacturing",3021
+"C192000","Natural Rubber Product Manufacturing",561
+"C201000","Glass and Glass Product Manufacturing",1728
+"C202100","Clay Brick Manufacturing",18
+"C202900","Other Ceramic Product Manufacturing",588
+"C203100","Cement and Lime Manufacturing",459
+"C203200","Plaster Product Manufacturing",393
+"C203300","Ready-Mixed Concrete Manufacturing",2064
+"C203400","Concrete Product Manufacturing",2262
+"C209000","Other Non-Metallic Mineral Product Manufacturing",903
+"C211000","Iron Smelting and Steel Manufacturing",2016
+"C212100","Iron and Steel Casting",270
+"C212200","Steel Pipe and Tube Manufacturing",150
+"C213100","Alumina Production",0
+"C213200","Aluminium Smelting",630
+"C213300","Copper, Silver, Lead and Zinc Smelting and Refining",0
+"C213900","Other Basic Non-Ferrous Metal Manufacturing",228
+"C214100","Non-Ferrous Metal Casting",228
+"C214200","Aluminium Rolling, Drawing, Extruding",930
+"C214900","Other Basic Non-Ferrous Metal Product Manufacturing",60
+"C221000","Iron and Steel Forging",156
+"C222100","Structural Steel Fabricating",4524
+"C222200","Prefabricated Metal Building Manufacturing",387
+"C222300","Architectural Aluminium Product Manufacturing",5205
+"C222400","Metal Roof and Guttering Manufacturing (except Aluminium)",1146
+"C222900","Other Structural Metal Product Manufacturing",1815
+"C223100","Boiler, Tank and Other Heavy Gauge Metal Container Manufacturing",354
+"C223900","Other Metal Container Manufacturing",669
+"C224000","Other Sheet Metal Product Manufacturing",3141
+"C229100","Spring and Wire Product Manufacturing",873
+"C229200","Nut, Bolt, Screw and Rivet Manufacturing",117
+"C229300","Metal Coating and Finishing",1590
+"C229900","Other Fabricated Metal Product Manufacturing nec",6912
+"C231100","Motor Vehicle Manufacturing",294
+"C231200","Motor Vehicle Body and Trailer Manufacturing",2652
+"C231300","Automotive Electrical Component Manufacturing",96
+"C231900","Other Motor Vehicle Parts Manufacturing",1707
+"C239100","Shipbuilding and Repair Services",504
+"C239200","Boatbuilding and Repair Services",2973
+"C239300","Railway Rolling Stock Manufacturing and Repair Services",615
+"C239400","Aircraft Manufacturing and Repair Services",4395
+"C239900","Other Transport Equipment Manufacturing nec",162
+"C241100","Photographic, Optical and Ophthalmic Equipment Manufacturing",189
+"C241200","Medical and Surgical Equipment Manufacturing",3384
+"C241900","Other Professional and Scientific Equipment Manufacturing",747
+"C242100","Computer and Electronic Office Equipment Manufacturing",102
+"C242200","Communication Equipment Manufacturing",810
+"C242900","Other Electronic Equipment Manufacturing",2781
+"C243100","Electric Cable and Wire Manufacturing",348
+"C243200","Electric Lighting Equipment Manufacturing",360
+"C243900","Other Electrical Equipment Manufacturing",1878
+"C244100","Whiteware Appliance Manufacturing",861
+"C244900","Other Domestic Appliance Manufacturing",564
+"C245100","Pumps and Compressor Manufacturing",267
+"C245200","Fixed Space Heating, Cooling and Ventilation Equipment Manufacturing",963
+"C246100","Agricultural Machinery and Equipment Manufacturing",2397
+"C246200","Mining and Construction Machinery Manufacturing",324
+"C246300","Machine Tool and Parts Manufacturing",1065
+"C246900","Other Specialised Machinery and Equipment Manufacturing",1260
+"C249100","Lifting and Material Handling Equipment Manufacturing",690
+"C249900","Other Machinery and Equipment Manufacturing nec",12483
+"C251100","Wooden Furniture and Upholstered Seat Manufacturing",4521
+"C251200","Metal Furniture Manufacturing",594
+"C251300","Mattress Manufacturing",384
+"C251900","Other Furniture Manufacturing",849
+"C259100","Jewellery and Silverware Manufacturing",1077
+"C259200","Toy, Sporting and Recreational Product Manufacturing",564
+"C259900","Other Manufacturing nec",3867
+"D261100","Fossil Fuel Electricity Generation",696
+"D261200","Hydro-electricity Generation",327
+"D261900","Other Electricity Generation",474
+"D262000","Electricity Transmission",930
+"D263000","Electricity Distribution",4005
+"D264000","On Selling Electricity and Electricity Market Operation",2250
+"D270000","Gas Supply",657
+"D281100","Water Supply",1479
+"D281200","Sewerage and Drainage Services",603
+"D291100","Solid Waste Collection Services",2451
+"D291900","Other Waste Collection Services",291
+"D292100","Waste Treatment and Disposal Services",2109
+"D292200","Waste Remediation and Materials Recovery Services",1734
+"E301100","House Construction",51804
+"E301900","Other Residential Building Construction",3267
+"E302000","Non-Residential Building Construction",12072
+"E310100","Road and Bridge Construction",16698
+"E310900","Other Heavy and Civil Engineering Construction",20121
+"E321100","Land Development and Subdivision",939
+"E321200","Site Preparation Services",11214
+"E322100","Concreting Services",4848
+"E322200","Bricklaying Services",2454
+"E322300","Roofing Services",4419
+"E322400","Structural Steel Erection Services",720
+"E323100","Plumbing Services",13755
+"E323200","Electrical Services",21474
+"E323300","Air Conditioning and Heating Services",6384
+"E323400","Fire and Security Alarm Installation Services",3891
+"E323900","Other Building Installation Services",3237
+"E324100","Plastering and Ceiling Services",4953
+"E324200","Carpentry Services",3480
+"E324300","Tiling and Carpeting Services",4962
+"E324400","Painting and Decorating Services",12948
+"E324500","Glazing Services",2325
+"E329100","Landscape Construction Services",8838
+"E329200","Hire of Construction Machinery with Operator",1305
+"E329900","Other Construction Services nec",10053
+"F331100","Wool Wholesaling",366
+"F331200","Cereal Grain Wholesaling",165
+"F331900","Other Agricultural Product Wholesaling",4527
+"F332100","Petroleum Product Wholesaling",1521
+"F332200","Metal and Mineral Wholesaling",3075
+"F332300","Industrial and Agricultural Chemical Product Wholesaling",2865
+"F333100","Timber Wholesaling",1632
+"F333200","Plumbing Goods Wholesaling",1056
+"F333900","Other Hardware Goods Wholesaling",8451
+"F341100","Agricultural and Construction Machinery Wholesaling",4785
+"F341900","Other Specialised Industrial Machinery and Equipment Wholesaling",6534
+"F349100","Professional and Scientific Goods Wholesaling",2829
+"F349200","Computer and Computer Peripheral Wholesaling",2802
+"F349300","Telecommunication Goods Wholesaling",1278
+"F349400","Other Electrical and Electronic Goods Wholesaling",10083
+"F349900","Other Machinery and Equipment Wholesaling nec",2484
+"F350100","Car Wholesaling",1872
+"F350200","Commercial Vehicle Wholesaling",957
+"F350300","Trailer and Other Motor Vehicle Wholesaling",234
+"F350400","Motor Vehicle New Parts Wholesaling",4242
+"F350500","Motor Vehicle Dismantling and Used Parts Wholesaling",1512
+"F360100","General Line Grocery Wholesaling",6630
+"F360200","Meat, Poultry and Smallgoods Wholesaling",3399
+"F360300","Dairy Produce Wholesaling",1356
+"F360400","Fish and Seafood Wholesaling",798
+"F360500","Fruit and Vegetable Wholesaling",3453
+"F360600","Liquor and Tobacco Product Wholesaling",2682
+"F360900","Other Grocery Wholesaling",8073
+"F371100","Textile Product Wholesaling",1431
+"F371200","Clothing and Footwear Wholesaling",2616
+"F372000","Pharmaceutical and Toiletry Goods Wholesaling",4773
+"F373100","Furniture and Floor Covering Wholesaling",1845
+"F373200","Jewellery and Watch Wholesaling",285
+"F373300","Kitchen and Diningware Wholesaling",552
+"F373400","Toy and Sporting Goods Wholesaling",1152
+"F373500","Book and Magazine Wholesaling",609
+"F373600","Paper Product Wholesaling",2502
+"F373900","Other Goods Wholesaling nec",9192
+"F380000","Commission-Based Wholesaling",5310
+"G391100","Car Retailing",12804
+"G391200","Motor Cycle Retailing",1494
+"G391300","Trailer and Other Motor Vehicle Retailing",198
+"G392100","Motor Vehicle Parts Retailing",1539
+"G392200","Tyre Retailing",3168
+"G400000","Fuel Retailing",8631
+"G411000","Supermarket and Grocery Stores",57609
+"G412100","Fresh Meat, Fish and Poultry Retailing",2985
+"G412200","Fruit and Vegetable Retailing",1905
+"G412300","Liquor Retailing",3504
+"G412900","Other Specialised Food Retailing",3558
+"G421100","Furniture Retailing",3915
+"G421200","Floor Coverings Retailing",2349
+"G421300","Houseware Retailing",1110
+"G421400","Manchester and Other Textile Goods Retailing",2085
+"G422100","Electrical, Electronic and Gas Appliance Retailing",4605
+"G422200","Computer and Computer Peripheral Retailing",1569
+"G422900","Other Electrical and Electronic Goods Retailing",1026
+"G423100","Hardware and Building Supplies Retailing",17781
+"G423200","Garden Supplies Retailing",2256
+"G424100","Sport and Camping Equipment Retailing",4611
+"G424200","Entertainment Media Retailing",507
+"G424300","Toy and Game Retailing",423
+"G424400","Newspaper and Book Retailing",2067
+"G424500","Marine Equipment Retailing",1101
+"G425100","Clothing Retailing",15252
+"G425200","Footwear Retailing",2580
+"G425300","Watch and Jewellery Retailing",2403
+"G425900","Other Personal Accessory Retailing",609
+"G426000","Department Stores",12474
+"G427100","Pharmaceutical, Cosmetic and Toiletry Goods Retailing",10386
+"G427200","Stationery Goods Retailing",2046
+"G427300","Antique and Used Goods Retailing",1941
+"G427400","Flower Retailing",1284
+"G427900","Other Store-Based Retailing nec",23013
+"G431000","Non-Store Retailing",4056
+"G432000","Retail Commission-Based Buying and/or Selling",288
+"H440000","Accommodation",37587
+"H451100","Cafes and Restaurants",67608
+"H451200","Takeaway Food Services",27105
+"H451300","Catering Services",9516
+"H452000","Pubs, Taverns and Bars",13281
+"H453000","Clubs (Hospitality)",4656
+"I461000","Road Freight Transport",34134
+"I462100","Interurban and Rural Bus Transport",1860
+"I462200","Urban Bus Transport (Including Tramway)",6267
+"I462300","Taxi and Other Road Transport",4542
+"I471000","Rail Freight Transport",1176
+"I472000","Rail Passenger Transport",1494
+"I481000","Water Freight Transport",1080
+"I482000","Water Passenger Transport",1059
+"I490000","Air and Space Transport",9423
+"I501000","Scenic and Sightseeing Transport",2214
+"I502100","Pipeline Transport",168
+"I502900","Other Transport nec",1098
+"I510100","Postal Services",6336
+"I510200","Courier Pick-up and Delivery Services",7209
+"I521100","Stevedoring Services",1608
+"I521200","Port and Water Transport Terminal Operations",3306
+"I521900","Other Water Transport Support Services",780
+"I522000","Airport Operations and Other Air Transport Support Services",3849
+"I529100","Customs Agency Services",729
+"I529200","Freight Forwarding Services",6006
+"I529900","Other Transport Support Services nec",4266
+"I530100","Grain Storage Services",15
+"I530900","Other Warehousing and Storage Services",6531
+"J541100","Newspaper Publishing",3729
+"J541200","Magazine and Other Periodical Publishing",1455
+"J541300","Book Publishing",795
+"J541400","Directory and Mailing List Publishing",36
+"J541900","Other Publishing (except Software, Music and Internet)",234
+"J542000","Software Publishing",774
+"J551100","Motion Picture and Video Production",3585
+"J551200","Motion Picture and Video Distribution",129
+"J551300","Motion Picture Exhibition",1683
+"J551400","Post-production Services and Other Motion Picture and Video Activities",2370
+"J552100","Music Publishing",57
+"J552200","Music and Other Sound Recording Activities",207
+"J561000","Radio Broadcasting",1614
+"J562100","Free-to-Air Television Broadcasting",1518
+"J562200","Cable and Other Subscription Broadcasting",813
+"J570000","Internet Publishing and Broadcasting",288
+"J580100","Wired Telecommunications Network Operation",6906
+"J580200","Other Telecommunications Network Operation",3636
+"J580900","Other Telecommunications Services",1461
+"J591000","Internet Service Providers and Web Search Portals",2067
+"J592100","Data Processing and Web Hosting Services",1605
+"J592200","Electronic Information Storage Services",684
+"J601000","Libraries and Archives",3021
+"J602000","Other Information Services",222
+"K621000","Central Banking",3654
+"K622100","Banking",19443
+"K622200","Building Society Operation",63
+"K622300","Credit Union Operation",540
+"K622900","Other Depository Financial Intermediation",1572
+"K623000","Non-Depository Financing",2493
+"K624000","Financial Asset Investing",6456
+"K631000","Life Insurance",2013
+"K632100","Health Insurance",1164
+"K632200","General Insurance",8115
+"K633000","Superannuation Funds",24
+"K641100","Financial Asset Broking Services",960
+"K641900","Other Auxiliary Finance and Investment Services",10365
+"K642000","Auxiliary Insurance Services",8079
+"L661100","Passenger Car Rental and Hiring",4170
+"L661900","Other Motor Vehicle and Transport Equipment Rental and Hiring",1125
+"L662000","Farm Animal and Bloodstock Leasing",306
+"L663100","Heavy Machinery and Scaffolding Rental and Hiring",2055
+"L663200","Video and Other Electronic Media Rental and Hiring",318
+"L663900","Other Goods and Equipment Rental and Hiring nec",4926
+"L664000","Non-Financial Intangible Assets (Except Copyrights) Leasing",2499
+"L671100","Residential Property Operators",2988
+"L671200","Non-Residential Property Operators",6678
+"L672000","Real Estate Services",24057
+"M691000","Scientific Research Services",9279
+"M692100","Architectural Services",9138
+"M692200","Surveying and Mapping Services",2892
+"M692300","Engineering Design and Engineering Consulting Services",24399
+"M692400","Other Specialised Design Services",8517
+"M692500","Scientific Testing and Analysis Services",5265
+"M693100","Legal Services",20130
+"M693200","Accounting Services",23394
+"M694000","Advertising Services",7710
+"M695000","Market Research and Statistical Services",3393
+"M696100","Corporate Head Office Management Services",44289
+"M696200","Management Advice and Related Consulting Services",30270
+"M697000","Veterinary Services",5958
+"M699100","Professional Photographic Services",2151
+"M699900","Other Professional, Scientific and Technical Services nec",4083
+"M700000","Computer System Design and Related Services",41751
+"N721100","Employment Placement and Recruitment Services",11256
+"N721200","Labour Supply Services",20100
+"N722000","Travel Agency and Tour Arrangement Services",12321
+"N729100","Office Administrative Services",7995
+"N729200","Document Preparation Services",411
+"N729300","Credit Reporting and Debt Collection Services",1032
+"N729400","Call Centre Operation",3606
+"N729900","Other Administrative Services nec",10101
+"N731100","Building and Other Industrial Cleaning Services",24699
+"N731200","Building Pest Control Services",1296
+"N731300","Gardening Services",11271
+"N732000","Packaging Services",7560
+"O751000","Central Government Administration",46794
+"O752000","State Government Administration",0
+"O753000","Local Government Administration",28032
+"O754000","Justice",4215
+"O755100","Domestic Government Representation",3
+"O755200","Foreign Government Representation",492
+"O760000","Defence",11919
+"O771100","Police Services",11907
+"O771200","Investigation and Security Services",10224
+"O771300","Fire Protection and Other Emergency Services",2862
+"O771400","Correctional and Detention Services",7197
+"O771900","Other Public Order and Safety Services",2691
+"O772000","Regulatory Services",5943
+"P801000","Preschool Education",30963
+"P802100","Primary Education",55779
+"P802200","Secondary Education",37158
+"P802300","Combined Primary and Secondary Education",5280
+"P802400","Special School Education",2994
+"P810100","Technical and Vocational Education and Training",9081
+"P810200","Higher Education",32271
+"P821100","Sports and Physical Recreation Instruction",3945
+"P821200","Arts Education",2634
+"P821900","Adult, Community and Other Education nec",15327
+"P822000","Educational Support Services",2586
+"Q840100","Hospitals (Except Psychiatric Hospitals)",52887
+"Q840200","Psychiatric Hospitals",1110
+"Q851100","General Practice Medical Services",16008
+"Q851200","Specialist Medical Services",4257
+"Q852000","Pathology and Diagnostic Imaging Services",4383
+"Q853100","Dental Services",7164
+"Q853200","Optometry and Optical Dispensing",2331
+"Q853300","Physiotherapy Services",3942
+"Q853400","Chiropractic and Osteopathic Services",1410
+"Q853900","Other Allied Health Services",41631
+"Q859100","Ambulance Services",1869
+"Q859900","Other Health Care Services nec",10137
+"Q860100","Aged Care Residential Services",30777
+"Q860900","Other Residential Care Services",13743
+"Q871000","Child Care Services",14928
+"Q879000","Other Social Assistance Services",25542
+"R891000","Museum Operation",3030
+"R892100","Zoological and Botanical Gardens Operation",732
+"R892200","Nature Reserves and Conservation Parks Operation",3654
+"R900100","Performing Arts Operation",1689
+"R900200","Creative Artists, Musicians, Writers and Performers",5742
+"R900300","Performing Arts Venue Operation",1014
+"R911100","Health and Fitness Centres and Gymnasia Operation",4044
+"R911200","Sports and Physical Recreation Clubs and Sports Professionals",5532
+"R911300","Sports and Physical Recreation Venues, Grounds and Facilities Operation",5220
+"R911400","Sports and Physical Recreation Administrative Service",2832
+"R912100","Horse and Dog Racing Administration and Track Operation",963
+"R912900","Other Horse and Dog Racing Activities",1671
+"R913100","Amusement Parks and Centres Operation",1317
+"R913900","Amusement and Other Recreation Activities nec",3015
+"R920100","Casino Operation",2691
+"R920200","Lottery Operation",219
+"R920900","Other Gambling Activities",1101
+"S941100","Automotive Electrical Services",1983
+"S941200","Automotive Body, Paint and Interior Repair",8709
+"S941900","Other Automotive Repair and Maintenance",17688
+"S942100","Domestic Appliance Repair and Maintenance",1218
+"S942200","Electronic (except Domestic Appliance) and Precision Equipment Repair and Maintenance",1887
+"S942900","Other Machinery and Equipment Repair and Maintenance",4311
+"S949100","Clothing and Footwear Repair",483
+"S949900","Other Repair and Maintenance nec",1152
+"S951100","Hairdressing and Beauty Services",17616
+"S951200","Diet and Weight Reduction Centre Operation",222
+"S952000","Funeral, Crematorium and Cemetery Services",1506
+"S953100","Laundry and Dry-Cleaning Services",5955
+"S953200","Photographic Film Processing",168
+"S953300","Parking Services",720
+"S953400","Brothel Keeping and Prostitution Services",279
+"S953900","Other Personal Services nec",4251
+"S954000","Religious Services",9231
+"S955100","Business and Professional Association Services",2886
+"S955200","Labour Association Services",1920
+"S955900","Other Interest Group Services nec",12957
+"S960100","Private Households Employing Staff",150
+"S960200","Undifferentiated Goods-Producing Activities of Private Households for Own Use",0
+"S960300","Undifferentiated Service-Producing Activities of Private Households for Own Use",0
+"T994000","Don't know",0
+"T995000","Refused to answer",0
+"T997000","Response unidentifiable",0
+"T998000","Response outside scope",0
+"T999999","Not stated",0
+"Total","Total",2445141

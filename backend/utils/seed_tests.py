@@ -83,22 +83,23 @@ def main():
         print("ERROR: DATABASE_URL not set")
         sys.exit(1)
 
-    examples_root = Path(__file__).resolve().parent.parent.parent / "examples"
-
-    # Discover all test suite JSON files
-    test_suite_files = list(examples_root.glob("*/testsuites/*.json"))
+    # Try backend/seeds/testsuites/ first (Docker), fall back to repo root (local dev)
+    seeds_testsuites = Path(__file__).resolve().parent.parent / "seeds" / "testsuites"
+    if seeds_testsuites.exists():
+        test_suite_files = list(seeds_testsuites.glob("*.json"))
+    else:
+        examples_root = Path(__file__).resolve().parent.parent.parent / "examples"
+        test_suite_files = list(examples_root.glob("*/testsuites/*.json"))
 
     if not test_suite_files:
-        print("No test suite files found in examples/*/testsuites/")
+        print("No test suite files found")
         return
 
     engine = create_engine(db_url)
 
     with Session(engine) as session:
         for test_file in test_suite_files:
-            print(
-                f"Loading test suite from {test_file.relative_to(examples_root.parent)}"
-            )
+            print(f"Loading test suite from {test_file.name}")
 
             with open(test_file) as f:
                 data = json.load(f)

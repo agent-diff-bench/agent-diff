@@ -1,0 +1,35 @@
+"Code","Dwelling_type","Occupied_private_and_non-private_dwellings"
+"1000","Private dwelling not further defined",21
+"1111","Separate house no storey information",86211
+"1112","Separate house with one storey",957996
+"1113","Separate house with two or more storeys",355740
+"1211","Joined dwelling no storey information",25989
+"1212","Joined dwelling in a one storey building",124848
+"1213","Joined dwelling in a two or three storey building",85563
+"1214","Joined dwelling in a four to six storey building",9339
+"1215","Joined dwelling in a seven to nine storey building",2805
+"1216","Joined dwelling in a ten or more storey building",4848
+"1311","Dwelling in a motor camp",1878
+"1312","Mobile dwelling not in a motor camp",5892
+"1313","Improvised dwelling or shelter",3042
+"1314","Roofless or rough sleeper",132
+"2000","Non-private dwelling not further defined",0
+"2111","Residential care for older people",756
+"2112","Public hospital",105
+"2113","Private hospital",72
+"2114","Residential and community care facilities",1515
+"2115","Welfare institution",90
+"2116","Educational institution",339
+"2117","Religious institution",78
+"2118","Prison or penal institution",45
+"2119","Defence establishment",21
+"2120","Night shelter",9
+"2211","Hotel, motel or guest accommodation",5061
+"2212","Boarding house",243
+"2213","Motor camp/camping ground",606
+"2214","Work, construction or training camp",39
+"2215","Youth, school or Scout/Guide camp",204
+"2216","Communal staff quarters",252
+"2217","Commercial vessel",48
+"2218","Marae complex",81
+"Total","Total",1673880

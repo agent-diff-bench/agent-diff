@@ -1,0 +1,189 @@
+"Code","Ethnic_group","Census_night_population_count","Census_usually_resident_population_count"
+"10000","European nfd",38187,34632
+"11111","New Zealand European",3025587,3013440
+"12100","British nfd",16545,11607
+"12111","Celtic nfd",570,558
+"12112","Channel Islander",96,96
+"12113","Cornish",177,165
+"12114","English",79479,72204
+"12116","Irish",18738,17835
+"12117","Manx",120,111
+"12119","Scottish",19467,18627
+"12121","Welsh",5226,4971
+"12199","British nec",129,123
+"12211","Dutch",31884,29820
+"12311","Greek",2553,2475
+"12411","Polish",3108,2871
+"12500","South Slav nfd",492,492
+"12511","Croatian",3000,2946
+"12512","Dalmatian",207,207
+"12513","Macedonian",612,588
+"12514","Serbian",1317,1284
+"12515","Slovenian",267,228
+"12516","Bosnian",165,162
+"12599","South Slav nec",75,72
+"12611","Italian",5886,5352
+"12711","German",23925,16818
+"12811","Australian",35931,29349
+"12911","Albanian",258,249
+"12912","Armenian",276,264
+"12913","Austrian",1602,1272
+"12914","Belgian",1245,888
+"12915","Bulgarian",669,636
+"12916","Belorussian",192,180
+"12918","Cypriot nfd",81,78
+"12919","Czech",2055,1740
+"12920","Danish",2856,2214
+"12921","Estonian",219,189
+"12922","Finnish",954,783
+"12923","Flemish",75,60
+"12924","French",10146,7677
+"12926","Hungarian",1749,1638
+"12927","Icelandic",138,117
+"12928","Latvian",288,261
+"12929","Lithuanian",267,219
+"12930","Maltese",363,336
+"12931","Norwegian",1356,1131
+"12932","Portuguese",1446,1365
+"12933","Romanian",1548,1485
+"12934","Gypsy",132,132
+"12935","Russian",7989,7713
+"12937","Slavic",138,126
+"12938","Slovak",462,408
+"12939","Spanish",3009,2733
+"12940","Swedish",2517,1911
+"12941","Swiss",3477,2649
+"12942","Ukrainian",1341,1281
+"12943","American",21048,16245
+"12945","Canadian",10179,7797
+"12947","New Caledonian",126,114
+"12948","South African European",37833,37155
+"12949","Afrikaner",798,789
+"12950","Zimbabwean European",1893,1872
+"12999","European nec",2061,1968
+"21111","Māori",777195,775836
+"30000","Pacific Peoples nfd",2775,2724
+"31111","Samoan",184332,182721
+"32100","Cook Islands Maori",80853,80532
+"33111","Tongan",83406,82389
+"34111","Niuean",30990,30867
+"35111","Tokelauan",8703,8676
+"36111","Fijian",19986,19722
+"37112","Indigenous Australian",825,795
+"37122","Hawaiian",441,429
+"37124","Kiribati",3288,3225
+"37130","Nauruan",135,135
+"37135","Papua New Guinean",1218,1131
+"37137","Pitcairn Islander",219,216
+"37138","Rotuman",990,981
+"37140","Tahitian",1815,1737
+"37141","Solomon Islander",1092,777
+"37144","Tuvaluan",4668,4653
+"37145","Ni Vanuatu",2040,990
+"37199","Pacific Peoples nec",351,336
+"40000","Asian nfd",11925,11811
+"41000","Southeast Asian nfd",6246,6219
+"41111","Filipino",73965,72612
+"41211","Cambodian",9756,9672
+"41311","Vietnamese",10356,10086
+"41411","Burmese",2505,2475
+"41412","Indonesian",6687,6033
+"41413","Lao",1626,1608
+"41414","Malay",3963,3729
+"41415","Thai",11337,10623
+"41416","Karen",546,543
+"41417","Chin",837,834
+"41499","Southeast Asian nec",1680,1638
+"42100","Chinese nfd",242286,231387
+"42111","Hong Kong Chinese",3261,3177
+"42112","Cambodian Chinese",1416,1413
+"42113","Malaysian Chinese",4974,4866
+"42114","Singaporean Chinese",687,675
+"42115","Vietnamese Chinese",612,609
+"42116","Taiwanese",6918,6570
+"42199","Chinese nec",234,222
+"43100","Indian nfd",225414,221916
+"43111","Bengali",213,201
+"43112","Fijian Indian",15240,15132
+"43114","Indian Tamil",321,315
+"43115","Punjabi",459,459
+"43116","Sikh",195,192
+"43117","Anglo Indian",387,381
+"43118","Malaysian Indian",477,474
+"43119","South African Indian",1644,1632
+"43199","Indian nec",369,348
+"44100","Sri Lankan nfd",4305,4245
+"44111","Sinhalese",9348,9171
+"44112","Sri Lankan Tamil",3543,3501
+"44199","Sri Lankan nec",3,3
+"44211","Japanese",20559,18141
+"44311","Korean",36621,35664
+"44411","Afghani",5256,5250
+"44412","Bangladeshi",2367,2337
+"44413","Nepalese",3687,3630
+"44414","Pakistani",6234,6135
+"44415","Tibetan",108,105
+"44416","Eurasian",1425,1389
+"44417","Bhutanese",801,801
+"44418","Maldivian",138,135
+"44419","Mongolian",159,147
+"44499","Asian nec",504,489
+"51100","Middle Eastern nfd",8340,8268
+"51111","Algerian",132,129
+"51112","Arab",3090,2994
+"51113","Assyrian",1296,1293
+"51114","Egyptian",1551,1533
+"51115","Iranian/Persian",4512,4425
+"51116","Iraqi",2697,2688
+"51117","Israeli/Jewish",2178,1854
+"51118","Jordanian",252,246
+"51119","Kurd",927,921
+"51120","Lebanese",1296,1278
+"51122","Moroccan",267,261
+"51124","Palestinian",294,288
+"51125","Syrian",813,807
+"51127","Turkish",1353,1320
+"51199","Middle Eastern nec",342,321
+"52100","Latin American nfd",10245,9798
+"52111","Argentinian",2211,1824
+"52112","Bolivian",144,135
+"52113","Brazilian",7023,6663
+"52114","Chilean",3072,2886
+"52115","Colombian",1695,1620
+"52118","Ecuadorian",123,114
+"52123","Mexican",1557,1425
+"52127","Peruvian",684,648
+"52128","Puerto Rican",135,126
+"52129","Uruguayan",354,327
+"52130","Venezuelan",159,156
+"52199","Latin American nec",450,423
+"53100","African nfd",7290,7221
+"53113","Jamaican",591,564
+"53114","Kenyan",333,324
+"53115","Nigerian",642,636
+"53116","African American",915,855
+"53118","Caribbean",1107,1047
+"53119","Somali",1710,1701
+"53120","Eritrean",342,342
+"53121","Ethiopian",1644,1635
+"53122","Ghanaian",378,375
+"53123","Burundian",105,102
+"53124","Congolese",153,153
+"53125","Sudanese",234,231
+"53126","Zambian",207,201
+"53127","Other Zimbabwean",1077,1068
+"53199","African nec",1029,1005
+"61113","Indigenous American",1374,1278
+"61115","Mauritian",570,549
+"61116","Seychellois",123,114
+"61117","Other South African",6882,6816
+"61118","New Zealander",45453,45330
+"61199","Other Ethnicity nec",4020,4017
+"94444","Don't know",6,0
+"95555","Refused to answer",6,0
+"97777","Response unidentifiable",1236,0
+"98888","Response outside scope",510,0
+"99999","Not stated",2361,0
+"TotalStated","Total stated",4789242,4699755
+"TotalResponse","Total responses",5514804,5420931
+"Total","Total",4793358,4699755

@@ -1,0 +1,22 @@
+"Code","Official_language_indicator_indicator","Census_usually_resident_population_count"
+"00","No language",101751
+"11","Māori only",8085
+"12","English only",3545193
+"13","NZ Sign Language only",1410
+"21","Māori and English only (not NZ Sign Language)",160392
+"22","Māori and NZ Sign Language only (not English)",81
+"23","Māori and other only (not English or NZ Sign Language)",375
+"24","English and NZ Sign Language only (not Māori)",12930
+"25","English and other only (not Māori or NZ Sign Language)",744018
+"26","NZ Sign Language and other only (not English or Māori)",384
+"31","Māori, English and NZ Sign Language (not other)",3855
+"32","Māori, English and other (not NZ Sign Language)",11448
+"33","Māori, NZ Sign Language and other (not English)",36
+"34","English, NZ Sign Language and other (not Māori)",2613
+"41","Māori, English, NZ Sign Language and other",1683
+"51","Other languages only (neither English, Māori nor NZ Sign Language)",105462
+"97","Response unidentifiable",21
+"98","Response outside scope",12
+"99","Languages not stated",3
+"TotalStated","Total stated",4699716
+"Total","Total",4699755

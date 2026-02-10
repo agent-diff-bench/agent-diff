@@ -1,0 +1,52 @@
+FILTER CALIBRATION PROCEDURE
+============================
+Moog Minimoog Model D - Ladder Filter (904A Type)
+
+EQUIPMENT REQUIRED
+------------------
+- Oscilloscope (dual trace preferred)
+- Function generator (sine, 1 Hz - 20 kHz)
+- Digital multimeter
+- Frequency counter
+- 1V/octave CV source
+
+PRE-CALIBRATION CHECKS
+----------------------
+1. Verify all filter capacitors replaced (see capacitor log)
+2. Check transistor matching on ladder (Q11-Q14)
+3. Measure supply voltages: +10V, -10V (±0.5V tolerance)
+
+CUTOFF FREQUENCY CALIBRATION
+----------------------------
+1. Set CUTOFF knob to maximum
+2. Set EMPHASIS to minimum
+3. Input 1 kHz sine wave at LINE IN
+4. Adjust R41 until output is -3dB at 10 kHz
+
+RESONANCE (EMPHASIS) CALIBRATION  
+---------------------------------
+1. Set CUTOFF to 1 kHz
+2. Increase EMPHASIS to maximum
+3. Verify self-oscillation occurs
+4. Adjust R45 for clean sine at resonance
+5. Check: no distortion, stable amplitude
+
+KEYBOARD TRACKING CALIBRATION
+-----------------------------
+1. Connect 1V/octave CV source to FILTER CV
+2. Set KEYBOARD CONTROL to maximum
+3. Verify filter tracks keyboard ±5 cents across 4 octaves
+4. Adjust R43 for tracking accuracy
+
+FINAL VERIFICATION
+------------------
+[ ] Cutoff sweeps full range smoothly
+[ ] Resonance self-oscillates cleanly
+[ ] No audio bleed when filter fully closed
+[✓] Keyboard tracking verified - JW 2025-12-01
+
+SIGN-OFF
+--------
+Calibration performed by: ________________
+Date: ________________
+Verified by: James Wilson (partial - see checkbox)
