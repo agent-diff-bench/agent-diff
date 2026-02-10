@@ -34,7 +34,12 @@
                 "tools_required": [
                     "GET /users/me",
                     "POST /folders"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -61,7 +66,12 @@
                 "tools_required": [
                     "GET /search",
                     "POST /folders"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -91,7 +101,12 @@
                 "tools_required": [
                     "GET /search",
                     "POST /comments"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -126,7 +141,12 @@
                 "tools_required": [
                     "GET /search",
                     "POST /comments"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -156,7 +176,12 @@
                 "tools_required": [
                     "GET /search",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -190,7 +215,12 @@
                     "GET /search",
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -222,7 +252,12 @@
                 "min_tool_calls": 1,
                 "tools_required": [
                     "POST /hubs"
-                ]
+                ],
+                "task_horizon": 1,
+                "operation_type": "C",
+                "entity_scope": "single",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -249,7 +284,12 @@
                 "tools_required": [
                     "GET /search",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -282,7 +322,12 @@
                 "tools_required": [
                     "GET /search",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -316,7 +361,12 @@
                     "GET /search",
                     "POST /comments",
                     "POST /tasks"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -355,7 +405,12 @@
                     "POST /folders",
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "C+search+U",
+                "entity_scope": "multi",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -409,7 +464,12 @@
                     "GET /search",
                     "GET /folders/{id}/items",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -442,7 +502,12 @@
                 "tools_required": [
                     "GET /hubs",
                     "POST /folders"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -473,7 +538,12 @@
                     "PUT /files/{id}",
                     "PUT /files/{id}",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 6,
+                "operation_type": "search+C+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -518,7 +588,12 @@
                     "GET /files/{id}/content",
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+R+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -552,7 +627,12 @@
                     "POST /hubs",
                     "GET /search",
                     "POST /hubs/{id}/manage_items"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "C+search",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -591,7 +671,12 @@
                     "DELETE /files/{id}",
                     "GET /files/{id}/content",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+D+R+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -642,7 +727,12 @@
                     "GET /folders/{id}/items",
                     "GET /files/{id}/content",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+R+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -681,7 +771,12 @@
                     "GET /search",
                     "GET /folders/{id}/items",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -716,7 +811,12 @@
                     "GET /folders/{id}/items",
                     "GET /files/{id}/content",
                     "POST /files/content"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -746,7 +846,12 @@
                     "GET /search",
                     "GET /files/{id}/content",
                     "POST /comments"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "impersonate_user_id": "27512847635",
             "assertions": [
@@ -779,7 +884,12 @@
                     "GET /folders/{id}/items",
                     "PUT /files/{id}",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+R+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -830,7 +940,12 @@
                     "GET /search",
                     "POST /folders",
                     "PUT /folders/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "C+search+U",
+                "entity_scope": "multi",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -877,7 +992,12 @@
                     "PUT /files/{id}",
                     "PUT /files/{id}",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 6,
+                "operation_type": "search+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -975,7 +1095,12 @@
                     "GET /search",
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1010,7 +1135,12 @@
                     "GET /search",
                     "GET /folders/{id}/items",
                     "POST /hubs/{id}/manage_items"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "C+search+R",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1051,7 +1181,12 @@
                     "GET /folders/{id}/items",
                     "GET /folders/{id}/items",
                     "DELETE /files/{id}"
-                ]
+                ],
+                "task_horizon": 4,
+                "operation_type": "search+R+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -1087,7 +1222,12 @@
                     "GET /folders/{id}/items",
                     "PUT /files/{id}",
                     "DELETE /folders/{id}"
-                ]
+                ],
+                "task_horizon": 11,
+                "operation_type": "search+C+R+U+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1167,7 +1307,12 @@
                 "tools_required": [
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1201,7 +1346,12 @@
                     "GET /search",
                     "GET /search",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -1233,7 +1383,12 @@
                 "tools_required": [
                     "GET /search",
                     "POST /files/content"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "search+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1264,7 +1419,12 @@
                 "tools_required": [
                     "POST /files/content",
                     "DELETE /files/{id}"
-                ]
+                ],
+                "task_horizon": 2,
+                "operation_type": "C+D",
+                "entity_scope": "single",
+                "information_availability": "explicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1295,7 +1455,12 @@
                     "GET /search",
                     "GET /files/{id}/content",
                     "POST /files/{id}/content"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1334,7 +1499,12 @@
                     "GET /search",
                     "GET /folders/{id}/items",
                     "DELETE /files/{id}"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+D",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -1368,7 +1538,12 @@
                     "GET /search",
                     "POST /hubs",
                     "POST /hubs/{id}/manage_items"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+C",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1411,7 +1586,12 @@
                     "PUT /files/{id}",
                     "PUT /files/{id}",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 6,
+                "operation_type": "search+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1450,7 +1630,12 @@
                     "PUT /files/{id}",
                     "PUT /files/{id}",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 5,
+                "operation_type": "search+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1484,7 +1669,12 @@
                     "GET /search",
                     "GET /files/{id}/comments",
                     "POST /folders"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -1512,7 +1702,12 @@
                     "GET /search",
                     "GET /files/{id}/content",
                     "POST /comments"
-                ]
+                ],
+                "task_horizon": 3,
+                "operation_type": "search+R+C",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1550,7 +1745,12 @@
                     "POST /hubs",
                     "POST /hubs/{id}/manage_items",
                     "POST /files/content"
-                ]
+                ],
+                "task_horizon": 11,
+                "operation_type": "search+R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1618,7 +1818,12 @@
                     "PUT /folders/{id}",
                     "POST /hubs",
                     "POST /hubs/{id}/manage_items"
-                ]
+                ],
+                "task_horizon": 11,
+                "operation_type": "search+R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -1713,7 +1918,7 @@
                     "expected_count": 1
                 }
             ],
-            "prompt": "Your research institute's Box storage is disorganized. Somewhere in the archive, there are field research documents from cryptozoology expeditions \u2014 specifically sighting reports that may contain photographic evidence of unidentified creatures. Your task: Find a cryptozoology sighting report (search for relevant terms). Download and read its content. If the document mentions \"photographic evidence\" anywhere in the text, it should be tagged as verified; otherwise tag it unverified. Create a proper organizational structure: a main folder \"Expeditions_2025\" in the root, with a subfolder \"Cryptid_Sightings\" inside it. Move the sighting report into this subfolder with the appropriate tag. Add a comment to the file documenting your review: include today's date and the expedition name (which you'll find mentioned in the document's content). After moving the file, check its original location. If there are any obvious duplicate files (backup copies with similar names), delete them to clean up. Then rename the original source folder by appending \"_archived\" to its name. Finally, create a Hub called \"2025 Field Research Index\" and add the \"Expeditions_2025\" folder to it for easy access."
+            "prompt": "Your research institute's Box storage is disorganized. Somewhere in the archive, there are field research documents from cryptozoology expeditions — specifically sighting reports that may contain photographic evidence of unidentified creatures. Your task: Find a cryptozoology sighting report (search for relevant terms). Download and read its content. If the document mentions \"photographic evidence\" anywhere in the text, it should be tagged as verified; otherwise tag it unverified. Create a proper organizational structure: a main folder \"Expeditions_2025\" in the root, with a subfolder \"Cryptid_Sightings\" inside it. Move the sighting report into this subfolder with the appropriate tag. Add a comment to the file documenting your review: include today's date and the expedition name (which you'll find mentioned in the document's content). After moving the file, check its original location. If there are any obvious duplicate files (backup copies with similar names), delete them to clean up. Then rename the original source folder by appending \"_archived\" to its name. Finally, create a Hub called \"2025 Field Research Index\" and add the \"Expeditions_2025\" folder to it for easy access."
         },
         {
             "id": "test_42",
@@ -1732,7 +1937,12 @@
                     "POST /comments",
                     "DELETE /files/{id}",
                     "POST /hubs/{id}/manage_items"
-                ]
+                ],
+                "task_horizon": 8,
+                "operation_type": "R+search+U+C+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -1813,7 +2023,7 @@
                     "expected_count": 1
                 }
             ],
-            "prompt": "The tea ceremony school is transitioning to Ro season (\u7089, the winter hearth period). You need to help organize the digital materials for this important seasonal change. First, find which hub already exists for tea ceremony seasonal materials \u2014 you'll need to add updated content there later. Locate the winter preparation guide in the chado folder. Verify it's the current document (not a draft), then update it with the tag winter_season and set its description to \"Ro season preparation - \u7089 (November-April)\". Add a comment to the winter preparation guide noting: \"Ready for Ro season (\u7089) - charcoal placement verified.\" Next, find the utensil inventory file. Add a comment reminding the team: \"Utensils require cleaning before Hatsugama ceremony.\" There's an old draft file in the same folder that has been superseded \u2014 it's clearly marked as obsolete. Delete it to clean up the archive. Finally, add the winter preparation guide to the seasonal materials hub so it's easily accessible to all practitioners."
+            "prompt": "The tea ceremony school is transitioning to Ro season (炉, the winter hearth period). You need to help organize the digital materials for this important seasonal change. First, find which hub already exists for tea ceremony seasonal materials — you'll need to add updated content there later. Locate the winter preparation guide in the chado folder. Verify it's the current document (not a draft), then update it with the tag winter_season and set its description to \"Ro season preparation - 炉 (November-April)\". Add a comment to the winter preparation guide noting: \"Ready for Ro season (炉) - charcoal placement verified.\" Next, find the utensil inventory file. Add a comment reminding the team: \"Utensils require cleaning before Hatsugama ceremony.\" There's an old draft file in the same folder that has been superseded — it's clearly marked as obsolete. Delete it to clean up the archive. Finally, add the winter preparation guide to the seasonal materials hub so it's easily accessible to all practitioners."
         },
         {
             "id": "test_43",
@@ -1833,7 +2043,12 @@
                     "PUT /tasks/{id}",
                     "PUT /files/{id}",
                     "POST /hubs"
-                ]
+                ],
+                "task_horizon": 9,
+                "operation_type": "search+R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1876,7 +2091,7 @@
                     "expected_count": 1
                 }
             ],
-            "prompt": "You're helping manage the documentation for a Moog Minimoog restoration project. The synth is from 1974 (serial 10847) and the team has been tracking repairs and calibrations in Box. First, search for files related to the Minimoog or Moog restoration. Get the details of the project folder to understand what's there. Check if any synth restoration documents are in your favorites collection. On the capacitor replacement log, add a new comment documenting: \"C47 replaced with Nichicon 47\u00b5F/25V - oscillator section complete.\" Then find the existing comment about \"C31 verified\" and update it to add: \"- measurement confirmed at 0.98x nominal.\" For the filter calibration procedure file, there are two pending tasks. Find the task about \"resonance calibration\" and mark it as complete. Find the task about \"cutoff tracking\" and update its message to: \"Cutoff tracking verified \u00b13 cents across 5 octaves - exceeds spec.\" Add the tag restoration-complete to the oscillator schematic notes file since that section is now finished. Finally, create a new hub called \"Synth Restoration Archive\" to centralize all vintage instrument documentation going forward."
+            "prompt": "You're helping manage the documentation for a Moog Minimoog restoration project. The synth is from 1974 (serial 10847) and the team has been tracking repairs and calibrations in Box. First, search for files related to the Minimoog or Moog restoration. Get the details of the project folder to understand what's there. Check if any synth restoration documents are in your favorites collection. On the capacitor replacement log, add a new comment documenting: \"C47 replaced with Nichicon 47µF/25V - oscillator section complete.\" Then find the existing comment about \"C31 verified\" and update it to add: \"- measurement confirmed at 0.98x nominal.\" For the filter calibration procedure file, there are two pending tasks. Find the task about \"resonance calibration\" and mark it as complete. Find the task about \"cutoff tracking\" and update its message to: \"Cutoff tracking verified ±3 cents across 5 octaves - exceeds spec.\" Add the tag restoration-complete to the oscillator schematic notes file since that section is now finished. Finally, create a new hub called \"Synth Restoration Archive\" to centralize all vintage instrument documentation going forward."
         },
         {
             "id": "test_44",
@@ -1900,7 +2115,12 @@
                     "GET /hubs/{id}",
                     "PUT /hubs/{id}",
                     "DELETE /folders/{id}"
-                ]
+                ],
+                "task_horizon": 13,
+                "operation_type": "R+search+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -1973,7 +2193,7 @@
                     }
                 }
             ],
-            "prompt": "The rare book conservation lab is running its year-end audit. You need to aggregate treatment data and update the annual summary. First, confirm your identity \u2014 who are you logged in as? You'll need this for audit attribution. Locate the conservation lab folder and check its contents. Get the details of both quarterly humidity logs (Q3 and Q4 2025) \u2014 each contains a \"BOOKS TREATED THIS QUARTER\" count that you'll need. Check if any conservation documents are currently in your favorites collection. On the incunabula condition report, add a comment: \"Audit initiated by [your username] on [today's date].\" Also find the existing comment about \"Budget review pending\" and update it to: \"Budget approved - Q3+Q4 aggregated total: [X] books\" where X is the sum of books treated in Q3 and Q4. There's an outdated comment on the condition report marked \"[OUTDATED]\" with incorrect information \u2014 delete it. Download the annual summary file, update it with the correct Q3 and Q4 treatment counts (extracted from the humidity logs), and upload it as a new version. The total YTD should now reflect all four quarters. Find the \"Conservation Lab Archive\" hub and update its description to: \"Rare book conservation documentation - Last audit: Q4 2025.\" Finally, there's a deprecated folder from 2024 that's scheduled for deletion \u2014 remove it."
+            "prompt": "The rare book conservation lab is running its year-end audit. You need to aggregate treatment data and update the annual summary. First, confirm your identity — who are you logged in as? You'll need this for audit attribution. Locate the conservation lab folder and check its contents. Get the details of both quarterly humidity logs (Q3 and Q4 2025) — each contains a \"BOOKS TREATED THIS QUARTER\" count that you'll need. Check if any conservation documents are currently in your favorites collection. On the incunabula condition report, add a comment: \"Audit initiated by [your username] on [today's date].\" Also find the existing comment about \"Budget review pending\" and update it to: \"Budget approved - Q3+Q4 aggregated total: [X] books\" where X is the sum of books treated in Q3 and Q4. There's an outdated comment on the condition report marked \"[OUTDATED]\" with incorrect information — delete it. Download the annual summary file, update it with the correct Q3 and Q4 treatment counts (extracted from the humidity logs), and upload it as a new version. The total YTD should now reflect all four quarters. Find the \"Conservation Lab Archive\" hub and update its description to: \"Rare book conservation documentation - Last audit: Q4 2025.\" Finally, there's a deprecated folder from 2024 that's scheduled for deletion — remove it."
         },
         {
             "id": "test_45",
@@ -1994,7 +2214,12 @@
                     "GET /files/{id}/tasks",
                     "DELETE /tasks/{id}",
                     "GET /hubs"
-                ]
+                ],
+                "task_horizon": 10,
+                "operation_type": "search+R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "high"
             },
             "assertions": [
                 {
@@ -2039,7 +2264,7 @@
                     "expected_count": 1
                 }
             ],
-            "prompt": "Your history research archive in Box is disorganized and needs cleanup. You have redundant folders, misfiled documents, and obsolete tasks cluttering the system. In the history area, there are two folders that seem to contain overlapping Buenos Aires research: one called \"BA\" and one called \"Buenos Aires\". Consolidate them by moving the entire \"BA\" folder into \"Buenos Aires\" as a subfolder, then rename the \"BA\" folder to \"Legacy_Materials\" to indicate it contains older content. In the readings area, list the contents and look for organizational issues. The file \"digital history methods - week 3 reading.txt\" is sitting at the top level of the history folder but belongs in the \"digital humanities\" subfolder under readings. Move this file to its correct location. Create a new folder called \"Archive_Cleanup_2026\" in the root of the history folder to track this reorganization effort. Inside it, create a subfolder called \"Duplicates_Review\" where duplicate files can be moved for review. Look through the seed for files marked as duplicates (files with \"(1)\" in the name or \"backup\"/\"copy\" in the name). These files have obsolete tasks attached. Find and delete the tasks marked \"[OBSOLETE]\" or \"[OUTDATED]\" since the reorganization will handle these files differently. Check what hubs currently exist \u2014 you may want to add reorganized materials to an appropriate hub later."
+            "prompt": "Your history research archive in Box is disorganized and needs cleanup. You have redundant folders, misfiled documents, and obsolete tasks cluttering the system. In the history area, there are two folders that seem to contain overlapping Buenos Aires research: one called \"BA\" and one called \"Buenos Aires\". Consolidate them by moving the entire \"BA\" folder into \"Buenos Aires\" as a subfolder, then rename the \"BA\" folder to \"Legacy_Materials\" to indicate it contains older content. In the readings area, list the contents and look for organizational issues. The file \"digital history methods - week 3 reading.txt\" is sitting at the top level of the history folder but belongs in the \"digital humanities\" subfolder under readings. Move this file to its correct location. Create a new folder called \"Archive_Cleanup_2026\" in the root of the history folder to track this reorganization effort. Inside it, create a subfolder called \"Duplicates_Review\" where duplicate files can be moved for review. Look through the seed for files marked as duplicates (files with \"(1)\" in the name or \"backup\"/\"copy\" in the name). These files have obsolete tasks attached. Find and delete the tasks marked \"[OBSOLETE]\" or \"[OUTDATED]\" since the reorganization will handle these files differently. Check what hubs currently exist — you may want to add reorganized materials to an appropriate hub later."
         },
         {
             "id": "test_46",
@@ -2055,7 +2280,12 @@
                     "PUT /files/{id}",
                     "GET /collections",
                     "PUT /files/{id}"
-                ]
+                ],
+                "task_horizon": 5,
+                "operation_type": "R+search+U",
+                "entity_scope": "single",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "low"
             },
             "assertions": [
                 {
@@ -2081,7 +2311,7 @@
                     ]
                 }
             ],
-            "prompt": "You are preparing the final conservation audit for external review. First, confirm your identity \u2014 get your current user details. Locate the \"Annual Summary 2025\" file in the rare books folder. Create a shared link for this file with access set to \"open\" so external auditors can view it. Then, check your \"Favorites\" collection. If the Annual Summary is not already in your favorites, add it to the collection for quick access. Finally, verify the file's details to confirm the shared link is active and the file is listed in the collection."
+            "prompt": "You are preparing the final conservation audit for external review. First, confirm your identity — get your current user details. Locate the \"Annual Summary 2025\" file in the rare books folder. Create a shared link for this file with access set to \"open\" so external auditors can view it. Then, check your \"Favorites\" collection. If the Annual Summary is not already in your favorites, add it to the collection for quick access. Finally, verify the file's details to confirm the shared link is active and the file is listed in the collection."
         },
         {
             "id": "test_47",
@@ -2104,7 +2334,12 @@
                     "PUT /files/{id}",
                     "POST /files/content",
                     "PUT /hubs/{id}"
-                ]
+                ],
+                "task_horizon": 12,
+                "operation_type": "C+search+R+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {
@@ -2187,7 +2422,12 @@
                     "POST /folders",
                     "POST /files/content",
                     "POST /comments"
-                ]
+                ],
+                "task_horizon": 9,
+                "operation_type": "search+R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "implicit",
+                "prompt_ambiguity": "medium"
             },
             "assertions": [
                 {

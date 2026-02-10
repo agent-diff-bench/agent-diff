@@ -153,6 +153,23 @@ def _slack_error(
     raise SlackAPIError(code, status_code, extra)
 
 
+def _parse_bool_param(value: Any, default: bool = False) -> bool:
+    """Safely parse a boolean parameter from JSON (bool) or form data (string).
+    
+    Handles:
+    - Boolean values: True/False
+    - String values: "true"/"false" (case-insensitive)
+    - None/missing: returns default
+    """
+    if value is None:
+        return default
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.lower() == "true"
+    return default
+
+
 def _resolve_channel_id(channel: str, session=None) -> str:
     """Resolve channel name or ID to channel ID.
 
@@ -1033,7 +1050,7 @@ async def conversations_list(request: Request) -> JSONResponse:
         except ValueError:
             _slack_error("invalid_arguments")
 
-    exclude_archived = params.get("exclude_archived", "false").lower() == "true"
+    exclude_archived = _parse_bool_param(params.get("exclude_archived"), default=False)
     types_param = params.get("types", "public_channel")  # Default: public_channel
 
     session = _session(request)
@@ -1146,7 +1163,7 @@ async def conversations_history(request: Request) -> JSONResponse:
             _slack_error("invalid_cursor")
     oldest_param = params.get("oldest")
     latest_param = params.get("latest")
-    inclusive = params.get("inclusive", "false").lower() == "true"
+    inclusive = _parse_bool_param(params.get("inclusive"), default=False)
 
     # Validate channel (required)
     if not channel:
@@ -1270,7 +1287,7 @@ async def conversations_replies(request: Request) -> JSONResponse:
 
     oldest_param = params.get("oldest")
     latest_param = params.get("latest")
-    inclusive = params.get("inclusive", "false").lower() == "true"
+    inclusive = _parse_bool_param(params.get("inclusive"), default=False)
 
     oldest_dt = None
     latest_dt = None
@@ -1710,8 +1727,8 @@ async def conversations_open(request: Request) -> JSONResponse:
 async def conversations_info(request: Request) -> JSONResponse:
     params = await _get_params_async(request)
     channel = params.get("channel")
-    include_locale = params.get("include_locale", "false").lower() == "true"
-    include_num_members = params.get("include_num_members", "false").lower() == "true"
+    include_locale = _parse_bool_param(params.get("include_locale"), default=False)
+    include_num_members = _parse_bool_param(params.get("include_num_members"), default=False)
 
     # Validate channel (required)
     if not channel:
@@ -2283,7 +2300,7 @@ async def users_info(request: Request) -> JSONResponse:
     if user is None:
         _slack_error("user_not_found")
 
-    include_locale = params.get("include_locale", "false").lower() == "true"
+    include_locale = _parse_bool_param(params.get("include_locale"), default=False)
 
     session = _session(request)
 
@@ -2317,7 +2334,7 @@ async def users_list(request: Request) -> JSONResponse:
         except ValueError:
             _slack_error("invalid_cursor")
 
-    include_locale = params.get("include_locale", "false").lower() == "true"
+    include_locale = _parse_bool_param(params.get("include_locale"), default=False)
     session = _session(request)
     actor = _principal_user_id(request)
     team_id = _get_env_team_id(request, channel_id=None, actor_user_id=actor)
@@ -2857,7 +2874,7 @@ async def search_messages(request: Request) -> JSONResponse:
     if not query_str:
         _slack_error("No query passed")
 
-    highlight = str(params.get("highlight", "false")).lower() == "true"
+    highlight = _parse_bool_param(params.get("highlight"), default=False)
     sort = (params.get("sort") or "score").lower()
     sort_dir = (params.get("sort_dir") or "desc").lower()
     count_param = params.get("count")

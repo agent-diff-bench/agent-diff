@@ -149,6 +149,12 @@ client.delete_env(envId=env.environmentId)
 SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
 
 
+## Benchmark & Training
+
+- **HuggingFace Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split, stratified by service)
+- **Prime Intellect Environment**: [agent-diff-bench on Prime Lab](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) — run evaluations or RL training via Hosted Training
+- **Paper**: [AgentDiff: Agentic API Evaluation via State Differencing (KDD 2026 pre-print)](https://drive.google.com/file/d/1BlmJTSMX7ohwvD1aYBByg7_Y815fgsxp/view?usp=sharing)
+
 ## Evaluations & Test Suites
 
 Collections of test cases with assertions that you can run against agent runs using evaluations.

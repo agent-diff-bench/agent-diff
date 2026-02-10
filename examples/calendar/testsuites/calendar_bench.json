@@ -113,7 +113,12 @@
           "freeBusy.query",
           "events.patch",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -233,7 +238,12 @@
           "events.delete",
           "acl.insert",
           "calendars.insert"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -637,7 +647,12 @@
           "events.list",
           "acl.insert",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 15,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -785,13 +800,18 @@
           "events.delete",
           "acl.insert",
           "calendars.insert"
-        ]
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_5",
       "name": "Symposium of Infinite Curiosity - Academic conference coordination",
-      "prompt": "The Symposium of Infinite Curiosity is three weeks away and the program is chaos. Find our main calendar - 'Symposium of Infinite Curiosity 2018'. We have sessions scheduled and I need an exact count of how many are in the 'Quantum' track (they'll have [Quantum] in the title). Add Mei-Lin's opening keynote - it's called 'Keynote: The Heresy of Obvious Conclusions' and should be Day 1 (Monday June 18) at 8am, lasting 1 hour. Update that keynote with a description: 'Mandatory attendance for all track chairs. Coffee will be existential.' Bogdan (bogdan@test.com) and Ravi (ravi@test.com) need to meet urgently on Day 2 (Tuesday June 19) afternoon to discuss a problematic submission - find when they're both free and create 'Secret Tribunal of the Program Committee' for 2 hours at that time on the symposium calendar. Dr. Chiamaka (chiamaka@test.com) is presenting four different papers across the conference - tell me when each of her sessions is. Someone finally noticed the irony: 'Workshop: Introduction to Procrastination (Postponed)' - delete it. Create a private calendar called 'Speakers Green Room of Mild Panic' for backstage coordination. Ingrid (ingrid@test.com) just joined as volunteer coordinator - give her edit access to the main symposium calendar. Chiamaka's first presentation needs to move to the same venue as 'Panel: Temporal Causality Roundtable' \u2014 but only if that venue is free at the same time. If that panel already occupies that venue at that time, move Chiamaka's first presentation to 'Annex of Temporal Studies' instead.",
+      "prompt": "The Symposium of Infinite Curiosity is three weeks away and the program is chaos. Find our main calendar - 'Symposium of Infinite Curiosity 2018'. We have sessions scheduled and I need an exact count of how many are in the 'Quantum' track (they'll have [Quantum] in the title). Add Mei-Lin's opening keynote - it's called 'Keynote: The Heresy of Obvious Conclusions' and should be Day 1 (Monday June 18) at 8am, lasting 1 hour. Update that keynote with a description: 'Mandatory attendance for all track chairs. Coffee will be existential.' Bogdan (bogdan@test.com) and Ravi (ravi@test.com) need to meet urgently on Day 2 (Tuesday June 19) afternoon to discuss a problematic submission - find when they're both free and create 'Secret Tribunal of the Program Committee' for 2 hours at that time on the symposium calendar. Dr. Chiamaka (chiamaka@test.com) is presenting four different papers across the conference - tell me when each of her sessions is. Someone finally noticed the irony: 'Workshop: Introduction to Procrastination (Postponed)' - delete it. Create a private calendar called 'Speakers Green Room of Mild Panic' for backstage coordination. Ingrid (ingrid@test.com) just joined as volunteer coordinator - give her edit access to the main symposium calendar. Chiamaka's first presentation needs to move to the same venue as 'Panel: Temporal Causality Roundtable' — but only if that venue is free at the same time. If that panel already occupies that venue at that time, move Chiamaka's first presentation to 'Annex of Temporal Studies' instead.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -927,7 +947,12 @@
           "events.delete",
           "calendars.insert",
           "acl.insert"
-        ]
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1037,7 +1062,12 @@
           "events.delete",
           "acl.insert",
           "calendars.insert"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1145,7 +1175,12 @@
           "events.patch",
           "events.delete",
           "acl.insert"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1226,7 +1261,12 @@
           "events.patch",
           "events.delete",
           "acl.insert"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1556,7 +1596,12 @@
           "freeBusy.query",
           "events.patch",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 24,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1703,7 +1748,12 @@
           "calendarList.patch",
           "acl.insert",
           "acl.delete"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1841,7 +1891,12 @@
           "calendarList.patch",
           "acl.insert",
           "calendarList.delete"
-        ]
+        ],
+        "task_horizon": 14,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1976,7 +2031,12 @@
           "calendarList.patch",
           "acl.insert",
           "acl.delete"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2082,13 +2142,18 @@
           "freeBusy.query",
           "events.patch",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_14",
       "name": "Clockwork Tinkerers Guild - Recurring series exceptions",
-      "prompt": "I\u2019m setting up the Clockwork Tinkerers Guild calendar. First, show me my calendars so I don\u2019t duplicate anything; if we don\u2019t already have it, create a calendar called Clockwork Tinkerers Guild and give Aiko (aiko@test.com) write access. Our Gear & Ember Workshop needs to run every Friday at 6:00pm for eight weeks starting June 22, 2018\u2014set it up as a recurring series. However, we need two exceptions: the June 29 session should start at 7:00pm and include the note \u2018Late start due to forge maintenance,\u2019 and the July 6 session must be cancelled entirely (festival blackout). After applying those exceptions, show me the guild calendar so I can confirm the series looks right. Then add a one-off event called Brass Beetle Showcase on Saturday July 7 at noon.",
+      "prompt": "I’m setting up the Clockwork Tinkerers Guild calendar. First, show me my calendars so I don’t duplicate anything; if we don’t already have it, create a calendar called Clockwork Tinkerers Guild and give Aiko (aiko@test.com) write access. Our Gear & Ember Workshop needs to run every Friday at 6:00pm for eight weeks starting June 22, 2018—set it up as a recurring series. However, we need two exceptions: the June 29 session should start at 7:00pm and include the note ‘Late start due to forge maintenance,’ and the July 6 session must be cancelled entirely (festival blackout). After applying those exceptions, show me the guild calendar so I can confirm the series looks right. Then add a one-off event called Brass Beetle Showcase on Saturday July 7 at noon.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -2264,13 +2329,18 @@
           "events.insert",
           "events.patch",
           "events.list"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "high"
       }
     },
     {
       "id": "test_15",
       "name": "Tidal Library Rotations - Recurring series lifecycle",
-      "prompt": "We\u2019re setting up the tidal library\u2019s long-term calendar. First, show me my calendars and create Tidal Library Rotations if it doesn\u2019t already exist. Share it with Fumiko (fumiko@test.com) so she can edit. The Moon-Shell Rebinding ritual needs to recur monthly on the first Tuesday at 9:00am, starting July 3, 2018, and should continue indefinitely until we cancel it. We also need two exceptions: the August 7, 2018 occurrence should start at 11:00am with a note \u2018Storm-surge delay,\u2019 and the September 4, 2018 occurrence should be cancelled entirely. Add a separate one-off event called Ink Tide Inventory on July 15, 2018 at 4:00pm. After confirming the schedule looks right, delete the entire Moon-Shell Rebinding series.",
+      "prompt": "We’re setting up the tidal library’s long-term calendar. First, show me my calendars and create Tidal Library Rotations if it doesn’t already exist. Share it with Fumiko (fumiko@test.com) so she can edit. The Moon-Shell Rebinding ritual needs to recur monthly on the first Tuesday at 9:00am, starting July 3, 2018, and should continue indefinitely until we cancel it. We also need two exceptions: the August 7, 2018 occurrence should start at 11:00am with a note ‘Storm-surge delay,’ and the September 4, 2018 occurrence should be cancelled entirely. Add a separate one-off event called Ink Tide Inventory on July 15, 2018 at 4:00pm. After confirming the schedule looks right, delete the entire Moon-Shell Rebinding series.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -2403,13 +2473,18 @@
           "events.insert",
           "events.patch",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_16",
       "name": "Monastery of Echoing Bells - Daily recurring lifecycle",
-      "prompt": "We\u2019re setting up a proper schedule for the Monastery of Echoing Bells. First, show me my calendars so I don\u2019t duplicate anything, and create a calendar with that name if needed. Give Linh (linh@test.com) edit access. The Dawn Bell Rite must recur daily at 5:30am, starting June 18, 2018, and it should continue indefinitely until we cancel it. I need two exceptions: the June 20, 2018 occurrence should start at 6:30am with the note \u2018Storm quiet hours,\u2019 and the June 23, 2018 occurrence should be cancelled entirely. Also, check when Kwame (kwame@test.com) is free on the evening of June 24. After you confirm the schedule, delete the entire Dawn Bell Rite series.",
+      "prompt": "We’re setting up a proper schedule for the Monastery of Echoing Bells. First, show me my calendars so I don’t duplicate anything, and create a calendar with that name if needed. Give Linh (linh@test.com) edit access. The Dawn Bell Rite must recur daily at 5:30am, starting June 18, 2018, and it should continue indefinitely until we cancel it. I need two exceptions: the June 20, 2018 occurrence should start at 6:30am with the note ‘Storm quiet hours,’ and the June 23, 2018 occurrence should be cancelled entirely. Also, check when Kwame (kwame@test.com) is free on the evening of June 24. After you confirm the schedule, delete the entire Dawn Bell Rite series.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -2561,7 +2636,12 @@
           "events.patch",
           "freeBusy.query",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "high"
       }
     },
     {
@@ -2618,7 +2698,12 @@
           "events.insert",
           "events.patch",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "C+U",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2681,7 +2766,12 @@
         "tools_required": [
           "events.import",
           "acl.delete"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "C+U+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2741,7 +2831,12 @@
         "tools_required": [
           "events.insert",
           "acl.delete"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -2815,7 +2910,12 @@
           "acl.list",
           "events.update",
           "calendars.delete"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+R+U+D",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2853,7 +2953,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "events.insert"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -2906,7 +3011,12 @@
           "events.quickAdd",
           "events.get",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2965,7 +3075,12 @@
           "acl.get",
           "events.update",
           "events.list"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2999,7 +3114,12 @@
         "tools_required": [
           "events.delete",
           "settings.list"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3025,7 +3145,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "calendars.insert"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3055,7 +3180,12 @@
         "tools_required": [
           "settings.list",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3135,7 +3265,12 @@
         "tools_required": [
           "calendarList.patch",
           "events.update"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3187,7 +3322,12 @@
         "tools_required": [
           "events.quickAdd",
           "events.watch"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3224,7 +3364,12 @@
         "tools_required": [
           "calendarList.get",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+R+U+D",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3260,7 +3405,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "events.delete"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "U+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3297,7 +3447,12 @@
         "tools_required": [
           "events.list",
           "events.move"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3338,7 +3493,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "events.import"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3393,7 +3553,12 @@
           "calendars.insert",
           "calendarList.get",
           "calendarList.update"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3423,7 +3588,11 @@
             }
           },
           "expected_count": 1,
-          "ignore": ["status", "sequence", "updated_at"]
+          "ignore": [
+            "status",
+            "sequence",
+            "updated_at"
+          ]
         },
         {
           "diff_type": "added",
@@ -3444,7 +3613,12 @@
         "tools_required": [
           "events.move",
           "events.watch"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "C+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3470,7 +3644,9 @@
               }
             }
           },
-          "expected_count": {"min": 1},
+          "expected_count": {
+            "min": 1
+          },
           "description": "All events on this calendar should be cleared (cancelled)"
         },
         {
@@ -3497,7 +3673,12 @@
         "tools_required": [
           "calendars.clear",
           "calendarList.patch"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3553,7 +3734,12 @@
           "calendars.insert",
           "acl.insert",
           "calendars.delete"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -3634,7 +3820,12 @@
           "freeBusy.query",
           "events.get",
           "channels.stop"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3715,7 +3906,12 @@
           "events.watch",
           "calendarList.delete",
           "channels.stop"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3830,7 +4026,12 @@
           "acl.update",
           "settings.get",
           "events.update"
-        ]
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+R+U",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3885,7 +4086,12 @@
           "acl.insert",
           "acl.update",
           "settings.get"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3921,7 +4127,12 @@
           "events.instances",
           "settings.list",
           "calendars.clear"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -3983,7 +4194,12 @@
           "calendars.patch",
           "acl.watch",
           "calendarList.delete"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4084,7 +4300,12 @@
           "events.patch",
           "events.list",
           "acl.watch"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4179,7 +4400,12 @@
           "freeBusy.query",
           "events.insert",
           "calendarList.patch"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4288,13 +4514,18 @@
           "events.update",
           "events.watch",
           "acl.watch"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_46",
       "name": "Brineglass Works - move, create, ACL update, settings watch",
-      "prompt": "On the Brineglass Works calendar (ID cal_brineglass_works), first fetch the event evt_brineglass_forge_demo, then move it to the Harbor Kiln Hall calendar (ID cal_harbor_kiln_hall). Next, use free/busy to find the earliest 30-minute overlap for Lucia (lucia@test.com) and Noah (noah@test.com) on June 30, 2018, and create a new event Saltglass Alignment on Brineglass Works at that time. Then fully replace Lucia\u2019s ACL rule (user:lucia@test.com) on Brineglass Works to writer. Finally, set up a settings watch for my account.",
+      "prompt": "On the Brineglass Works calendar (ID cal_brineglass_works), first fetch the event evt_brineglass_forge_demo, then move it to the Harbor Kiln Hall calendar (ID cal_harbor_kiln_hall). Next, use free/busy to find the earliest 30-minute overlap for Lucia (lucia@test.com) and Noah (noah@test.com) on June 30, 2018, and create a new event Saltglass Alignment on Brineglass Works at that time. Then fully replace Lucia’s ACL rule (user:lucia@test.com) on Brineglass Works to writer. Finally, set up a settings watch for my account.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -4384,7 +4615,12 @@
           "events.insert",
           "acl.update",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4477,7 +4713,12 @@
           "calendarList.get",
           "acl.watch",
           "calendarList.watch"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4565,13 +4806,18 @@
           "calendarList.patch",
           "calendarList.watch",
           "calendars.delete"
-        ]
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_50",
       "name": "Emberveil Rookery - subscribe, watch, revoke, delete",
-      "prompt": "Subscribe me to the external calendar cal_emberveil_rookery. Then start an events watch on that calendar. Next, check Hana\u2019s calendar and only set up a settings watch for my account if Hana has an event on June 30, 2018 at 9:00-9:30am Asia/Tokyo time. Then, only remove Salma\u2019s access from Emberveil Rookery (rule cal_emberveil_rookery:user:salma@test.com) if that calendar has more than 7 events between June 20-27, 2018. Finally, delete the obsolete Ashfeather Annex calendar (ID cal_ashfeather_annex).",
+      "prompt": "Subscribe me to the external calendar cal_emberveil_rookery. Then start an events watch on that calendar. Next, check Hana’s calendar and only set up a settings watch for my account if Hana has an event on June 30, 2018 at 9:00-9:30am Asia/Tokyo time. Then, only remove Salma’s access from Emberveil Rookery (rule cal_emberveil_rookery:user:salma@test.com) if that calendar has more than 7 events between June 20-27, 2018. Finally, delete the obsolete Ashfeather Annex calendar (ID cal_ashfeather_annex).",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -4661,13 +4907,18 @@
           "settings.watch",
           "acl.delete",
           "calendars.delete"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_51",
       "name": "Windchord Cartotheca - create, color, list patch, ACL update",
-      "prompt": "Create a new calendar named Windchord Cartotheca. Pull the calendar color palette and set it to color ID 11. Then fetch its calendar list entry and patch it so the calendar is visible and selected. Also update the calendar description to 'Atlas repair bays.' Fully replace Aiko\u2019s ACL rule (user:aiko@test.com) on this calendar to writer. At the very end, on my primary calendar, count the attendees on event evt_cartotheca_intake_huddle (Cartotheca Intake Huddle) and copy those attendees as invitees to event evt_atlas_crate_sync (Atlas Crate Sync). Add the note 'Copied <the number of attendees you copied> attendees' to Atlas Crate Sync\u2019s description.",
+      "prompt": "Create a new calendar named Windchord Cartotheca. Pull the calendar color palette and set it to color ID 11. Then fetch its calendar list entry and patch it so the calendar is visible and selected. Also update the calendar description to 'Atlas repair bays.' Fully replace Aiko’s ACL rule (user:aiko@test.com) on this calendar to writer. At the very end, on my primary calendar, count the attendees on event evt_cartotheca_intake_huddle (Cartotheca Intake Huddle) and copy those attendees as invitees to event evt_atlas_crate_sync (Atlas Crate Sync). Add the note 'Copied <the number of attendees you copied> attendees' to Atlas Crate Sync’s description.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -4781,7 +5032,12 @@
           "acl.update",
           "events.get",
           "events.patch"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -4982,13 +5238,18 @@
           "events.list",
           "events.patch",
           "events.move"
-        ]
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_53",
       "name": "Crystalfold Foundry - replace, delete events, unsubscribe",
-      "prompt": "On the Crystalfold Foundry calendar (ID cal_crystalfold_foundry), fully replace evt_crystalfold_quench so it\u2019s on July 1, 2018 from 9:00am-10:30am at Forge Bay 2. Then delete evt_crystalfold_slag and evt_crystalfold_mold. Finally, unsubscribe me from the Old Lattice Mill calendar (ID cal_old_lattice_mill).",
+      "prompt": "On the Crystalfold Foundry calendar (ID cal_crystalfold_foundry), fully replace evt_crystalfold_quench so it’s on July 1, 2018 from 9:00am-10:30am at Forge Bay 2. Then delete evt_crystalfold_slag and evt_crystalfold_mold. Finally, unsubscribe me from the Old Lattice Mill calendar (ID cal_old_lattice_mill).",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -5099,13 +5360,18 @@
           "events.update",
           "events.delete",
           "calendarList.delete"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
       "id": "test_54",
       "name": "Sablewind Archive - share, revoke, list patch, settings watch",
-      "prompt": "On the Sablewind Archive calendar (ID cal_sablewind_archive), fetch its calendar list entry and set it to visible (not hidden) with color ID 5. Share the calendar with Keiko (keiko@test.com) as writer, and remove Salma\u2019s access (rule cal_sablewind_archive:user:salma@test.com). Finally, set up a settings watch for my account.",
+      "prompt": "On the Sablewind Archive calendar (ID cal_sablewind_archive), fetch its calendar list entry and set it to visible (not hidden) with color ID 5. Share the calendar with Keiko (keiko@test.com) as writer, and remove Salma’s access (rule cal_sablewind_archive:user:salma@test.com). Finally, set up a settings watch for my account.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -5192,13 +5458,18 @@
           "acl.insert",
           "acl.delete",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_55",
       "name": "Skyloom Observatory - event replace, ACL update, events watch",
-      "prompt": "On the Skyloom Observatory calendar (ID cal_skyloom_observatory), list events first. Then fully replace evt_skyloom_alignment so it\u2019s on July 2, 2018 from 8:00pm\u20139:00pm at Upper Ring. Also fully replace the ACL rule user:mechanic@skyloom.example to reader. After that, start an events watch on the Skyloom Observatory calendar and list events again to confirm the change.",
+      "prompt": "On the Skyloom Observatory calendar (ID cal_skyloom_observatory), list events first. Then fully replace evt_skyloom_alignment so it’s on July 2, 2018 from 8:00pm–9:00pm at Upper Ring. Also fully replace the ACL rule user:mechanic@skyloom.example to reader. After that, start an events watch on the Skyloom Observatory calendar and list events again to confirm the change.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -5285,7 +5556,12 @@
           "events.update",
           "acl.update",
           "events.watch"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -5418,7 +5694,12 @@
           "acl.patch",
           "channels.stop",
           "calendars.delete"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+U+D",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -5484,7 +5765,12 @@
           "calendarList.insert",
           "calendarList.patch",
           "events.import"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -5583,7 +5869,12 @@
           "acl.get",
           "acl.watch",
           "calendars.clear"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+R+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -5794,7 +6085,12 @@
           "events.list",
           "events.delete",
           "events.patch"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -5910,13 +6206,18 @@
           "acl.list",
           "events.list",
           "events.delete"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_61",
       "name": "Wavelock Guest Sweep - create, purge attendees, freebusy, watch",
-      "prompt": "Create a new calendar called Wavelock Guest Sweep. Fully update that calendar to set timezone Europe/Berlin and description \"Guest sweep log and embargo notes.\" Then list events on my primary calendar and identify all events where Aiko, Farid, Lucia, or Oksana appear in the attendee list. Delete every such event. Run a free/busy query for those four across Aug 1\u20137, 2018, then another for Aug 8\u201314, 2018. Schedule a weekly 30-minute event on my primary calendar at the earliest time that doesn't conflict with any of those four attendees. Unsubscribe me from the legacy calendar cal_wavelock_legacy. Finally, start a watch on my calendar list and a watch on my settings.",
+      "prompt": "Create a new calendar called Wavelock Guest Sweep. Fully update that calendar to set timezone Europe/Berlin and description \"Guest sweep log and embargo notes.\" Then list events on my primary calendar and identify all events where Aiko, Farid, Lucia, or Oksana appear in the attendee list. Delete every such event. Run a free/busy query for those four across Aug 1–7, 2018, then another for Aug 8–14, 2018. Schedule a weekly 30-minute event on my primary calendar at the earliest time that doesn't conflict with any of those four attendees. Unsubscribe me from the legacy calendar cal_wavelock_legacy. Finally, start a watch on my calendar list and a watch on my settings.",
       "type": "actionEval",
       "seed_template": "calendar_default",
       "impersonate_user_id": "user_agent",
@@ -6072,7 +6373,12 @@
           "calendarList.delete",
           "calendarList.watch",
           "settings.watch"
-        ]
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     }
   ]
