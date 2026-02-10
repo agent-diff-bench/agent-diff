@@ -40,7 +40,12 @@
         "tools_required": [
           "teams",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -73,7 +78,12 @@
         "tools_required": [
           "teams",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -110,7 +120,12 @@
           "issues",
           "workflowStates",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -150,7 +165,12 @@
           "issues",
           "users",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -179,7 +199,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -215,7 +240,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "teamCreate"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -256,7 +286,12 @@
         "tools_required": [
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -293,7 +328,12 @@
           "teams",
           "users",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -329,7 +369,12 @@
         "tools_required": [
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -356,7 +401,12 @@
         "tools_required": [
           "teams",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -393,7 +443,12 @@
           "issues",
           "workflowStates",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -419,7 +474,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "issueLabelCreate"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -447,7 +507,12 @@
           "issueLabels",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -478,7 +543,12 @@
           "issueLabels",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -514,7 +584,12 @@
         "tools_required": [
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -546,7 +621,12 @@
           "comments",
           "issueLabels",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -583,7 +663,12 @@
           "issues",
           "workflowStates",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -620,7 +705,12 @@
           "issues",
           "users",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -659,7 +749,12 @@
           "teams",
           "issueLabels",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -688,7 +783,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -725,7 +825,12 @@
           "issues",
           "comments",
           "commentUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -765,7 +870,12 @@
           "issues",
           "comments",
           "commentDelete"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -817,7 +927,12 @@
           "teams",
           "issueLabels",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -854,7 +969,12 @@
           "issues",
           "workflowStates",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -892,7 +1012,12 @@
           "issueLabelCreate",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -928,7 +1053,12 @@
         "tools_required": [
           "issueLabels",
           "issueLabelUpdate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -964,7 +1094,12 @@
         "tools_required": [
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1020,7 +1155,12 @@
           "issueCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1059,7 +1199,12 @@
         "tools_required": [
           "workflowStates",
           "workflowStateArchive"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+D",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1113,7 +1258,12 @@
           "issues",
           "workflowStateCreate",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1143,7 +1293,12 @@
         "tools_required": [
           "teams",
           "teamMembershipCreate"
-        ]
+        ],
+        "task_horizon": 2,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1178,7 +1333,12 @@
         "min_tool_calls": 1,
         "tools_required": [
           "commentUpdate"
-        ]
+        ],
+        "task_horizon": 1,
+        "operation_type": "U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1239,7 +1399,12 @@
           "issueLabels",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1285,7 +1450,12 @@
           "teams",
           "workflowStates",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+U",
+        "entity_scope": "single",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1328,7 +1498,12 @@
           "teams",
           "issueCreate",
           "issueRelationCreate"
-        ]
+        ],
+        "task_horizon": 5,
+        "operation_type": "search+R+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1365,7 +1540,12 @@
           "teams",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 3,
+        "operation_type": "search+R+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1417,7 +1597,12 @@
           "issueLabels",
           "issues",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1469,7 +1654,12 @@
           "issues",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+U",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1513,7 +1703,12 @@
           "issues",
           "users",
           "issueCreate"
-        ]
+        ],
+        "task_horizon": 4,
+        "operation_type": "search+C",
+        "entity_scope": "single",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1551,7 +1746,12 @@
           "teams",
           "issueCreate",
           "issueRelationCreate"
-        ]
+        ],
+        "task_horizon": 6,
+        "operation_type": "search+C",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "low"
       }
     },
     {
@@ -1666,13 +1866,18 @@
           "issueRelationCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_42",
       "name": "Seed Library Germination Audit",
-      "prompt": "The Seed Library team is conducting its quarterly germination audit. We need to evaluate each donor's success rate and take appropriate action.\n\nFirst, calculate Yuto's germination rate: count how many of his seed packets are in \"Sprouted\" status versus \"Failed\" status, then compute (sprouted / total) \u00d7 100. If his rate is 75% or higher AND he has at least 2 different varieties that sprouted, create a new label called \"Seed Guardian\" and apply it to all of his packets as recognition.\n\nNext, handle Nneka's special case: she donated exactly one packet and it's marked as priority 1 (rare heirloom). Regardless of whether it sprouted or failed, move this packet to \"Preserved Collection\" status\u2014the library will attempt tissue culture propagation on rare genetics.\n\nFinally, evaluate Szymon's packets the same way. If his germination rate is below 60%, move all his non-sprouted packets to \"Needs Donor Review\" status and add a comment to each one that reads: \"GERMINATION_AUDIT: X sprouted / Y total = Z% - below 60% threshold\" where X, Y, Z are the actual calculated values.",
+      "prompt": "The Seed Library team is conducting its quarterly germination audit. We need to evaluate each donor's success rate and take appropriate action.\n\nFirst, calculate Yuto's germination rate: count how many of his seed packets are in \"Sprouted\" status versus \"Failed\" status, then compute (sprouted / total) × 100. If his rate is 75% or higher AND he has at least 2 different varieties that sprouted, create a new label called \"Seed Guardian\" and apply it to all of his packets as recognition.\n\nNext, handle Nneka's special case: she donated exactly one packet and it's marked as priority 1 (rare heirloom). Regardless of whether it sprouted or failed, move this packet to \"Preserved Collection\" status—the library will attempt tissue culture propagation on rare genetics.\n\nFinally, evaluate Szymon's packets the same way. If his germination rate is below 60%, move all his non-sprouted packets to \"Needs Donor Review\" status and add a comment to each one that reads: \"GERMINATION_AUDIT: X sprouted / Y total = Z% - below 60% threshold\" where X, Y, Z are the actual calculated values.",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -1772,13 +1977,18 @@
           "issueLabelCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 11,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_43",
       "name": "Forest Mycology Collective Expedition",
-      "prompt": "The Forest Mycology Collective is organizing their autumn foraging expedition. First, create a new team called \"Forest Mycology Collective\" to track all club activities.\n\nCreate a label called \"awaiting-spore-print\" for specimens that need laboratory analysis before identification can be confirmed.\n\nNow set up the expedition: create an issue titled \"Coastal Redwood Reserve Autumn Foray\" and assign it to Haruki as the expedition leader.\n\nDuring the planning phase, we're pre-logging anticipated specimen finds based on last year's survey. Create a specimen issue titled \"Specimen #1: Cantharellus formosus cluster - Sector 7\" and assign it to Priya for documentation. Create another specimen issue \"Specimen #2: Unknown Amanita - requires cross-reference\" and assign it to Dmitri, applying the \"awaiting-spore-print\" label.\n\nThe Amanita identification depends on comparing its spore print against the Cantharellus specimen first (they were found in the same microhabitat and we need to rule out look-alikes). Set up the Amanita issue as blocked by the Cantharellus issue.\n\nFinally, add a field note comment to the Cantharellus specimen that reads: \"FIELD_NOTE_REF: GPS coordinates 41.2132\u00b0N, found near fallen Douglas fir. Fruiting body golden-yellow, false gills present, apricot aroma confirmed.\"",
+      "prompt": "The Forest Mycology Collective is organizing their autumn foraging expedition. First, create a new team called \"Forest Mycology Collective\" to track all club activities.\n\nCreate a label called \"awaiting-spore-print\" for specimens that need laboratory analysis before identification can be confirmed.\n\nNow set up the expedition: create an issue titled \"Coastal Redwood Reserve Autumn Foray\" and assign it to Haruki as the expedition leader.\n\nDuring the planning phase, we're pre-logging anticipated specimen finds based on last year's survey. Create a specimen issue titled \"Specimen #1: Cantharellus formosus cluster - Sector 7\" and assign it to Priya for documentation. Create another specimen issue \"Specimen #2: Unknown Amanita - requires cross-reference\" and assign it to Dmitri, applying the \"awaiting-spore-print\" label.\n\nThe Amanita identification depends on comparing its spore print against the Cantharellus specimen first (they were found in the same microhabitat and we need to rule out look-alikes). Set up the Amanita issue as blocked by the Cantharellus issue.\n\nFinally, add a field note comment to the Cantharellus specimen that reads: \"FIELD_NOTE_REF: GPS coordinates 41.2132°N, found near fallen Douglas fir. Fruiting body golden-yellow, false gills present, apricot aroma confirmed.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -1887,7 +2097,12 @@
           "issueUpdate",
           "issueRelationCreate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 11,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1951,7 +2166,12 @@
           "issueCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -1998,7 +2218,9 @@
               }
             }
           },
-          "ignore": ["updatedAt"]
+          "ignore": [
+            "updatedAt"
+          ]
         },
         {
           "diff_type": "added",
@@ -2045,7 +2267,12 @@
           "issueUpdate",
           "commentCreate",
           "commentUpdate"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2116,7 +2343,12 @@
           "commentCreate",
           "commentDelete",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2220,13 +2452,18 @@
           "issueRelationCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_48",
       "name": "Research Grant Application Pipeline",
-      "prompt": "The Research team needs to set up the grant application pipeline for the upcoming NIH submission deadline (June 15th).\n\nFirst, find the existing \"IRB Ethics Approval\" issue - this is our starting point and is already in progress.\n\nCreate three new issues in the Research team to complete the pipeline:\n\n1. \"Data Collection Protocol v2\" - Nadia will own this. It cannot begin until ethics approval is complete.\n\n2. \"Pilot Study Design - 50 participant cohort\" - Tom\u00e1s will lead this. It depends on having the data collection protocol finalized.\n\n3. \"Grant Submission Draft - R01 mechanism\" - Chioma will compile the final submission. This is the last step and depends on pilot study results.\n\nSet up the blocking relationships to enforce the sequential workflow:\n- IRB Ethics Approval blocks Data Collection Protocol\n- Data Collection Protocol blocks Pilot Study Design\n- Pilot Study Design blocks Grant Submission Draft\n\nAfter setting up the dependencies, add a comment to the Grant Submission issue summarizing the critical path: \"PIPELINE_STATUS: This submission depends on completion chain: Ethics (in progress) \u2192 Data Protocol (Nadia) \u2192 Pilot Study (Tom\u00e1s) \u2192 This draft. Target: June 15th deadline.\"",
+      "prompt": "The Research team needs to set up the grant application pipeline for the upcoming NIH submission deadline (June 15th).\n\nFirst, find the existing \"IRB Ethics Approval\" issue - this is our starting point and is already in progress.\n\nCreate three new issues in the Research team to complete the pipeline:\n\n1. \"Data Collection Protocol v2\" - Nadia will own this. It cannot begin until ethics approval is complete.\n\n2. \"Pilot Study Design - 50 participant cohort\" - Tomás will lead this. It depends on having the data collection protocol finalized.\n\n3. \"Grant Submission Draft - R01 mechanism\" - Chioma will compile the final submission. This is the last step and depends on pilot study results.\n\nSet up the blocking relationships to enforce the sequential workflow:\n- IRB Ethics Approval blocks Data Collection Protocol\n- Data Collection Protocol blocks Pilot Study Design\n- Pilot Study Design blocks Grant Submission Draft\n\nAfter setting up the dependencies, add a comment to the Grant Submission issue summarizing the critical path: \"PIPELINE_STATUS: This submission depends on completion chain: Ethics (in progress) → Data Protocol (Nadia) → Pilot Study (Tomás) → This draft. Target: June 15th deadline.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -2310,7 +2547,12 @@
           "issueRelationCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2394,13 +2636,18 @@
           "issueRelationCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 12,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_50",
       "name": "Archaeological Dig Site Coordination - Deadlock Resolution",
-      "prompt": "The Archaeology team is managing the Season 3 excavation at Site Karnak-West. There's a workflow problem blocking progress.\n\nExamine the issues \"Artifact Photography Documentation\" and \"Lab Sample Analysis\". These two issues are in a dependency deadlock - each one is marked as blocking the other, which means neither can proceed.\n\nDetermine which blocking relationship is incorrect. The correct archaeological workflow is: Photography must complete BEFORE samples can go to the lab (you need photos of artifacts in situ before extraction for the record). The reverse relationship (lab blocking photography) was added by mistake and makes no sense.\n\nDelete the incorrect blocking relationship to resolve the deadlock.\n\nNow extend the workflow. Create a new issue called \"Final Site Report Compilation - Season 3\" in the Archaeology team. This report cannot be written until BOTH the photography documentation AND the lab analysis are complete. Set up both as blockers for the report.\n\nAssign the work: Ximena handles photography, Okonkwo handles lab analysis, and S\u00f8ren compiles the final report.\n\nMove the photography issue to \"In Progress\" now that it's unblocked.\n\nAfter fixing everything, add a comment to the \"Lab Sample Analysis\" issue documenting the fix: \"WORKFLOW_FIX: Removed erroneous blocking relation where Lab was blocking Photography. Correct flow is Photography \u2192 Lab (need in-situ photos before extraction). Deadlock resolved. Current chain: Photography \u2192 Lab Analysis \u2192 Final Report.\"",
+      "prompt": "The Archaeology team is managing the Season 3 excavation at Site Karnak-West. There's a workflow problem blocking progress.\n\nExamine the issues \"Artifact Photography Documentation\" and \"Lab Sample Analysis\". These two issues are in a dependency deadlock - each one is marked as blocking the other, which means neither can proceed.\n\nDetermine which blocking relationship is incorrect. The correct archaeological workflow is: Photography must complete BEFORE samples can go to the lab (you need photos of artifacts in situ before extraction for the record). The reverse relationship (lab blocking photography) was added by mistake and makes no sense.\n\nDelete the incorrect blocking relationship to resolve the deadlock.\n\nNow extend the workflow. Create a new issue called \"Final Site Report Compilation - Season 3\" in the Archaeology team. This report cannot be written until BOTH the photography documentation AND the lab analysis are complete. Set up both as blockers for the report.\n\nAssign the work: Ximena handles photography, Okonkwo handles lab analysis, and Søren compiles the final report.\n\nMove the photography issue to \"In Progress\" now that it's unblocked.\n\nAfter fixing everything, add a comment to the \"Lab Sample Analysis\" issue documenting the fix: \"WORKFLOW_FIX: Removed erroneous blocking relation where Lab was blocking Photography. Correct flow is Photography → Lab (need in-situ photos before extraction). Deadlock resolved. Current chain: Photography → Lab Analysis → Final Report.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -2532,7 +2779,12 @@
           "issueRelationCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 13,
+        "operation_type": "search+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2627,13 +2879,18 @@
           "issueCreate",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "explicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_52",
       "name": "Pottery Studio - Kiln Firing Schedule",
-      "prompt": "The Clay & Fire pottery studio tracks their kiln schedule. Help update the firing queue.\n\nFirst, find the existing issues \"Fatou's Celadon Vase\" and \"Stoneware Bowl Set\" in the Ceramics team.\n\nThe celadon vase is ready to go in the kiln - move it to \"Firing\" status.\n\nThe stoneware bowls have finished their cone 10 firing and need to cool down - move them to \"Cooling\" status.\n\nCreate a new label called \"raku-firing\" for pieces that will use the rapid-cooling technique (we'll apply it to future items).\n\nFinally, add a kiln log comment to the celadon vase issue: \"KILN_LOG: Loaded into kiln #2 at 9:15am. Target: Cone 9 oxidation (~2300\u00b0F). Fatou requested slow cooling for crystal development. Do not open kiln door until temp drops below 400\u00b0F.\"",
+      "prompt": "The Clay & Fire pottery studio tracks their kiln schedule. Help update the firing queue.\n\nFirst, find the existing issues \"Fatou's Celadon Vase\" and \"Stoneware Bowl Set\" in the Ceramics team.\n\nThe celadon vase is ready to go in the kiln - move it to \"Firing\" status.\n\nThe stoneware bowls have finished their cone 10 firing and need to cool down - move them to \"Cooling\" status.\n\nCreate a new label called \"raku-firing\" for pieces that will use the rapid-cooling technique (we'll apply it to future items).\n\nFinally, add a kiln log comment to the celadon vase issue: \"KILN_LOG: Loaded into kiln #2 at 9:15am. Target: Cone 9 oxidation (~2300°F). Fatou requested slow cooling for crystal development. Do not open kiln door until temp drops below 400°F.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -2737,7 +2994,12 @@
           "issueUpdate",
           "issueLabelCreate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2835,13 +3097,18 @@
           "users",
           "issueCreate",
           "issueUpdate"
-        ]
+        ],
+        "task_horizon": 7,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_54",
-      "name": "Board Game Caf\u00e9 - Tournament Rescheduling Crisis",
-      "prompt": "The Meeple & Brew board game caf\u00e9 has a scheduling emergency. The venue for our Catan Regional Championship double-booked us, so we need to reschedule the entire tournament pipeline.\n\nFind the three tournament issues: \"Catan Regional Championship - Spring 2025\", \"Qualifying Round - Top 16 Bracket\", and \"Tournament Registration Deadline\".\n\nThe championship was originally March 15th but must move to March 23rd (8-day delay).\n\nHere's the critical part - the dates are interdependent:\n- The Qualifying Round must happen exactly 7 days before the Championship\n- The Registration Deadline must close exactly 5 days before the Qualifying Round\n\nCalculate and update all three due dates accordingly.\n\nAlso, Yuto was organizing the championship but has a work trip conflict on the new date. Reassign the championship to Adaeze. Keep Henrik on the qualifying round.\n\nAfter updating all dates, add a comment to the championship issue documenting the changes:\n\n\"RESCHEDULE_AUDIT: Venue conflict forced 8-day delay. New timeline calculated:\n- Registration closes: March 11th (was March 3rd)\n- Qualifiers: March 16th (was March 8th)\n- Championship: March 23rd (was March 15th)\nOrganizer handoff: Yuto \u2192 Adaeze due to travel conflict.\"",
+      "name": "Board Game Café - Tournament Rescheduling Crisis",
+      "prompt": "The Meeple & Brew board game café has a scheduling emergency. The venue for our Catan Regional Championship double-booked us, so we need to reschedule the entire tournament pipeline.\n\nFind the three tournament issues: \"Catan Regional Championship - Spring 2025\", \"Qualifying Round - Top 16 Bracket\", and \"Tournament Registration Deadline\".\n\nThe championship was originally March 15th but must move to March 23rd (8-day delay).\n\nHere's the critical part - the dates are interdependent:\n- The Qualifying Round must happen exactly 7 days before the Championship\n- The Registration Deadline must close exactly 5 days before the Qualifying Round\n\nCalculate and update all three due dates accordingly.\n\nAlso, Yuto was organizing the championship but has a work trip conflict on the new date. Reassign the championship to Adaeze. Keep Henrik on the qualifying round.\n\nAfter updating all dates, add a comment to the championship issue documenting the changes:\n\n\"RESCHEDULE_AUDIT: Venue conflict forced 8-day delay. New timeline calculated:\n- Registration closes: March 11th (was March 3rd)\n- Qualifiers: March 16th (was March 8th)\n- Championship: March 23rd (was March 15th)\nOrganizer handoff: Yuto → Adaeze due to travel conflict.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -2949,7 +3216,12 @@
           "users",
           "issueUpdate",
           "commentCreate"
-        ]
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
@@ -2970,7 +3242,9 @@
           },
           "expected_changes": {
             "teamId": {
-              "to": {"eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"}
+              "to": {
+                "eq": "ad608998-915c-4bad-bcd9-85ebfccccee8"
+              }
             }
           },
           "expected_count": 1,
@@ -3098,7 +3372,12 @@
         ],
         "requires_aggregation": true,
         "requires_max_finding": true,
-        "requires_arithmetic": true
+        "requires_arithmetic": true,
+        "task_horizon": 12,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "high"
       }
     },
     {
@@ -3213,13 +3492,18 @@
         "requires_counting": true,
         "requires_id_collection": true,
         "expected_count": 3,
-        "affected_issues": 2
+        "affected_issues": 2,
+        "task_horizon": 11,
+        "operation_type": "search+R+C",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     },
     {
       "id": "test_57",
       "name": "Competitive Pigeon Racing Club - Storm Emergency Protocol",
-      "prompt": "The Wing & Wind pigeon racing club has an emergency. A fast-moving storm system is approaching the race corridor and we need to execute safety protocols.\n\nFirst, find all birds currently marked as \"In Flight\" in the Racing Operations team - these are the ones at risk.\n\nCreate an emergency coordination issue in the Racing Operations team titled \"WEATHER ALERT: Storm cell approaching sector 7 - All birds at risk\" with description \"NWS severe thunderstorm warning issued 14:32 UTC. Wind gusts to 60mph expected. Initiating emergency diversion protocol.\"\n\nFind the bird tracking issue for \"Stormchaser\" (Liora's champion racer, band #2847). Update it to add this to the description: \"DIVERSION ACTIVE: Rerouted to backup loft at coordinates 41.8781\u00b0 N, 87.6298\u00b0 W. Amadi's loft confirmed ready to receive.\"\n\nFinally, add a weather advisory comment to the emergency coordination issue:\n\"WEATHER_LOG: Storm tracking update at 14:45 UTC. Cell moving NNE at 35mph. ETA to race corridor: 47 minutes. All handlers notified via SMS. GPS tracking shows 3 birds diverted successfully. Amadi confirming visual on Stormchaser approaching backup loft.\"",
+      "prompt": "The Wing & Wind pigeon racing club has an emergency. A fast-moving storm system is approaching the race corridor and we need to execute safety protocols.\n\nFirst, find all birds currently marked as \"In Flight\" in the Racing Operations team - these are the ones at risk.\n\nCreate an emergency coordination issue in the Racing Operations team titled \"WEATHER ALERT: Storm cell approaching sector 7 - All birds at risk\" with description \"NWS severe thunderstorm warning issued 14:32 UTC. Wind gusts to 60mph expected. Initiating emergency diversion protocol.\"\n\nFind the bird tracking issue for \"Stormchaser\" (Liora's champion racer, band #2847). Update it to add this to the description: \"DIVERSION ACTIVE: Rerouted to backup loft at coordinates 41.8781° N, 87.6298° W. Amadi's loft confirmed ready to receive.\"\n\nFinally, add a weather advisory comment to the emergency coordination issue:\n\"WEATHER_LOG: Storm tracking update at 14:45 UTC. Cell moving NNE at 35mph. ETA to race corridor: 47 minutes. All handlers notified via SMS. GPS tracking shows 3 birds diverted successfully. Amadi confirming visual on Stormchaser approaching backup loft.\"",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -3381,7 +3665,12 @@
         ],
         "requires_state_filtering": true,
         "expected_in_flight_birds": 3,
-        "coordinate_precision_test": true
+        "coordinate_precision_test": true,
+        "task_horizon": 12,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "implicit",
+        "prompt_ambiguity": "medium"
       }
     }
   ]

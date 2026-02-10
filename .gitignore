@@ -245,3 +245,6 @@ local_experiments/
 .claude/**
 !.claude/CLAUDE.md
 !.claude/settings.json
+
+experiments/kdd 2026
+
