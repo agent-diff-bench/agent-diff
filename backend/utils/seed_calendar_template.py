@@ -203,7 +203,9 @@ def main():
     # Try backend/seeds/ first (Docker), fall back to repo root (local dev)
     seeds_dir = Path(__file__).parent.parent / "seeds" / "calendar"
     if not seeds_dir.exists():
-        seeds_dir = Path(__file__).parent.parent.parent / "examples" / "calendar" / "seeds"
+        seeds_dir = (
+            Path(__file__).parent.parent.parent / "examples" / "calendar" / "seeds"
+        )
 
     # Create empty base template
     create_template(engine, "calendar_base")
@@ -214,7 +216,9 @@ def main():
         for seed_file in seed_files:
             template_name = seed_file.stem
             create_template(engine, template_name, seed_file)
-        print(f"\nAll {1 + len(seed_files)} Calendar template(s) created successfully\n")
+        print(
+            f"\nAll {1 + len(seed_files)} Calendar template(s) created successfully\n"
+        )
     else:
         print(f"\nSeeds directory not found: {seeds_dir}")
         print("Only calendar_base template created.\n")

@@ -44,7 +44,42 @@ class EnvironmentHandler:
         )
         meta.create_all(translated)
 
+        # Copy GIN / non-standard indexes that MetaData.reflect doesn't capture
+        self._copy_custom_indexes(template_schema, target_schema)
+
         self._set_replica_identity(target_schema)
+
+    def _copy_custom_indexes(self, src_schema: str, dst_schema: str) -> None:
+        """Copy GIN trigram and other custom indexes from template to target schema."""
+        with self.session_manager.base_engine.begin() as conn:
+            rows = conn.execute(
+                text(
+                    """
+                    SELECT indexname, indexdef
+                    FROM pg_indexes
+                    WHERE schemaname = :schema
+                      AND indexdef LIKE '%gin%'
+                    """
+                ),
+                {"schema": src_schema},
+            ).fetchall()
+            for idx_name, idx_def in rows:
+                # Rewrite the CREATE INDEX to target the new schema
+                new_def = idx_def.replace(
+                    f" ON {src_schema}.", f" ON {dst_schema}."
+                )
+                # Avoid name collisions by prefixing with target schema
+                new_idx_name = f"{dst_schema}_{idx_name}"
+                new_def = new_def.replace(
+                    f"CREATE INDEX {idx_name}",
+                    f"CREATE INDEX IF NOT EXISTS {new_idx_name}",
+                )
+                try:
+                    conn.execute(text(new_def))
+                except Exception as exc:
+                    logger.warning(
+                        f"Could not copy index {idx_name} to {dst_schema}: {exc}"
+                    )
 
     def _list_tables(self, conn, schema: str) -> list[str]:
         rows = conn.execute(

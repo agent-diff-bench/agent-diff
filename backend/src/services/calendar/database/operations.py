@@ -2,11 +2,12 @@
 # CRUD operations for all Calendar API resources
 
 import logging
+import time
 from datetime import datetime, timezone, timedelta
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload, joinedload
 from sqlalchemy import select, and_, or_, func, update, delete
 from sqlalchemy.exc import IntegrityError
 
@@ -131,9 +132,7 @@ def get_user(session: Session, user_id: str) -> Optional[User]:
 
 def get_user_by_email(session: Session, email: str) -> Optional[User]:
     """Get a user by email."""
-    return session.execute(
-        select(User).where(User.email == email)
-    ).scalar_one_or_none()
+    return session.execute(select(User).where(User.email == email)).scalar_one_or_none()
 
 
 def _create_default_settings(session: Session, user_id: str) -> None:
@@ -236,12 +235,16 @@ def get_calendar(
     user_id: Optional[str] = None,
 ) -> Calendar:
     """Get a calendar by ID, optionally resolving 'primary'."""
+    t_start = time.perf_counter()
     if calendar_id == "primary" and user_id:
         user = session.get(User, user_id)
         if user:
             calendar_id = user.email
 
     calendar = session.get(Calendar, calendar_id)
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(f"[PERF] get_calendar({calendar_id}) time={t_ms:.0f}ms")
     if calendar is None or calendar.deleted:
         raise CalendarNotFoundError(calendar_id)
 
@@ -426,6 +429,7 @@ def list_calendar_list_entries(
 
     Returns: (entries, next_page_token, next_sync_token)
     """
+    t_start = time.perf_counter()
     # Handle sync token
     if sync_token:
         token_record = session.execute(
@@ -442,15 +446,21 @@ def list_calendar_list_entries(
             raise SyncTokenExpiredError()
 
         # Return only items updated since token was created
-        query = select(CalendarListEntry).where(
-            and_(
-                CalendarListEntry.user_id == user_id,
-                CalendarListEntry.updated_at > token_record.snapshot_time,
+        query = (
+            select(CalendarListEntry)
+            .options(joinedload(CalendarListEntry.calendar))
+            .where(
+                and_(
+                    CalendarListEntry.user_id == user_id,
+                    CalendarListEntry.updated_at > token_record.snapshot_time,
+                )
             )
         )
     else:
-        query = select(CalendarListEntry).where(
-            CalendarListEntry.user_id == user_id
+        query = (
+            select(CalendarListEntry)
+            .options(joinedload(CalendarListEntry.calendar))
+            .where(CalendarListEntry.user_id == user_id)
         )
 
     # Apply filters
@@ -481,7 +491,7 @@ def list_calendar_list_entries(
         offset, _ = PageToken.decode(page_token)
     query = query.offset(offset).limit(max_results + 1)
 
-    entries = list(session.execute(query).scalars().all())
+    entries = list(session.execute(query).unique().scalars().all())
 
     # Check if there are more results
     next_page_token = None
@@ -495,6 +505,12 @@ def list_calendar_list_entries(
         # Only generate sync token for initial full sync
         next_sync_token = _create_sync_token(session, user_id, "calendarList")
 
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] list_calendar_list_entries({user_id}) time={t_ms:.0f}ms "
+            f"entries={len(entries)}"
+        )
     return entries, next_page_token, next_sync_token
 
 
@@ -576,6 +592,7 @@ def create_event(
     **kwargs: Any,
 ) -> Event:
     """Create a new event."""
+    t_start_perf = time.perf_counter()
     calendar = get_calendar(session, calendar_id, user_id)
     _check_calendar_access(session, calendar.id, user_id, AccessRole.writer)
 
@@ -607,7 +624,9 @@ def create_event(
     # Use provided values if present, otherwise default to current user
     # This matches Google Calendar API behavior where imports preserve original organizer
     organizer_email = kwargs.pop("organizer_email", None) or user.email
-    organizer_display_name = kwargs.pop("organizer_display_name", None) or user.display_name
+    organizer_display_name = (
+        kwargs.pop("organizer_display_name", None) or user.display_name
+    )
     organizer_self = organizer_email == user.email
 
     event = Event(
@@ -663,6 +682,12 @@ def create_event(
         session.rollback()
         raise DuplicateError(f"Event already exists: {event_id}")
 
+    t_ms = (time.perf_counter() - t_start_perf) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] create_event({calendar_id}, {event_id}) time={t_ms:.0f}ms "
+            f"attendees={len(attendees) if attendees else 0}"
+        )
     return event
 
 
@@ -675,25 +700,26 @@ def get_event(
 ) -> Event:
     """
     Get an event by ID, including recurring event instances.
-    
+
     This function handles three cases:
     1. Regular event: Returns the event directly
     2. Persisted exception: Returns the exception event
     3. Virtual instance: Creates and returns a virtual Event object
-    
+
     Args:
         session: Database session
         calendar_id: Calendar ID
         event_id: Event ID (may be an instance ID like "abc123_20180618T100000Z")
         user_id: User ID for access check
         time_zone: Optional timezone for response formatting
-        
+
     Returns:
         Event object (may be virtual for recurring instances)
-        
+
     Raises:
         EventNotFoundError: If event not found or cancelled
     """
+    t_start = time.perf_counter()
     calendar = get_calendar(session, calendar_id, user_id)
     _check_calendar_access(session, calendar.id, user_id, AccessRole.reader)
 
@@ -702,25 +728,30 @@ def get_event(
     if event is not None and event.calendar_id == calendar.id:
         if event.status == EventStatus.cancelled:
             raise EventNotFoundError(event_id)
+        t_ms = (time.perf_counter() - t_start) * 1000
+        if t_ms > 10:
+            logger.info(
+                f"[PERF] get_event({calendar_id}, {event_id}) time={t_ms:.0f}ms"
+            )
         return event
-    
+
     # Check if this is a recurring instance ID
     base_id, original_time_str = parse_instance_id(event_id)
     if not original_time_str:
         # Not an instance ID and not found as regular event
         raise EventNotFoundError(event_id)
-    
+
     # Get the master recurring event
     master = session.get(Event, base_id)
     if master is None or master.calendar_id != calendar.id or not master.recurrence:
         raise EventNotFoundError(event_id)
-    
+
     if master.status == EventStatus.cancelled:
         raise EventNotFoundError(event_id)
-    
+
     # Parse the original start time
     original_dt = parse_original_start_time(original_time_str)
-    
+
     # Check for a cancelled exception for this instance
     cancelled = session.execute(
         select(Event).where(
@@ -730,14 +761,14 @@ def get_event(
             )
         )
     ).scalar_one_or_none()
-    
+
     if cancelled:
         raise EventNotFoundError(event_id)
-    
+
     # Verify this instance exists in the recurrence
     time_min = original_dt - timedelta(minutes=1)
     time_max = original_dt + timedelta(minutes=1)
-    
+
     instance_dates = expand_recurrence(
         recurrence=master.recurrence,
         start=master.start_datetime,
@@ -745,7 +776,7 @@ def get_event(
         time_max=time_max,
         max_instances=10,
     )
-    
+
     # Check if the original_dt is in the expanded instances
     instance_found = False
     for inst_dt in instance_dates:
@@ -754,15 +785,21 @@ def get_event(
             inst_dt = inst_dt.replace(tzinfo=timezone.utc)
         else:
             inst_dt = inst_dt.astimezone(timezone.utc)
-        
+
         if abs((inst_dt - original_dt).total_seconds()) < 60:  # Within 1 minute
             instance_found = True
             break
-    
+
     if not instance_found:
         raise EventNotFoundError(event_id)
 
     # Create virtual instance with attendees inherited from master
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] get_event({calendar_id}, {event_id}) time={t_ms:.0f}ms "
+            f"(virtual instance)"
+        )
     return _create_virtual_instance(master, original_dt, event_id, master.attendees)
 
 
@@ -781,14 +818,23 @@ def list_events(
     show_deleted: bool = False,
     sync_token: Optional[str] = None,
     ical_uid: Optional[str] = None,
+    _verified_calendar: Optional[Calendar] = None,
 ) -> tuple[list[Event], Optional[str], Optional[str]]:
     """
     List events from a calendar.
 
     Returns: (events, next_page_token, next_sync_token)
+
+    Args:
+        _verified_calendar: If the caller has already fetched and verified access
+            to the calendar, pass it here to avoid redundant DB lookups.
     """
-    calendar = get_calendar(session, calendar_id, user_id)
-    _check_calendar_access(session, calendar.id, user_id, AccessRole.reader)
+    t_start = time.perf_counter()
+    if _verified_calendar is not None:
+        calendar = _verified_calendar
+    else:
+        calendar = get_calendar(session, calendar_id, user_id)
+        _check_calendar_access(session, calendar.id, user_id, AccessRole.reader)
 
     # Handle sync token
     if sync_token:
@@ -806,14 +852,22 @@ def list_events(
         if token_record is None or token_record.expires_at < calendar_now():
             raise SyncTokenExpiredError()
 
-        query = select(Event).where(
-            and_(
-                Event.calendar_id == calendar.id,
-                Event.updated_at > token_record.snapshot_time,
+        query = (
+            select(Event)
+            .options(selectinload(Event.attendees))
+            .where(
+                and_(
+                    Event.calendar_id == calendar.id,
+                    Event.updated_at > token_record.snapshot_time,
+                )
             )
         )
     else:
-        query = select(Event).where(Event.calendar_id == calendar.id)
+        query = (
+            select(Event)
+            .options(selectinload(Event.attendees))
+            .where(Event.calendar_id == calendar.id)
+        )
 
     # Apply filters
     if not show_deleted:
@@ -870,7 +924,7 @@ def list_events(
         # Add the recurrence predicate to get only recurring masters
         recurring_query = query.where(Event.recurrence != None)  # noqa: E711
         recurring_masters = list(session.execute(recurring_query).scalars().all())
-        
+
         # Exclude recurring masters from main query (we'll merge expanded instances)
         query = query.where(Event.recurrence == None)  # noqa: E711
 
@@ -886,49 +940,51 @@ def list_events(
     if single_events and recurring_masters:
         from ..core.utils import expand_recurrence, format_rfc3339, parse_rfc3339
         from datetime import timedelta
-        
+
         # Parse page_token offset BEFORE expansion so we know how many instances to generate
         offset = 0
         if page_token:
             offset, _ = PageToken.decode(page_token)
-        
+
         # Calculate how many instances we need: offset + max_results + 1 (for next page check)
         instances_needed = offset + max_results + 1
-        
+
         # Get all non-recurring events first (no pagination yet)
         all_events = list(session.execute(query).scalars().all())
-        
+
         # Determine time bounds for expansion
         now = calendar_now()
         min_dt = parse_rfc3339(time_min) if time_min else now - timedelta(days=30)
         max_dt = parse_rfc3339(time_max) if time_max else now + timedelta(days=365)
-        
+
         # Ensure timezone-aware
         if min_dt.tzinfo is None:
             min_dt = min_dt.replace(tzinfo=timezone.utc)
         if max_dt.tzinfo is None:
             max_dt = max_dt.replace(tzinfo=timezone.utc)
-        
+
         # Expand each recurring master into instances
         for master in recurring_masters:
             if not master.start_datetime or not master.recurrence:
                 continue
-            
+
             start_dt = master.start_datetime
             if start_dt.tzinfo is None:
                 start_dt = start_dt.replace(tzinfo=timezone.utc)
-            
+
             # Calculate duration
             duration = timedelta(hours=1)
             if master.end_datetime and master.start_datetime:
                 duration = master.end_datetime - master.start_datetime
-            
+
             # Get all exceptions for this master event
-            exceptions_query = select(Event).where(
-                Event.recurring_event_id == master.id
+            exceptions_query = (
+                select(Event)
+                .options(selectinload(Event.attendees))
+                .where(Event.recurring_event_id == master.id)
             )
             exceptions = list(session.execute(exceptions_query).scalars().all())
-            
+
             # Build a set of exception original start times (for excluding from virtual instances)
             exception_times: set[str] = set()
             for exc in exceptions:
@@ -937,8 +993,8 @@ def list_events(
                     exc_dt = parse_rfc3339(exc.original_start_time["dateTime"])
                     if exc_dt.tzinfo is None:
                         exc_dt = exc_dt.replace(tzinfo=timezone.utc)
-                    exception_times.add(exc_dt.strftime('%Y%m%dT%H%M%SZ'))
-            
+                    exception_times.add(exc_dt.strftime("%Y%m%dT%H%M%SZ"))
+
             # Add exception events to results (modified or cancelled if show_deleted)
             for exc in exceptions:
                 if exc.status == EventStatus.cancelled and not show_deleted:
@@ -950,7 +1006,7 @@ def list_events(
                         exc_start = exc_start.replace(tzinfo=timezone.utc)
                     if exc_start >= min_dt and exc_start < max_dt:
                         all_events.append(exc)
-            
+
             try:
                 instance_dates = expand_recurrence(
                     recurrence=master.recurrence,
@@ -977,7 +1033,7 @@ def list_events(
                     inst_start = inst_start.replace(tzinfo=timezone.utc)
 
                 # Skip if there's an exception for this instance
-                inst_time_str = inst_start.strftime('%Y%m%dT%H%M%SZ')
+                inst_time_str = inst_start.strftime("%Y%m%dT%H%M%SZ")
                 if inst_time_str in exception_times:
                     continue
 
@@ -1002,12 +1058,21 @@ def list_events(
                     organizer_display_name=master.organizer_display_name,
                     organizer_profile_id=master.organizer_profile_id,
                     organizer_self=master.organizer_self,
-                    start={"dateTime": format_rfc3339(inst_start), "timeZone": master.start.get("timeZone", "UTC")},
-                    end={"dateTime": format_rfc3339(inst_end), "timeZone": master.end.get("timeZone", "UTC")},
+                    start={
+                        "dateTime": format_rfc3339(inst_start),
+                        "timeZone": master.start.get("timeZone", "UTC"),
+                    },
+                    end={
+                        "dateTime": format_rfc3339(inst_end),
+                        "timeZone": master.end.get("timeZone", "UTC"),
+                    },
                     start_datetime=inst_start,
                     end_datetime=inst_end,
                     recurring_event_id=master.id,
-                    original_start_time={"dateTime": format_rfc3339(inst_start), "timeZone": master.start.get("timeZone", "UTC")},
+                    original_start_time={
+                        "dateTime": format_rfc3339(inst_start),
+                        "timeZone": master.start.get("timeZone", "UTC"),
+                    },
                     sequence=master.sequence,
                     etag=generate_etag(f"{master.id}:{inst_start.isoformat()}"),
                     html_link=master.html_link,
@@ -1039,7 +1104,7 @@ def list_events(
                     instance.attendees.append(virtual_attendee)
 
                 all_events.append(instance)
-        
+
         # Helper to normalize datetime to timezone-aware for comparison
         def _normalize_dt(dt: Optional[datetime]) -> datetime:
             if dt is None:
@@ -1052,18 +1117,20 @@ def list_events(
         if order_by == "startTime":
             all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
         elif order_by == "updated":
-            all_events.sort(key=lambda e: (_normalize_dt(e.updated_at), e.id), reverse=True)
+            all_events.sort(
+                key=lambda e: (_normalize_dt(e.updated_at), e.id), reverse=True
+            )
         else:
             all_events.sort(key=lambda e: (_normalize_dt(e.start_datetime), e.id))
-        
+
         # Apply pagination to combined results (offset already decoded above)
-        paginated_events = all_events[offset:offset + max_results + 1]
-        
+        paginated_events = all_events[offset : offset + max_results + 1]
+
         next_page_token = None
         if len(paginated_events) > max_results:
             paginated_events = paginated_events[:max_results]
             next_page_token = PageToken.encode(offset + max_results)
-        
+
         events = paginated_events
     else:
         # Standard pagination for non-single_events queries
@@ -1087,6 +1154,12 @@ def list_events(
             session, user_id, "events", resource_id=calendar.id
         )
 
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] list_events({calendar_id}) time={t_ms:.0f}ms "
+            f"events={len(events)} single_events={single_events} q={q!r}"
+        )
     return events, next_page_token, next_sync_token
 
 
@@ -1140,9 +1213,7 @@ def update_event(
     # Handle attendees update
     if "attendees" in kwargs and kwargs["attendees"] is not None:
         # Remove existing attendees
-        session.execute(
-            delete(EventAttendee).where(EventAttendee.event_id == event_id)
-        )
+        session.execute(delete(EventAttendee).where(EventAttendee.event_id == event_id))
         # Add new attendees
         user = session.get(User, user_id)
         for idx, attendee_data in enumerate(kwargs["attendees"]):
@@ -1307,29 +1378,29 @@ def _get_master_event_for_instance(
 ) -> tuple[Optional[Event], Optional[str], Optional[datetime]]:
     """
     Get the master event for a recurring instance.
-    
+
     Args:
         session: Database session
         calendar_id: Calendar ID
         instance_id: Instance ID (may include time suffix)
         user_id: User ID for access check
-        
+
     Returns:
         Tuple of (master_event, original_time_str, original_datetime) or (None, None, None)
     """
     base_id, original_time_str = parse_instance_id(instance_id)
-    
+
     if not original_time_str:
         return None, None, None
-    
+
     # Get the master event
     master = session.get(Event, base_id)
     if master is None or master.calendar_id != calendar_id:
         return None, None, None
-    
+
     if not master.recurrence:
         return None, None, None
-    
+
     original_dt = parse_original_start_time(original_time_str)
     return master, original_time_str, original_dt
 
@@ -1344,10 +1415,10 @@ def update_recurring_instance(
 ) -> Event:
     """
     Update a single instance of a recurring event.
-    
+
     Creates a persisted exception event with the modifications.
     If an exception already exists for this instance, updates it.
-    
+
     Args:
         session: Database session
         calendar_id: Calendar ID
@@ -1355,32 +1426,32 @@ def update_recurring_instance(
         user_id: User ID
         user_email: User's email address
         **kwargs: Fields to update
-        
+
     Returns:
         The created/updated exception event
     """
     calendar = get_calendar(session, calendar_id, user_id)
     _check_calendar_access(session, calendar.id, user_id, AccessRole.writer)
-    
+
     # Check if an exception already exists
     existing = session.get(Event, instance_id)
     if existing and existing.calendar_id == calendar.id:
         # Update existing exception
         return update_event(session, calendar_id, instance_id, user_id, **kwargs)
-    
+
     # Get master event info
     master, original_time_str, original_dt = _get_master_event_for_instance(
         session, calendar.id, instance_id, user_id
     )
-    
+
     if not master or not original_dt:
         raise EventNotFoundError(instance_id)
-    
+
     # Validate that this instance date is valid for the recurrence
     # (not excluded by EXDATE and within the recurrence pattern)
     time_min = original_dt - timedelta(minutes=1)
     time_max = original_dt + timedelta(minutes=1)
-    
+
     instance_dates = expand_recurrence(
         recurrence=master.recurrence,
         start=master.start_datetime,
@@ -1388,7 +1459,7 @@ def update_recurring_instance(
         time_max=time_max,
         max_instances=10,
     )
-    
+
     # Check if the original_dt is in the expanded instances
     instance_found = False
     for inst_dt in instance_dates:
@@ -1397,37 +1468,43 @@ def update_recurring_instance(
             inst_dt = inst_dt.replace(tzinfo=timezone.utc)
         else:
             inst_dt = inst_dt.astimezone(timezone.utc)
-        
+
         if abs((inst_dt - original_dt).total_seconds()) < 60:  # Within 1 minute
             instance_found = True
             break
-    
+
     if not instance_found:
         raise EventNotFoundError(instance_id)
-    
+
     # Calculate default start/end for this instance
     duration = timedelta(hours=1)
     if master.end_datetime and master.start_datetime:
         duration = master.end_datetime - master.start_datetime
-    
+
     tz = master.start.get("timeZone", "UTC")
-    
+
     # Use provided start/end or calculate from original
-    new_start = kwargs.get("start", {
-        "dateTime": format_rfc3339(original_dt),
-        "timeZone": tz,
-    })
-    new_end = kwargs.get("end", {
-        "dateTime": format_rfc3339(original_dt + duration),
-        "timeZone": master.end.get("timeZone", tz),
-    })
-    
+    new_start = kwargs.get(
+        "start",
+        {
+            "dateTime": format_rfc3339(original_dt),
+            "timeZone": tz,
+        },
+    )
+    new_end = kwargs.get(
+        "end",
+        {
+            "dateTime": format_rfc3339(original_dt + duration),
+            "timeZone": master.end.get("timeZone", tz),
+        },
+    )
+
     # Build originalStartTime
     original_start_time = build_original_start_time(original_dt, tz)
-    
+
     # Get user for creator info
     user = session.get(User, user_id)
-    
+
     # Create exception event
     exception = Event(
         id=instance_id,
@@ -1450,8 +1527,12 @@ def update_recurring_instance(
         organizer_id=master.organizer_id,
         organizer_email=master.organizer_email,
         organizer_display_name=master.organizer_display_name,
-        creator_self=master.creator_email == user_email if master.creator_email else False,
-        organizer_self=master.organizer_email == user_email if master.organizer_email else False,
+        creator_self=master.creator_email == user_email
+        if master.creator_email
+        else False,
+        organizer_self=master.organizer_email == user_email
+        if master.organizer_email
+        else False,
         # Status and visibility
         status=EventStatus.confirmed,
         visibility=kwargs.get("visibility", master.visibility),
@@ -1461,18 +1542,26 @@ def update_recurring_instance(
         hangout_link=kwargs.get("hangout_link", master.hangout_link),
         conference_data=kwargs.get("conference_data", master.conference_data),
         reminders=kwargs.get("reminders", master.reminders),
-        extended_properties=kwargs.get("extended_properties", master.extended_properties),
+        extended_properties=kwargs.get(
+            "extended_properties", master.extended_properties
+        ),
         # Guest permissions
-        guests_can_invite_others=kwargs.get("guests_can_invite_others", master.guests_can_invite_others),
+        guests_can_invite_others=kwargs.get(
+            "guests_can_invite_others", master.guests_can_invite_others
+        ),
         guests_can_modify=kwargs.get("guests_can_modify", master.guests_can_modify),
-        guests_can_see_other_guests=kwargs.get("guests_can_see_other_guests", master.guests_can_see_other_guests),
-        anyone_can_add_self=kwargs.get("anyone_can_add_self", master.anyone_can_add_self),
+        guests_can_see_other_guests=kwargs.get(
+            "guests_can_see_other_guests", master.guests_can_see_other_guests
+        ),
+        anyone_can_add_self=kwargs.get(
+            "anyone_can_add_self", master.anyone_can_add_self
+        ),
         # Generate etag
         etag=generate_etag(f"{instance_id}:{calendar_now().isoformat()}"),
     )
-    
+
     session.add(exception)
-    
+
     # Handle attendees - if provided use them, otherwise inherit from master
     attendees = kwargs.get("attendees")
     if attendees is not None:
@@ -1492,10 +1581,14 @@ def update_recurring_instance(
             session.add(attendee)
     else:
         # No attendees provided - inherit from master event
-        master_attendees = session.execute(
-            select(EventAttendee).where(EventAttendee.event_id == master.id)
-        ).scalars().all()
-        
+        master_attendees = (
+            session.execute(
+                select(EventAttendee).where(EventAttendee.event_id == master.id)
+            )
+            .scalars()
+            .all()
+        )
+
         for master_att in master_attendees:
             attendee = EventAttendee(
                 event_id=instance_id,
@@ -1509,7 +1602,7 @@ def update_recurring_instance(
                 additional_guests=master_att.additional_guests,
             )
             session.add(attendee)
-    
+
     session.flush()
     return exception
 
@@ -1522,10 +1615,10 @@ def delete_recurring_instance(
 ) -> None:
     """
     Delete a single instance of a recurring event.
-    
+
     Creates a cancelled exception event. If an exception already exists,
     marks it as cancelled.
-    
+
     Args:
         session: Database session
         calendar_id: Calendar ID
@@ -1534,7 +1627,7 @@ def delete_recurring_instance(
     """
     calendar = get_calendar(session, calendar_id, user_id)
     _check_calendar_access(session, calendar.id, user_id, AccessRole.writer)
-    
+
     # Check if an exception already exists
     existing = session.get(Event, instance_id)
     if existing and existing.calendar_id == calendar.id:
@@ -1543,19 +1636,19 @@ def delete_recurring_instance(
         existing.updated_at = calendar_now()
         existing.etag = generate_etag(f"{instance_id}:cancelled")
         return
-    
+
     # Get master event info
     master, original_time_str, original_dt = _get_master_event_for_instance(
         session, calendar.id, instance_id, user_id
     )
-    
+
     if not master or not original_dt:
         raise EventNotFoundError(instance_id)
-    
+
     # Validate that this instance date is valid for the recurrence
     time_min = original_dt - timedelta(minutes=1)
     time_max = original_dt + timedelta(minutes=1)
-    
+
     instance_dates = expand_recurrence(
         recurrence=master.recurrence,
         start=master.start_datetime,
@@ -1563,7 +1656,7 @@ def delete_recurring_instance(
         time_max=time_max,
         max_instances=10,
     )
-    
+
     # Check if the original_dt is in the expanded instances
     instance_found = False
     for inst_dt in instance_dates:
@@ -1571,24 +1664,24 @@ def delete_recurring_instance(
             inst_dt = inst_dt.replace(tzinfo=timezone.utc)
         else:
             inst_dt = inst_dt.astimezone(timezone.utc)
-        
+
         if abs((inst_dt - original_dt).total_seconds()) < 60:
             instance_found = True
             break
-    
+
     if not instance_found:
         raise EventNotFoundError(instance_id)
-    
+
     # Calculate default times for this instance
     duration = timedelta(hours=1)
     if master.end_datetime and master.start_datetime:
         duration = master.end_datetime - master.start_datetime
-    
+
     tz = master.start.get("timeZone", "UTC")
-    
+
     # Build originalStartTime
     original_start_time = build_original_start_time(original_dt, tz)
-    
+
     # Create cancelled exception event
     exception = Event(
         id=instance_id,
@@ -1616,7 +1709,7 @@ def delete_recurring_instance(
         status=EventStatus.cancelled,  # Key difference - cancelled status
         etag=generate_etag(f"{instance_id}:cancelled"),
     )
-    
+
     session.add(exception)
     session.flush()
 
@@ -1629,48 +1722,48 @@ def get_or_create_instance(
 ) -> Optional[Event]:
     """
     Get an event, including virtual recurring instances.
-    
+
     This function handles three cases:
     1. Regular event: Returns the event directly
     2. Persisted exception: Returns the exception event
     3. Virtual instance: Creates and returns a virtual Event object
-    
+
     Args:
         session: Database session
         calendar_id: Calendar ID
         instance_id: Event or instance ID
         user_id: User ID for access check
-        
+
     Returns:
         Event object (may be virtual for instances) or None if not found
     """
     calendar = get_calendar(session, calendar_id, user_id)
     _check_calendar_access(session, calendar.id, user_id, AccessRole.reader)
-    
+
     # First, try to find the event directly (handles regular events and exceptions)
     event = session.get(Event, instance_id)
     if event and event.calendar_id == calendar.id:
         if event.status == EventStatus.cancelled:
             return None
         return event
-    
+
     # Check if this is an instance ID
     base_id, original_time_str = parse_instance_id(instance_id)
     if not original_time_str:
         # Not an instance ID and not found as regular event
         return None
-    
+
     # Get the master event
     master = session.get(Event, base_id)
     if not master or master.calendar_id != calendar.id or not master.recurrence:
         return None
-    
+
     if master.status == EventStatus.cancelled:
         return None
-    
+
     # Parse the original start time
     original_dt = parse_original_start_time(original_time_str)
-    
+
     # Verify this date is valid for the recurrence (not excluded)
     # Check for a cancelled exception
     cancelled = session.execute(
@@ -1681,14 +1774,14 @@ def get_or_create_instance(
             )
         )
     ).scalar_one_or_none()
-    
+
     if cancelled:
         return None
-    
+
     # Expand recurrence to verify this instance exists
     time_min = original_dt - timedelta(minutes=1)
     time_max = original_dt + timedelta(minutes=1)
-    
+
     instance_dates = expand_recurrence(
         recurrence=master.recurrence,
         start=master.start_datetime,
@@ -1696,7 +1789,7 @@ def get_or_create_instance(
         time_max=time_max,
         max_instances=10,
     )
-    
+
     # Check if the original_dt is in the expanded instances
     instance_found = False
     for inst_dt in instance_dates:
@@ -1705,11 +1798,11 @@ def get_or_create_instance(
             inst_dt = inst_dt.replace(tzinfo=timezone.utc)
         else:
             inst_dt = inst_dt.astimezone(timezone.utc)
-        
+
         if abs((inst_dt - original_dt).total_seconds()) < 60:  # Within 1 minute
             instance_found = True
             break
-    
+
     if not instance_found:
         return None
 
@@ -1910,7 +2003,7 @@ def quick_add_event(
             else:
                 parsed_dt = parsed_dt.astimezone(tzinfo)
             start_dt = parsed_dt
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             start_dt = now_local.replace(minute=0, second=0, microsecond=0) + timedelta(
                 hours=1
             )
@@ -2011,7 +2104,7 @@ def get_event_instances(
             exc_dt = parse_rfc3339(exc.original_start_time["dateTime"])
             if exc_dt.tzinfo is None:
                 exc_dt = exc_dt.replace(tzinfo=timezone.utc)
-            exception_times.add(exc_dt.strftime('%Y%m%dT%H%M%SZ'))
+            exception_times.add(exc_dt.strftime("%Y%m%dT%H%M%SZ"))
 
     # Collect all instances (virtual + exceptions)
     all_instances = []
@@ -2042,7 +2135,9 @@ def get_event_instances(
         # Log and return empty if recurrence expansion fails
         # Keep broad exception to maintain graceful degradation (matching Google's behavior)
         logger.warning(
-            "Failed to expand recurrence for event %s in get_instances: %s", master.id, e
+            "Failed to expand recurrence for event %s in get_instances: %s",
+            master.id,
+            e,
         )
         return [], None, None
 
@@ -2061,7 +2156,7 @@ def get_event_instances(
             inst_start = inst_start.replace(tzinfo=timezone.utc)
 
         # Skip if there's a persisted exception for this instance
-        inst_time_str = inst_start.strftime('%Y%m%dT%H%M%SZ')
+        inst_time_str = inst_start.strftime("%Y%m%dT%H%M%SZ")
         if inst_time_str in exception_times:
             continue
 
@@ -2088,12 +2183,21 @@ def get_event_instances(
             organizer_display_name=master.organizer_display_name,
             organizer_profile_id=master.organizer_profile_id,
             organizer_self=master.organizer_self,
-            start={"dateTime": format_rfc3339(inst_start), "timeZone": master.start.get("timeZone", "UTC")},
-            end={"dateTime": format_rfc3339(inst_end), "timeZone": master.end.get("timeZone", "UTC")},
+            start={
+                "dateTime": format_rfc3339(inst_start),
+                "timeZone": master.start.get("timeZone", "UTC"),
+            },
+            end={
+                "dateTime": format_rfc3339(inst_end),
+                "timeZone": master.end.get("timeZone", "UTC"),
+            },
             start_datetime=inst_start,
             end_datetime=inst_end,
             recurring_event_id=master.id,
-            original_start_time={"dateTime": format_rfc3339(inst_start), "timeZone": master.start.get("timeZone", "UTC")},
+            original_start_time={
+                "dateTime": format_rfc3339(inst_start),
+                "timeZone": master.start.get("timeZone", "UTC"),
+            },
             sequence=master.sequence,
             etag=generate_etag(f"{master.id}:{inst_start.isoformat()}"),
             html_link=master.html_link,
@@ -2131,7 +2235,7 @@ def get_event_instances(
         target_dt = parse_rfc3339(original_start)
         if target_dt.tzinfo is None:
             target_dt = target_dt.replace(tzinfo=timezone.utc)
-        target_str = target_dt.strftime('%Y%m%dT%H%M%SZ')
+        target_str = target_dt.strftime("%Y%m%dT%H%M%SZ")
 
         filtered_instances = []
         for inst in all_instances:
@@ -2139,13 +2243,16 @@ def get_event_instances(
                 inst_dt = parse_rfc3339(inst.original_start_time["dateTime"])
                 if inst_dt.tzinfo is None:
                     inst_dt = inst_dt.replace(tzinfo=timezone.utc)
-                if inst_dt.strftime('%Y%m%dT%H%M%SZ') == target_str:
+                if inst_dt.strftime("%Y%m%dT%H%M%SZ") == target_str:
                     filtered_instances.append(inst)
         all_instances = filtered_instances
 
     # Sort by start time
     all_instances.sort(
-        key=lambda e: (e.start_datetime or datetime.min.replace(tzinfo=timezone.utc), e.id)
+        key=lambda e: (
+            e.start_datetime or datetime.min.replace(tzinfo=timezone.utc),
+            e.id,
+        )
     )
 
     # Limit to max_results
@@ -2445,57 +2552,126 @@ def query_free_busy(
 ) -> dict[str, Any]:
     """
     Query free/busy information for calendars.
-    
+
     Following Google Calendar API behavior:
     - If timeZone is not provided, times are returned in UTC (with Z suffix)
     - If timeZone is provided, times are converted to that timezone (with offset like -08:00)
     """
+    t_start = time.perf_counter()
     from ..core.utils import parse_rfc3339, format_rfc3339
     from zoneinfo import ZoneInfo
     from datetime import timezone as dt_timezone
 
     min_dt = parse_rfc3339(time_min)
     max_dt = parse_rfc3339(time_max)
-    
+
     # Determine target timezone for output
     target_tz = None
     if time_zone:
         try:
             target_tz = ZoneInfo(time_zone)
-        except (KeyError, ValueError):
+        except KeyError, ValueError:
             # Invalid timezone - fall back to UTC
             pass
 
     calendars_result: dict[str, dict[str, Any]] = {}
 
+    # --- Phase 1: Resolve calendar IDs and batch-check access ---
+    # Resolve "primary" once
+    user = session.get(User, user_id)
+    resolved_map: dict[str, str] = {}  # original_id -> resolved_id
     for cal_id in calendar_ids:
-        original_cal_id = cal_id  # Keep original for response key
-        try:
-            # Resolve primary to actual calendar ID
-            resolved_cal_id = cal_id
-            if cal_id == "primary":
-                user = session.get(User, user_id)
-                if user:
-                    resolved_cal_id = user.email
+        if cal_id == "primary" and user:
+            resolved_map[cal_id] = user.email
+        else:
+            resolved_map[cal_id] = cal_id
 
-            # Check access
-            access_role = _get_user_access_role(session, resolved_cal_id, user_id)
-            if access_role is None:
-                calendars_result[original_cal_id] = {
-                    "errors": [
-                        {
-                            "domain": "calendar",
-                            "reason": "notFound",
-                        }
-                    ]
-                }
-                continue
+    # Batch access check: get all CalendarListEntry rows for this user + these calendars
+    resolved_ids = list(set(resolved_map.values()))
+    accessible_entries = {
+        row.calendar_id: row.access_role
+        for row in session.execute(
+            select(CalendarListEntry.calendar_id, CalendarListEntry.access_role).where(
+                and_(
+                    CalendarListEntry.user_id == user_id,
+                    CalendarListEntry.calendar_id.in_(resolved_ids),
+                    CalendarListEntry.deleted == False,  # noqa: E712
+                )
+            )
+        ).all()
+    }
 
-            # Get events in time range
-            events = session.execute(
+    # For calendars not in CalendarListEntry, do a single batched ACL check
+    missing_ids = [cid for cid in resolved_ids if cid not in accessible_entries]
+    acl_access: dict[str, AccessRole] = {}
+    if missing_ids and user:
+        acl_conditions = [
+            and_(
+                AclRule.scope_type == AclScopeType.user,
+                AclRule.scope_value == user.email,
+            ),
+            and_(
+                AclRule.scope_type == AclScopeType.default,
+            ),
+        ]
+        if "@" in user.email:
+            domain = user.email.split("@")[1]
+            acl_conditions.append(
+                and_(
+                    AclRule.scope_type == AclScopeType.domain,
+                    AclRule.scope_value == domain,
+                )
+            )
+        acl_rules = list(
+            session.execute(
+                select(AclRule).where(
+                    and_(
+                        AclRule.calendar_id.in_(missing_ids),
+                        AclRule.deleted == False,  # noqa: E712
+                        or_(*acl_conditions),
+                    )
+                )
+            )
+            .scalars()
+            .all()
+        )
+        # Group by calendar_id, pick highest-priority scope per calendar
+        scope_priority = {
+            AclScopeType.user: 3,
+            AclScopeType.domain: 2,
+            AclScopeType.default: 1,
+        }
+        acl_best_scope: dict[str, AclScopeType] = {}  # track scope of best rule
+        for rule in acl_rules:
+            existing_scope = acl_best_scope.get(rule.calendar_id)
+            if existing_scope is None or scope_priority.get(
+                rule.scope_type, 0
+            ) > scope_priority.get(existing_scope, 0):
+                acl_access[rule.calendar_id] = rule.role
+                acl_best_scope[rule.calendar_id] = rule.scope_type
+
+    # Determine which calendars are accessible
+    accessible_cal_ids: list[str] = []
+    for original_id, resolved_id in resolved_map.items():
+        if resolved_id in accessible_entries or resolved_id in acl_access:
+            accessible_cal_ids.append(resolved_id)
+        else:
+            calendars_result[original_id] = {
+                "errors": [
+                    {
+                        "domain": "calendar",
+                        "reason": "notFound",
+                    }
+                ]
+            }
+
+    # --- Phase 2: Batch fetch all events across accessible calendars ---
+    if accessible_cal_ids:
+        all_events = list(
+            session.execute(
                 select(Event).where(
                     and_(
-                        Event.calendar_id == resolved_cal_id,
+                        Event.calendar_id.in_(accessible_cal_ids),
                         Event.status != EventStatus.cancelled,
                         Event.transparency == "opaque",
                         or_(
@@ -2514,49 +2690,61 @@ def query_free_busy(
                         ),
                     )
                 )
-            ).scalars().all()
+            )
+            .scalars()
+            .all()
+        )
 
-            # Build busy periods with timezone conversion if specified
+        # Group events by calendar_id
+        events_by_cal: dict[str, list[Event]] = {cid: [] for cid in accessible_cal_ids}
+        for event in all_events:
+            if event.calendar_id in events_by_cal:
+                events_by_cal[event.calendar_id].append(event)
+    else:
+        events_by_cal = {}
+
+    # --- Phase 3: Build busy periods ---
+    for original_id, resolved_id in resolved_map.items():
+        if original_id in calendars_result:
+            # Already set as error
+            continue
+
+        try:
+            events = events_by_cal.get(resolved_id, [])
             busy = []
             for event in events:
                 if event.start_datetime and event.end_datetime:
                     start_dt = event.start_datetime
                     end_dt = event.end_datetime
-                    
+
                     # Get the event's timezone from the JSONB start/end fields
-                    # The start_datetime/end_datetime columns store local times without offset
                     event_tz_name = None
                     if event.start and isinstance(event.start, dict):
                         event_tz_name = event.start.get("timeZone")
-                    
+
                     if event_tz_name and start_dt.tzinfo is None:
                         try:
                             event_tz = ZoneInfo(event_tz_name)
-                            # Interpret the naive datetime in the event's timezone
                             start_dt = start_dt.replace(tzinfo=event_tz)
-                        except (KeyError, ValueError):
-                            # Fall back to UTC if timezone is invalid
+                        except KeyError, ValueError:
                             start_dt = start_dt.replace(tzinfo=dt_timezone.utc)
                     elif start_dt.tzinfo is None:
-                        # No event timezone, assume UTC
                         start_dt = start_dt.replace(tzinfo=dt_timezone.utc)
-                    
-                    # Same for end datetime
+
                     end_tz_name = None
                     if event.end and isinstance(event.end, dict):
                         end_tz_name = event.end.get("timeZone")
-                    
+
                     if end_tz_name and end_dt.tzinfo is None:
                         try:
                             end_tz = ZoneInfo(end_tz_name)
                             end_dt = end_dt.replace(tzinfo=end_tz)
-                        except (KeyError, ValueError):
+                        except KeyError, ValueError:
                             end_dt = end_dt.replace(tzinfo=dt_timezone.utc)
                     elif end_dt.tzinfo is None:
                         end_dt = end_dt.replace(tzinfo=dt_timezone.utc)
-                    
+
                     if target_tz:
-                        # Convert to target timezone and format with offset
                         start_dt = start_dt.astimezone(target_tz)
                         end_dt = end_dt.astimezone(target_tz)
                         busy.append(
@@ -2566,7 +2754,6 @@ def query_free_busy(
                             }
                         )
                     else:
-                        # Return in UTC (with Z suffix per Google API)
                         start_utc = start_dt.astimezone(dt_timezone.utc)
                         end_utc = end_dt.astimezone(dt_timezone.utc)
                         busy.append(
@@ -2576,11 +2763,11 @@ def query_free_busy(
                             }
                         )
 
-            calendars_result[original_cal_id] = {"busy": busy}
+            calendars_result[original_id] = {"busy": busy}
 
         except Exception as e:
-            logger.exception("Error querying free/busy for calendar %s", cal_id)
-            calendars_result[original_cal_id] = {
+            logger.exception("Error querying free/busy for calendar %s", original_id)
+            calendars_result[original_id] = {
                 "errors": [
                     {
                         "domain": "calendar",
@@ -2589,6 +2776,11 @@ def query_free_busy(
                 ]
             }
 
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] query_free_busy() time={t_ms:.0f}ms calendars={len(calendar_ids)}"
+        )
     return {
         "kind": "calendar#freeBusy",
         "timeMin": time_min,
@@ -2607,14 +2799,18 @@ def _get_user_access_role(
     calendar_id: str,
     user_id: str,
 ) -> Optional[AccessRole]:
-    """Get user's access role to a calendar."""
+    """Get user's access role to a calendar.
+
+    Optimized: checks CalendarListEntry first (single query), then falls back
+    to a single consolidated ACL query covering user/domain/default scopes.
+    """
     user = session.get(User, user_id)
     if user is None:
         return None
 
-    # Check CalendarListEntry first
+    # Check CalendarListEntry first (most common path, indexed on user_id)
     entry = session.execute(
-        select(CalendarListEntry).where(
+        select(CalendarListEntry.access_role).where(
             and_(
                 CalendarListEntry.user_id == user_id,
                 CalendarListEntry.calendar_id == calendar_id,
@@ -2624,56 +2820,59 @@ def _get_user_access_role(
     ).scalar_one_or_none()
 
     if entry:
-        return entry.access_role
+        return entry
 
-    # Check ACL rules
-    # User scope
-    rule = session.execute(
-        select(AclRule).where(
-            and_(
-                AclRule.calendar_id == calendar_id,
-                AclRule.scope_type == AclScopeType.user,
-                AclRule.scope_value == user.email,
-                AclRule.deleted == False,  # noqa: E712
-            )
-        )
-    ).scalar_one_or_none()
+    # Consolidated ACL check: fetch all matching rules in a single query
+    # instead of 3 separate queries for user/domain/default scopes
+    acl_conditions = [
+        # User scope
+        and_(
+            AclRule.scope_type == AclScopeType.user,
+            AclRule.scope_value == user.email,
+        ),
+        # Default scope (public)
+        and_(
+            AclRule.scope_type == AclScopeType.default,
+        ),
+    ]
 
-    if rule:
-        return rule.role
-
-    # Domain scope
+    # Domain scope (only if email has a domain)
+    domain = None
     if "@" in user.email:
         domain = user.email.split("@")[1]
-        rule = session.execute(
+        acl_conditions.append(
+            and_(
+                AclRule.scope_type == AclScopeType.domain,
+                AclRule.scope_value == domain,
+            )
+        )
+
+    rules = list(
+        session.execute(
             select(AclRule).where(
                 and_(
                     AclRule.calendar_id == calendar_id,
-                    AclRule.scope_type == AclScopeType.domain,
-                    AclRule.scope_value == domain,
                     AclRule.deleted == False,  # noqa: E712
+                    or_(*acl_conditions),
                 )
             )
-        ).scalar_one_or_none()
-
-        if rule:
-            return rule.role
-
-    # Default scope (public)
-    rule = session.execute(
-        select(AclRule).where(
-            and_(
-                AclRule.calendar_id == calendar_id,
-                AclRule.scope_type == AclScopeType.default,
-                AclRule.deleted == False,  # noqa: E712
-            )
         )
-    ).scalar_one_or_none()
+        .scalars()
+        .all()
+    )
 
-    if rule:
-        return rule.role
+    if not rules:
+        return None
 
-    return None
+    # Return the highest-privilege role found
+    # Priority: user scope > domain scope > default scope
+    scope_priority = {
+        AclScopeType.user: 3,
+        AclScopeType.domain: 2,
+        AclScopeType.default: 1,
+    }
+    best_rule = max(rules, key=lambda r: scope_priority.get(r.scope_type, 0))
+    return best_rule.role
 
 
 def _check_calendar_access(

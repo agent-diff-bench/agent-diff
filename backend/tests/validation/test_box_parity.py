@@ -243,6 +243,13 @@ class BoxParityTester:
         # Mismatch counter
         self.mismatch_count = 0
 
+        # Performance tracking: list of (label, prod_ms, replica_ms)
+        self.perf_records: list[tuple[str, float, float]] = []
+        self._last_prod_ms: float = 0.0
+        self._last_replica_ms: float = 0.0
+        self._last_prod_endpoint: str = ""
+        self._auto_record_perf: bool = True
+
     def log_mismatch(
         self,
         test_name: str,
@@ -264,6 +271,61 @@ class BoxParityTester:
             logger.info("No mismatches found!")
         else:
             logger.warning("Total mismatches: %d", self.mismatch_count)
+
+    def print_perf_summary(self):
+        """Print performance summary for all recorded operations."""
+        if not self.perf_records:
+            return
+
+        print("\n" + "=" * 70)
+        print("PERFORMANCE SUMMARY")
+        print("=" * 70)
+
+        prod_times = [r[1] for r in self.perf_records]
+        replica_times = [r[2] for r in self.perf_records]
+
+        print(f"  Total operations timed: {len(self.perf_records)}")
+        print(f"\n  {'':40s} {'Prod':>10s} {'Replica':>10s} {'Delta':>10s}")
+        print(f"  {'-' * 40} {'-' * 10} {'-' * 10} {'-' * 10}")
+
+        # Aggregate stats
+        import statistics
+
+        for label, vals in [("Prod (ms)", prod_times), ("Replica (ms)", replica_times)]:
+            if vals:
+                print(
+                    f"  {label:40s} min={min(vals):.0f}  avg={statistics.mean(vals):.0f}  "
+                    f"p50={statistics.median(vals):.0f}  p90={sorted(vals)[int(len(vals) * 0.9)]:.0f}  "
+                    f"p99={sorted(vals)[min(int(len(vals) * 0.99), len(vals) - 1)]:.0f}  "
+                    f"max={max(vals):.0f}"
+                )
+
+        # Show slowest 10 operations by replica time
+        print("\n  Top 10 slowest replica operations:")
+        print(f"  {'Operation':50s} {'Prod':>8s} {'Replica':>8s}")
+        print(f"  {'-' * 50} {'-' * 8} {'-' * 8}")
+        for label, prod_ms, replica_ms in sorted(
+            self.perf_records, key=lambda x: x[2], reverse=True
+        )[:10]:
+            print(f"  {label:50s} {prod_ms:7.0f}ms {replica_ms:7.0f}ms")
+
+        # Show operations where replica is significantly slower than prod
+        slow_ops = [
+            (lbl, p, r) for lbl, p, r in self.perf_records if r > p * 2 and r > 100
+        ]
+        if slow_ops:
+            print("\n  Operations where replica > 2x slower than prod (and > 100ms):")
+            print(f"  {'Operation':50s} {'Prod':>8s} {'Replica':>8s} {'Ratio':>6s}")
+            print(f"  {'-' * 50} {'-' * 8} {'-' * 8} {'-' * 6}")
+            for label, prod_ms, replica_ms in sorted(
+                slow_ops, key=lambda x: x[2] / max(x[1], 1), reverse=True
+            ):
+                ratio = replica_ms / max(prod_ms, 1)
+                print(
+                    f"  {label:50s} {prod_ms:7.0f}ms {replica_ms:7.0f}ms {ratio:5.1f}x"
+                )
+
+        print("=" * 70)
 
     # -------------------------------------------------------------------------
     # Environment Setup
@@ -324,7 +386,8 @@ class BoxParityTester:
         if files:
             req_headers.pop("Content-Type", None)
 
-        return requests.request(
+        t0 = time.perf_counter()
+        resp = requests.request(
             method,
             url,
             json=json,
@@ -333,6 +396,9 @@ class BoxParityTester:
             params=params,
             headers=req_headers,
         )
+        self._last_prod_ms = (time.perf_counter() - t0) * 1000
+        self._last_prod_endpoint = f"{method} /{endpoint.lstrip('/')}"
+        return resp
 
     def api_replica(
         self,
@@ -358,7 +424,8 @@ class BoxParityTester:
         if files:
             req_headers.pop("Content-Type", None)
 
-        return requests.request(
+        t0 = time.perf_counter()
+        resp = requests.request(
             method,
             url,
             json=json,
@@ -367,6 +434,26 @@ class BoxParityTester:
             params=params,
             headers=req_headers,
         )
+        self._last_replica_ms = (time.perf_counter() - t0) * 1000
+
+        # Auto-record: every replica call following a prod call forms a pair
+        if self._auto_record_perf and self._last_prod_endpoint:
+            self.perf_records.append(
+                (self._last_prod_endpoint, self._last_prod_ms, self._last_replica_ms)
+            )
+        return resp
+
+    def record_perf(self, label: str):
+        """Record the last prod/replica call times for the perf summary."""
+        prod_ms = getattr(self, "_last_prod_ms", 0.0)
+        replica_ms = getattr(self, "_last_replica_ms", 0.0)
+        self.perf_records.append((label, prod_ms, replica_ms))
+
+    def _perf_tag(self) -> str:
+        """Return a formatted timing tag from the last prod/replica calls."""
+        prod_ms = getattr(self, "_last_prod_ms", 0.0)
+        replica_ms = getattr(self, "_last_replica_ms", 0.0)
+        return f"[prod={prod_ms:.0f}ms, replica={replica_ms:.0f}ms]"
 
     # -------------------------------------------------------------------------
     # File Upload Helpers
@@ -496,6 +583,7 @@ class BoxParityTester:
         prod_call: Callable[[], requests.Response],
         replica_call: Callable[[], requests.Response],
         validate_schema: bool = True,
+        expected_status_code: int | None = None,
     ) -> bool:
         """
         Test an operation against both APIs.
@@ -512,9 +600,16 @@ class BoxParityTester:
         print(f"  {name}...", end=" ")
 
         try:
+            # Disable auto-recording; we record manually with the test name
+            self._auto_record_perf = False
             prod_resp = prod_call()
+            prod_ms = self._last_prod_ms
             replica_resp = replica_call()
+            replica_ms = self._last_replica_ms
+            self._auto_record_perf = True
+            self.perf_records.append((name, prod_ms, replica_ms))
         except Exception as e:
+            self._auto_record_perf = True
             print(f"EXCEPTION: {e}")
             self.log_mismatch(name, "exception", {"error": str(e)})
             return False
@@ -553,7 +648,9 @@ class BoxParityTester:
                 differences = self.compare_shapes(prod_shape, replica_shape, "data")
 
                 if differences:
-                    print("SCHEMA MISMATCH")
+                    print(
+                        f"SCHEMA MISMATCH  [prod={prod_ms:.0f}ms, replica={replica_ms:.0f}ms]"
+                    )
                     for diff in differences[:3]:
                         print(f"     {diff}")
                     if len(differences) > 3:
@@ -573,16 +670,18 @@ class BoxParityTester:
                     )
                     return False
 
-            print("PASS")
+            print(f"PASS  [prod={prod_ms:.0f}ms, replica={replica_ms:.0f}ms]")
             return True
 
         elif not prod_ok and not replica_ok:
             # Both failed - check if error types are similar
-            print("(both failed)")
+            print(f"(both failed)  [prod={prod_ms:.0f}ms, replica={replica_ms:.0f}ms]")
             return True
 
         else:
-            print("STATUS MISMATCH")
+            print(
+                f"STATUS MISMATCH  [prod={prod_ms:.0f}ms, replica={replica_ms:.0f}ms]"
+            )
             print(f"     Prod: {prod_resp.status_code}")
             print(f"     Replica: {replica_resp.status_code}")
 
@@ -605,6 +704,7 @@ class BoxParityTester:
 
     def setup_test_resources(self):
         """Create matching test resources in both environments."""
+        self._auto_record_perf = False  # Don't record setup calls
         print("\n📦 Setting up test resources...")
 
         # Get current user info
@@ -665,9 +765,11 @@ class BoxParityTester:
                 print(f"    ✓ Replica file: {self.replica_file_id}")
 
         print()
+        self._auto_record_perf = True  # Re-enable for test operations
 
     def cleanup_test_resources(self):
         """Clean up test resources created during testing."""
+        self._auto_record_perf = False  # Don't record cleanup calls
         print("\n🧹 Cleaning up test resources...")
 
         # Delete test folders (this also deletes files inside)
@@ -3899,6 +4001,9 @@ class BoxParityTester:
         pct = int(total_passed / total_tests * 100) if total_tests > 0 else 0
         print(f"TOTAL: {total_passed}/{total_tests} tests passed ({pct}%)")
         print("=" * 70)
+
+        # Performance summary
+        self.print_perf_summary()
 
         # Save mismatch log
         self.log_summary()
