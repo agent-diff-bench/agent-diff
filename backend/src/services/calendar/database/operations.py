@@ -2003,7 +2003,7 @@ def quick_add_event(
             else:
                 parsed_dt = parsed_dt.astimezone(tzinfo)
             start_dt = parsed_dt
-        except (ValueError, TypeError):
+        except ValueError, TypeError:
             start_dt = now_local.replace(minute=0, second=0, microsecond=0) + timedelta(
                 hours=1
             )
@@ -2570,7 +2570,7 @@ def query_free_busy(
     if time_zone:
         try:
             target_tz = ZoneInfo(time_zone)
-        except (KeyError, ValueError):
+        except KeyError, ValueError:
             # Invalid timezone - fall back to UTC
             pass
 
@@ -2726,7 +2726,7 @@ def query_free_busy(
                         try:
                             event_tz = ZoneInfo(event_tz_name)
                             start_dt = start_dt.replace(tzinfo=event_tz)
-                        except (KeyError, ValueError):
+                        except KeyError, ValueError:
                             start_dt = start_dt.replace(tzinfo=dt_timezone.utc)
                     elif start_dt.tzinfo is None:
                         start_dt = start_dt.replace(tzinfo=dt_timezone.utc)
@@ -2739,7 +2739,7 @@ def query_free_busy(
                         try:
                             end_tz = ZoneInfo(end_tz_name)
                             end_dt = end_dt.replace(tzinfo=end_tz)
-                        except (KeyError, ValueError):
+                        except KeyError, ValueError:
                             end_dt = end_dt.replace(tzinfo=dt_timezone.utc)
                     elif end_dt.tzinfo is None:
                         end_dt = end_dt.replace(tzinfo=dt_timezone.utc)

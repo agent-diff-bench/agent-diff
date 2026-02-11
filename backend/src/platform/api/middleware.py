@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 import time
 
+from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
@@ -61,6 +62,8 @@ class PlatformMiddleware(BaseHTTPMiddleware):
                 {"detail": str(exc)},
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
+        except HTTPException:
+            raise  # Let Starlette handle route-level HTTP errors (e.g. 404)
         except Exception:
             logger.exception("Unhandled exception in PlatformMiddleware")
             return JSONResponse(

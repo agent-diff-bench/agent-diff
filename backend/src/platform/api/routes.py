@@ -407,7 +407,11 @@ async def init_environment(request: Request) -> JSONResponse:
         logger.warning("Unauthorized template access in init_environment")
         return unauthorized()
     except ValueError as e:
-        logger.warning(f"Template resolution failed in init_environment: {e}")
+        logger.warning(
+            f"Template resolution failed in init_environment: {e} "
+            f"(service={body.templateService!r}, name={body.templateName!r}, "
+            f"testId={body.testId!r}, schema={body.templateSchema!r})"
+        )
         return bad_request(str(e))
 
     if not body.testId and not body.impersonateUserId and not body.impersonateEmail:
