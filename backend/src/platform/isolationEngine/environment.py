@@ -44,10 +44,37 @@ class EnvironmentHandler:
         )
         meta.create_all(translated)
 
+        # Ensure newer columns exist even if template was seeded before they
+        # were added to the ORM models.  Uses IF NOT EXISTS so it's safe to
+        # run repeatedly.
+        self._ensure_box_columns(target_schema)
+
         # Copy GIN / non-standard indexes that MetaData.reflect doesn't capture
         self._copy_custom_indexes(template_schema, target_schema)
 
         self._set_replica_identity(target_schema)
+
+    def _ensure_box_columns(self, schema: str) -> None:
+        """Add columns that may be missing from older template snapshots."""
+        _columns = [
+            # (table, column, SQL type, default)
+            ("box_folders", "path", "VARCHAR(500)", "'/'"),
+            ("box_files", "path", "VARCHAR(500)", "'/0/'"),
+        ]
+        with self.session_manager.base_engine.begin() as conn:
+            for table, col, sql_type, default in _columns:
+                try:
+                    conn.execute(
+                        text(
+                            f"ALTER TABLE {schema}.{table} "
+                            f"ADD COLUMN IF NOT EXISTS {col} {sql_type} "
+                            f"DEFAULT {default}"
+                        )
+                    )
+                except Exception as exc:
+                    logger.warning(
+                        f"Could not ensure column {schema}.{table}.{col}: {exc}"
+                    )
 
     def _copy_custom_indexes(self, src_schema: str, dst_schema: str) -> None:
         """Copy GIN trigram and other custom indexes from template to target schema."""
