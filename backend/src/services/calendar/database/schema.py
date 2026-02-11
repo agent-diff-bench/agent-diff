@@ -207,9 +207,7 @@ class CalendarListEntry(Base):
     user_id: Mapped[str] = mapped_column(
         ForeignKey("calendar_users.id"), nullable=False
     )
-    calendar_id: Mapped[str] = mapped_column(
-        ForeignKey("calendars.id"), nullable=False
-    )
+    calendar_id: Mapped[str] = mapped_column(ForeignKey("calendars.id"), nullable=False)
     etag: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Access role
@@ -226,12 +224,8 @@ class CalendarListEntry(Base):
     foreground_color: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
 
     # Visibility settings
-    hidden: Mapped[bool] = mapped_column(
-        Boolean, default=False, server_default="false"
-    )
-    selected: Mapped[bool] = mapped_column(
-        Boolean, default=True, server_default="true"
-    )
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    selected: Mapped[bool] = mapped_column(Boolean, default=True, server_default="true")
     primary: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false"
     )
@@ -276,12 +270,16 @@ class Event(Base):
         Index("ix_event_ical_uid", "ical_uid"),
         Index("ix_event_recurring", "recurring_event_id"),
         Index("ix_event_updated", "updated_at"),
+        # Composite indexes for common query patterns
+        Index("ix_event_cal_status_start", "calendar_id", "status", "start_datetime"),
+        Index(
+            "ix_event_cal_start_end", "calendar_id", "start_datetime", "end_datetime"
+        ),
+        Index("ix_event_cal_updated", "calendar_id", "updated_at"),
     )
 
     id: Mapped[str] = mapped_column(String(1024), primary_key=True)
-    calendar_id: Mapped[str] = mapped_column(
-        ForeignKey("calendars.id"), nullable=False
-    )
+    calendar_id: Mapped[str] = mapped_column(ForeignKey("calendars.id"), nullable=False)
     etag: Mapped[str] = mapped_column(String(100), nullable=False)
 
     # Basic info
@@ -312,8 +310,12 @@ class Event(Base):
         String(255), nullable=True
     )
     # Google Profile IDs (different from internal user_id)
-    creator_profile_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    organizer_profile_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    creator_profile_id: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    organizer_profile_id: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
     creator_self: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default="false"
     )
@@ -337,7 +339,9 @@ class Event(Base):
 
     # Recurrence
     recurrence: Mapped[Optional[list[str]]] = mapped_column(JSONB, nullable=True)
-    recurring_event_id: Mapped[Optional[str]] = mapped_column(String(1024), nullable=True)
+    recurring_event_id: Mapped[Optional[str]] = mapped_column(
+        String(1024), nullable=True
+    )
     original_start_time: Mapped[Optional[dict[str, Any]]] = mapped_column(
         JSONB, nullable=True
     )
@@ -499,7 +503,9 @@ class EventAttendee(Base):
         default=AttendeeResponseStatus.needsAction,
     )
     comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    additional_guests: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    additional_guests: Mapped[int] = mapped_column(
+        Integer, default=0, server_default="0"
+    )
     # Profile ID (if available)
     profile_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
@@ -544,14 +550,14 @@ class AclRule(Base):
 
     __tablename__ = "calendar_acl_rules"
     __table_args__ = (
-        UniqueConstraint("calendar_id", "scope_type", "scope_value", name="uq_acl_rule"),
+        UniqueConstraint(
+            "calendar_id", "scope_type", "scope_value", name="uq_acl_rule"
+        ),
         Index("ix_acl_calendar", "calendar_id"),
     )
 
     id: Mapped[str] = mapped_column(String(255), primary_key=True)
-    calendar_id: Mapped[str] = mapped_column(
-        ForeignKey("calendars.id"), nullable=False
-    )
+    calendar_id: Mapped[str] = mapped_column(ForeignKey("calendars.id"), nullable=False)
     etag: Mapped[str] = mapped_column(String(100), nullable=False)
 
     role: Mapped[AccessRole] = mapped_column(
@@ -636,7 +642,9 @@ class Channel(Base):
     token: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     params: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
     # Whether payload is wanted for notifications
-    payload: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
+    payload: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false"
+    )
     # User who created the channel (for ownership validation)
     user_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
@@ -654,9 +662,7 @@ class SyncToken(Base):
     """
 
     __tablename__ = "calendar_sync_tokens"
-    __table_args__ = (
-        Index("ix_sync_token_resource", "resource_type", "resource_id"),
-    )
+    __table_args__ = (Index("ix_sync_token_resource", "resource_type", "resource_id"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     token: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
