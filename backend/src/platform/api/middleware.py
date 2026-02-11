@@ -102,18 +102,30 @@ class IsolationMiddleware(BaseHTTPMiddleware):
                     status_code=status.HTTP_400_BAD_REQUEST,
                 )
 
+            # Box /download paths are reached via 302 redirect from the
+            # authenticated /content endpoint.  HTTP clients strip auth
+            # headers on redirect (per RFC 9110), so we skip the API-key
+            # check here — mirroring how real Box returns a pre-signed CDN
+            # URL that needs no Authorization header.
+            is_download_redirect = "/download" in path
+
             api_key_hdr = request.headers.get("X-API-Key") or request.headers.get(
                 "Authorization"
             )
 
-            if not api_key_hdr and not is_dev_mode():
+            if not api_key_hdr and not is_download_redirect and not is_dev_mode():
                 return JSONResponse(
                     {"ok": False, "error": "not_authed"},
                     status_code=status.HTTP_401_UNAUTHORIZED,
                 )
 
             t_auth_start = time.perf_counter()
-            principal_id = await get_principal_id(api_key_hdr, action="api_request")
+            if api_key_hdr:
+                principal_id = await get_principal_id(api_key_hdr, action="api_request")
+            elif is_download_redirect:
+                principal_id = "download-redirect"
+            else:
+                principal_id = "dev-user"
             t_auth_ms = (time.perf_counter() - t_auth_start) * 1000
 
             t_meta_start = time.perf_counter()
