@@ -1429,6 +1429,82 @@ async def list_file_comments(request: Request) -> Response:
         return _error_response(e)
 
 
+async def get_comment_by_id(request: Request) -> Response:
+    """
+    GET /2.0/comments/{comment_id}
+
+    Retrieves a specific comment.
+
+    SDK Reference: CommentsManager.get_comment_by_id()
+    """
+    try:
+        session = _session(request)
+        comment_id = request.path_params["comment_id"]
+        fields = _parse_fields(request)
+
+        comment = ops.get_comment_by_id(session, comment_id)
+        if not comment:
+            _box_error(BoxErrorCode.NOT_FOUND, "Not Found")
+
+        comment_data = comment.to_dict()
+        filtered_data = _filter_fields(comment_data, fields)
+
+        return _json_response(filtered_data)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
+async def update_comment_by_id(request: Request) -> Response:
+    """
+    PUT /2.0/comments/{comment_id}
+
+    Updates a comment's message.
+
+    SDK Reference: CommentsManager.update_comment_by_id()
+    """
+    try:
+        session = _session(request)
+        comment_id = request.path_params["comment_id"]
+        fields = _parse_fields(request)
+
+        body = await _parse_json_body(request)
+        message = body.get("message")
+
+        comment = ops.update_comment(session, comment_id, message=message)
+
+        comment_data = comment.to_dict()
+        filtered_data = _filter_fields(comment_data, fields)
+
+        return _json_response(filtered_data)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
+async def delete_comment_by_id(request: Request) -> Response:
+    """
+    DELETE /2.0/comments/{comment_id}
+
+    Deletes a comment.
+
+    SDK Reference: CommentsManager.delete_comment_by_id()
+
+    Returns:
+        204 No Content on success
+    """
+    try:
+        session = _session(request)
+        comment_id = request.path_params["comment_id"]
+
+        ops.delete_comment(session, comment_id)
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
 # Task Endpoints
 
 
@@ -1562,6 +1638,102 @@ async def create_task(request: Request) -> Response:
         filtered_data = _filter_fields(task_data, fields)
 
         return _json_response(filtered_data, status_code=status.HTTP_201_CREATED)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
+async def get_task_by_id(request: Request) -> Response:
+    """
+    GET /2.0/tasks/{task_id}
+
+    Retrieves a specific task.
+
+    SDK Reference: TasksManager.get_task_by_id()
+    """
+    try:
+        session = _session(request)
+        task_id = request.path_params["task_id"]
+        fields = _parse_fields(request)
+
+        task = ops.get_task_by_id(session, task_id)
+        if not task:
+            _box_error(BoxErrorCode.NOT_FOUND, "Not Found")
+
+        task_data = task.to_dict()
+        filtered_data = _filter_fields(task_data, fields)
+
+        return _json_response(filtered_data)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
+async def update_task_by_id(request: Request) -> Response:
+    """
+    PUT /2.0/tasks/{task_id}
+
+    Updates a task.
+
+    SDK Reference: TasksManager.update_task_by_id()
+    """
+    try:
+        session = _session(request)
+        task_id = request.path_params["task_id"]
+        fields = _parse_fields(request)
+
+        body = await _parse_json_body(request)
+
+        action = body.get("action")
+        message = body.get("message")
+        due_at_str = body.get("due_at")
+        completion_rule = body.get("completion_rule")
+
+        due_at = None
+        if due_at_str:
+            from datetime import datetime
+
+            try:
+                due_at = datetime.fromisoformat(due_at_str.replace("Z", "+00:00"))
+            except (ValueError, AttributeError):
+                _box_error(BoxErrorCode.BAD_REQUEST, "Invalid 'due_at' format")
+
+        task = ops.update_task(
+            session,
+            task_id,
+            action=action,
+            message=message,
+            due_at=due_at,
+            completion_rule=completion_rule,
+        )
+
+        task_data = task.to_dict()
+        filtered_data = _filter_fields(task_data, fields)
+
+        return _json_response(filtered_data)
+
+    except BoxAPIError as e:
+        return _error_response(e)
+
+
+async def delete_task_by_id(request: Request) -> Response:
+    """
+    DELETE /2.0/tasks/{task_id}
+
+    Deletes a task.
+
+    SDK Reference: TasksManager.delete_task_by_id()
+
+    Returns:
+        204 No Content on success
+    """
+    try:
+        session = _session(request)
+        task_id = request.path_params["task_id"]
+
+        ops.delete_task(session, task_id)
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except BoxAPIError as e:
         return _error_response(e)
@@ -2079,8 +2251,14 @@ routes = [
     Route("/files/{file_id}/tasks", list_file_tasks, methods=["GET"]),
     # Comments
     Route("/comments", create_comment, methods=["POST"]),
+    Route("/comments/{comment_id}", get_comment_by_id, methods=["GET"]),
+    Route("/comments/{comment_id}", update_comment_by_id, methods=["PUT"]),
+    Route("/comments/{comment_id}", delete_comment_by_id, methods=["DELETE"]),
     # Tasks
     Route("/tasks", create_task, methods=["POST"]),
+    Route("/tasks/{task_id}", get_task_by_id, methods=["GET"]),
+    Route("/tasks/{task_id}", update_task_by_id, methods=["PUT"]),
+    Route("/tasks/{task_id}", delete_task_by_id, methods=["DELETE"]),
     # Hubs (requires box-version: 2025.0 header)
     Route("/hubs", list_hubs, methods=["GET"]),
     Route("/hubs", create_hub, methods=["POST"]),
