@@ -12,6 +12,8 @@ Session and user management follows Slack patterns:
 from __future__ import annotations
 
 import json
+import logging
+import time
 from typing import Any, List, NoReturn, Optional
 
 from starlette.requests import Request
@@ -32,6 +34,8 @@ from src.services.box.utils.errors import (
     ERROR_STATUS_MAP,
     bad_request_error,
 )
+
+logger = logging.getLogger(__name__)
 
 
 # Session & User Management
@@ -276,6 +280,7 @@ async def get_file_by_id(request: Request) -> Response:
                 "context_info": {"errors": [{"reason": "invalid_parameter", ...}]}}
     """
     try:
+        t_start = time.perf_counter()
         session = _session(request)
         file_id = request.path_params["file_id"]
         fields = _parse_fields(request)
@@ -283,7 +288,8 @@ async def get_file_by_id(request: Request) -> Response:
         # Get If-None-Match header for conditional GET
         if_none_match = request.headers.get("if-none-match")
 
-        file = ops.get_file_by_id(session, file_id)
+        file = ops.get_file_by_id(session, file_id, eager_serialize=True)
+        t_db_ms = (time.perf_counter() - t_start) * 1000
         if not file:
             _box_error(
                 BoxErrorCode.NOT_FOUND,
@@ -303,8 +309,17 @@ async def get_file_by_id(request: Request) -> Response:
         if if_none_match and file.etag == if_none_match:
             return Response(status_code=status.HTTP_304_NOT_MODIFIED)
 
+        t_ser_start = time.perf_counter()
         file_data = file.to_dict()
+        t_ser_ms = (time.perf_counter() - t_ser_start) * 1000
         filtered_data = _filter_fields(file_data, fields)
+
+        t_total_ms = (time.perf_counter() - t_start) * 1000
+        if t_total_ms > 20:
+            logger.info(
+                f"[PERF] GET /files/{file_id} total={t_total_ms:.0f}ms "
+                f"db={t_db_ms:.0f}ms serialize={t_ser_ms:.0f}ms"
+            )
 
         return _json_response(filtered_data)
 
@@ -658,7 +673,8 @@ async def create_folder(request: Request) -> Response:
         )
 
         folder_with_items = ops.get_folder_by_id(
-            session, new_folder.id, load_children=True, load_files=True
+            session, new_folder.id, load_children=True, load_files=True,
+            eager_serialize=True,
         )
         assert folder_with_items is not None
         folder_data = folder_with_items.to_dict(include_items=True)
@@ -695,6 +711,7 @@ async def get_folder_by_id(request: Request) -> Response:
         404 Not Found - if folder doesn't exist
     """
     try:
+        t_start = time.perf_counter()
         session = _session(request)
         folder_id = request.path_params["folder_id"]
         fields = _parse_fields(request)
@@ -702,8 +719,10 @@ async def get_folder_by_id(request: Request) -> Response:
 
         # Load children and files for item_collection
         folder = ops.get_folder_by_id(
-            session, folder_id, load_children=True, load_files=True
+            session, folder_id, load_children=True, load_files=True,
+            eager_serialize=True,
         )
+        t_db_ms = (time.perf_counter() - t_start) * 1000
         if not folder:
             _box_error(
                 BoxErrorCode.NOT_FOUND,
@@ -724,8 +743,17 @@ async def get_folder_by_id(request: Request) -> Response:
             return Response(status_code=status.HTTP_304_NOT_MODIFIED)
 
         # Box API always returns item_collection with entries for GET /folders/{id}
+        t_ser_start = time.perf_counter()
         folder_data = folder.to_dict(include_items=True)
+        t_ser_ms = (time.perf_counter() - t_ser_start) * 1000
         filtered_data = _filter_fields(folder_data, fields)
+
+        t_total_ms = (time.perf_counter() - t_start) * 1000
+        if t_total_ms > 20:
+            logger.info(
+                f"[PERF] GET /folders/{folder_id} total={t_total_ms:.0f}ms "
+                f"db={t_db_ms:.0f}ms serialize={t_ser_ms:.0f}ms"
+            )
 
         return _json_response(filtered_data)
 
@@ -810,7 +838,8 @@ async def update_folder_by_id(request: Request) -> Response:
 
         # Re-fetch with children and files for item_collection
         folder_with_items = ops.get_folder_by_id(
-            session, updated_folder.id, load_children=True, load_files=True
+            session, updated_folder.id, load_children=True, load_files=True,
+            eager_serialize=True,
         )
         # folder_with_items should never be None since we just updated it
         assert folder_with_items is not None
@@ -915,6 +944,7 @@ async def list_folder_items(request: Request) -> Response:
         - Includes order array in response
     """
     try:
+        t_start = time.perf_counter()
         session = _session(request)
         folder_id = request.path_params["folder_id"]
         fields = _parse_fields(request)
@@ -957,6 +987,13 @@ async def list_folder_items(request: Request) -> Response:
                 {"by": sort, "direction": direction},
             ],
         }
+
+        t_total_ms = (time.perf_counter() - t_start) * 1000
+        if t_total_ms > 20:
+            logger.info(
+                f"[PERF] GET /folders/{folder_id}/items total={t_total_ms:.0f}ms "
+                f"items={result['total_count']}"
+            )
 
         return _json_response(response_data)
 
@@ -1029,6 +1066,7 @@ async def search_content(request: Request) -> Response:
             content_types = [item_type]
 
         # Search - returns dict with total_count, entries, offset, limit
+        t_search_start = time.perf_counter()
         search_result = ops.search_content(
             session,
             query=query,
@@ -1036,6 +1074,7 @@ async def search_content(request: Request) -> Response:
             limit=limit,
             offset=offset,
         )
+        t_search_ms = (time.perf_counter() - t_search_start) * 1000
 
         # Build entries with field filtering
         entries = []
@@ -1051,6 +1090,11 @@ async def search_content(request: Request) -> Response:
             "offset": search_result["offset"],
             "type": "search_results_items",
         }
+
+        logger.info(
+            f"[PERF] GET /search query='{query}' total={t_search_ms:.0f}ms "
+            f"results={search_result['total_count']}"
+        )
 
         return _json_response(response_data)
 

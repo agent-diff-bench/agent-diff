@@ -62,6 +62,22 @@ def create_tables(conn, schema_name: str):
     _ = box_schema  # Ensure all models are loaded
     Base.metadata.create_all(conn_with_schema, checkfirst=True)
 
+    # Enable pg_trgm for fast ILIKE search and create GIN trigram indexes
+    conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+    for tbl, col in [
+        ("box_files", "name"),
+        ("box_files", "description"),
+        ("box_folders", "name"),
+        ("box_folders", "description"),
+    ]:
+        idx_name = f"ix_{tbl}_{col}_trgm"
+        conn.execute(
+            text(
+                f"CREATE INDEX IF NOT EXISTS {idx_name} "
+                f"ON {schema_name}.{tbl} USING gin ({col} gin_trgm_ops)"
+            )
+        )
+
 
 def _validate_identifier(identifier: str, allowed_set: set[str], label: str) -> str:
     """Validate that an identifier is in the allowed set to prevent SQL injection."""
@@ -199,6 +215,9 @@ def insert_seed_data(conn, schema_name: str, seed_data: dict) -> SeedStats:
         # Print summary for file loading
         stats.print_summary()
 
+    # ---- Compute materialized paths for folders and files ----
+    _compute_materialized_paths(seed_data)
+
     for table_name in TABLE_ORDER:
         if table_name not in seed_data:
             continue
@@ -227,6 +246,64 @@ def insert_seed_data(conn, schema_name: str, seed_data: dict) -> SeedStats:
             conn.execute(text(sql), record)
 
     return stats
+
+
+def _compute_materialized_paths(seed_data: dict) -> None:
+    """Compute and set the ``path`` column for box_folders and box_files.
+
+    The path format is a slash-separated list of ancestor folder IDs from
+    root down to (but not including) the item itself.
+
+    Examples:
+        Root folder (id=0):       path = "/"
+        Child of root:            path = "/0/"
+        Grandchild (parent=123):  path = "/0/123/"
+
+    For files the path represents the ancestor chain of its parent folder,
+    including the parent folder itself (same as the folder's own path + its id).
+    """
+    folders = seed_data.get("box_folders", [])
+    if not folders:
+        return
+
+    # Build lookup: folder_id -> record
+    folder_by_id: dict[str, dict] = {f["id"]: f for f in folders}
+
+    # Compute path for each folder (memoised)
+    path_cache: dict[str, str] = {}
+
+    def _folder_path(folder_id: str) -> str:
+        if folder_id in path_cache:
+            return path_cache[folder_id]
+
+        rec = folder_by_id.get(folder_id)
+        if rec is None:
+            path_cache[folder_id] = "/"
+            return "/"
+
+        pid = rec.get("parent_id")
+        if pid is None:
+            # Root folder
+            path_cache[folder_id] = "/"
+            return "/"
+
+        parent_path = _folder_path(pid)
+        my_path = f"{parent_path}{pid}/"
+        path_cache[folder_id] = my_path
+        return my_path
+
+    # Set path on every folder record
+    for f in folders:
+        f["path"] = _folder_path(f["id"])
+
+    # Set path on every file record (path = parent folder's path + parent_id)
+    for f in seed_data.get("box_files", []):
+        pid = f.get("parent_id")
+        if pid:
+            parent_path = _folder_path(pid)
+            f["path"] = f"{parent_path}{pid}/"
+        else:
+            f["path"] = "/"
 
 
 def register_public_template(

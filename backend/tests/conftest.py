@@ -31,10 +31,11 @@ if env_path.exists():
 
 @pytest.fixture(scope="session")
 def db_url():
-    """Database URL from environment."""
-    url = os.environ.get("DATABASE_URL")
-    if not url:
-        pytest.skip("DATABASE_URL not set")
+    """Database URL from environment, defaults to local postgres."""
+    url = os.environ.get(
+        "DATABASE_URL",
+        "postgresql://postgres:postgres@localhost:5432/postgres",
+    )
     return url
 
 

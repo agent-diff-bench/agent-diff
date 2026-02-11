@@ -3,13 +3,17 @@ Box Database Operations - CRUD operations for all Box entities.
 """
 
 import hashlib
+import logging
 import re
+import time
 import uuid
 from datetime import datetime
 from typing import Optional, Literal, cast
 
 from sqlalchemy import select, func, or_, and_
 from sqlalchemy.orm import Session, joinedload
+
+logger = logging.getLogger(__name__)
 
 from .schema import (
     User,
@@ -19,6 +23,7 @@ from .schema import (
     FileContent,
     Comment,
     Task,
+    TaskAssignment,
     Hub,
     HubItem,
     Collection,
@@ -44,6 +49,100 @@ from ..utils.errors import (
     conflict_error,
     bad_request_error,
 )
+
+
+# ---------------------------------------------------------------------------
+# Materialized-path helpers
+# ---------------------------------------------------------------------------
+
+
+def _compute_folder_path(parent: Folder) -> str:
+    """Compute the materialized path for a new child of *parent*.
+
+    The convention is:
+        root (id=0):  path = "/"
+        child of root: path = "/0/"
+        child of X whose path is "/0/A/": path = "/0/A/X/"
+    """
+    if parent.path is None:
+        # Parent has no path yet (legacy data) – fall back
+        return "/"
+    return f"{parent.path}{parent.id}/"
+
+
+def _prefetch_ancestor_folders(
+    session: Session, items: list[Folder | File]
+) -> dict[str, dict]:
+    """Bulk-fetch folder mini-dicts for all ancestors referenced in *items*' paths.
+
+    Returns a dict mapping folder ID → mini-dict (type, id, sequence_id, etag, name).
+    This replaces per-item ``_get_path_collection`` lazy-load queries with a
+    single ``SELECT ... WHERE id IN (...)`` for the whole result set.
+    """
+    all_ids: set[str] = set()
+    for item in items:
+        if item.path and item.path != "/":
+            for seg in item.path.strip("/").split("/"):
+                if seg:
+                    all_ids.add(seg)
+    if not all_ids:
+        return {}
+
+    rows = session.execute(
+        select(Folder.id, Folder.sequence_id, Folder.etag, Folder.name).where(
+            Folder.id.in_(all_ids)
+        )
+    ).all()
+    return {
+        r.id: {
+            "type": "folder",
+            "id": r.id,
+            "sequence_id": r.sequence_id,
+            "etag": r.etag,
+            "name": r.name,
+        }
+        for r in rows
+    }
+
+
+def _cascade_path_update(session: Session, folder: Folder, old_path: str) -> None:
+    """After moving *folder*, update paths of all descendants in bulk.
+
+    Works by replacing the *old_path* prefix with the folder's new path
+    on every descendant folder and file whose ``path`` starts with the
+    old prefix.  Two SQL UPDATEs – one for folders, one for files.
+    """
+    new_prefix = f"{folder.path}{folder.id}/"
+    old_prefix = f"{old_path}{folder.id}/"
+
+    if old_prefix == new_prefix:
+        return  # Nothing changed
+
+    from sqlalchemy import update
+
+    # Update descendant folders
+    session.execute(
+        update(Folder)
+        .where(Folder.path.startswith(old_prefix))
+        .values(
+            path=func.concat(
+                new_prefix,
+                func.substr(Folder.path, len(old_prefix) + 1),
+            )
+        )
+    )
+
+    # Update descendant files
+    session.execute(
+        update(File)
+        .where(File.path.startswith(old_prefix))
+        .values(
+            path=func.concat(
+                new_prefix,
+                func.substr(File.path, len(old_prefix) + 1),
+            )
+        )
+    )
 
 
 # CONSTANTS
@@ -195,9 +294,25 @@ def get_folder_by_id(
     *,
     load_children: bool = False,
     load_files: bool = False,
+    eager_serialize: bool = False,
 ) -> Optional[Folder]:
-    """Get a folder by ID, optionally with children and files."""
+    """Get a folder by ID, optionally with children and files.
+
+    Args:
+        eager_serialize: If True, eagerly load all relationships needed by
+            ``to_dict()`` (parent, created_by, modified_by, owned_by) to
+            avoid lazy-load N+1 queries during serialization.
+    """
+    t_start = time.perf_counter()
     stmt = select(Folder).where(Folder.id == folder_id)
+
+    if eager_serialize:
+        stmt = stmt.options(
+            joinedload(Folder.parent),
+            joinedload(Folder.created_by),
+            joinedload(Folder.modified_by),
+            joinedload(Folder.owned_by),
+        )
 
     if load_children:
         stmt = stmt.options(joinedload(Folder.children))
@@ -205,7 +320,15 @@ def get_folder_by_id(
         # Also load file versions for file_version in to_mini_dict()
         stmt = stmt.options(joinedload(Folder.files).joinedload(File.versions))
 
-    return session.execute(stmt).scalars().first()
+    result = session.execute(stmt).scalars().unique().first()
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] get_folder_by_id({folder_id}) time={t_ms:.0f}ms "
+            f"load_children={load_children} load_files={load_files} "
+            f"eager_serialize={eager_serialize}"
+        )
+    return result
 
 
 def get_root_folder(session: Session) -> Optional[Folder]:
@@ -290,6 +413,7 @@ def create_folder(
         name=name,
         description=description,
         parent_id=parent_id,
+        path=_compute_folder_path(parent),
         created_by_id=user_id,
         owned_by_id=user_id,
         modified_by_id=user_id,
@@ -298,7 +422,9 @@ def create_folder(
     )
     session.add(folder)
     session.flush()
-    return folder
+
+    # Re-fetch with eager loads so to_dict() won't trigger lazy queries
+    return get_folder_by_id(session, folder.id, eager_serialize=True) or folder
 
 
 def _is_descendant_of(
@@ -343,7 +469,7 @@ def update_folder(
     shared_link: Optional[dict] | _Unset = UNSET,
 ) -> Folder:
     """Update a folder's properties."""
-    folder = get_folder_by_id(session, folder_id)
+    folder = get_folder_by_id(session, folder_id, eager_serialize=True)
     if not folder:
         raise not_found_error("folder", folder_id)
 
@@ -419,7 +545,12 @@ def update_folder(
                     {"type": "folder", "id": existing.id, "name": existing.name}
                 ],
             )
+        old_path = folder.path or "/"
         folder.parent_id = parent_id
+        folder.parent = new_parent  # Keep ORM relationship in sync with FK
+        folder.path = _compute_folder_path(new_parent)
+        # Cascade path changes to all descendants
+        _cascade_path_update(session, folder, old_path)
     if tags is not None:
         folder.tags = tags
 
@@ -504,6 +635,7 @@ def list_folder_items(
     Box API returns folders first, then files, each sorted by the specified field.
     This matches the real Box API behavior.
     """
+    t_start = time.perf_counter()
     # Validate limit (Box rejects negative values)
     if limit < 0:
         raise bad_request_error("Invalid value for 'limit'. Must be non-negative.")
@@ -638,6 +770,13 @@ def list_folder_items(
         files = session.execute(files_query).scalars().unique().all()
         entries.extend([f.to_mini_dict() for f in files])
 
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] list_folder_items({folder_id}) time={t_ms:.0f}ms "
+            f"total={total_count} returned={len(entries)}"
+        )
+
     return {
         "total_count": total_count,
         "entries": entries,
@@ -655,14 +794,37 @@ def get_file_by_id(
     file_id: str,
     *,
     load_versions: bool = False,
+    eager_serialize: bool = False,
 ) -> Optional[File]:
-    """Get a file by ID, optionally with versions."""
+    """Get a file by ID, optionally with versions.
+
+    Args:
+        eager_serialize: If True, eagerly load all relationships needed by
+            ``to_dict()`` (parent, created_by, modified_by, owned_by,
+            versions) to avoid lazy-load N+1 queries during serialization.
+    """
+    t_start = time.perf_counter()
     stmt = select(File).where(File.id == file_id)
 
-    if load_versions:
+    if eager_serialize:
+        stmt = stmt.options(
+            joinedload(File.parent),
+            joinedload(File.created_by),
+            joinedload(File.modified_by),
+            joinedload(File.owned_by),
+            joinedload(File.versions),
+        )
+    elif load_versions:
         stmt = stmt.options(joinedload(File.versions))
 
-    return session.execute(stmt).scalars().first()
+    result = session.execute(stmt).scalars().unique().first()
+    t_ms = (time.perf_counter() - t_start) * 1000
+    if t_ms > 10:
+        logger.info(
+            f"[PERF] get_file_by_id({file_id}) time={t_ms:.0f}ms "
+            f"load_versions={load_versions} eager_serialize={eager_serialize}"
+        )
+    return result
 
 
 def create_file(
@@ -727,6 +889,7 @@ def create_file(
         description=description,
         size=len(content),
         parent_id=parent_id,
+        path=_compute_folder_path(parent),  # same formula: parent.path + parent.id
         created_by_id=user_id,
         owned_by_id=user_id,
         modified_by_id=user_id,
@@ -756,7 +919,8 @@ def create_file(
     file.file_version_id = version.id
     session.flush()
 
-    return file
+    # Re-fetch with eager loads so to_dict() won't trigger lazy queries
+    return get_file_by_id(session, file.id, eager_serialize=True) or file
 
 
 def update_file(
@@ -790,7 +954,7 @@ def update_file(
 
     Matches SDK FilesManager.update_file_by_id parameters.
     """
-    file = get_file_by_id(session, file_id)
+    file = get_file_by_id(session, file_id, eager_serialize=True)
     if not file:
         raise not_found_error("file", file_id)
 
@@ -856,6 +1020,8 @@ def update_file(
                 conflicts=[{"type": "file", "id": existing.id, "name": existing.name}],
             )
         file.parent_id = parent_id
+        file.parent = new_parent  # Keep ORM relationship in sync with FK
+        file.path = _compute_folder_path(new_parent)  # new_parent.path + new_parent.id
     if tags is not None:
         file.tags = tags
     if shared_link is not UNSET:
@@ -929,7 +1095,7 @@ def upload_file_version(
 
     Matches SDK UploadsManager.upload_file_version parameters.
     """
-    file = get_file_by_id(session, file_id, load_versions=True)
+    file = get_file_by_id(session, file_id, eager_serialize=True)
     if not file:
         raise not_found_error("file", file_id)
 
@@ -1101,12 +1267,14 @@ def list_file_comments(
     comments = (
         session.execute(
             select(Comment)
+            .options(joinedload(Comment.created_by))
             .where(Comment.file_id == file_id)
             .order_by(Comment.created_at.desc())
             .offset(offset)
             .limit(limit)
         )
         .scalars()
+        .unique()
         .all()
     )
 
@@ -1171,7 +1339,18 @@ def create_comment(
     )
     session.add(comment)
     session.flush()
-    return comment
+
+    # Re-fetch with eager loads so to_dict() won't trigger lazy queries
+    loaded = (
+        session.execute(
+            select(Comment)
+            .where(Comment.id == comment.id)
+            .options(joinedload(Comment.created_by))
+        )
+        .scalars()
+        .first()
+    )
+    return loaded or comment
 
 
 def update_comment(
@@ -1219,9 +1398,18 @@ def get_task_by_id(session: Session, task_id: str) -> Optional[Task]:
     """Get a task by ID."""
     return (
         session.execute(
-            select(Task).where(Task.id == task_id).options(joinedload(Task.assignments))
+            select(Task)
+            .where(Task.id == task_id)
+            .options(
+                joinedload(Task.assignments).joinedload(TaskAssignment.assigned_to),
+                joinedload(Task.assignments).joinedload(TaskAssignment.assigned_by),
+                joinedload(Task.assignments).joinedload(TaskAssignment.item).joinedload(File.versions),
+                joinedload(Task.created_by),
+                joinedload(Task.item).joinedload(File.versions),
+            )
         )
         .scalars()
+        .unique()
         .first()
     )
 
@@ -1244,12 +1432,17 @@ def list_file_tasks(
         or 0
     )
 
-    # Get tasks
+    # Get tasks with all relationships eagerly loaded
     tasks = (
         session.execute(
             select(Task)
             .where(Task.item_id == file_id)
-            .options(joinedload(Task.assignments))
+            .options(
+                joinedload(Task.assignments).joinedload(TaskAssignment.assigned_to),
+                joinedload(Task.assignments).joinedload(TaskAssignment.assigned_by),
+                joinedload(Task.created_by),
+                joinedload(Task.item).joinedload(File.versions),
+            )
             .order_by(Task.created_at.desc())
             .offset(offset)
             .limit(limit)
@@ -1309,7 +1502,22 @@ def create_task(
     )
     session.add(task)
     session.flush()
-    return task
+
+    # Re-fetch with eager loads so to_dict() won't trigger lazy queries
+    loaded = (
+        session.execute(
+            select(Task)
+            .where(Task.id == task.id)
+            .options(
+                joinedload(Task.created_by),
+                joinedload(Task.item).joinedload(File.versions),
+                joinedload(Task.assignments),
+            )
+        )
+        .scalars()
+        .first()
+    )
+    return loaded or task
 
 
 def update_task(
@@ -1368,12 +1576,15 @@ def get_hub_by_id(
     load_items: bool = False,
 ) -> Optional[Hub]:
     """Get a hub by ID."""
-    stmt = select(Hub).where(Hub.id == hub_id)
+    stmt = select(Hub).where(Hub.id == hub_id).options(
+        joinedload(Hub.created_by),
+        joinedload(Hub.updated_by),
+    )
 
     if load_items:
         stmt = stmt.options(joinedload(Hub.items))
 
-    return session.execute(stmt).scalars().first()
+    return session.execute(stmt).scalars().unique().first()
 
 
 def list_hubs(
@@ -1386,12 +1597,17 @@ def list_hubs(
     # Count total
     total_count = session.execute(select(func.count()).select_from(Hub)).scalar() or 0
 
-    # Get hubs
+    # Get hubs with eager-loaded relationships for serialization
     hubs = (
         session.execute(
-            select(Hub).order_by(Hub.created_at.desc()).offset(offset).limit(limit)
+            select(Hub)
+            .options(joinedload(Hub.created_by), joinedload(Hub.updated_by))
+            .order_by(Hub.created_at.desc())
+            .offset(offset)
+            .limit(limit)
         )
         .scalars()
+        .unique()
         .all()
     )
 
@@ -1421,7 +1637,9 @@ def create_hub(
     )
     session.add(hub)
     session.flush()
-    return hub
+
+    # Re-fetch with eager loads so to_dict() won't trigger lazy queries
+    return get_hub_by_id(session, hub.id) or hub
 
 
 def update_hub(
@@ -1576,7 +1794,9 @@ def search_content(
         ancestor_folder_ids: Limit to specific folder trees
         file_extensions: Filter files by extension
     """
+    t_start = time.perf_counter()
     results = []
+    all_items: list[File | Folder] = []  # collected before bulk-prefetch
 
     # Default to searching both files and folders
     if content_types is None:
@@ -1584,6 +1804,7 @@ def search_content(
 
     # Search files
     if "file" in content_types:
+        t_file_q = time.perf_counter()
         file_query = (
             select(File)
             .options(
@@ -1605,18 +1826,26 @@ def search_content(
         )
 
         if file_extensions:
-            # Filter by extensions
-            ext_conditions = [File.name.ilike(f"%.{ext}") for ext in file_extensions]
-            file_query = file_query.where(or_(*ext_conditions))
+            # Filter by extension column (indexed) instead of ILIKE on name
+            normalized_exts = [ext.lower().lstrip(".") for ext in file_extensions]
+            file_query = file_query.where(
+                func.lower(File.extension).in_(normalized_exts)
+            )
 
         if ancestor_folder_ids:
             file_query = file_query.where(File.parent_id.in_(ancestor_folder_ids))
 
         files = session.execute(file_query).scalars().unique().all()
-        results.extend([f.to_search_dict() for f in files])
+        t_file_db_ms = (time.perf_counter() - t_file_q) * 1000
+        all_items.extend(files)
+        logger.info(
+            f"[PERF] search_content files: query_db={t_file_db_ms:.0f}ms "
+            f"rows={len(files)}"
+        )
 
     # Search folders
     if "folder" in content_types:
+        t_folder_q = time.perf_counter()
         folder_query = (
             select(Folder)
             .options(
@@ -1641,11 +1870,37 @@ def search_content(
             folder_query = folder_query.where(Folder.parent_id.in_(ancestor_folder_ids))
 
         folders = session.execute(folder_query).scalars().unique().all()
-        results.extend([f.to_search_dict() for f in folders])
+        t_folder_db_ms = (time.perf_counter() - t_folder_q) * 1000
+        all_items.extend(folders)
+        logger.info(
+            f"[PERF] search_content folders: query_db={t_folder_db_ms:.0f}ms "
+            f"rows={len(folders)}"
+        )
+
+    # Bulk-prefetch ancestor folder mini-dicts (1 query for ALL results)
+    t_prefetch = time.perf_counter()
+    ancestor_cache = _prefetch_ancestor_folders(session, all_items)
+    t_prefetch_ms = (time.perf_counter() - t_prefetch) * 1000
+
+    # Serialize with pre-fetched cache (zero extra DB queries)
+    t_ser = time.perf_counter()
+    results = [item.to_search_dict(ancestor_cache) for item in all_items]
+    t_ser_ms = (time.perf_counter() - t_ser) * 1000
+    if t_prefetch_ms > 5 or t_ser_ms > 5:
+        logger.info(
+            f"[PERF] search_content prefetch={t_prefetch_ms:.0f}ms "
+            f"serialize={t_ser_ms:.0f}ms items={len(all_items)}"
+        )
 
     # Paginate
     total_count = len(results)
     paginated = results[offset : offset + limit]
+
+    t_total_ms = (time.perf_counter() - t_start) * 1000
+    logger.info(
+        f"[PERF] search_content TOTAL={t_total_ms:.0f}ms "
+        f"query='{query}' total_results={total_count} returned={len(paginated)}"
+    )
 
     return {
         "total_count": total_count,
@@ -1749,6 +2004,7 @@ def get_collection_items(
 
     Returns files and folders that have this collection ID in their collections array.
     """
+    t_start = time.perf_counter()
     collection = get_collection_by_id(session, collection_id)
     if not collection:
         raise not_found_error("collection", collection_id)
@@ -1756,6 +2012,7 @@ def get_collection_items(
     entries = []
 
     # Find folders in this collection
+    t_folder_q = time.perf_counter()
     folders = (
         session.execute(
             select(Folder)
@@ -1776,9 +2033,11 @@ def get_collection_items(
         .unique()
         .all()
     )
+    t_folder_ms = (time.perf_counter() - t_folder_q) * 1000
     entries.extend([f.to_mini_dict() for f in folders])
 
     # Find files in this collection
+    t_file_q = time.perf_counter()
     files = (
         session.execute(
             select(File)
@@ -1799,10 +2058,18 @@ def get_collection_items(
         .unique()
         .all()
     )
+    t_file_ms = (time.perf_counter() - t_file_q) * 1000
     entries.extend([f.to_mini_dict() for f in files])
 
     total_count = len(entries)
     paginated = entries[offset : offset + limit]
+
+    t_total_ms = (time.perf_counter() - t_start) * 1000
+    logger.info(
+        f"[PERF] get_collection_items TOTAL={t_total_ms:.0f}ms "
+        f"collection_id={collection_id} folder_q={t_folder_ms:.0f}ms "
+        f"file_q={t_file_ms:.0f}ms total_items={total_count}"
+    )
 
     return {
         "total_count": total_count,
@@ -1830,7 +2097,7 @@ def update_folder_collections(
     Returns:
         Updated folder
     """
-    folder = get_folder_by_id(session, folder_id)
+    folder = get_folder_by_id(session, folder_id, eager_serialize=True)
     if not folder:
         raise not_found_error("folder", folder_id)
 
@@ -1878,7 +2145,7 @@ def update_file_collections(
     Returns:
         Updated file
     """
-    file = get_file_by_id(session, file_id)
+    file = get_file_by_id(session, file_id, eager_serialize=True)
     if not file:
         raise not_found_error("file", file_id)
 

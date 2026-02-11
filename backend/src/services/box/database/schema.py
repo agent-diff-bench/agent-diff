@@ -256,6 +256,11 @@ class Folder(Base):
     parent_id: Mapped[Optional[str]] = mapped_column(
         String(20), ForeignKey("box_folders.id"), nullable=True, index=True
     )
+    # Materialized path: slash-separated ancestor IDs from root to parent.
+    # Root folder has path="/", children of root have path="/0/",
+    # deeper folders have path="/0/<parent1_id>/<parent2_id>/..." etc.
+    # This eliminates N+1 queries in _get_path_collection().
+    path: Mapped[Optional[str]] = mapped_column(String(500), default="/")
 
     # Ownership
     created_by_id: Mapped[Optional[str]] = mapped_column(
@@ -352,7 +357,11 @@ class Folder(Base):
     )
 
     # Indexes
-    __table_args__ = (Index("ix_box_folders_parent_name", "parent_id", "name"),)
+    __table_args__ = (
+        Index("ix_box_folders_parent_name", "parent_id", "name"),
+        Index("ix_box_folders_item_status", "item_status"),
+        Index("ix_box_folders_status_parent", "item_status", "parent_id"),
+    )
 
     def to_mini_dict(self) -> dict:
         """Return minimal folder representation (Folder--Mini)."""
@@ -393,8 +402,14 @@ class Folder(Base):
             "folder_upload_email": self.folder_upload_email,
         }
 
-    def to_search_dict(self) -> dict:
-        """Return folder representation for search results (Box search API format)."""
+    def to_search_dict(self, ancestor_cache: dict | None = None) -> dict:
+        """Return folder representation for search results (Box search API format).
+
+        Args:
+            ancestor_cache: Optional pre-fetched {folder_id: mini_dict} map.
+                            When provided, ``_get_path_collection`` skips its
+                            own DB query and uses the cache instead.
+        """
         return {
             "id": self.id,
             "type": "folder",
@@ -406,7 +421,7 @@ class Folder(Base):
             "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
             "modified_at": self.modified_at.isoformat() if self.modified_at else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "path_collection": self._get_path_collection(),
+            "path_collection": self._get_path_collection(ancestor_cache),
             "modified_by": self.modified_by.to_mini_dict()
             if self.modified_by
             else None,
@@ -507,17 +522,68 @@ class Folder(Base):
 
         return result
 
-    def _get_path_collection(self) -> dict:
-        """Build the path collection from root to this folder."""
+    def _get_path_collection(self, ancestor_cache: dict | None = None) -> dict:
+        """Build the path collection from root to this folder.
+
+        Uses the materialized ``path`` column (e.g. "/0/123/456/") to avoid
+        N+1 lazy-load queries up the parent chain.
+
+        Args:
+            ancestor_cache: Optional pre-fetched ``{folder_id: mini_dict}``
+                map.  When provided, the method does pure dict lookups with
+                **zero** DB queries.
+        """
+        # Fast path – use materialized path column
+        if self.path and self.path != "/":
+            ancestor_ids = [seg for seg in self.path.strip("/").split("/") if seg]
+            if not ancestor_ids:
+                return {"total_count": 0, "entries": []}
+
+            # Use pre-fetched cache when available (bulk search path)
+            if ancestor_cache is not None:
+                entries = [
+                    ancestor_cache[aid]
+                    for aid in ancestor_ids
+                    if aid in ancestor_cache
+                ]
+                return {"total_count": len(entries), "entries": entries}
+
+            # Single-item fallback – one IN query
+            from sqlalchemy.orm import object_session
+            from sqlalchemy import select as sa_select
+
+            session = object_session(self)
+            if session is not None:
+                rows = session.execute(
+                    sa_select(
+                        Folder.id, Folder.sequence_id, Folder.etag, Folder.name,
+                    ).where(Folder.id.in_(ancestor_ids))
+                ).all()
+                lookup = {r.id: r for r in rows}
+                entries = [
+                    {
+                        "type": "folder", "id": r.id,
+                        "sequence_id": r.sequence_id,
+                        "etag": r.etag, "name": r.name,
+                    }
+                    for aid in ancestor_ids
+                    if (r := lookup.get(aid))
+                ]
+                return {"total_count": len(entries), "entries": entries}
+
+            return {"total_count": 0, "entries": []}
+
+        # path is "/" or None → root folder / legacy data
+        if self.path == "/":
+            return {"total_count": 0, "entries": []}
+
+        # Fallback – walk parent chain (legacy data without path)
         entries = []
         current = self.parent
         while current:
             entries.insert(0, current.to_mini_dict())
             current = current.parent
-        return {
-            "total_count": len(entries),
-            "entries": entries,
-        }
+        return {"total_count": len(entries), "entries": entries}
 
     def _get_collections_dict(self) -> list:
         """Build the collections array for this folder.
@@ -578,6 +644,10 @@ class File(Base):
     parent_id: Mapped[Optional[str]] = mapped_column(
         String(20), ForeignKey("box_folders.id"), index=True
     )
+    # Materialized path: slash-separated ancestor IDs from root to parent folder.
+    # E.g. "/0/" for files in root, "/0/<folder_id>/" for files one level deep.
+    # This eliminates N+1 queries in _get_path_collection().
+    path: Mapped[Optional[str]] = mapped_column(String(500), default="/0/")
 
     # Ownership
     created_by_id: Mapped[Optional[str]] = mapped_column(
@@ -702,7 +772,12 @@ class File(Base):
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="item")
 
     # Indexes
-    __table_args__ = (Index("ix_box_files_parent_name", "parent_id", "name"),)
+    __table_args__ = (
+        Index("ix_box_files_parent_name", "parent_id", "name"),
+        Index("ix_box_files_item_status", "item_status"),
+        Index("ix_box_files_status_parent", "item_status", "parent_id"),
+        Index("ix_box_files_extension", "extension"),
+    )
 
     def to_mini_dict(self) -> dict:
         """Return minimal file representation (File--Mini)."""
@@ -746,8 +821,12 @@ class File(Base):
             "path_collection": self._get_path_collection(),
         }
 
-    def to_search_dict(self) -> dict:
-        """Return file representation for search results (Box search API format)."""
+    def to_search_dict(self, ancestor_cache: dict | None = None) -> dict:
+        """Return file representation for search results (Box search API format).
+
+        Args:
+            ancestor_cache: Optional pre-fetched {folder_id: mini_dict} map.
+        """
         return {
             "id": self.id,
             "type": "file",
@@ -759,7 +838,7 @@ class File(Base):
             "trashed_at": self.trashed_at.isoformat() if self.trashed_at else None,
             "modified_at": self.modified_at.isoformat() if self.modified_at else None,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "path_collection": self._get_path_collection(),
+            "path_collection": self._get_path_collection(ancestor_cache),
             "modified_by": self.modified_by.to_mini_dict()
             if self.modified_by
             else None,
@@ -853,8 +932,62 @@ class File(Base):
             return self.versions[0].to_mini_dict()
         return None
 
-    def _get_path_collection(self) -> dict:
-        """Build the path collection from root to this file's parent."""
+    def _get_path_collection(self, ancestor_cache: dict | None = None) -> dict:
+        """Build the path collection from root to this file's parent.
+
+        Uses the materialized ``path`` column (e.g. "/0/123/456/") to avoid
+        N+1 lazy-load queries up the parent chain.
+
+        Args:
+            ancestor_cache: Optional pre-fetched ``{folder_id: mini_dict}``
+                map.  When provided, the method does pure dict lookups with
+                **zero** DB queries.
+        """
+        # Fast path – use materialized path column
+        if self.path and self.path != "/":
+            ancestor_ids = [seg for seg in self.path.strip("/").split("/") if seg]
+            if not ancestor_ids:
+                return {"total_count": 0, "entries": []}
+
+            # Use pre-fetched cache when available (bulk search path)
+            if ancestor_cache is not None:
+                entries = [
+                    ancestor_cache[aid]
+                    for aid in ancestor_ids
+                    if aid in ancestor_cache
+                ]
+                return {"total_count": len(entries), "entries": entries}
+
+            # Single-item fallback – one IN query
+            from sqlalchemy.orm import object_session
+            from sqlalchemy import select as sa_select
+
+            session = object_session(self)
+            if session is not None:
+                rows = session.execute(
+                    sa_select(
+                        Folder.id, Folder.sequence_id, Folder.etag, Folder.name,
+                    ).where(Folder.id.in_(ancestor_ids))
+                ).all()
+                lookup = {r.id: r for r in rows}
+                entries = [
+                    {
+                        "type": "folder", "id": r.id,
+                        "sequence_id": r.sequence_id,
+                        "etag": r.etag, "name": r.name,
+                    }
+                    for aid in ancestor_ids
+                    if (r := lookup.get(aid))
+                ]
+                return {"total_count": len(entries), "entries": entries}
+
+            return {"total_count": 0, "entries": []}
+
+        # path is "/" or None
+        if self.path == "/":
+            return {"total_count": 0, "entries": []}
+
+        # Fallback – walk parent chain (legacy data without path)
         entries = []
         current = self.parent
         while current:

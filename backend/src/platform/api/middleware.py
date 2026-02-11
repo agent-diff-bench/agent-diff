@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import time
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -86,6 +87,8 @@ class IsolationMiddleware(BaseHTTPMiddleware):
         if not path.startswith("/api/env/"):
             return await call_next(request)
 
+        t_total_start = time.perf_counter()
+
         try:
             path_after_prefix = path[len("/api/env/") :]
             env_id = path_after_prefix.split("/")[0] if path_after_prefix else ""
@@ -106,8 +109,11 @@ class IsolationMiddleware(BaseHTTPMiddleware):
                     status_code=status.HTTP_401_UNAUTHORIZED,
                 )
 
+            t_auth_start = time.perf_counter()
             principal_id = await get_principal_id(api_key_hdr, action="api_request")
+            t_auth_ms = (time.perf_counter() - t_auth_start) * 1000
 
+            t_meta_start = time.perf_counter()
             with self.session_manager.with_meta_session() as meta_session:
                 request.state.principal_id = principal_id
 
@@ -125,11 +131,26 @@ class IsolationMiddleware(BaseHTTPMiddleware):
                     logger.debug(
                         f"Could not load impersonation data for env {env_id}: {e}"
                     )
+            t_meta_ms = (time.perf_counter() - t_meta_start) * 1000
 
+            t_handler_start = time.perf_counter()
             with self.session_manager.with_session_for_environment(env_id) as session:
                 request.state.db_session = session
                 request.state.environment_id = env_id
-                return await call_next(request)
+                response = await call_next(request)
+            t_handler_ms = (time.perf_counter() - t_handler_start) * 1000
+
+            t_total_ms = (time.perf_counter() - t_total_start) * 1000
+            # Extract service from path for easier log filtering
+            parts = path_after_prefix.split("/")
+            service_name = parts[2] if len(parts) > 2 else "unknown"
+            logger.info(
+                f"[PERF] {request.method} {path} | service={service_name} "
+                f"total={t_total_ms:.0f}ms auth={t_auth_ms:.0f}ms "
+                f"meta_db={t_meta_ms:.0f}ms handler={t_handler_ms:.0f}ms "
+                f"status={response.status_code}"
+            )
+            return response
 
         except PermissionError as exc:
             return JSONResponse(
