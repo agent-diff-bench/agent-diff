@@ -55,14 +55,35 @@ class EnvironmentHandler:
         self._set_replica_identity(target_schema)
 
     def _ensure_box_columns(self, schema: str) -> None:
-        """Add columns that may be missing from older template snapshots."""
+        """Add columns that may be missing from older template snapshots.
+
+        Only runs against schemas that actually contain Box tables.  Each
+        ALTER TABLE is wrapped in a SAVEPOINT so that a single failure does
+        not poison the surrounding transaction (the same pattern used by
+        ``_copy_custom_indexes``).
+        """
         _columns = [
             # (table, column, SQL type, default)
             ("box_folders", "path", "VARCHAR(500)", "'/'"),
             ("box_files", "path", "VARCHAR(500)", "'/0/'"),
         ]
         with self.session_manager.base_engine.begin() as conn:
+            # Quick check: skip entirely when the schema has no Box tables.
+            has_box = conn.execute(
+                text(
+                    "SELECT EXISTS("
+                    "  SELECT 1 FROM information_schema.tables"
+                    "  WHERE table_schema = :schema"
+                    "    AND table_name = 'box_folders'"
+                    ")"
+                ),
+                {"schema": schema},
+            ).scalar()
+            if not has_box:
+                return
+
             for table, col, sql_type, default in _columns:
+                nested = conn.begin_nested()
                 try:
                     conn.execute(
                         text(
@@ -71,7 +92,9 @@ class EnvironmentHandler:
                             f"DEFAULT {default}"
                         )
                     )
+                    nested.commit()
                 except Exception as exc:
+                    nested.rollback()
                     logger.warning(
                         f"Could not ensure column {schema}.{table}.{col}: {exc}"
                     )
