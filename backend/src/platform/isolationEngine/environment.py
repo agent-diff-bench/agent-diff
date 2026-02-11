@@ -65,17 +65,30 @@ class EnvironmentHandler:
             ).fetchall()
             for idx_name, idx_def in rows:
                 # Rewrite the CREATE INDEX to target the new schema
-                new_def = idx_def.replace(
-                    f" ON {src_schema}.", f" ON {dst_schema}."
-                )
+                new_def = idx_def.replace(f" ON {src_schema}.", f" ON {dst_schema}.")
                 # Avoid name collisions by prefixing with target schema
                 new_idx_name = f"{dst_schema}_{idx_name}"
+                # Handle both CREATE INDEX and CREATE UNIQUE INDEX
+                new_def = new_def.replace(
+                    f"CREATE UNIQUE INDEX {idx_name}",
+                    f"CREATE UNIQUE INDEX IF NOT EXISTS {new_idx_name}",
+                )
                 new_def = new_def.replace(
                     f"CREATE INDEX {idx_name}",
                     f"CREATE INDEX IF NOT EXISTS {new_idx_name}",
                 )
                 try:
-                    conn.execute(text(new_def))
+                    # Use a savepoint so a single index failure doesn't abort
+                    # the entire transaction and block subsequent indexes.
+                    nested = conn.begin_nested()
+                    try:
+                        conn.execute(text(new_def))
+                        nested.commit()
+                    except Exception as exc:
+                        nested.rollback()
+                        logger.warning(
+                            f"Could not copy index {idx_name} to {dst_schema}: {exc}"
+                        )
                 except Exception as exc:
                     logger.warning(
                         f"Could not copy index {idx_name} to {dst_schema}: {exc}"

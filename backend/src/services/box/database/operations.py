@@ -547,6 +547,7 @@ def update_folder(
             )
         old_path = folder.path or "/"
         folder.parent_id = parent_id
+        folder.parent = new_parent  # Keep ORM relationship in sync with FK
         folder.path = _compute_folder_path(new_parent)
         # Cascade path changes to all descendants
         _cascade_path_update(session, folder, old_path)
@@ -1019,6 +1020,7 @@ def update_file(
                 conflicts=[{"type": "file", "id": existing.id, "name": existing.name}],
             )
         file.parent_id = parent_id
+        file.parent = new_parent  # Keep ORM relationship in sync with FK
         file.path = _compute_folder_path(new_parent)  # new_parent.path + new_parent.id
     if tags is not None:
         file.tags = tags
