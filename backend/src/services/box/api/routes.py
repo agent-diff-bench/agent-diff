@@ -535,11 +535,10 @@ async def download_file(request: Request) -> Response:
                 "Could not find the specified resource",
             )
 
-        # Build redirect URL using request's base URL to get full mount path
-        # This matches Box's pattern of redirecting to a different URL for actual download
-        # Extract the base path from request URL (e.g., /api/env/{env_id}/services/box/2.0)
-        base_url = str(request.url).split("/files/")[0]
-        download_url = f"{base_url}/files/{file_id}/download"
+        # Build redirect URL using the request path (not full URL) to avoid
+        # http:// vs https:// mismatch behind reverse proxies (Railway, etc.)
+        base_path = request.scope["path"].split("/files/")[0]
+        download_url = f"{base_path}/files/{file_id}/download"
         if version:
             download_url += f"?version={version}"
 
@@ -673,7 +672,10 @@ async def create_folder(request: Request) -> Response:
         )
 
         folder_with_items = ops.get_folder_by_id(
-            session, new_folder.id, load_children=True, load_files=True,
+            session,
+            new_folder.id,
+            load_children=True,
+            load_files=True,
             eager_serialize=True,
         )
         assert folder_with_items is not None
@@ -719,7 +721,10 @@ async def get_folder_by_id(request: Request) -> Response:
 
         # Load children and files for item_collection
         folder = ops.get_folder_by_id(
-            session, folder_id, load_children=True, load_files=True,
+            session,
+            folder_id,
+            load_children=True,
+            load_files=True,
             eager_serialize=True,
         )
         t_db_ms = (time.perf_counter() - t_start) * 1000
@@ -838,7 +843,10 @@ async def update_folder_by_id(request: Request) -> Response:
 
         # Re-fetch with children and files for item_collection
         folder_with_items = ops.get_folder_by_id(
-            session, updated_folder.id, load_children=True, load_files=True,
+            session,
+            updated_folder.id,
+            load_children=True,
+            load_files=True,
             eager_serialize=True,
         )
         # folder_with_items should never be None since we just updated it
@@ -1695,7 +1703,7 @@ async def update_task_by_id(request: Request) -> Response:
 
             try:
                 due_at = datetime.fromisoformat(due_at_str.replace("Z", "+00:00"))
-            except (ValueError, AttributeError):
+            except ValueError, AttributeError:
                 _box_error(BoxErrorCode.BAD_REQUEST, "Invalid 'due_at' format")
 
         task = ops.update_task(
