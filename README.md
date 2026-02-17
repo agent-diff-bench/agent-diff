@@ -5,8 +5,11 @@
 Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, no rate limits.
 
 <p align="center">
+  <a href="https://arxiv.org/abs/2602.11224">Paper (arXiv)</a> •
   <a href="https://agentdiff.dev">Website</a> •
   <a href="https://agentdiff.mintlify.app/introduction">Docs</a> •
+  <a href="https://huggingface.co/datasets/hubertmarek/agent-diff-bench">Dataset</a> •
+  <a href="https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench">Prime Intellect</a> •
   <a href="mailto:hubert@uni.minerva.edu">Feedback</a>
 </p>
 
@@ -109,23 +112,15 @@ client.delete_env(envId=env.environmentId)
 
 ## Supported APIs
 
-- **Slack** – core Web API coverage for conversations, chat, reactions, users, etc. Full list here [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). A few examples:
+- **Box** – REST API for file/folder management, search, comments, tags, shared links, hubs, and content versioning. See [`backend/src/services/box/README.md`](backend/src/services/box/README.md). 27 endpoints.
 
-  ```python
-  "chat.postMessage"  # post messages in seeded channels/DMs
-  "conversations.open"  # spin up IM/MPIM threads
-  "reactions.add"  # add emoji reactions to seeded messages
-  ```
+- **Google Calendar** – REST API for calendar CRUD, events, recurring series, free/busy queries, ACL rules, calendar list management, and push notifications. See [`backend/src/services/calendar/README.md`](backend/src/services/calendar/README.md). 37 endpoints.
 
-- **Linear** – GraphQL API. See [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 
+- **Linear** – GraphQL API for issue tracking, teams, workflow states, labels, comments, relations, and memberships. See [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 19 endpoints.
 
-  ```python
-  "issues"            # list/filter issues with pagination
-  "teams"             # list teams
-  "issueCreate"       # create new issue
-  "issueUpdate"       # update issue (state, assignee, priority, etc.)
-  "commentCreate"     # add comment to issue
-  ```
+- **Slack** – Web API for conversations, messaging, reactions, threading, users, and channels. See [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 25 endpoints.
+
+> **108 unique endpoints** across all 4 services.
 
 ## Templates, Seeds & Environments
 
@@ -149,18 +144,93 @@ client.delete_env(envId=env.environmentId)
 SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
 
 
-## Benchmark & Training
+## Paper
 
-- **HuggingFace Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split, stratified by service)
-- **Prime Intellect Environment**: [agent-diff-bench on Prime Lab](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) — run evaluations or RL training via Hosted Training
-- **Paper**: [AgentDiff: Agentic API Evaluation via State Differencing (KDD 2026 pre-print)](https://drive.google.com/file/d/1BlmJTSMX7ohwvD1aYBByg7_Y815fgsxp/view?usp=sharing)
+> **Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation**
+> Hubert M. Pysklo, Artem Zhuravel, Patrick D. Watson
+> *Pre-print. Under review for KDD 2026.*
+> [arXiv:2602.11224](https://arxiv.org/abs/2602.11224)
+
+If you use Agent-Diff in your research, please cite:
+
+```bibtex
+@article{pysklo2025agentdiff,
+  title={Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
+  author={Pysklo, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
+  journal={arXiv preprint arXiv:2602.11224},
+  year={2025}
+}
+```
+
+## Run Evaluations
+
+The fastest way to run Agent-Diff evaluations is via **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — run evals or RL training with no setup required.
+
+Alternatively, run locally or self-hosted using the SDK (see [To run evaluations](#to-run-evaluations) below).
+
+**Resources:**
+- **Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split)
+- **Prime Intellect**: [agent-diff-bench on Prime Lab](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) — hosted evaluations & RL training
+
+## Benchmark
+
+The Agent-Diff benchmark comprises **224 tasks** across four enterprise services, each evaluated via deterministic state-diff contracts. Tasks span single-step CRUD operations to long-horizon, multi-entity workflows requiring search, conditional logic, and coordinated state changes.
+
+### Task Distribution
+
+| Metric | Box | Calendar | Linear | Slack | **Total** |
+|---|---|---|---|---|---|
+| Tasks | 48 | 60 | 57 | 59 | **224** |
+| Task horizon _n*_ (range) | 1–13 | 1–24 | 1–13 | 1–14 | 1–24 |
+| Task horizon _n*_ (mean) | 4.6 | 5.9 | 5.2 | 5.6 | 5.3 |
+| | | | | | |
+| **Operation profile** _(% of tasks, non-exclusive)_ | | | | | |
+| Search | 92 | 77 | 89 | 64 | 80 |
+| Create | 58 | 78 | 63 | 88 | 73 |
+| Read | 54 | 82 | 14 | 68 | 55 |
+| Update | 62 | 93 | 70 | 37 | 66 |
+| Delete | 19 | 53 | 7 | 24 | 26 |
+| | | | | | |
+| **Entity scope** | | | | | |
+| Single-entity | 28 | 11 | 33 | 33 | 105 |
+| Multi-entity | 20 | 49 | 24 | 26 | 119 |
+| | | | | | |
+| **Information availability** | | | | | |
+| Explicit | 6 | 10 | 25 | 36 | 77 |
+| Implicit | 42 | 50 | 32 | 23 | 147 |
+| | | | | | |
+| **Prompt ambiguity** | | | | | |
+| Low | 24 | 13 | 37 | 27 | 101 |
+| Medium | 17 | 45 | 19 | 22 | 103 |
+| High | 7 | 2 | 1 | 10 | 20 |
+
+Tasks are characterized along five dimensions: _task horizon_ (minimum API calls under an optimal policy), _operation profile_ (which CRUD primitives are required), _entity scope_ (single vs. multi-entity state changes), _information availability_ (whether identifiers are given explicitly or must be discovered), and _prompt ambiguity_ (how underspecified the target is).
+
+### Results (No-Docs Baseline)
+
+| Model | Box | Calendar | Linear | Slack | **Overall** | Pass % | Cost/test | Score/$ |
+|---|---|---|---|---|---|---|---|---|
+| deepseek-v3.2 | 76.6 | **87.5** | **94.8** | **86.1** | **88.1** | 76 | $0.03 | 2,938 |
+| devstral-2512 | 79.0 | 80.0 | 91.5 | 85.7 | **86.0** | 74 | $0.08 | 1,075 |
+| qwen3-vl-235b | 68.4 | 71.0 | 82.0 | 75.8 | **79.2** | 65 | $0.02 | 3,959 |
+| kimi-k2-0905 | 66.5 | 72.3 | 88.2 | 82.2 | **75.4** | 64 | $0.04 | 1,885 |
+| grok-4.1-fast | 58.5 | 75.7 | 66.0 | 77.1 | **74.9** | 52 | $0.01 | 7,489 |
+| gemini-3-flash | **80.3** | 62.2 | 84.0 | 77.5 | **73.8** | 67 | $0.05 | 1,477 |
+| gpt-oss-120b | 70.1 | 68.4 | 79.5 | 69.1 | **68.5** | 60 | $0.02 | 3,428 |
+| claude-haiku-4.5 | 45.1 | 57.8 | 35.6 | 57.3 | **49.3** | 50 | $0.22 | 224 |
+| llama-4-scout | 33.7 | 41.4 | 20.9 | 42.9 | **38.0** | 29 | $0.02 | 1,900 |
+
+Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
 
 ## Evaluations & Test Suites
 
 Collections of test cases with assertions that you can run against agent runs using evaluations.
 
+- **[box_bench.json](examples/box/testsuites/box_bench.json)** - test cases covering file/folder operations, search, tags, comments, hubs, and content versioning
+- **[calendar_bench.json](examples/calendar/testsuites/calendar_bench.json)** - test cases covering event CRUD, recurring events, free/busy queries, ACL management, and calendar lifecycle
+- **[linear_bench.json](examples/linear/testsuites/linear_bench.json)** - test cases covering issue management, labels, comments, workflow states, and team operations
 - **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
-- **[linear_bench.json](examples/linear/testsuites/linear_bench.json)** - test cases covering issue management, labels, comments, workflow states, and team operations. HF dataset: https://huggingface.co/datasets/hubertmarek/linear-bench-mini . 
+
 <img width="2985" height="1966" alt="pass_rates_annotated" src="https://github.com/user-attachments/assets/f5c59c81-c3bd-427e-977c-a5c2c0695e86" />
 
 - **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
