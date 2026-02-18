@@ -168,6 +168,11 @@ The fastest way to run Agent-Diff evaluations is via **[Prime Intellect](https:/
 
 Alternatively, run locally or self-hosted using the SDK (see [To run evaluations](#to-run-evaluations) below).
 
+### Example Notebooks
+
+- **[ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb)** — Custom ReAct loop matching the paper methodology [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb)
+- **[LangChain Agent](examples/langchain_agent_benchmark.ipynb)** — LangChain agent with tool calling [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb)
+
 **Resources:**
 - **Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split)
 - **Prime Intellect**: [agent-diff-bench on Prime Lab](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) — hosted evaluations & RL training
