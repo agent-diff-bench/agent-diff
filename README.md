@@ -5,11 +5,16 @@
 Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, no rate limits.
 
 <p align="center">
-  <a href="https://arxiv.org/abs/2602.11224">Paper (arXiv)</a> •
+  <a href="https://arxiv.org/abs/2602.11224"><img src="https://img.shields.io/badge/arXiv-2602.11224-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://huggingface.co/datasets/hubertmarek/agent-diff-bench"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow.svg" alt="HuggingFace"></a>
+  <a href="https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench"><img src="https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg" alt="Prime Intellect"></a>
+  <a href="https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
+</p>
+
+<p align="center">
   <a href="https://agentdiff.dev">Website</a> •
   <a href="https://agentdiff.mintlify.app/introduction">Docs</a> •
-  <a href="https://huggingface.co/datasets/hubertmarek/agent-diff-bench">Dataset</a> •
-  <a href="https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench">Prime Intellect</a> •
+  <a href="https://arxiv.org/abs/2602.11224">Paper</a> •
   <a href="mailto:hubert@uni.minerva.edu">Feedback</a>
 </p>
 
@@ -167,6 +172,11 @@ If you use Agent-Diff in your research, please cite:
 The fastest way to run Agent-Diff evaluations is via **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — run evals or RL training with no setup required.
 
 Alternatively, run locally or self-hosted using the SDK (see [To run evaluations](#to-run-evaluations) below).
+
+### Example Notebooks
+
+- **[ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb)** — Custom ReAct loop matching the paper methodology [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb)
+- **[LangChain Agent](examples/langchain_agent_benchmark.ipynb)** — LangChain agent with tool calling [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb)
 
 **Resources:**
 - **Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split)
