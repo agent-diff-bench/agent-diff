@@ -18,6 +18,12 @@ Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behav
   <a href="mailto:hubert@uni.minerva.edu">Feedback</a>
 </p>
 
+### Try it now
+
+| Notebook | Description | |
+|----------|-------------|---|
+| [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | Custom ReAct loop matching the paper methodology | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
+| [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | LangChain agent with tool calling | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
 
 ## Quick Start
 
@@ -52,7 +58,7 @@ export AGENT_DIFF_BASE_URL="https://api.agentdiff.dev"
 <summary><b>Self-Hosted</b></summary>
 
 ```bash
-git clone https://github.com/hubertpysklo/agent-diff.git
+git clone https://github.com/agent-diff-bench/agent-diff.git
 cd agent-diff/ops
 docker-compose up --build
 # Backend runs on http://localhost:8000
@@ -60,60 +66,43 @@ docker-compose up --build
 
 </details>
 
-### 3. Flow
+### 3. Use
+
 ```python
 from agent_diff import AgentDiff
 
-# Self-hosted (defaults to http://localhost:8000)
 client = AgentDiff()
 
-# Initialise isolated environment from a template. See: examples/slack/seeds
-env = client.init_env(templateService="slack", templateName="slack_default",
-impersonateUserId="U01AGENBOT9", TTL="3600") #impersonateUserId - seeded user account that agent will use
+# Create an isolated environment from a template
+env = client.init_env(
+    templateService="slack",
+    templateName="slack_default",
+    impersonateUserId="U01AGENBOT9",
+)
 
-# print(env.environmentUrl) = http://localhost:8000/api/env/{environmentId}/services/slack
-
-# Take before snapshot
+# Snapshot before agent runs
 run = client.start_run(envId=env.environmentId)
 
-# Your agent does stuff using the environment URL 
-# You can swap the URLs in MCPs or use the code executor tool (Python or bash) with a proxy 
+# --- Your agent interacts with the API here ---
+# SDK provides code execution proxies (Python/Bash) for OpenAI Agents, LangChain, etc.
+# Agent writes normal code (e.g. requests.post('https://slack.com/api/chat.postMessage', ...))
+# which is automatically intercepted and routed to the sandboxed environment.
 
-# Using CodeExecutorProxy with OpenAI Agents SDK (For Vercel AI, check TS SDK docs)
-from agent_diff import PythonExecutorProxy, create_openai_tool
-from agents import Agent, Runner
+from agent_diff import BashExecutorProxy, create_openai_tool
+bash = BashExecutorProxy(env.environmentId)
+tool = create_openai_tool(bash)  # also: create_langchain_tool, create_smolagents_tool
 
-# Create executor (auto-loads from AGENT_DIFF_API_KEY and AGENT_DIFF_BASE_URL env vars)
-python_executor = PythonExecutorProxy(env.environmentId)
-python_tool = create_openai_tool(python_executor) 
-
-agent = Agent(
-        name="Slack Assistant",
-        instructions="Use execute_python tool to interact with Slack API at https://slack.com/api/*. Complete the task using the tools provided. Authentication is handled automatically via proxy. Leave a placeholder credential where you would add a real token.",
-        tools=[python_tool] # python_tool (or bash_tool) where agent will write code
-    )
-
-response = await Runner.run(agent, "Post 'Hello' to Slack channel #general")
-
-# The agent writes normal code like:
-# requests.post('https://slack.com/api/chat.postMessage', ...)
-# But it will be proxied to the temporary sandbox environment
-# e.g. transforms:
-# from: https://api.slack.com/api/conversations.list
-# to: http://localhost:8000/api/env/{environmentId}/services/slack/conversations.list 
-
-# Compute diff (changes in the environment) and get results
+# Compute state diff and inspect changes
 diff = client.diff_run(runId=run.runId)
-
-# Inspect changes
-print(diff.diff['inserts'])   # New records, e.g. new message or user added by agent
-print(diff.diff['updates'])   # Modified records, edited message
-print(diff.diff['deletes'])   # Deleted records, deleted message, linear issue, etc.
+print(diff.diff['inserts'])   # new records created by agent
+print(diff.diff['updates'])   # modified records
+print(diff.diff['deletes'])   # deleted records
 
 # Clean up
 client.delete_env(envId=env.environmentId)
-
 ```
+
+See the [Python SDK](sdk/agent-diff-python/README.md) and [TS SDK](sdk/agent-diff-ts/README.md) for full reference.
 
 ## Supported APIs
 
@@ -130,9 +119,9 @@ client.delete_env(envId=env.environmentId)
 ## Templates, Seeds & Environments
 
 **Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
-- **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `linear_base`)
-- **Content**: Templates are seeded during startup time from seeds with data like users, channels, messages, issues, etc.
-- **Example Seeds**: **[slack_default](examples/slack/seeds/slack_bench_default.json)** - sample users, channels and messages.
+- **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `box_default`, `linear_expanded`, `calendar_base`)
+- **Content**: Seeded with realistic data — users, channels, messages, files, folders, issues, calendar events, etc.
+- **Seeds**: [box](examples/box/seeds/) | [calendar](examples/calendar/seeds/) | [linear](examples/linear/seeds/) | [slack](examples/slack/seeds/)
 
 <img width="2330" height="688" alt="image" src="https://github.com/user-attachments/assets/481d3f40-e378-402c-9d3c-8a2ab75c880e" />
 
@@ -144,43 +133,12 @@ client.delete_env(envId=env.environmentId)
 <img width="2344" height="432" alt="image" src="https://github.com/user-attachments/assets/c61e93f2-1826-429e-8ee7-4a32f4172a38" />
 
 
-## CodeExecutorProxy
-
-SDK provides **code execution proxies** - tools for AI agents. You add it to your toolbox in Vercel AI SDK, Langchain or OpenAI Agents, making LLM write Python or Bash code to talk with Slack or Linear API. Requests will automatically be intercepted and routed to isolated test environments. This enables agents to interact with service replicas without any code changes. See more in: **[Python SDK](sdk/agent-diff-python/README.md)** 
-
-
-## Paper
-
-> **Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation**
-> Hubert M. Pysklo, Artem Zhuravel, Patrick D. Watson
-> *Pre-print. Under review for KDD 2026.*
-> [arXiv:2602.11224](https://arxiv.org/abs/2602.11224)
-
-If you use Agent-Diff in your research, please cite:
-
-```bibtex
-@article{pysklo2025agentdiff,
-  title={Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
-  author={Pysklo, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
-  journal={arXiv preprint arXiv:2602.11224},
-  year={2025}
-}
-```
 
 ## Run Evaluations
 
-The fastest way to run Agent-Diff evaluations is via **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — run evals or RL training with no setup required.
-
-Alternatively, run locally or self-hosted using the SDK (see [To run evaluations](#to-run-evaluations) below).
-
-### Example Notebooks
-
-- **[ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb)** — Custom ReAct loop matching the paper methodology [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb)
-- **[LangChain Agent](examples/langchain_agent_benchmark.ipynb)** — LangChain agent with tool calling [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb)
-
-**Resources:**
-- **Dataset**: [hubertmarek/agent-diff-bench](https://huggingface.co/datasets/hubertmarek/agent-diff-bench) — 224 tasks across all 4 services (80/20 train/test split)
-- **Prime Intellect**: [agent-diff-bench on Prime Lab](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) — hosted evaluations & RL training
+- **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — Run evals or RL training with no setup required
+- **[Colab Notebooks](#try-it-now)** — Run locally with the example notebooks above
+- **[Dataset](https://huggingface.co/datasets/hubertmarek/agent-diff-bench)** — 224 tasks across all 4 services (80/20 train/test split)
 
 ## Benchmark
 
@@ -232,81 +190,37 @@ Tasks are characterized along five dimensions: _task horizon_ (minimum API calls
 
 Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
 
-## Evaluations & Test Suites
+## Test Suites
 
-Collections of test cases with assertions that you can run against agent runs using evaluations.
+| Service | Test Suite | Tests | Coverage |
+|---------|-----------|-------|----------|
+| Box | [box_bench.json](examples/box/testsuites/box_bench.json) | 48 | File/folder ops, search, tags, comments, hubs, versioning |
+| Calendar | [calendar_bench.json](examples/calendar/testsuites/calendar_bench.json) | 60 | Event CRUD, recurring events, free/busy, ACL, lifecycle |
+| Linear | [linear_bench.json](examples/linear/testsuites/linear_bench.json) | 57 | Issues, labels, comments, workflow states, teams |
+| Slack | [slack_bench.json](examples/slack/testsuites/slack_bench.json) | 59 | Messages, channels, reactions, threading |
 
-- **[box_bench.json](examples/box/testsuites/box_bench.json)** - test cases covering file/folder operations, search, tags, comments, hubs, and content versioning
-- **[calendar_bench.json](examples/calendar/testsuites/calendar_bench.json)** - test cases covering event CRUD, recurring events, free/busy queries, ACL management, and calendar lifecycle
-- **[linear_bench.json](examples/linear/testsuites/linear_bench.json)** - test cases covering issue management, labels, comments, workflow states, and team operations
-- **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - test cases covering message sending, channel ops, reactions, threading
-
-<img width="2985" height="1966" alt="pass_rates_annotated" src="https://github.com/user-attachments/assets/f5c59c81-c3bd-427e-977c-a5c2c0695e86" />
-
-- **[Evaluation DSL](docs/evaluation-dsl.md)** - Check DSL docs on how it works.
+Each test defines expected state changes via declarative assertions. See the [assertions docs](https://agentdiff.mintlify.app/core-concepts/assertions) for how they work.
 
 <img width="2516" height="1020" alt="image" src="https://github.com/user-attachments/assets/3270f1f1-5afa-4db2-97b0-c35c070ef44f" />
 
-
-### To run evaluations:
-
-```python
-from agent_diff import AgentDiff, PythonExecutorProxy, BashExecutorProxy, create_openai_tool
-from agents import Agent, Runner
-
-client = AgentDiff()
-
-
-suite_list = client.list_test_suites(name="Slack Bench")
-slack_suite = suite_list.testSuites[0]
-suite = client.get_test_suite(slack_suite.id, expand=True)
-
-evaluation_results = []
-
-for test in suite.tests:
-    prompt = test.prompt
-    test_id = test.id
-
-    #In test suite you define which env seed template is used for each test
-    env = client.init_env(testId=test_id)
-
-    # This function will take a snapshot before run
-    run = client.start_run(envId=env.environmentId, testId=test_id)
-
-
-    bash_executor = BashExecutorProxy(env.environmentId)  # Auto-loads from env vars
-    bash_tool = create_openai_tool(bash_executor)
-
-    agent = Agent(
-        name="Slack Assistant",
-        instructions="Use execute_bash tool with curl to interact with Slack API at https://slack.com/api/*. Authentication is handled automatically.",
-        tools=[bash_tool]
-    )
-
-    response = await Runner.run(agent, prompt)
-
-    #This function will take a 2nd snapshot, run diff and assert results against expected state defined in test suite
-    
-    #computes eval
-    client.evaluate_run(runId=run.runId)
-    
-    #returns score runId, full diff and score (0/1)
-    run_result = client.get_results_for_run(runId=run.runId)
-
-    evaluation_results.append(run_result) 
-
-    client.delete_env(envId=env.environmentId)
-```
-
-### Example output:
-
-<img width="1669" height="878" alt="image" src="https://github.com/user-attachments/assets/096393d2-e464-4a3d-b0a8-b188af5cf8a9" />
-
-
 ## Documentation
 
-- **[Python SDK](sdk/agent-diff-python/README.md)** - Complete Python SDK reference
-- **[TS SDK](sdk/agent-diff-ts/README.md)** - Complete TS SDK reference
-- **[Evaluation DSL](docs/evaluation-dsl.md)** - Write test assertions
-- **[API Reference](docs/api-reference.md)** - REST API documentation
+- **[Python SDK](https://agentdiff.mintlify.app/sdks/python/installation)** — Full Python SDK reference
+- **[TypeScript SDK](https://agentdiff.mintlify.app/sdks/typescript/installation)** — Full TypeScript SDK reference
+- **[Assertions & Evaluation DSL](https://agentdiff.mintlify.app/core-concepts/assertions)** — Write test assertions
+- **[API Reference](https://agentdiff.mintlify.app/api-reference/introduction)** — REST API documentation
+- **[Self-Hosting](https://agentdiff.mintlify.app/hosting/docker-setup)** — Docker setup & configuration
+
+## Citation
+
+If you use Agent-Diff in your research, please cite:
+
+```bibtex
+@article{pysklo2025agentdiff,
+  title={Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
+  author={Pysklo, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
+  journal={arXiv preprint arXiv:2602.11224},
+  year={2025}
+}
+```
 
