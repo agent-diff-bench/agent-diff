@@ -7,8 +7,6 @@ Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behav
 <p align="center">
   <a href="https://arxiv.org/abs/2602.11224"><img src="https://img.shields.io/badge/arXiv-2602.11224-b31b1b.svg" alt="arXiv"></a>
   <a href="https://huggingface.co/datasets/hubertmarek/agent-diff-bench"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow.svg" alt="HuggingFace"></a>
-  <a href="https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench"><img src="https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg" alt="Prime Intellect"></a>
-  <a href="https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"></a>
 </p>
 
 <p align="center">
@@ -20,10 +18,12 @@ Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behav
 
 ### Try it now
 
-| Notebook | Description | |
-|----------|-------------|---|
-| [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | Custom ReAct loop matching the paper methodology | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
-| [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | LangChain agent with tool calling | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
+| | Description | |
+|---|-------------|---|
+| [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | Run AgentDiff Benchmark (LangChain Agents) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
+| [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | AgentDiff Benchmark (ReAct)| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
+| [Custom Evaluations Demo](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) | Write your own assertions & evaluate agents | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) |
+| [Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) | Run evals or RL training| [![Prime Intellect](https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg)](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) |
 
 ## Quick Start
 
@@ -102,7 +102,7 @@ print(diff.diff['deletes'])   # deleted records
 client.delete_env(envId=env.environmentId)
 ```
 
-See the [Python SDK](sdk/agent-diff-python/README.md) and [TS SDK](sdk/agent-diff-ts/README.md) for full reference.
+See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) and [TS SDK](https://agentdiff.mintlify.app/sdks/python/installation) for full reference.
 
 ## Supported APIs
 
