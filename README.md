@@ -106,15 +106,15 @@ See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) an
 
 ## Supported APIs
 
-- **Box** – REST API for file/folder management, search, comments, tags, shared links, hubs, and content versioning. See [`backend/src/services/box/README.md`](backend/src/services/box/README.md). 27 endpoints.
-
-- **Google Calendar** – REST API for calendar CRUD, events, recurring series, free/busy queries, ACL rules, calendar list management, and push notifications. See [`backend/src/services/calendar/README.md`](backend/src/services/calendar/README.md). 37 endpoints.
-
-- **Linear** – GraphQL API for issue tracking, teams, workflow states, labels, comments, relations, and memberships. See [`backend/src/services/linear/README.md`](backend/src/services/linear/README.md). 19 endpoints.
-
-- **Slack** – Web API for conversations, messaging, reactions, threading, users, and channels. See [`backend/src/services/slack/README.md`](backend/src/services/slack/README.md). 25 endpoints.
+| Service | Type | Endpoints | Coverage |
+|---------|------|-----------|----------|
+| **[Box](https://agentdiff.mintlify.app/services/overview)** | REST | 27 | Files, folders, search, comments, tags, shared links, hubs, versioning |
+| **[Google Calendar](https://agentdiff.mintlify.app/services/overview)** | REST | 37 | Calendars, events, recurring series, free/busy, ACL, push notifications |
+| **[Linear](https://agentdiff.mintlify.app/services/linear/overview)** | GraphQL | 19 | Issues, teams, workflow states, labels, comments, relations, memberships |
+| **[Slack](https://agentdiff.mintlify.app/services/slack/overview)** | Web API | 25 | Conversations, messaging, reactions, threading, users, channels |
 
 > **108 unique endpoints** across all 4 services.
+
 
 ## Templates, Seeds & Environments
 
@@ -158,19 +158,7 @@ The Agent-Diff benchmark comprises **224 tasks** across four enterprise services
 | Read | 54 | 82 | 14 | 68 | 55 |
 | Update | 62 | 93 | 70 | 37 | 66 |
 | Delete | 19 | 53 | 7 | 24 | 26 |
-| | | | | | |
-| **Entity scope** | | | | | |
-| Single-entity | 28 | 11 | 33 | 33 | 105 |
-| Multi-entity | 20 | 49 | 24 | 26 | 119 |
-| | | | | | |
-| **Information availability** | | | | | |
-| Explicit | 6 | 10 | 25 | 36 | 77 |
-| Implicit | 42 | 50 | 32 | 23 | 147 |
-| | | | | | |
-| **Prompt ambiguity** | | | | | |
-| Low | 24 | 13 | 37 | 27 | 101 |
-| Medium | 17 | 45 | 19 | 22 | 103 |
-| High | 7 | 2 | 1 | 10 | 20 |
+
 
 Tasks are characterized along five dimensions: _task horizon_ (minimum API calls under an optimal policy), _operation profile_ (which CRUD primitives are required), _entity scope_ (single vs. multi-entity state changes), _information availability_ (whether identifiers are given explicitly or must be discovered), and _prompt ambiguity_ (how underspecified the target is).
 
