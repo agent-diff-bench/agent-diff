@@ -240,7 +240,6 @@ backend/src/services/linear/api/resolvers.py.backup
 backend/FILES_CREATED.md
 third_party/
 slack_credentials.md
-local_experiments/
 .claude/settings.local.json
 .claude/**
 !.claude/CLAUDE.md
