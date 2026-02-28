@@ -1,0 +1,6079 @@
+{
+  "id": "calendar-bench",
+  "name": "Calendar Bench",
+  "description": "Benchmark tests for Google Calendar MCP operations",
+  "service": "calendar",
+  "ignore_fields": {
+    "global": [
+      "created_at",
+      "updated_at",
+      "etag",
+      "html_link",
+      "ical_uid",
+      "sequence",
+      "start_datetime",
+      "end_datetime"
+    ]
+  },
+  "tests": [
+    {
+      "id": "test_1",
+      "name": "Cosmic Voyagers Astronomy Club - Multi-step calendar organization",
+      "prompt": "Our astronomy club is getting serious and we need proper organization. First, show me what calendars I have - I want to make sure we're not duplicating anything. Create a dedicated calendar called 'Cosmic Voyagers HQ' for all our stargazing activities. Yuki (yuki@test.com) is my co-organizer, so give her write access to the new calendar. The Perseid meteor shower is this Saturday at midnight - create an event called 'Perseid Meteor Shower Watch Party' for it on our new calendar. Before the main event, we need to set up the telescopes, but it has to work with Oleksandra's schedule (oleksandra@test.com) - find when she's free her Saturday evening and create a 'Telescope Alignment Ceremony' at that time (use Oleksandra's timezone). The duration of the event has to be 1.5 hours. Oh, I just remembered - the watch party location is confirmed as 'Hillcrest Observatory Field', so update that event. Also, there's still that embarrassing 'Failed Rocket Launch Viewing (Cancelled)' event on my main calendar from when SpaceX scrubbed last month - you know what to do with it.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Cosmic Voyagers HQ"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "yuki@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Perseid Meteor Shower Watch Party"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-24T00:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "location": {
+              "contains": "Hillcrest Observatory Field"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Telescope Alignment Ceremony"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T19:30"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T21:00"
+            },
+            "start.timeZone": {
+              "eq": "Europe/Kyiv"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_failed_rocket"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "acl.insert",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_2",
+      "name": "Green Thumbs Urban Garden Collective - Complex garden coordination",
+      "prompt": "Tomato season waits for no one - create 'Sacred Tomato Planting Ritual' on my calendar for Sunday morning immediately. Then show me what else I have this week so we don't double-book the garden crew. That tomato event needs more details - update it to say 'Bring your own seedlings and prayers' in the description. For the compost committee, I need to find a time Saturday when both Kenji (kenji@test.com) and Oksana (oksana@test.com) can make it. Speaking of which, which of my calendars is the 'Harvest Schedule' one? Once you find it, create 'Compost Communion: The Turning of the Heap' on that calendar at whatever time works for Kenji and Oksana (set in Kenji's timezone, please). Make sure the duration of the event is 2 hours. Bad news - 'Weed Warrior Wednesday' got rained out, so delete it from the Harvest Schedule and confirm it's actually gone. We have a new collective member, Chisom (chisom@test.com), who needs to see the harvest calendar but shouldn't edit it - set that up. Also, I completely forgot to invite Dariush (dariush@test.com) to the compost thing - he's our soil whisperer, please add him. One last thing: we're starting a new experimental growing project and need a calendar called 'Greenhouse Experiments' for it.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Sacred Tomato Planting Ritual"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "description": {
+              "i_contains": "seedlings"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-17"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Compost Communion"
+            },
+            "calendar_id": {
+              "eq": "cal_harvest_schedule"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23"
+            },
+            "start.timeZone": {
+              "eq": "Asia/Tokyo"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "dariush@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_weed_warrior"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "chisom@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            },
+            "calendar_id": {
+              "eq": "cal_harvest_schedule"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Greenhouse Experiments"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "calendarList.list",
+          "events.insert",
+          "events.list",
+          "events.patch",
+          "freeBusy.query",
+          "events.delete",
+          "acl.insert",
+          "calendars.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_3",
+      "name": "Dice & Dragons Tabletop Gaming Guild - Campaign scheduling",
+      "prompt": "The guild needs organizing. First, remind me which calendars I have - I'm looking for our 'Dungeon Masters Guild' one. We're kicking off a new campaign called 'The Curse of the Crimson Dice' and I need to schedule Session Zero for Friday at 7pm on that calendar. The duration should be 3 hours. Amara (amara@test.com) offered to run a one-shot this weekend - find when she's free and schedule 'Amara's Epic One-Shot Adventure' for 4 hours at that time on the guild calendar (use Amara's timezone). Oh, and that Session Zero event needs more info - update the description to say 'Bring character concepts. Snacks provided. No phones at the table.' I want to see all the sessions we have planned this month on the guild calendar. Hiroshi (hiroshi@test.com) has been running great sessions and deserves to schedule his own games now - give him edit access to the Dungeon Masters Guild calendar. That old 'TPK Recovery Support Group (Postponed Indefinitely)' event is still sitting there as a bad joke from when we had that campaign wipe, and it should not be sitting there anymore. Finally, we've been mixing board game nights with RPG sessions and it's confusing people. Use the existing Board Game Bazaar calendar (ID cal_board_game_bazaar) for non-RPG gaming (create it if it doesn't exist). Then scan every game event on the Dungeon Masters Guild calendar: each event description is tagged 'Type: RPG' or 'Type: Non-RPG'. Copy every Non-RPG event to Board Game Bazaar; if it is recurring, copy it as a recurring event there too.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Curse of the Crimson Dice"
+            },
+            "description": {
+              "i_contains": "character concepts"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-22T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-22T22:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Amara's Epic One-Shot Adventure"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-24T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-24T18:00"
+            },
+            "start.timeZone": {
+              "eq": "Africa/Lagos"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "hiroshi@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_tpk_recovery"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Board Game Brawl Night"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            },
+            "recurrence": {
+              "contains": "RRULE:FREQ=WEEKLY;BYDAY=MO"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-18T21:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Catan Quarry Trade"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-20T18:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-20T20:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Meeple Market Mixer"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            },
+            "recurrence": {
+              "contains": "RRULE:FREQ=WEEKLY;BYDAY=FR"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-22T18:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-22T20:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Ticket to Ride Summit"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T17:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T19:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "RPG Legends League"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "RPG: Mirefall Campaign"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "RPG: Iron Citadel"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "RPG: Ember Vale Prelude"
+            },
+            "calendar_id": {
+              "eq": "cal_board_game_bazaar"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_legend"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_legend"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_legend"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_mire"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_mire"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_mire"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_iron_citadel"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_iron_citadel"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_iron_citadel"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_ember_prelude"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_ember_prelude"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_dungeon_rpg_ember_prelude"
+            },
+            "calendar_id": {
+              "eq": "cal_dungeon_masters"
+            }
+          },
+          "expected_count": 0
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 13,
+        "tools_required": [
+          "calendarList.list",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.list",
+          "acl.insert",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_4",
+      "name": "Celluloid Dreams Film Festival - Large scale event coordination",
+      "prompt": "The Celluloid Dreams Film Festival is in full swing and I'm drowning in logistics. First, find our main festival calendar - it's called 'Celluloid Dreams Festival 2018'. I need you to go through the entire screening schedule and tell me exactly how many films are showing at the 'Noir Dungeon' venue - I'm worried we overbooked that theater. While you're at it, create an emergency event called 'Emergency Projector Repair: The Reel Must Go On' for 2 hours on Saturday afternoon on the festival calendar. Takeshi (takeshi@test.com) is our miracle-worker projectionist - check when he's free Saturday and schedule the repair during his available time (use his timezone). Add him as an attendee to that repair event with a note saying 'Bring spare bulbs and prayers' in the description. Here's a problem: we have this highly anticipated screening of 'The Last Samurai of Saturn' - find it in our schedule and tell me when it's showing. Also, delete all the 'Intermission: Existential Crisis (15 min)' events - we're cutting breaks to squeeze in more films. Olena (olena@test.com) from The Kyiv Film Review needs to see our complete schedule for her coverage - give her read access to the festival calendar. Create a new calendar called 'Green Room Chaos' for backstage crew coordination. Oh, and once you've found 'The Last Samurai of Saturn', move it to the same venue as our most popular screening, 'Epic Journey to the Stars' - ticket demand is through the roof.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Emergency Projector Repair"
+            },
+            "description": {
+              "i_contains": "spare bulbs"
+            },
+            "calendar_id": {
+              "eq": "cal_celluloid_dreams"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T16:00"
+            },
+            "start.timeZone": {
+              "eq": "Asia/Tokyo"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "takeshi@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_film_022"
+            }
+          },
+          "expected_changes": {
+            "location": {
+              "to": {
+                "contains": "Grand Aurora Theater"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_intermission_1"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_intermission_2"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "olena@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            },
+            "calendar_id": {
+              "eq": "cal_celluloid_dreams"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Green Room Chaos"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "calendarList.list",
+          "events.list",
+          "freeBusy.query",
+          "events.insert",
+          "events.patch",
+          "events.delete",
+          "acl.insert",
+          "calendars.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_5",
+      "name": "Symposium of Infinite Curiosity - Academic conference coordination",
+      "prompt": "The Symposium of Infinite Curiosity is three weeks away and the program is chaos. Find our main calendar - 'Symposium of Infinite Curiosity 2018'. We have sessions scheduled and I need an exact count of how many are in the 'Quantum' track (they'll have [Quantum] in the title). Add Mei-Lin's opening keynote - it's called 'Keynote: The Heresy of Obvious Conclusions' and should be Day 1 (Monday June 18) at 8am, lasting 1 hour. Update that keynote with a description: 'Mandatory attendance for all track chairs. Coffee will be existential.' Bogdan (bogdan@test.com) and Ravi (ravi@test.com) need to meet urgently on Day 2 (Tuesday June 19) afternoon to discuss a problematic submission - find when they're both free and create 'Secret Tribunal of the Program Committee' for 2 hours at that time on the symposium calendar. Dr. Chiamaka (chiamaka@test.com) is presenting four different papers across the conference - tell me when each of her sessions is. Someone finally noticed the irony: 'Workshop: Introduction to Procrastination (Postponed)' - delete it. Create a private calendar called 'Speakers Green Room of Mild Panic' for backstage coordination. Ingrid (ingrid@test.com) just joined as volunteer coordinator - give her edit access to the main symposium calendar. Chiamaka's first presentation needs to move to the same venue as 'Panel: Temporal Causality Roundtable' \u2014 but only if that venue is free at the same time. If that panel already occupies that venue at that time, move Chiamaka's first presentation to 'Annex of Temporal Studies' instead.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Heresy of Obvious Conclusions"
+            },
+            "description": {
+              "i_contains": "existential"
+            },
+            "calendar_id": {
+              "eq": "cal_symposium_curiosity"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T08:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-18T09:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Secret Tribunal"
+            },
+            "calendar_id": {
+              "eq": "cal_symposium_curiosity"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-19T15:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-19T17:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_procrastination_workshop"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_chiamaka_pres_1"
+            }
+          },
+          "expected_changes": {
+            "location": {
+              "to": {
+                "contains": "Annex of Temporal Studies"
+              }
+            }
+          },
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "ingrid@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            },
+            "calendar_id": {
+              "eq": "cal_symposium_curiosity"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Speakers Green Room"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 12,
+        "tools_required": [
+          "calendarList.list",
+          "events.list",
+          "events.insert",
+          "events.patch",
+          "freeBusy.query",
+          "events.delete",
+          "calendars.insert",
+          "acl.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_6",
+      "name": "Thunderwave Music Festival - Multi-stage festival coordination",
+      "prompt": "Thunderwave Festival is about to explode and I need clarity on the chaos. Find the 'Thunderwave Festival 2018' calendar. We have performances booked across 6 stages and I need to know exactly how many acts are playing the 'Volcano Stage' - go through the schedule and count them. Kofi (kofi@test.com) is our Volcano Stage manager - check when he's free Saturday afternoon (June 16) because we need an emergency sound check. We just confirmed a secret sunrise set - create 'Sacred Sound Ritual: DJ Nebula Sunrise Set' for Sunday June 17 at 5am, lasting 2 hours, on 'Ethereal Meadow Stage'. I'm worried we accidentally dropped some metal bands from the lineup. Search the schedule and find every act with [METAL] in the title - tell me the count. For the sunrise set, add Yuna (yuna@test.com) and Petro (petro@test.com) as attendees - they're running lights and sound. Good news: 'The Amplifier Incident Investigation (Staff Only)' can be deleted - we found the culprit (it was a rogue beer). Sakura (sakura@test.com) is our festival photographer and needs to see the complete schedule to plan her shots - give her read access to the Thunderwave calendar. Finally, create a private calendar called 'Artist Hospitality Demands and Disasters' for tracking the ridiculous rider requests.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "DJ Nebula"
+            },
+            "calendar_id": {
+              "eq": "cal_thunderwave_festival"
+            },
+            "location": {
+              "contains": "Ethereal Meadow"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-17T05:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-17T07:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "yuna@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "petro@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_amplifier_incident"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "sakura@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            },
+            "calendar_id": {
+              "eq": "cal_thunderwave_festival"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Artist Hospitality"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "calendarList.list",
+          "events.list",
+          "freeBusy.query",
+          "events.insert",
+          "events.delete",
+          "acl.insert",
+          "calendars.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_7",
+      "name": "Crypto-Zoology Summit - Mythical creatures research conference",
+      "prompt": "We're hosting the Intergalactic Crypto-Zoology Summit and I need you to set up the schedule. Find the 'Crypto-Zoology Summit 2018' calendar. Schedule the opening keynote 'Keynote: The Sasquatch Migration Patterns' for 9am on Monday June 18, lasting 1 hour. I need to schedule the main debate panel, 'Panel: Nessie vs Ogopogo - A Comparative Analysis', but it depends on Zahra's (zahra@test.com) availability in the afternoon of June 18 - find when she's free and book a 2-hour panel at that time on the summit calendar. Mateusz (mateusz@test.com) just agreed to co-present the Sasquatch keynote, so please add him as an attendee to that event. I accidentally added a workshop called 'How to Fake Bigfoot Prints' to the summit calendar earlier - delete it immediately, we can't have that on the official record. Aarav (aarav@test.com) from the press office needs read access to the summit calendar.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Sasquatch Migration"
+            },
+            "calendar_id": {
+              "eq": "cal_cryptozoology_summit"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T09:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-18T10:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "mateusz@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Nessie"
+            },
+            "calendar_id": {
+              "eq": "cal_cryptozoology_summit"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-18T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_bigfoot_workshop"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "aarav@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            },
+            "calendar_id": {
+              "eq": "cal_cryptozoology_summit"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendarList.list",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.delete",
+          "acl.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_8",
+      "name": "Time-Traveler's Convention - Temporal event coordination",
+      "prompt": "We're setting up the Time-Traveler's Convention and the timeline is fragile. First, check if 'Timeline Alpha' already exists in my calendars - it should be there. Create a new calendar called 'Timeline Beta' for our temporal experiments. Schedule the 'Paradox Prevention Seminar' for Tuesday June 19 at 10am, lasting 2 hours, on Timeline Beta. Sven (sven@test.com) is arriving from 2099 and needs to attend, but his arrival window is fluctuating - check his availability for Wednesday June 20 instead. Move the 'Paradox Prevention Seminar' to Sven's free slot on Wednesday. The Time Council has flagged the 'Grandfather Paradox Demonstration' as a Class 5 risk - find it and delete it immediately. Finally, grant Fatima (fatima@test.com) write access to Timeline Beta so she can document the changes to history.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Timeline Beta"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Paradox Prevention Seminar"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-20T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-20T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_grandfather_paradox"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "fatima@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.delete",
+          "acl.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_9",
+      "name": "Mirage Menagerie Caravan Festival - Batching required",
+      "prompt": "I'm drowning in festival logistics for Mirage Menagerie 2026. Find that calendar first. We also need a private crew calendar called Backstage Sandstorm Ops and Piotr (piotr@test.com) must be able to edit it. On the main festival calendar, schedule our eight 15-minute micro-acts starting Saturday June 23, 2018 at 2:00pm, back-to-back every 15 minutes in this exact order: Glass-Dune Juggling, Whispering Wadi Puppets, Lantern Maze Overture, Sand-Script Calligraphy, Mothlight Drummers, Nomad Kite Ballet, Oasis Echo Choir, and Moon-Salt Acrobatics. Add a quick note-style event: 'Starlit Tea Ceremony with Akira tomorrow 3pm' (tomorrow is Monday June 18, 2018). I also need a Twilight Troupe Council for 1 hour on Saturday evening (June 23, 2018) when both Ananya (ananya@test.com) and Zainab (zainab@test.com) can attend--check their availability first. Then update all the micro-acts to be at Dune Pavilion B and include Ananya. Finally, remove the placeholders 'Placeholder: Dust Rehearsal' and 'Placeholder: Ghost Stage'. Please batch the repeated edits/inserts/deletes so we don't trip our API rate limits.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Backstage Sandstorm Ops"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "piotr@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Glass-Dune Juggling"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T14:15"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Whispering Wadi Puppets"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T14:15"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T14:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Lantern Maze Overture"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T14:30"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T14:45"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Sand-Script Calligraphy"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T14:45"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T15:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Mothlight Drummers"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T15:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T15:15"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Nomad Kite Ballet"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T15:15"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T15:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Oasis Echo Choir"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T15:30"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T15:45"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Moon-Salt Acrobatics"
+            },
+            "location": {
+              "contains": "Dune Pavilion B"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T15:45"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "ananya@test.com"
+            }
+          },
+          "expected_count": 8
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Starlit Tea Ceremony with Akira"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T15:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Twilight Troupe Council"
+            },
+            "calendar_id": {
+              "eq": "cal_mirage_menagerie"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T20:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_placeholder_dust"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_placeholder_ghost"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "acl.insert",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_10",
+      "name": "Museum of Whispered Relics - Calendar governance and access",
+      "prompt": "We are reorganizing the Traveling Museum of Whispered Relics. Find the main calendar called Whispered Relics Mainline and the old Embargoed Vault calendar first. Create two new route calendars: Relic Transit - Northern Route and Relic Transit - Coastal Route. Set the Northern Route description to 'Northern caravan route logistics' and the Coastal Route description to 'Coastal caravan route logistics'. Use distinct colors from the calendar palette: set Northern Route to color ID 7 and Coastal Route to color ID 11. Subscribe me to the external calendar with ID cal_city_archives_access (titled 'City Archives Access Windows'). In my calendar list, hide Embargoed Vault from view and ensure both new route calendars are visible with their assigned colors. Access changes: Niamh (niamh@test.com) should be an owner on both route calendars, and Farid (farid@test.com) should be a reader on both. Remove Olena (olena@test.com) from the Embargoed Vault entirely.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Relic Transit - Northern Route"
+            },
+            "description": {
+              "contains": "Northern caravan route logistics"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Relic Transit - Coastal Route"
+            },
+            "description": {
+              "contains": "Coastal caravan route logistics"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_city_archives_access"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_embargoed_vault"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            }
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "7"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "11"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "niamh@test.com"
+            },
+            "role": {
+              "eq": "owner"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "farid@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_embargoed_vault"
+            },
+            "scope_value": {
+              "eq": "olena@test.com"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "calendarList.insert",
+          "calendarList.patch",
+          "acl.insert",
+          "acl.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_11",
+      "name": "Emberline Embassy Network - Calendar governance and access",
+      "prompt": "We're reorganizing the Emberline Embassy courier network. Find the Emberline Embassy Roster calendar and the legacy Old Courier Shifts entry. I need two new route calendars: Emberline Courier North Circuit and Emberline Courier South Circuit. Also subscribe me to the external calendar with ID cal_consular_blackout (Consular Blackout Windows) so we can avoid those times. For compliance, set up a watch on my settings and then confirm my current locale/timezone preferences. Update the North Circuit to use timezone Europe/Warsaw with description 'Northern route handoff schedule', and the South Circuit to use timezone Asia/Kolkata with description 'Southern route handoff schedule'. Make both route calendars visible in my list and set their colors: North Circuit color ID 6 and South Circuit color ID 12. Share both routes with Priya (priya@test.com) as a writer and Hassan (hassan@test.com) as a reader. Finally, remove Old Courier Shifts from my calendar list. Please batch the calendar-list updates and permission changes to reduce API calls.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Emberline Courier North Circuit"
+            },
+            "time_zone": {
+              "eq": "Europe/Warsaw"
+            },
+            "description": {
+              "contains": "Northern route handoff schedule"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Emberline Courier South Circuit"
+            },
+            "time_zone": {
+              "eq": "Asia/Kolkata"
+            },
+            "description": {
+              "contains": "Southern route handoff schedule"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_consular_blackout"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "6"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "12"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_old_courier_shifts"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "priya@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "hassan@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            }
+          },
+          "expected_count": 2
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "calendarList.insert",
+          "settings.watch",
+          "settings.get",
+          "calendars.patch",
+          "calendarList.patch",
+          "acl.insert",
+          "calendarList.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_12",
+      "name": "Skyward Observatory Access Passes - Calendar governance and access",
+      "prompt": "We're reorganizing the mountain observatory. First, find Skyward Observatory Access and the legacy Dormant Telescopes calendar. Create two new calendars: Meteor Patrol Rotation and Aurora Research Slots. Subscribe me to the external calendar with ID cal_mountain_weather (Mountain Weather Alerts) so we can coordinate around storms. Set the Meteor Patrol Rotation description to 'Night patrol rotation schedule' with timezone America/Denver, and set the Aurora Research Slots description to 'Research telescope booking slots' with timezone America/Los_Angeles. Make sure both new calendars are visible in my list and color-coded: Meteor Patrol Rotation color ID 9 and Aurora Research Slots color ID 14. Access changes: Mei (mei@test.com) should be an owner on both new calendars, Tomasz (tomasz@test.com) should be a reader on both, and remove Leila (leila@test.com) from Dormant Telescopes. Please batch the calendar-list updates and ACL changes to stay under quota limits.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Meteor Patrol Rotation"
+            },
+            "description": {
+              "contains": "Night patrol rotation schedule"
+            },
+            "time_zone": {
+              "eq": "America/Denver"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Aurora Research Slots"
+            },
+            "description": {
+              "contains": "Research telescope booking slots"
+            },
+            "time_zone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_mountain_weather"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "14"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "mei@test.com"
+            },
+            "role": {
+              "eq": "owner"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "tomasz@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_dormant_telescopes"
+            },
+            "scope_value": {
+              "eq": "leila@test.com"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          }
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "calendarList.insert",
+          "calendarList.patch",
+          "acl.insert",
+          "acl.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_13",
+      "name": "Firefly Conservatory - Recurring patrols and cleanup",
+      "prompt": "We are starting a serious conservation push for the firefly habitat. First, show me all my calendars so I can see whether I already have a conservatory calendar. If not, create a new calendar called 'Firefly Conservatory 2018' and share it with Haruto (haruto@test.com) as a writer. The weekly Lantern Patrols need to happen every Tuesday at 7:00pm for 6 weeks starting June 19, 2018, lasting 1 hour - set that up as a recurring event (one series, not six separate events). Zanele (zanele@test.com) can only do the Bioluminescent Microscopy Workshop on Saturday evening June 23, 2018 between 6pm and 10pm in her timezone - check her availability and schedule a 1-hour workshop when she is free, using her timezone. Once the patrol route is final, update the Lantern Patrol to use the location 'Willow Glade Observation Ring'. Finally, delete the old 'Broken Jar Ceremony' event from my primary calendar.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Firefly Conservatory 2018"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "haruto@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Lantern Patrol"
+            },
+            "location": {
+              "contains": "Willow Glade Observation Ring"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-19T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-19T20:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "recurrence": {
+              "contains": "FREQ=WEEKLY"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Bioluminescent Microscopy Workshop"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-23T20:00"
+            },
+            "start.timeZone": {
+              "eq": "Africa/Johannesburg"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_broken_jar"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "acl.insert",
+          "events.insert",
+          "freeBusy.query",
+          "events.patch",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_14",
+      "name": "Clockwork Tinkerers Guild - Recurring series exceptions",
+      "prompt": "I\u2019m setting up the Clockwork Tinkerers Guild calendar. First, show me my calendars so I don\u2019t duplicate anything; if we don\u2019t already have it, create a calendar called Clockwork Tinkerers Guild and give Aiko (aiko@test.com) write access. Our Gear & Ember Workshop needs to run every Friday at 6:00pm for eight weeks starting June 22, 2018\u2014set it up as a recurring series. However, we need two exceptions: the June 29 session should start at 7:00pm and include the note \u2018Late start due to forge maintenance,\u2019 and the July 6 session must be cancelled entirely (festival blackout). After applying those exceptions, show me the guild calendar so I can confirm the series looks right. Then add a one-off event called Brass Beetle Showcase on Saturday July 7 at noon.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "scope_value": {
+              "eq": "aiko@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Gear & Ember Workshop"
+            },
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-22T18:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-22T19:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "recurrence": {
+              "contains": "FREQ=WEEKLY"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Gear & Ember Workshop"
+            },
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-29T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-29T20:00"
+            },
+            "description": {
+              "i_contains": "forge maintenance"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Gear & Ember Workshop"
+            },
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "recurrence": {
+              "i_contains": "EXDATE"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Gear & Ember Workshop"
+            },
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "start.dateTime": {
+              "contains": "2018-07-06T18:00"
+            },
+            "status": {
+              "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Brass Beetle Showcase"
+            },
+            "calendar_id": {
+              "eq": "cal_clockwork_tinkerers_guild"
+            },
+            "start.dateTime": {
+              "contains": "2018-07-07T12:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-07-07T13:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendarList.list",
+          "acl.insert",
+          "events.insert",
+          "events.patch",
+          "events.list"
+        ]
+      }
+    },
+    {
+      "id": "test_15",
+      "name": "Tidal Library Rotations - Recurring series lifecycle",
+      "prompt": "We\u2019re setting up the tidal library\u2019s long-term calendar. First, show me my calendars and create Tidal Library Rotations if it doesn\u2019t already exist. Share it with Fumiko (fumiko@test.com) so she can edit. The Moon-Shell Rebinding ritual needs to recur monthly on the first Tuesday at 9:00am, starting July 3, 2018, and should continue indefinitely until we cancel it. We also need two exceptions: the August 7, 2018 occurrence should start at 11:00am with a note \u2018Storm-surge delay,\u2019 and the September 4, 2018 occurrence should be cancelled entirely. Add a separate one-off event called Ink Tide Inventory on July 15, 2018 at 4:00pm. After confirming the schedule looks right, delete the entire Moon-Shell Rebinding series.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Tidal Library Rotations"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "fumiko@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Moon-Shell Rebinding"
+            },
+            "start.dateTime": {
+              "contains": "2018-07-03T09:00"
+            },
+            "status": {
+              "eq": "cancelled"
+            },
+            "recurrence": {
+              "contains": "FREQ=MONTHLY"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Moon-Shell Rebinding"
+            },
+            "recurrence": {
+              "i_contains": "EXDATE"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Moon-Shell Rebinding"
+            },
+            "start.dateTime": {
+              "contains": "2018-09-04T09:00"
+            },
+            "status": {
+              "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Moon-Shell Rebinding"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-07T11:00"
+            },
+            "description": {
+              "i_contains": "storm-surge delay"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "summary": {
+              "contains": "Ink Tide Inventory"
+            },
+            "start.dateTime": {
+              "contains": "2018-07-15T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.insert",
+          "acl.insert",
+          "events.insert",
+          "events.patch",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_16",
+      "name": "Monastery of Echoing Bells - Daily recurring lifecycle",
+      "prompt": "We\u2019re setting up a proper schedule for the Monastery of Echoing Bells. First, show me my calendars so I don\u2019t duplicate anything, and create a calendar with that name if needed. Give Linh (linh@test.com) edit access. The Dawn Bell Rite must recur daily at 5:30am, starting June 18, 2018, and it should continue indefinitely until we cancel it. I need two exceptions: the June 20, 2018 occurrence should start at 6:30am with the note \u2018Storm quiet hours,\u2019 and the June 23, 2018 occurrence should be cancelled entirely. Also, check when Kwame (kwame@test.com) is free on the evening of June 24. After you confirm the schedule, delete the entire Dawn Bell Rite series.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_monastery_echoing_bells"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_monastery_echoing_bells"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_monastery_echoing_bells"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_monastery_echoing_bells"
+            },
+            "scope_value": {
+              "eq": "linh@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_monastery_echoing_bells"
+            },
+            "summary": {
+              "contains": "Dawn Bell Rite"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-18T05:30"
+            },
+            "status": {
+              "eq": "cancelled"
+            },
+            "recurrence": {
+              "contains": "FREQ=DAILY"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_monastery_echoing_bells"
+            },
+            "summary": {
+              "contains": "Dawn Bell Rite"
+            },
+            "recurrence": {
+              "i_contains": "EXDATE"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_monastery_echoing_bells"
+            },
+            "summary": {
+              "contains": "Dawn Bell Rite"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-23"
+            },
+            "status": {
+              "eq": "cancelled"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": {
+            "min": 0,
+            "max": 1
+          }
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_monastery_echoing_bells"
+            },
+            "summary": {
+              "contains": "Dawn Bell Rite"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-20T06:30"
+            },
+            "description": {
+              "i_contains": "storm quiet hours"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendarList.list",
+          "acl.insert",
+          "events.insert",
+          "events.patch",
+          "freeBusy.query",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_17",
+      "name": "Glassmoth Conservatory Candle-Lighting - simple hold update",
+      "prompt": "Please put a hold on my primary calendar for Glassmoth Conservatory Candle-Lighting and invite Ngozi (ngozi@test.com). After you add it, move it one hour later and set the location to Hothouse Lantern Atrium. Also, set up a watch so I get notified whenever my calendar settings change.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Glassmoth Conservatory Candle-Lighting"
+            },
+            "location": {
+              "contains": "Hothouse Lantern Atrium"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "email": {
+              "eq": "ngozi@test.com"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "events.insert",
+          "events.patch",
+          "settings.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_18",
+      "name": "Sandglass Aviary - import event and revoke access",
+      "prompt": "Please import the following legacy entry into my primary calendar (not a manual create): 'Saffron Dusk Feather-Mending' on June 22, 2018 from 6:00pm-7:00pm, location 'Windglass Roost,' iCalUID saffron-dusk-20180622@aviary. Also, remove Salma's access to the Sandglass Aviary calendar - her ACL rule is user:salma@test.com.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Saffron Dusk Feather-Mending"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-22T18:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-22T19:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "location": {
+              "contains": "Windglass Roost"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_sandglass_aviary"
+            },
+            "scope_value": {
+              "eq": "salma@test.com"
+            },
+            "deleted": {
+              "eq": true
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.import",
+          "acl.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_19",
+      "name": "Quartzloom Herbarium - event create and access revoke",
+      "prompt": "On my primary calendar, add a one-hour event called Quartzloom Spore Cataloging on June 21, 2018 from 9:00am-10:00am. Also, remove Mina's access from the Quartzloom Herbarium calendar (calendar ID cal_quartzloom_herbarium, rule ID user:mina@test.com).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Quartzloom Spore Cataloging"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-21T09:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-21T10:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_quartzloom_herbarium"
+            },
+            "scope_value": {
+              "eq": "mina@test.com"
+            },
+            "deleted": {
+              "eq": true
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.insert",
+          "acl.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_20",
+      "name": "Starfen Observatory - replace event and delete calendar",
+      "prompt": "On the Starfen Observatory calendar, please review who has access, then fully replace the Comet Scribe Session so it is on June 24, 2018 from 2:00pm-3:00pm at Dome 3 (treat this as a full replace, not a patch). Also, delete the Dust Ledger calendar entirely.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_comet_scribe_session"
+            },
+            "calendar_id": {
+              "eq": "cal_starfen_observatory"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-06-24T14:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-06-24T15:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Dome 3"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_dust_ledger"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "acl.list",
+          "events.update",
+          "calendars.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_21",
+      "name": "Emberglass Atelier - single event create",
+      "prompt": "Add a one-off event on my primary calendar called Emberglass Kiln Glow on June 25, 2018 from 7:00pm-8:30pm.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Emberglass Kiln Glow"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-25T19:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-25T20:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "events.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_22",
+      "name": "Fogloom Archive - quickAdd and settings watch",
+      "prompt": "Please quick-add this to my primary calendar: 'Fogloom Archive Lantern Check on June 26, 2018 at 8:00pm for 45 minutes.' After it's created, fetch that event by ID so we can verify the parsed details. Also, set up a watch for changes to my calendar settings.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Fogloom Archive Lantern Check"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-26T20:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-26T20:45"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "events.quickAdd",
+          "events.get",
+          "settings.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_23",
+      "name": "Lumenfjord Scriptorium - replace event and list access",
+      "prompt": "On the Lumenfjord Scriptorium calendar, check the ACL rule user:scribe@lumenfjord.example and tell me what role it has. Then fully replace the Aurora Ink Drying event so it's on June 27, 2018 from 3:00pm-4:00pm at North Alcove. Afterward, list the events on that calendar so I can verify the update.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "event_aurora_ink_drying"
+            },
+            "calendar_id": {
+              "eq": "cal_lumenfjord_scriptorium"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-06-27T15:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-06-27T16:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "North Alcove"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "acl.get",
+          "events.update",
+          "events.list"
+        ]
+      }
+    },
+    {
+      "id": "test_24",
+      "name": "Sunthread Archive - delete event and list settings",
+      "prompt": "Please remove the Sunthread Loom Blessing event from my primary calendar (event ID evt_sunthread_loom_001). After that, list all my calendar settings so I can confirm my current timezone before I update Adebayo (adebayo@test.com).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_sunthread_loom_001"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.delete",
+          "settings.list"
+        ]
+      }
+    },
+    {
+      "id": "test_25",
+      "name": "Emberpine Cartography - create calendar only",
+      "prompt": "Create a new calendar called Emberpine Cartography Ledger.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Emberpine Cartography Ledger"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "calendars.insert"
+        ]
+      }
+    },
+    {
+      "id": "test_26",
+      "name": "Mistforge Observatory - settings check and watch",
+      "prompt": "Please list my calendar settings so I can confirm my timezone and date/time formats before I reply to Sana (sana@test.com). Also, set up a watch on my settings so I get notified of any changes.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "settings.list",
+          "settings.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_27",
+      "name": "Lattice Observatory - hide calendar and replace recurring event",
+      "prompt": "Please hide the Lattice Observatory calendar in my calendar list (calendar ID cal_lattice_observatory). Also, fully replace the recurring Prism-Lens Alignment event (event ID evt_prism_lens_004) on that calendar so it runs weekly on Thursdays at 6:00am, starting June 28, 2018, for 45 minutes at Pier 7 Scope. Ewa asked me to confirm the updated series today.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_lattice_observatory"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_prism_lens_004"
+            },
+            "calendar_id": {
+              "eq": "cal_lattice_observatory"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-06-28T06:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-06-28T06:45"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Pier 7 Scope"
+              }
+            },
+            "recurrence": {
+              "to": {
+                "contains": "FREQ=WEEKLY"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "calendarList.patch",
+          "events.update"
+        ]
+      }
+    },
+    {
+      "id": "test_28",
+      "name": "Copperseed Archive - quickAdd and events watch",
+      "prompt": "Quick-add this to my primary calendar: 'Copperseed Archive dusting on June 28, 2018 at 9:30am for 30 minutes.' Then start watching my primary calendar for event changes so I can notify Fatima (fatima@test.com) if anything shifts.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Copperseed Archive dusting"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-28T09:30"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-28T10:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/test.user@test.com/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.quickAdd",
+          "events.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_29",
+      "name": "Aurora Loom - delete recurring series",
+      "prompt": "Check that I'm subscribed to the Aurora Loom calendar (ID cal_aurora_loom). Then remove the entire recurring series Starlit Weave Circle (event ID evt_starlit_weave_series) from that calendar.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_starlit_weave_series"
+            },
+            "calendar_id": {
+              "eq": "cal_aurora_loom"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "calendarList.get",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_30",
+      "name": "Cinderflock Choir - delete recurring series",
+      "prompt": "Please delete the entire recurring Cinderflock Vesper Choir series (event ID evt_cinderflock_vespers) from the Cinderflock Choir calendar (ID cal_cinderflock_choir).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_cinderflock_vespers"
+            },
+            "calendar_id": {
+              "eq": "cal_cinderflock_choir"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_31",
+      "name": "Driftglass Studio - move event to annex",
+      "prompt": "Please list events on my Driftglass Studio calendar so you can find the event ID for Tide-Polish Lesson, then move that event to the Mariner Annex calendar.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_tide_polish_lesson"
+            },
+            "calendar_id": {
+              "eq": "cal_driftglass_studio"
+            }
+          },
+          "expected_changes": {
+            "calendar_id": {
+              "to": {
+                "eq": "cal_mariner_annex"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.list",
+          "events.move"
+        ]
+      }
+    },
+    {
+      "id": "test_32",
+      "name": "Emberwharf Ledger - import event only",
+      "prompt": "Please import this legacy entry into my primary calendar (do not recreate it manually): 'Emberwharf Tide Log' on June 29, 2018 from 5:00pm-5:30pm, location 'Pier Lantern Desk,' iCalUID emberwharf-tide-20180629@ledger.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Emberwharf Tide Log"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-29T17:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-29T17:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "location": {
+              "contains": "Pier Lantern Desk"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 1,
+        "tools_required": [
+          "events.import"
+        ]
+      }
+    },
+    {
+      "id": "test_33",
+      "name": "Latticewren Survey - create calendar and hide entry",
+      "prompt": "Create a new calendar called Latticewren Survey Log. Then fetch its calendar-list entry and fully replace that entry so the calendar is hidden and not selected in my list. I want it out of sight until Salma (salma@test.com) asks for it.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Latticewren Survey Log"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "primary": {
+              "eq": false
+            },
+            "hidden": {
+              "eq": true
+            },
+            "selected": {
+              "eq": false
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            },
+            "selected": {
+              "to": false
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "calendars.insert",
+          "calendarList.get",
+          "calendarList.update"
+        ]
+      }
+    },
+    {
+      "id": "test_34",
+      "name": "Icefern Annex - move event and watch destination",
+      "prompt": "Please move Icefern Map Workshop (event ID evt_icefern_maps_07) from the Icefern Annex calendar to the Boreal Classroom calendar (ID cal_boreal_classroom). Then start watching the Boreal Classroom calendar for event changes so I can notify Hana (hana@test.com) and Sven (sven@test.com) if anything shifts.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_icefern_maps_07"
+            },
+            "calendar_id": {
+              "eq": "cal_icefern_annex"
+            }
+          },
+          "expected_changes": {
+            "calendar_id": {
+              "to": {
+                "eq": "cal_boreal_classroom"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": ["status", "sequence", "updated_at"]
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_boreal_classroom/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "events.move",
+          "events.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_35",
+      "name": "Nightglass Repository - clear calendar and hide entry",
+      "prompt": "Please clear all events from my Nightglass Repository calendar (ID cal_nightglass_repository) but keep the calendar. Then hide that calendar in my list. I'll let Ewa (ewa@test.com) and Hana (hana@test.com) know once it's done.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_nightglass_repository"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": {"min": 1},
+          "description": "All events on this calendar should be cleared (cancelled)"
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_nightglass_repository"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 2,
+        "tools_required": [
+          "calendars.clear",
+          "calendarList.patch"
+        ]
+      }
+    },
+    {
+      "id": "test_36",
+      "name": "Brasswillow Registry - create, share, delete",
+      "prompt": "Create a new calendar called Brasswillow Registry and share it with Ewa (ewa@test.com) with edit access. After she's had a look, delete the Brasswillow Registry calendar entirely.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Brasswillow Registry"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "ewa@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Brasswillow Registry"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 3,
+        "tools_required": [
+          "calendars.insert",
+          "acl.insert",
+          "calendars.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_37",
+      "name": "Kiteglass Survey Log - access update and channel stop",
+      "prompt": "Create a new calendar named Kiteglass Survey Log. Before you do anything else, pull the calendar color palette and set the new calendar to color ID 9. Sven needs editor access on the Harbor Signalboard calendar (ID cal_harbor_signalboard) -- his ACL rule is user:sven@test.com, please update it. Then find the earliest 45-minute overlap between my primary calendar and Sven's calendar across June 27-28, 2018. Also, fetch the event evt_horizon_shim_02 on my primary calendar to confirm its exact time so the overlap you pick doesn't collide. Finally, stop the old settings watch channel with id chan_settings_204 and resourceId res_settings_204.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Kiteglass Survey Log"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "color_id": {
+              "eq": "9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_harbor_signalboard"
+            },
+            "scope_value": {
+              "eq": "sven@test.com"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "writer"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_settings_204"
+            },
+            "resource_id": {
+              "eq": "res_settings_204"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendars.insert",
+          "colors.get",
+          "calendarList.patch",
+          "acl.update",
+          "freeBusy.query",
+          "events.get",
+          "channels.stop"
+        ]
+      }
+    },
+    {
+      "id": "test_38",
+      "name": "Driftweave Annex - access, watch, unsubscribe",
+      "prompt": "Please update Iryna's access on the Driftweave Annex calendar (ID cal_driftweave_annex) to writer -- her ACL rule is user:iryna@test.com. Then set up an events watch on that calendar. Also, unsubscribe me from the Old Aster Lodge calendar (ID cal_old_aster_lodge). Finally, stop the old events watch channel with id chan_annex_77 and resourceId res_annex_77.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_driftweave_annex"
+            },
+            "scope_value": {
+              "eq": "iryna@test.com"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "writer"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_driftweave_annex/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_old_aster_lodge"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_annex_77"
+            },
+            "resource_id": {
+              "eq": "res_annex_77"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "acl.update",
+          "events.watch",
+          "calendarList.delete",
+          "channels.stop"
+        ]
+      }
+    },
+    {
+      "id": "test_39",
+      "name": "Mossquill Archive - clear, patch, replace",
+      "prompt": "Please clear all events from the Mossquill Archive calendar (ID cal_mossquill_archive). Then patch that calendar's description to 'Restoration ledger and vault access.' Update Salma's ACL on the Mossquill Archive calendar (rule user:salma@test.com) to reader using a full replacement. Before changing the inspection slot, check my timezone setting. Then fully replace the event evt_mossquill_vault_check so it's on June 29, 2018 from 4:00pm-5:00pm at Lower Vault Door. Finally, fetch my dateFieldOrder setting.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_mossquill_archive"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_mossquill_archive"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Restoration ledger and vault access"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_mossquill_archive"
+            },
+            "scope_value": {
+              "eq": "salma@test.com"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "reader"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_mossquill_vault_check"
+            },
+            "calendar_id": {
+              "eq": "cal_mossquill_archive"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-06-29T16:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-06-29T17:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Lower Vault Door"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "calendars.clear",
+          "calendars.patch",
+          "acl.update",
+          "settings.get",
+          "events.update"
+        ]
+      }
+    },
+    {
+      "id": "test_40",
+      "name": "Glimmerforge Atlas - create and share",
+      "prompt": "Create a new calendar called Glimmerforge Atlas. Share it with Mina (mina@test.com) as writer. Then update Sven's access on that same calendar (rule user:sven@test.com) to writer. Finally, fetch my timezone setting so I can include it in the access note to Adebayo (adebayo@test.com).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Glimmerforge Atlas"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "mina@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "sven@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "calendars.insert",
+          "acl.insert",
+          "acl.update",
+          "settings.get"
+        ]
+      }
+    },
+    {
+      "id": "test_41",
+      "name": "Tidemire Conservatory - inspect and clear",
+      "prompt": "On the Tidemire Conservatory calendar (ID cal_tidemire_conservatory), first fetch the event evt_tidemire_orchid_rounds, then list its instances so I can review upcoming rounds. After that, list my calendar settings for the record. Once I confirm, clear all events from the Tidemire Conservatory calendar. Yara (yara@test.com) needs the final report after the reset.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_tidemire_conservatory"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 4
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "events.get",
+          "events.instances",
+          "settings.list",
+          "calendars.clear"
+        ]
+      }
+    },
+    {
+      "id": "test_42",
+      "name": "Lanternbraid Pavilion - patch and watch",
+      "prompt": "On the Lanternbraid Pavilion calendar (ID cal_lanternbraid_pavilion), fetch the event evt_lanternbraid_opening first. Then update the calendar's location to Harborline Rotunda. Also start an ACL watch on the Lanternbraid Pavilion calendar. Finally, unsubscribe me from the Old Copper Annex calendar (ID cal_old_copper_annex).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_lanternbraid_pavilion"
+            }
+          },
+          "expected_changes": {
+            "location": {
+              "to": {
+                "contains": "Harborline Rotunda"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_lanternbraid_pavilion/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_old_copper_annex"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "events.get",
+          "calendars.patch",
+          "acl.watch",
+          "calendarList.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_43",
+      "name": "Meridian Drift Folio - subscribe, tune, patch, watch",
+      "prompt": "Subscribe me to the external calendar cal_meridian_drift_folio. Then fully replace that calendar list entry so it's hidden, not selected, and uses color ID 7. On that same calendar, patch the event evt_meridian_index to add the description 'Catalog spine check.' Finally, start an ACL watch on every calendar that has at least one event whose name contains 'coolcoolcool'.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_meridian_drift_folio"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "hidden": {
+              "eq": true
+            },
+            "selected": {
+              "eq": false
+            },
+            "color_id": {
+              "eq": "7"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_meridian_index"
+            },
+            "calendar_id": {
+              "eq": "cal_meridian_drift_folio"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Catalog spine check"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_meridian_drift_folio/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_tidemire_conservatory/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_lanternbraid_pavilion/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "calendarList.insert",
+          "calendarList.update",
+          "events.patch",
+          "events.list",
+          "acl.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_44",
+      "name": "Ashline Relay Commons - ACLs, freebusy, hide",
+      "prompt": "On the Ashline Relay Commons calendar (ID cal_ashline_relay_commons), check the ACL rule user:hana@test.com first. Then grant Chinedu (chinedu@test.com) writer access and Noah (noah@test.com) reader access. After that, use free/busy to find the earliest 60-minute overlap for Hana, Chinedu, and Noah between June 28-29, 2018, and schedule a new event on my primary calendar at that overlap called \"Ashline Relay Briefing\" (use my timezone). Finally, update the calendar list entry so this calendar is hidden and not selected.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_ashline_relay_commons"
+            },
+            "scope_value": {
+              "eq": "chinedu@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_ashline_relay_commons"
+            },
+            "scope_value": {
+              "eq": "noah@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_ashline_relay_commons"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            },
+            "selected": {
+              "to": false
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Ashline Relay Briefing"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-28T15:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-28T16:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "acl.get",
+          "acl.insert",
+          "freeBusy.query",
+          "events.insert",
+          "calendarList.patch"
+        ]
+      }
+    },
+    {
+      "id": "test_45",
+      "name": "Silverroot Observatory - replace recurring event and watch",
+      "prompt": "On the Silverroot Observatory calendar (ID cal_silverroot_observatory), first check the ACL rule user:zahra@test.com. Then update the calendar description to 'Lens rotation and night ledger.' Next, list instances of the recurring event evt_silverroot_rotation, and then fully replace that event so it runs weekly on Mondays at 7:00pm, starting July 2, 2018, for 1 hour at West Dome. After that, enable both an events watch and an ACL watch on this calendar.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_silverroot_observatory"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Lens rotation and night ledger"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_silverroot_rotation"
+            },
+            "calendar_id": {
+              "eq": "cal_silverroot_observatory"
+            }
+          },
+          "expected_changes": {
+            "recurrence": {
+              "to": {
+                "contains": "RRULE:FREQ=WEEKLY;BYDAY=MO"
+              }
+            },
+            "start": {
+              "to": {
+                "contains": "2018-07-02T19:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-07-02T20:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "West Dome"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_silverroot_observatory/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_silverroot_observatory/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "acl.get",
+          "calendars.patch",
+          "events.instances",
+          "events.update",
+          "events.watch",
+          "acl.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_46",
+      "name": "Brineglass Works - move, create, ACL update, settings watch",
+      "prompt": "On the Brineglass Works calendar (ID cal_brineglass_works), first fetch the event evt_brineglass_forge_demo, then move it to the Harbor Kiln Hall calendar (ID cal_harbor_kiln_hall). Next, use free/busy to find the earliest 30-minute overlap for Lucia (lucia@test.com) and Noah (noah@test.com) on June 30, 2018, and create a new event Saltglass Alignment on Brineglass Works at that time. Then fully replace Lucia\u2019s ACL rule (user:lucia@test.com) on Brineglass Works to writer. Finally, set up a settings watch for my account.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_brineglass_forge_demo"
+            },
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            }
+          },
+          "expected_changes": {
+            "calendar_id": {
+              "to": {
+                "eq": "cal_harbor_kiln_hall"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            },
+            "summary": {
+              "contains": "Saltglass Alignment"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-30T22:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-30T22:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            },
+            "scope_value": {
+              "eq": "lucia@test.com"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "writer"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "events.get",
+          "events.move",
+          "freeBusy.query",
+          "events.insert",
+          "acl.update",
+          "settings.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_47",
+      "name": "Quillshore Annex - import, ACL check, list entry review, dual watches",
+      "prompt": "Pull the calendar color palette and set Quillshore Annex (ID cal_quillshore_annex) to color ID 8. Then import the legacy entry Quillshore Salt Index into that calendar for June 30, 2018 from 2:00pm-3:00pm, location Brine Archive Hall, iCalUID quillshore-salt-20180630@annex. After that, check the ACL rule user:linh@test.com on Quillshore Annex and show me the calendar list entry for that calendar. Finally, start an ACL watch on Quillshore Annex and a calendar list watch for my account.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_quillshore_annex"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "color_id": {
+              "to": {
+                "eq": "8"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_quillshore_annex"
+            },
+            "summary": {
+              "contains": "Quillshore Salt Index"
+            },
+            "location": {
+              "contains": "Brine Archive Hall"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-30T14:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-30T15:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_quillshore_annex/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/me/calendarList"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "colors.get",
+          "calendarList.patch",
+          "events.import",
+          "acl.get",
+          "calendarList.get",
+          "acl.watch",
+          "calendarList.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_49",
+      "name": "Thistlewire Workshop - instances review, create, hide, watch, delete",
+      "prompt": "On the Thistlewire Workshop calendar (ID cal_thistlewire_workshop), list instances of the recurring event evt_thistlewire_cycles first. Then add a one-off event Bronze Fret Alignment on June 30, 2018 from 10:00am-11:00am. After that, hide the Thistlewire Workshop calendar in my list and start a calendar list watch for my account. Finally, delete the obsolete Copperwind Annex calendar (ID cal_copperwind_annex).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_thistlewire_workshop"
+            },
+            "summary": {
+              "contains": "Bronze Fret Alignment"
+            },
+            "start.dateTime": {
+              "contains": "2018-06-30T10:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-06-30T11:00"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_thistlewire_workshop"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/me/calendarList"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_copperwind_annex"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "events.instances",
+          "events.insert",
+          "calendarList.patch",
+          "calendarList.watch",
+          "calendars.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_50",
+      "name": "Emberveil Rookery - subscribe, watch, revoke, delete",
+      "prompt": "Subscribe me to the external calendar cal_emberveil_rookery. Then start an events watch on that calendar. Next, check Hana\u2019s calendar and only set up a settings watch for my account if Hana has an event on June 30, 2018 at 9:00-9:30am Asia/Tokyo time. Then, only remove Salma\u2019s access from Emberveil Rookery (rule cal_emberveil_rookery:user:salma@test.com) if that calendar has more than 7 events between June 20-27, 2018. Finally, delete the obsolete Ashfeather Annex calendar (ID cal_ashfeather_annex).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_emberveil_rookery"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_emberveil_rookery/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_emberveil_rookery"
+            },
+            "scope_value": {
+              "eq": "salma@test.com"
+            },
+            "deleted": {
+              "eq": true
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_ashfeather_annex"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "calendarList.insert",
+          "events.watch",
+          "events.list",
+          "settings.watch",
+          "acl.delete",
+          "calendars.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_51",
+      "name": "Windchord Cartotheca - create, color, list patch, ACL update",
+      "prompt": "Create a new calendar named Windchord Cartotheca. Pull the calendar color palette and set it to color ID 11. Then fetch its calendar list entry and patch it so the calendar is visible and selected. Also update the calendar description to 'Atlas repair bays.' Fully replace Aiko\u2019s ACL rule (user:aiko@test.com) on this calendar to writer. At the very end, on my primary calendar, count the attendees on event evt_cartotheca_intake_huddle (Cartotheca Intake Huddle) and copy those attendees as invitees to event evt_atlas_crate_sync (Atlas Crate Sync). Add the note 'Copied <the number of attendees you copied> attendees' to Atlas Crate Sync\u2019s description.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Windchord Cartotheca"
+            },
+            "description": {
+              "contains": "Atlas repair bays"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "color_id": {
+              "to": {
+                "eq": "11"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "scope_value": {
+              "eq": "aiko@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_atlas_crate_sync"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Copied 3 attendees"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "event_id": {
+              "eq": "evt_atlas_crate_sync"
+            },
+            "email": {
+              "in": [
+                "lucia@test.com",
+                "zahra@test.com",
+                "adebayo@test.com"
+              ]
+            }
+          },
+          "expected_count": 3
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_event_attendees",
+          "where": {
+            "event_id": {
+              "eq": "evt_atlas_crate_sync"
+            },
+            "email": {
+              "not_in": [
+                "lucia@test.com",
+                "zahra@test.com",
+                "adebayo@test.com"
+              ]
+            }
+          },
+          "expected_count": 0
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "calendars.insert",
+          "colors.get",
+          "calendarList.patch",
+          "calendarList.get",
+          "calendars.patch",
+          "acl.update",
+          "events.get",
+          "events.patch"
+        ]
+      }
+    },
+    {
+      "id": "test_52",
+      "name": "Stoneglow Depot - clear, replace, ACL update, move, settings watch",
+      "prompt": "Check my calendar list entry for Stoneglow Depot (ID cal_stoneglow_depot) first. Then fully replace the calendar metadata with summary Stoneglow Depot, description 'Crate intake ledger', and timezone America/Los_Angeles. Fully replace the ACL rule user:clerk@stoneglow.example to reader. Add the note 'Week-of intake note' to the description of all events in Stoneglow Depot that occur during the week of July 1-7, 2018. Move evt_stoneglow_manifest from Stoneglow Depot to Harbor Ledger (ID cal_harbor_ledger).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_week_0702"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Week-of intake note"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Crate intake ledger"
+              }
+            },
+            "time_zone": {
+              "to": {
+                "eq": "America/Los_Angeles"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            },
+            "scope_value": {
+              "eq": "clerk@stoneglow.example"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "reader"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_week_0704"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Week-of intake note"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_inventory"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_inventory"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_inventory"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_out_0615"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_out_0615"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_out_0615"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_stoneglow_manifest"
+            },
+            "calendar_id": {
+              "eq": "cal_stoneglow_depot"
+            }
+          },
+          "expected_changes": {
+            "calendar_id": {
+              "to": {
+                "eq": "cal_harbor_ledger"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 7,
+        "tools_required": [
+          "calendarList.get",
+          "calendars.update",
+          "acl.update",
+          "events.list",
+          "events.patch",
+          "events.move"
+        ]
+      }
+    },
+    {
+      "id": "test_53",
+      "name": "Crystalfold Foundry - replace, delete events, unsubscribe",
+      "prompt": "On the Crystalfold Foundry calendar (ID cal_crystalfold_foundry), fully replace evt_crystalfold_quench so it\u2019s on July 1, 2018 from 9:00am-10:30am at Forge Bay 2. Then delete evt_crystalfold_slag and evt_crystalfold_mold. Finally, unsubscribe me from the Old Lattice Mill calendar (ID cal_old_lattice_mill).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_crystalfold_quench"
+            },
+            "calendar_id": {
+              "eq": "cal_crystalfold_foundry"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-07-01T09:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-07-01T10:30"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Forge Bay 2"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_crystalfold_slag"
+            },
+            "calendar_id": {
+              "eq": "cal_crystalfold_foundry"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_crystalfold_mold"
+            },
+            "calendar_id": {
+              "eq": "cal_crystalfold_foundry"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_old_lattice_mill"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "events.update",
+          "events.delete",
+          "calendarList.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_54",
+      "name": "Sablewind Archive - share, revoke, list patch, settings watch",
+      "prompt": "On the Sablewind Archive calendar (ID cal_sablewind_archive), fetch its calendar list entry and set it to visible (not hidden) with color ID 5. Share the calendar with Keiko (keiko@test.com) as writer, and remove Salma\u2019s access (rule cal_sablewind_archive:user:salma@test.com). Finally, set up a settings watch for my account.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_sablewind_archive"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": false
+            },
+            "color_id": {
+              "to": {
+                "eq": "5"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_sablewind_archive"
+            },
+            "scope_value": {
+              "eq": "keiko@test.com"
+            },
+            "role": {
+              "eq": "writer"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_sablewind_archive"
+            },
+            "scope_value": {
+              "eq": "salma@test.com"
+            },
+            "deleted": {
+              "eq": true
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "calendarList.get",
+          "calendarList.patch",
+          "acl.insert",
+          "acl.delete",
+          "settings.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_55",
+      "name": "Skyloom Observatory - event replace, ACL update, events watch",
+      "prompt": "On the Skyloom Observatory calendar (ID cal_skyloom_observatory), list events first. Then fully replace evt_skyloom_alignment so it\u2019s on July 2, 2018 from 8:00pm\u20139:00pm at Upper Ring. Also fully replace the ACL rule user:mechanic@skyloom.example to reader. After that, start an events watch on the Skyloom Observatory calendar and list events again to confirm the change.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_skyloom_alignment"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-07-02T20:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-07-02T21:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Upper Ring"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            },
+            "scope_value": {
+              "eq": "mechanic@skyloom.example"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "reader"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_skyloom_observatory/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 5,
+        "tools_required": [
+          "events.list",
+          "events.update",
+          "acl.update",
+          "events.watch"
+        ]
+      }
+    },
+    {
+      "id": "test_56",
+      "name": "Ironlace Conservatory - clear, replace, instances, ACL patch, delete calendar",
+      "prompt": "On the Ironlace Conservatory calendar (ID cal_ironlace_conservatory), list instances of evt_ironlace_orchid first. Then clear all events from that calendar. After the reset, fully replace evt_ironlace_orchid so it's on July 3, 2018 from 10:00am-11:00am at Glassbed Hall. Patch Mina's ACL rule (user:mina@test.com) to reader. Then stop the old channel with id chan_ironlace_12 and resourceId res_ironlace_12. Finally, delete the Old Driftgreen calendar (ID cal_old_driftgreen).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ironlace_cleanup"
+            },
+            "calendar_id": {
+              "eq": "cal_ironlace_conservatory"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ironlace_orchid"
+            },
+            "calendar_id": {
+              "eq": "cal_ironlace_conservatory"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-07-03T10:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-07-03T11:00"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Glassbed Hall"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_ironlace_conservatory"
+            },
+            "scope_value": {
+              "eq": "mina@test.com"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "reader"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_ironlace_12"
+            },
+            "resource_id": {
+              "eq": "res_ironlace_12"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_old_driftgreen"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "events.instances",
+          "calendars.clear",
+          "events.update",
+          "acl.patch",
+          "channels.stop",
+          "calendars.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_57",
+      "name": "Tideglass Registry - subscribe, hide, color, import",
+      "prompt": "List my calendars first so we don't duplicate anything. Then subscribe me to the external Tideglass Registry calendar (ID cal_tideglass_registry). After that, hide that calendar in my list and set it to color ID 4. Finally, import the legacy entry Tideglass Ledger Seal into the Tideglass Registry calendar for July 4, 2018 from 1:00pm-2:00pm at Seawick Vault, iCalUID tideglass-seal-20180704@registry. Salma, Linh, Sven, and Mateusz are the stakeholders to keep in the loop.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_tideglass_registry"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "hidden": {
+              "eq": true
+            },
+            "color_id": {
+              "eq": "4"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_tideglass_registry"
+            },
+            "ical_uid": {
+              "eq": "tideglass-seal-20180704@registry"
+            },
+            "summary": {
+              "contains": "Tideglass Ledger Seal"
+            },
+            "start.dateTime": {
+              "contains": "2018-07-04T13:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-07-04T14:00"
+            },
+            "location": {
+              "contains": "Seawick Vault"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "calendarList.list",
+          "calendarList.insert",
+          "calendarList.patch",
+          "events.import"
+        ]
+      }
+    },
+    {
+      "id": "test_58",
+      "name": "Glassreef Codex - count, move, patch, watch, clear",
+      "prompt": "For the Glassreef Codex calendar (ID cal_glassreef_codex), I need a tally log. First, check the calendar color palette and confirm my timezone setting. Then list July 1-31, 2018 events on Glassreef Codex and count how many include \"Tide-loom\" in the summary. Move the template event evt_kelp_murmur_template from cal_kelpshade_staging into Glassreef Codex and update it to Tide-loom Count Ledger at Pearlwork Desk, with a description that explicitly includes that count. Also fetch the ACL rule user:archivist@glassreef.example on Glassreef Codex, start an ACL watch for that calendar, and finally clear the old Barnacle Practice calendar (ID cal_barnacle_practice).",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_kelp_murmur_template"
+            },
+            "calendar_id": {
+              "eq": "cal_glassreef_codex"
+            }
+          },
+          "expected_changes": {
+            "calendar_id": {
+              "to": {
+                "eq": "cal_glassreef_codex"
+              }
+            },
+            "summary": {
+              "to": {
+                "contains": "Tide-loom Count Ledger"
+              }
+            },
+            "location": {
+              "to": {
+                "contains": "Pearlwork Desk"
+              }
+            },
+            "description": {
+              "to": {
+                "regex": "(?i)(tide-loom.*\\b10\\b|\\b10\\b.*tide-loom)"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "end",
+            "recurrence",
+            "reminders",
+            "start",
+            "status",
+            "transparency",
+            "visibility"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/calendars/cal_glassreef_codex/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_barnacle_practice"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "colors.get",
+          "settings.get",
+          "events.list",
+          "events.move",
+          "events.patch",
+          "acl.get",
+          "acl.watch",
+          "calendars.clear"
+        ]
+      }
+    },
+    {
+      "id": "test_59",
+      "name": "Seabriar Leave Ledger - count, book, cancel conflicts, reschedule",
+      "prompt": "Please help me plan leave using the Seabriar Leave Ledger calendar (ID cal_seabriar_leave). First list my calendar list to confirm the ledger is there, and fetch that calendar's metadata. Then count how many vacation days I've already used by listing instances of evt_used_vacation_day from Jan 1 to Aug 9, 2018. Use that count to book my vacation starting Aug 10, 2018 for the remaining days (assume the annual allowance is 20 days), and make sure you count only business days (no weekends). Before you lock it in, check instances of evt_company_blackout and evt_weekend_silence so you don't place anything on weekends. Update the ledger description to \"Leave ledger and tally-based booking,\" share the ledger with Aiko (aiko@test.com) as a reader, and set its calendar list entry to visible with color ID 10. Create the vacation block event on the ledger, and quick-add a reminder: \"Send pigeon letter Sep 10, 2018 9am.\" Also stop the old channel chan_leave_09 / res_leave_09.\n\nNext, cancel all events on my primary calendar that overlap the vacation window. Finally, I want to know if a pigeon letter sent on Sep 10 (it takes 6 days) would arrive before when the Clilffside Pact (evt_cliffside_pact) is scheduled. If it would not, move it to the earliest weekday after the arrival of the pigeon mail that doesn't overlap my vacation.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_seabriar_leave"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Leave ledger and tally-based booking"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": false
+            },
+            "color_id": {
+              "to": {
+                "eq": "10"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            },
+            "scope_value": {
+              "eq": "aiko@test.com"
+            },
+            "role": {
+              "eq": "reader"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            },
+            "summary": {
+              "contains": "Seabriar Leave Block"
+            },
+            "start": {
+              "contains": "2018-08-10"
+            },
+            "end": {
+              "contains": "2018-08-23"
+            },
+            "end.dateTime": {
+              "contains": "2018-08-23"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            },
+            "summary": {
+              "contains": "Send pigeon letter Sep 10, 2018 9am"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_leave_09"
+            },
+            "resource_id": {
+              "eq": "res_leave_09"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_primary_leave_conflict_1"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_primary_leave_conflict_2"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_cliffside_pact"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "start": {
+              "to": {
+                "contains": "2018-09-17T10:00"
+              }
+            },
+            "end": {
+              "to": {
+                "contains": "2018-09-17T11:00"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "attendees",
+            "color_id",
+            "description",
+            "location",
+            "recurrence",
+            "reminders",
+            "status",
+            "summary",
+            "transparency",
+            "visibility"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 12,
+        "tools_required": [
+          "calendarList.list",
+          "calendars.get",
+          "events.instances",
+          "calendars.patch",
+          "acl.insert",
+          "calendarList.patch",
+          "events.insert",
+          "events.quickAdd",
+          "channels.stop",
+          "events.list",
+          "events.delete",
+          "events.patch"
+        ]
+      }
+    },
+    {
+      "id": "test_60",
+      "name": "Ivory Loom Archive - purge blood events",
+      "prompt": "On the Ivory Loom Archive calendar (ID cal_ivory_loom_archive), I need a cleanup. First, switch this calendar's timezone to match Ewa's. Next, list the calendar's ACL rules so we confirm access. After that, list events on Ivory Loom Archive and identify every event whose title or description contains the word \"blood\". Delete all of those events.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_ivory_loom_archive"
+            }
+          },
+          "expected_changes": {
+            "time_zone": {
+              "to": {
+                "eq": "Europe/Warsaw"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ivory_loom_blood_ink"
+            },
+            "calendar_id": {
+              "eq": "cal_ivory_loom_archive"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ivory_loom_redaction"
+            },
+            "calendar_id": {
+              "eq": "cal_ivory_loom_archive"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ivory_loom_blood_oath"
+            },
+            "calendar_id": {
+              "eq": "cal_ivory_loom_archive"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_ivory_loom_crimson_notice"
+            },
+            "calendar_id": {
+              "eq": "cal_ivory_loom_archive"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 4,
+        "tools_required": [
+          "calendars.patch",
+          "acl.list",
+          "events.list",
+          "events.delete"
+        ]
+      }
+    },
+    {
+      "id": "test_61",
+      "name": "Wavelock Guest Sweep - create, purge attendees, freebusy, watch",
+      "prompt": "Create a new calendar called Wavelock Guest Sweep. Fully update that calendar to set timezone Europe/Berlin and description \"Guest sweep log and embargo notes.\" Then list events on my primary calendar and identify all events where Aiko, Farid, Lucia, or Oksana appear in the attendee list. Delete every such event. Run a free/busy query for those four across Aug 1\u20137, 2018, then another for Aug 8\u201314, 2018. Schedule a weekly 30-minute event on my primary calendar at the earliest time that doesn't conflict with any of those four attendees. Unsubscribe me from the legacy calendar cal_wavelock_legacy. Finally, start a watch on my calendar list and a watch on my settings.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Wavelock Guest Sweep"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "contains": "Wavelock Guest Sweep"
+            }
+          },
+          "expected_changes": {
+            "time_zone": {
+              "to": {
+                "eq": "Europe/Berlin"
+              }
+            },
+            "description": {
+              "to": {
+                "contains": "Guest sweep log and embargo notes"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_primary_guest_aiko_farid"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_primary_guest_lucia_oksana"
+            },
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-01T09:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-08-01T09:30"
+            },
+            "start.timeZone": {
+              "eq": "America/Los_Angeles"
+            },
+            "recurrence": {
+              "contains": "RRULE:FREQ=WEEKLY"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_wavelock_legacy"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/me/calendarList"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "calendars.insert",
+          "calendars.update",
+          "events.list",
+          "events.delete",
+          "freeBusy.query",
+          "events.insert",
+          "calendarList.delete",
+          "calendarList.watch",
+          "settings.watch"
+        ]
+      }
+    }
+  ]
+}
