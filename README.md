@@ -129,17 +129,11 @@ See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) an
 - **Creation**: `client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9")`
 - **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
 
-## Run Evaluations
-
-- **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — Run evals or RL training with no setup required
-- **[Colab Notebooks](#try-it-now)** — Run locally with the example notebooks above
-- **[Dataset](https://huggingface.co/datasets/hubertmarek/agent-diff-bench)** — 224 tasks across all 4 services (80/20 train/test split)
-
-## Benchmark
+## Agent-Diff Bench
 
 The Agent-Diff benchmark comprises **224 tasks** across four enterprise services, each evaluated via deterministic state-diff contracts. Tasks span single-step CRUD operations to long-horizon, multi-entity workflows requiring search, conditional logic, and coordinated state changes.
 
-### Benchmark Results
+### Agent-Diff Bench Results
 
 | Model | Box | Calendar | Linear | Slack | **Overall** | Pass % | Cost/test | Score/$ |
 |---|---|---|---|---|---|---|---|---|
@@ -155,16 +149,11 @@ The Agent-Diff benchmark comprises **224 tasks** across four enterprise services
 
 Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
 
-## Benchmark Suites
+## Run Agent-Diff Bench
 
-| Service | Test Suite | Tests | Coverage |
-|---------|-----------|-------|----------|
-| Box | [box_bench.json](examples/box/testsuites/box_bench.json) | 48 | File/folder ops, search, tags, comments, hubs, versioning |
-| Calendar | [calendar_bench.json](examples/calendar/testsuites/calendar_bench.json) | 60 | Event CRUD, recurring events, free/busy, ACL, lifecycle |
-| Linear | [linear_bench.json](examples/linear/testsuites/linear_bench.json) | 57 | Issues, labels, comments, workflow states, teams |
-| Slack | [slack_bench.json](examples/slack/testsuites/slack_bench.json) | 59 | Messages, channels, reactions, threading |
-
-Each test defines expected state changes via declarative assertions. See the [assertions docs](https://agentdiff.mintlify.app/core-concepts/assertions) for how they work.
+- **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — Run evals or RL training with no setup required
+- **[Colab Notebooks](#try-it-now)** — Run locally with the example notebooks above
+- **[Dataset](https://huggingface.co/datasets/hubertmarek/agent-diff-bench)** — 224 tasks across all 4 services (80/20 train/test split). Each test defines expected state changes via declarative assertions. See the [assertions docs](https://agentdiff.mintlify.app/core-concepts/assertions) for how they work.
 
 
 ## Documentation
