@@ -22,8 +22,9 @@ Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behav
 |---|-------------|---|
 | [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | Run AgentDiff Benchmark (LangChain Agents) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
 | [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | AgentDiff Benchmark (ReAct)| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
+| [Prime Intellect Environment](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) | Run evals or RL training| [![Prime Intellect](https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg)](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) |
 | [Custom Evaluations Demo](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) | Write your own assertions & evaluate agents | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) |
-| [Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) | Run evals or RL training| [![Prime Intellect](https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg)](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) |
+
 
 ## Quick Start
 
@@ -123,16 +124,10 @@ See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) an
 - **Content**: Seeded with realistic data — users, channels, messages, files, folders, issues, calendar events, etc.
 - **Seeds**: [box](examples/box/seeds/) | [calendar](examples/calendar/seeds/) | [linear](examples/linear/seeds/) | [slack](examples/slack/seeds/)
 
-<img width="2330" height="688" alt="image" src="https://github.com/user-attachments/assets/481d3f40-e378-402c-9d3c-8a2ab75c880e" />
-
 **Environments** are isolated, temporary copies of a template schema:
 - **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
 - **Creation**: `client.init_env(templateService="slack", templateName="slack_default", impersonateUserId="U01AGENBOT9")`
 - **Cleanup**: `client.delete_env(envId)` or auto-expires after TTL
-
-<img width="2344" height="432" alt="image" src="https://github.com/user-attachments/assets/c61e93f2-1826-429e-8ee7-4a32f4172a38" />
-
-
 
 ## Run Evaluations
 
@@ -144,25 +139,7 @@ See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) an
 
 The Agent-Diff benchmark comprises **224 tasks** across four enterprise services, each evaluated via deterministic state-diff contracts. Tasks span single-step CRUD operations to long-horizon, multi-entity workflows requiring search, conditional logic, and coordinated state changes.
 
-### Task Distribution
-
-| Metric | Box | Calendar | Linear | Slack | **Total** |
-|---|---|---|---|---|---|
-| Tasks | 48 | 60 | 57 | 59 | **224** |
-| Task horizon _n*_ (range) | 1–13 | 1–24 | 1–13 | 1–14 | 1–24 |
-| Task horizon _n*_ (mean) | 4.6 | 5.9 | 5.2 | 5.6 | 5.3 |
-| | | | | | |
-| **Operation profile** _(% of tasks, non-exclusive)_ | | | | | |
-| Search | 92 | 77 | 89 | 64 | 80 |
-| Create | 58 | 78 | 63 | 88 | 73 |
-| Read | 54 | 82 | 14 | 68 | 55 |
-| Update | 62 | 93 | 70 | 37 | 66 |
-| Delete | 19 | 53 | 7 | 24 | 26 |
-
-
-Tasks are characterized along five dimensions: _task horizon_ (minimum API calls under an optimal policy), _operation profile_ (which CRUD primitives are required), _entity scope_ (single vs. multi-entity state changes), _information availability_ (whether identifiers are given explicitly or must be discovered), and _prompt ambiguity_ (how underspecified the target is).
-
-### Results (No-Docs Baseline)
+### Benchmark Results
 
 | Model | Box | Calendar | Linear | Slack | **Overall** | Pass % | Cost/test | Score/$ |
 |---|---|---|---|---|---|---|---|---|
@@ -178,7 +155,7 @@ Tasks are characterized along five dimensions: _task horizon_ (minimum API calls
 
 Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
 
-## Test Suites
+## Benchmark Suites
 
 | Service | Test Suite | Tests | Coverage |
 |---------|-----------|-------|----------|
@@ -189,7 +166,6 @@ Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agen
 
 Each test defines expected state changes via declarative assertions. See the [assertions docs](https://agentdiff.mintlify.app/core-concepts/assertions) for how they work.
 
-<img width="2516" height="1020" alt="image" src="https://github.com/user-attachments/assets/3270f1f1-5afa-4db2-97b0-c35c070ef44f" />
 
 ## Documentation
 
