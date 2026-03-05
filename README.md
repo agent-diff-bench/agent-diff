@@ -149,6 +149,17 @@ The Agent-Diff benchmark comprises **224 tasks** across four enterprise services
 
 Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
 
+### Training on Agent-Diff
+
+Agent-Diff environments double as training infrastructure. We used the benchmark to generate rollouts and fine-tune models on API tool-calling tasks:
+
+| Method | Model | Base | Trained (eval set) | Delta |
+|---|---|---|---|---|
+| RL | [Qwen3-30B-A3B](https://app.primeintellect.ai/training/shared/ww6raxtlj4hduqksmulmcmji) | 0.31 | 0.55 | **+77%** |
+| SFT (LoRA) | [Ministral-3-14B](https://huggingface.co/hubertmarek/Ministral-3-14B-Agent-Diff-SFT-LoRA) | 0.28 | 0.35 | **+24%** |
+
+The SFT pipeline filters high-reward Devstral rollouts (reward > 0.8), applies command flattening and error turn removal, and trains a LoRA adapter (rank 64) with prompt-level train/val splits. The RL run uses Agent-Diff as a live verifier environment on [Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench).
+
 ## Run Agent-Diff Bench
 
 - **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — Run evals or RL training with no setup required
