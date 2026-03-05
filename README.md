@@ -23,7 +23,7 @@ Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behav
 | [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | Run AgentDiff Benchmark (LangChain Agents) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
 | [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | AgentDiff Benchmark (ReAct)| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
 | [Prime Intellect Environment](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) | Run evals or RL training| [![Prime Intellect](https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg)](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) |
-| [Custom Evaluations Demo](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) | Write your own assertions & evaluate agents | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Hext-WWDsm9BxsOrASYoMjgu1N_lN0Fz) |
+| [Custom Evaluations Demo](https://colab.research.google.com/drive/1cfeMQ2R_JpGRdagT0U-D8cngpsHJmJON?usp=sharing) | Write your own assertions & evaluate agents | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cfeMQ2R_JpGRdagT0U-D8cngpsHJmJON?usp=sharing) |
 
 
 ## Quick Start
