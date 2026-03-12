@@ -4,7 +4,7 @@
 
 Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, no rate limits.
 
-### Try it now
+### Run Agent-Diff Benchmark
 
 | Example | Description |
 |---|---|
@@ -109,7 +109,7 @@ See the local SDK references in `sdk/agent-diff-python/README.md` and `sdk/agent
 **Templates** are pre-configured database schemas that serve as the starting point for test environments. Think of them as snapshots of a service's state:
 - **Location**: Templates live in PostgreSQL schemas (e.g., `slack_default`, `box_default`, `linear_expanded`, `calendar_base`)
 - **Content**: Seeded with realistic data — users, channels, messages, files, folders, issues, calendar events, etc.
-- **Seeds**: [box](examples/box/seeds/) | [calendar](examples/calendar/seeds/) | [linear](examples/linear/seeds/) | [slack](examples/slack/seeds/)
+- **Seeds**: [box](examples/box/seeds/box_default.json) | [calendar](examples/calendar/seeds/calendar_default.json) | [linear](examples/linear/seeds/linear_default.json) | [slack](examples/slack/seeds/slack_default.json)
 
 **Environments** are isolated, temporary copies of a template schema:
 - **URL**: Each environment has a unique service URL (e.g., `http://localhost:8000/api/env/{env_id}/services/slack`)
@@ -146,11 +146,6 @@ Agent-Diff environments double as training infrastructure. We used the benchmark
 | SFT (LoRA) | Ministral-3-14B | 0.28 | 0.35 | **+24%** |
 
 The SFT pipeline filters high-reward Devstral rollouts (reward > 0.8), applies command flattening and error turn removal, and trains a LoRA adapter (rank 64) with prompt-level train/val splits.
-
-## Run Agent-Diff Bench
-
-- **[Colab Notebooks](#try-it-now)** — Run locally with the example notebooks above
-- **Dataset** — 224 tasks across all 4 services (80/20 train/test split). Each test defines expected state changes via declarative assertions. See `docs/evaluation-dsl.md` for how they work.
 
 
 ## Documentation
