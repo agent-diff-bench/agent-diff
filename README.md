@@ -4,26 +4,13 @@
 
 Run it locally (or deploy it). Agents call sandboxed replicas of APIs that behave like the real ones, and you get deterministic diffs of every state change — no external services, no side effects, no rate limits.
 
-<p align="center">
-  <a href="https://arxiv.org/abs/2602.11224"><img src="https://img.shields.io/badge/arXiv-2602.11224-b31b1b.svg" alt="arXiv"></a>
-  <a href="https://huggingface.co/datasets/hubertmarek/agent-diff-bench"><img src="https://img.shields.io/badge/%F0%9F%A4%97-Dataset-yellow.svg" alt="HuggingFace"></a>
-</p>
-
-<p align="center">
-  <a href="https://agentdiff.dev">Website</a> •
-  <a href="https://agentdiff.mintlify.app/introduction">Docs</a> •
-  <a href="https://arxiv.org/abs/2602.11224">Paper</a> •
-  <a href="mailto:hubert@uni.minerva.edu">Feedback</a>
-</p>
-
 ### Try it now
 
-| | Description | |
-|---|-------------|---|
-| [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | Run AgentDiff Benchmark (LangChain Agents) | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/langchain_agent_benchmark.ipynb) |
-| [ReAct Agent (Paper)](examples/react_agent_benchmark.ipynb) | AgentDiff Benchmark (ReAct)| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/agent-diff-bench/agent-diff/blob/main/examples/react_agent_benchmark.ipynb) |
-| [Prime Intellect Environment](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) | Run evals or RL training| [![Prime Intellect](https://img.shields.io/badge/Prime%20Intellect-Run%20Evals-blue.svg)](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench) |
-| [Custom Evaluations Demo](https://colab.research.google.com/drive/1cfeMQ2R_JpGRdagT0U-D8cngpsHJmJON?usp=sharing) | Write your own assertions & evaluate agents | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cfeMQ2R_JpGRdagT0U-D8cngpsHJmJON?usp=sharing) |
+| Example | Description |
+|---|---|
+| [LangChain Agent](examples/langchain_agent_benchmark.ipynb) | Run AgentDiff Benchmark with LangChain agents |
+| [ReAct Agent](examples/react_agent_benchmark.ipynb) | Run AgentDiff Benchmark with a custom ReAct loop |
+| `examples/` notebooks | Write custom evaluations and inspect benchmark workflows locally |
 
 
 ## Quick Start
@@ -45,12 +32,12 @@ npm install agent-diff
 <details>
 <summary><b> Hosted</b></summary>
 
-1. Sign up at [agentdiff.dev](https://agentdiff.dev) and get your API key
+1. Obtain an API key from your deployment or evaluation organizer
 2. Set environment variables:
 
 ```bash
 export AGENT_DIFF_API_KEY="ad_live_sk_..."
-export AGENT_DIFF_BASE_URL="https://api.agentdiff.dev"
+export AGENT_DIFF_BASE_URL="<base-url>"
 ```
 
 </details>
@@ -59,7 +46,7 @@ export AGENT_DIFF_BASE_URL="https://api.agentdiff.dev"
 <summary><b>Self-Hosted</b></summary>
 
 ```bash
-git clone https://github.com/agent-diff-bench/agent-diff.git
+git clone <repository-url>
 cd agent-diff/ops
 docker-compose up --build
 # Backend runs on http://localhost:8000
@@ -103,16 +90,16 @@ print(diff.diff['deletes'])   # deleted records
 client.delete_env(envId=env.environmentId)
 ```
 
-See the [Python SDK](https://agentdiff.mintlify.app/sdks/python/installation) and [TS SDK](https://agentdiff.mintlify.app/sdks/python/installation) for full reference.
+See the local SDK references in `sdk/agent-diff-python/README.md` and `sdk/agent-diff-ts/README.md`.
 
 ## Supported APIs
 
 | Service | Type | Endpoints | Coverage |
 |---------|------|-----------|----------|
-| **[Box](https://agentdiff.mintlify.app/services/overview)** | REST | 27 | Files, folders, search, comments, tags, shared links, hubs, versioning |
-| **[Google Calendar](https://agentdiff.mintlify.app/services/overview)** | REST | 37 | Calendars, events, recurring series, free/busy, ACL, push notifications |
-| **[Linear](https://agentdiff.mintlify.app/services/linear/overview)** | GraphQL | 19 | Issues, teams, workflow states, labels, comments, relations, memberships |
-| **[Slack](https://agentdiff.mintlify.app/services/slack/overview)** | Web API | 25 | Conversations, messaging, reactions, threading, users, channels |
+| **Box** | REST | 27 | Files, folders, search, comments, tags, shared links, hubs, versioning |
+| **Google Calendar** | REST | 37 | Calendars, events, recurring series, free/busy, ACL, push notifications |
+| **Linear** | GraphQL | 19 | Issues, teams, workflow states, labels, comments, relations, memberships |
+| **Slack** | Web API | 25 | Conversations, messaging, reactions, threading, users, channels |
 
 > **108 unique endpoints** across all 4 services.
 
@@ -147,7 +134,7 @@ The Agent-Diff benchmark comprises **224 tasks** across four enterprise services
 | claude-haiku-4.5 | 45.1 | 57.8 | 35.6 | 57.3 | **49.3** | 50 | $0.22 | 224 |
 | llama-4-scout | 33.7 | 41.4 | 20.9 | 42.9 | **38.0** | 29 | $0.02 | 1,900 |
 
-Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task. Full methodology and documentation ablation results in the [paper](https://arxiv.org/abs/2602.11224).
+Per-service assertion-weighted scores (95% Bayesian CrI). No-docs baseline: agents receive no API documentation and must discover endpoints through exploration. 3 trials per task.
 
 ### Training on Agent-Diff
 
@@ -155,36 +142,35 @@ Agent-Diff environments double as training infrastructure. We used the benchmark
 
 | Method | Model | Base | Trained (eval set) | Delta |
 |---|---|---|---|---|
-| RL | [Qwen3-30B-A3B](https://app.primeintellect.ai/training/shared/ww6raxtlj4hduqksmulmcmji) | 0.31 | 0.55 | **+77%** |
-| SFT (LoRA) | [Ministral-3-14B](https://huggingface.co/hubertmarek/Ministral-3-14B-Agent-Diff-SFT-LoRA) | 0.28 | 0.35 | **+24%** |
+| RL | Qwen3-30B-A3B | 0.31 | 0.55 | **+77%** |
+| SFT (LoRA) | Ministral-3-14B | 0.28 | 0.35 | **+24%** |
 
-The SFT pipeline filters high-reward Devstral rollouts (reward > 0.8), applies command flattening and error turn removal, and trains a LoRA adapter (rank 64) with prompt-level train/val splits. The RL run uses Agent-Diff as a live verifier environment on [Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench).
+The SFT pipeline filters high-reward Devstral rollouts (reward > 0.8), applies command flattening and error turn removal, and trains a LoRA adapter (rank 64) with prompt-level train/val splits.
 
 ## Run Agent-Diff Bench
 
-- **[Prime Intellect](https://app.primeintellect.ai/dashboard/environments/hubert-marek/agent-diff-bench)** — Run evals or RL training with no setup required
 - **[Colab Notebooks](#try-it-now)** — Run locally with the example notebooks above
-- **[Dataset](https://huggingface.co/datasets/hubertmarek/agent-diff-bench)** — 224 tasks across all 4 services (80/20 train/test split). Each test defines expected state changes via declarative assertions. See the [assertions docs](https://agentdiff.mintlify.app/core-concepts/assertions) for how they work.
+- **Dataset** — 224 tasks across all 4 services (80/20 train/test split). Each test defines expected state changes via declarative assertions. See `docs/evaluation-dsl.md` for how they work.
 
 
 ## Documentation
 
-- **[Python SDK](https://agentdiff.mintlify.app/sdks/python/installation)** — Full Python SDK reference
-- **[TypeScript SDK](https://agentdiff.mintlify.app/sdks/typescript/installation)** — Full TypeScript SDK reference
-- **[Assertions & Evaluation DSL](https://agentdiff.mintlify.app/core-concepts/assertions)** — Write test assertions
-- **[API Reference](https://agentdiff.mintlify.app/api-reference/introduction)** — REST API documentation
-- **[Self-Hosting](https://agentdiff.mintlify.app/hosting/docker-setup)** — Docker setup & configuration
+- **[Python SDK](sdk/agent-diff-python/README.md)** — Full Python SDK reference
+- **[TypeScript SDK](sdk/agent-diff-ts/README.md)** — Full TypeScript SDK reference
+- **[Assertions & Evaluation DSL](docs/evaluation-dsl.md)** — Write test assertions
+- **[API Reference](docs/api-reference.md)** — REST API documentation
+- **[Getting Started](docs/getting-started.md)** — Local setup and usage
 
 ## Citation
 
 If you use Agent-Diff in your research, please cite:
 
 ```bibtex
-@article{pysklo2025agentdiff,
+@article{anonymous2026agentdiff,
   title={Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
-  author={Pysklo, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
-  journal={arXiv preprint arXiv:2602.11224},
-  year={2025}
+  author={Anonymous},
+  journal={Under review},
+  year={2026}
 }
 ```
 

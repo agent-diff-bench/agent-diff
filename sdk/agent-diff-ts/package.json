@@ -35,11 +35,6 @@
   ],
   "author": "Agent Diff",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hubertpysklo/agent-diff.git",
-    "directory": "sdk/agent-diff-ts"
-  },
   "dependencies": {
     "zod": "^3.23.0"
   },

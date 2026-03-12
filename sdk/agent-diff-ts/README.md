@@ -1,6 +1,6 @@
 # Agent Diff TypeScript SDK
 
-TypeScript/Node.js SDK for [Agent Diff](https://github.com/hubertpysklo/agent-diff) - test AI agents against isolated replicas of services like Slack and Linear.
+TypeScript/Node.js SDK for Agent Diff - test AI agents against isolated replicas of services like Slack and Linear.
 
 ## Installation
 
@@ -13,7 +13,7 @@ npm install agent-diff
 ### 1. Start Backend
 
 ```bash
-git clone https://github.com/hubertpysklo/agent-diff.git
+git clone <repository-url>
 cd agent-diff/ops
 docker-compose up
 ```

@@ -25,8 +25,8 @@
     {
       "user_id": "U02ARTEM23",
       "username": "artembogdanov",
-      "display_name": "Artem",
-      "real_name": "Artem Bogdanov",
+      "display_name": "Alex",
+      "real_name": "Alex Bogdanov",
       "email": "artem@gmail.com",
       "is_bot": false
     },
@@ -56,9 +56,9 @@
     },
     {
       "user_id": "U06HUBERT23",
-      "username": "hubertmarek",
-      "display_name": "Hubert",
-      "real_name": "Hubert Marek",
+      "username": "admin_user",
+      "display_name": "Admin",
+      "real_name": "Admin User",
       "email": "hubert@gmail.com",
       "is_bot": false
     },

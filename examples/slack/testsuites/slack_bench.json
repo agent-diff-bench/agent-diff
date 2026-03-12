@@ -68,8 +68,8 @@
     },
     {
       "id": "test_3",
-      "name": "Send direct message Artem, and Hubert (Create group conversation + send message)",
-      "prompt": "Send a DM (group conversation not channel) to Artem and Hubert saying 'Hey, I've took a look at the presentation and I have some questions. Can you help me?'",
+      "name": "Send direct message Alex, and Admin (Create group conversation + send message)",
+      "prompt": "Send a DM (group conversation not channel) to Alex and Admin saying 'Hey, I've took a look at the presentation and I have some questions. Can you help me?'",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -381,7 +381,7 @@
     {
       "id": "test_13",
       "name": "Mention user in message",
-      "prompt": "Post to #general mentioning Artem with text 'Please review the pull request'",
+      "prompt": "Post to #general mentioning Alex with text 'Please review the pull request'",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -499,7 +499,7 @@
     {
       "id": "test_17",
       "name": "Search messages in a channel and combine results into a new message as DM",
-      "prompt": "Search for all messages (4 messages) in the #engineering channel related to login issues and combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "prompt": "Search for all messages (4 messages) in the #engineering channel related to login issues and combine them into a single new message as DM to Admin. Do not change the meaning of the original messages just combine them.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -612,7 +612,7 @@
     {
       "id": "test_18",
       "name": "Search messages in multiple channels and combine results into a new message as DM",
-      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Combine them into a single new message as DM to Admin. Do not change the meaning of the original messages just combine them.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -1082,7 +1082,7 @@
     {
       "id": "test_28",
       "name": "Rich Text: User Mention",
-      "prompt": "Mention @Artem in #general using Slack Block Kit rich_text blocks with a user element type containing Artem's user ID.",
+      "prompt": "Mention @Alex in #general using Slack Block Kit rich_text blocks with a user element type containing Alex's user ID.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",
@@ -1198,7 +1198,7 @@
     {
       "id": "test_32",
       "name": "Constraint Verification (Negative Test)",
-      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Hubert) via Slack.",
+      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Admin) via Slack.",
       "type": "actionEval",
       "seed_template": "slack_bench_default",
       "impersonate_user_id": "U01AGENBOT9",

@@ -83,8 +83,8 @@
     },
     {
       "id": "test_3",
-      "name": "Send direct message Artem, and Hubert (Create group conversation + send message)",
-      "prompt": "Send a DM (group conversation not channel) to Artem and Hubert saying 'Hey, I've took a look at the presentation and I have some questions. Can you help me?'",
+      "name": "Send direct message Alex, and Admin (Create group conversation + send message)",
+      "prompt": "Send a DM (group conversation not channel) to Alex and Admin saying 'Hey, I've took a look at the presentation and I have some questions. Can you help me?'",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -512,7 +512,7 @@
     {
       "id": "test_15",
       "name": "Mention user in message",
-      "prompt": "Post to #general mentioning Artem with text 'Please review the pull request'",
+      "prompt": "Post to #general mentioning Alex with text 'Please review the pull request'",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -691,7 +691,7 @@
     {
       "id": "test_19",
       "name": "Search messages in a channel and combine results into a new message as DM",
-      "prompt": "Search for all messages (4 messages) in the #engineering channel related to login issues and combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "prompt": "Search for all messages (4 messages) in the #engineering channel related to login issues and combine them into a single new message as DM to Admin. Do not change the meaning of the original messages just combine them.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -813,7 +813,7 @@
     {
       "id": "test_20",
       "name": "Search messages in multiple channels and combine results into a new message as DM",
-      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Combine them into a single new message as DM to Hubert. Do not change the meaning of the original messages just combine them.",
+      "prompt": "Search for all messages (6 messages) related to login issues and auth improvments. Combine them into a single new message as DM to Admin. Do not change the meaning of the original messages just combine them.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -1351,7 +1351,7 @@
     {
       "id": "test_29",
       "name": "Rich Text: User Mention",
-      "prompt": "Mention @Artem in #general using Slack Block Kit rich_text blocks with a user element type containing Artem's user ID.",
+      "prompt": "Mention @Alex in #general using Slack Block Kit rich_text blocks with a user element type containing Alex's user ID.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -1492,7 +1492,7 @@
     {
       "id": "test_32",
       "name": "Constraint Verification (Negative Test)",
-      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Hubert) via Slack.",
+      "prompt": "Try to invite the user 'ElonMusk' to #general. If you can't find him, inform me (Admin) via Slack.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -2002,7 +2002,7 @@
     {
       "id": "test_41",
       "name": "Music Festival Tech Stack",
-      "prompt": "I need some help cleaning up our Afrobeats festival streaming project workspace. We've had some organizational issues lately. First, can you find out who's currently hanging out in #random and also get me a list of everyone on the team? I need to verify Robert Chen's role since he's supposed to be leading the engineering side of things.\n\nI also need you to dig through our CDN-related conversations - we had some important discussions about our content delivery setup that I need to reference. Check what's been happening recently in #project-alpha too.\n\nOnce you've got the lay of the land, please remove Artem Bogdanov from #project-alpha-dev and also kick Hubert Marek from #core-infra - they've moved to different workstreams. Post an update to #core-infra about our streaming infrastructure progress, and update the topic there to reflect our virtual festival focus.\n\nThere's also an outdated message I posted earlier that needs deleting, and I need to correct some information in a previous update I sent. Can you help me sort all this out?",
+      "prompt": "I need some help cleaning up our Afrobeats festival streaming project workspace. We've had some organizational issues lately. First, can you find out who's currently hanging out in #random and also get me a list of everyone on the team? I need to verify Robert Chen's role since he's supposed to be leading the engineering side of things.\n\nI also need you to dig through our CDN-related conversations - we had some important discussions about our content delivery setup that I need to reference. Check what's been happening recently in #project-alpha too.\n\nOnce you've got the lay of the land, please remove Alex Bogdanov from #project-alpha-dev and also kick Admin User from #core-infra - they've moved to different workstreams. Post an update to #core-infra about our streaming infrastructure progress, and update the topic there to reflect our virtual festival focus.\n\nThere's also an outdated message I posted earlier that needs deleting, and I need to correct some information in a previous update I sent. Can you help me sort all this out?",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -3494,7 +3494,7 @@
     {
       "id": "test_54",
       "name": "Cartography of Lost Rivers",
-      "prompt": "Hubert, John, Morgan, and Omer want to start a mapping project for forgotten underground rivers \u2014 they're calling it \"Cartography of Lost Rivers\". Pull up some details about #core-infra to see if that community would be a good match for cross-pollination. Now, \"Morgan\" \u2014 I mean the one who's been in the engineering discussions, not the other one. Also, that Morgan asked me to count all of the messages across all of the chats that mention the word \"supercomputer.\" Do this please. Then create #lost-rivers-cartography, set a topic about mapping forgotten urban waterways, invite all four, and write a project manifesto as the opening post that will say: '\"supercomputer\" mentioned <your_count> number of times across all of the chats'. DM Morgan privately to ask whether they'd rather lead the cartography side or the field exploration. Lastly, find a message about infrastructure in #engineering and edit it to include a mention of the new project.",
+      "prompt": "Admin, John, Morgan, and Omer want to start a mapping project for forgotten underground rivers \u2014 they're calling it \"Cartography of Lost Rivers\". Pull up some details about #core-infra to see if that community would be a good match for cross-pollination. Now, \"Morgan\" \u2014 I mean the one who's been in the engineering discussions, not the other one. Also, that Morgan asked me to count all of the messages across all of the chats that mention the word \"supercomputer.\" Do this please. Then create #lost-rivers-cartography, set a topic about mapping forgotten urban waterways, invite all four, and write a project manifesto as the opening post that will say: '\"supercomputer\" mentioned <your_count> number of times across all of the chats'. DM Morgan privately to ask whether they'd rather lead the cartography side or the field exploration. Lastly, find a message about infrastructure in #engineering and edit it to include a mention of the new project.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -3712,7 +3712,7 @@
     {
       "id": "test_56",
       "name": "The Apiary Report",
-      "prompt": "Hubert does this thing he calls the \"Apiary Report\" \u2014 he sees the workspace as a beehive, and he wants a quarterly survey. First he needs the full picture: how many honeycomb cells does this hive have, and which ones are alive? Then go taste the honey in #growth \u2014 read through whatever's been happening there. Find the sweetest drop \u2014 the single best message \u2014 and mark it with a :honey_pot:. That's Hubert's forager tradition. Once you've done your tasting, write up a Forager's Report and post it in #random for the rest of the colony, summarizing whatever noteworthy conversation you found in #growth. Note, that the report must contain the words \"FORAGERS REPORT\". Last thing: #project-alpha is an empty cell. Nobody's in it, nothing's happening. Seal it off.",
+      "prompt": "Admin does this thing he calls the \"Apiary Report\" \u2014 he sees the workspace as a beehive, and he wants a quarterly survey. First he needs the full picture: how many honeycomb cells does this hive have, and which ones are alive? Then go taste the honey in #growth \u2014 read through whatever's been happening there. Find the sweetest drop \u2014 the single best message \u2014 and mark it with a :honey_pot:. That's Admin's forager tradition. Once you've done your tasting, write up a Forager's Report and post it in #random for the rest of the colony, summarizing whatever noteworthy conversation you found in #growth. Note, that the report must contain the words \"FORAGERS REPORT\". Last thing: #project-alpha is an empty cell. Nobody's in it, nothing's happening. Seal it off.",
       "type": "actionEval",
       "seed_template": "slack_bench_v2",
       "impersonate_user_id": "U01AGENBOT9",
@@ -3936,7 +3936,7 @@
             }
           },
           "expected_count": 6,
-          "description": "6 new DM channels created to reach target of 7 private conversations (Agent started with 1 DM with Sophie, needs DMs with: Aisha, Artem, Carlos, Gabriel, Hubert, John \u2014 first 6 alphabetically excluding Sophie)"
+          "description": "6 new DM channels created to reach target of 7 private conversations (Agent started with 1 DM with Sophie, needs DMs with: Aisha, Alex, Carlos, Gabriel, Admin, John \u2014 first 6 alphabetically excluding Sophie)"
         },
         {
           "diff_type": "added",

@@ -51,7 +51,7 @@ from agent_diff import AgentDiff
 
 client = AgentDiff(
     api_key="ad_live_sk_...",
-    base_url="https://api.agentdiff.dev",  # or http://localhost:8000
+    base_url="http://localhost:8000",  # replace with your deployment URL if needed
 )
 
 env = client.init_env(
@@ -65,7 +65,7 @@ env = client.init_env(
 
 **Via curl:**
 ```bash
-curl -X POST https://api.agentdiff.dev/api/platform/initEnv \
+curl -X POST http://localhost:8000/api/platform/initEnv \
   -H "X-API-Key: ad_live_sk_..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -208,43 +208,6 @@ for test in suite.tests:
 
     client.delete_env(envId=env.environmentId)
 ```
-
-### Using HuggingFace Dataset
-
-Alternatively, load tasks from the published HuggingFace dataset:
-
-```python
-from agent_diff import AgentDiff, BashExecutorProxy
-from datasets import load_dataset
-
-client = AgentDiff()
-dataset = load_dataset("hubertmarek/agent-diff-bench", split="test")
-
-for example in dataset:
-    info = json.loads(example["info"])
-    expected = json.loads(example["answer"])
-
-    env = client.init_env(
-        templateService=info["service"],
-        templateName=info["seed_template"],
-        impersonateUserId=info["impersonate_user_id"],
-    )
-    run = client.start_run(envId=env.environmentId)
-    bash = BashExecutorProxy(env.environmentId, base_url=client.base_url, api_key=client.api_key)
-
-    # --- your agent loop goes here, calling bash.execute(command) ---
-
-    client.evaluate_run(runId=run.runId, expectedOutput=expected)
-    result = client.get_results_for_run(runId=run.runId)
-    print(f"{example['test_id']}: {'PASS' if result.passed else 'FAIL'} score={result.score}")
-
-    client.delete_env(envId=env.environmentId)
-```
-
-See `examples/react_agent_benchmark.ipynb` and `examples/langchain_agent_benchmark.ipynb`
-for full runnable notebook examples.
-
----
 
 ## SessionManager & Isolation Architecture
 

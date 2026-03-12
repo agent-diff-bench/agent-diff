@@ -3879,7 +3879,7 @@
     "test_id": "ee767f31-aa7c-41fd-9fa8-cc438364036d"
   },
   {
-    "prompt": "Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
+    "prompt": "Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
     "status": "failed",
     "passed": false,
     "score": 0.0,
@@ -3890,7 +3890,7 @@
     "runId": "104fb82e-7b63-4870-a87d-b0a894296a9d",
     "trace": {
       "messages": [
-        "content='Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='10a579de-e15a-4679-b82c-599e840c2e8d'",
+        "content='Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='10a579de-e15a-4679-b82c-599e840c2e8d'",
         "content='' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 525, 'prompt_tokens': 283, 'total_tokens': 808, 'completion_tokens_details': {'accepted_prediction_tokens': None, 'audio_tokens': None, 'reasoning_tokens': 325, 'rejected_prediction_tokens': None, 'image_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0, 'video_tokens': 0}, 'cost': 0.000110787, 'is_byok': False, 'cost_details': {'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 1.1037e-05, 'upstream_inference_completions_cost': 9.975e-05}}, 'model_provider': 'openai', 'model_name': 'openai/gpt-oss-120b', 'system_fingerprint': None, 'id': 'gen-1765416130-aaoq3nR2VkC17pEr5IVx', 'finish_reason': 'tool_calls', 'logprobs': None} id='lc_run--019b0b00-5879-74b1-95d5-2865cc0d150c-0' invalid_tool_calls=[{'type': 'invalid_tool_call', 'id': 'functions.execute_python_145e', 'name': 'execute_python', 'args': 'import os, json, requests, textwrap, sys, re, math, random, datetime, itertools, collections, typing, string, hashlib, base64, functools, time, decimal, fractions, statistics, inspect, uuid, pathlib, csv, html\\n\\ndef graphql_query(query, variables=None):\\n    url = \"https://api.linear.app/graphql\"\\n    headers = {\\n        \"Authorization\": \"Bearer YOUR_TOKEN\",  # placeholder\\n        \"Content-Type\": \"application/json\"\\n    }\\n    payload = {\"query\": query}\\n    if variables:\\n        payload[\"variables\"] = variables\\n    resp = requests.post(url, headers=headers, json=payload)\\n    resp.raise_for_status()\\n    return resp.json()\\n\\n# Step 1: get team ID\\nquery = \"\"\"\\nquery ProductTeam {\\n  teams(filter: {name: {eq: \"Product\"}}) {\\n    nodes {\\n      id\\n      name\\n    }\\n  }\\n}\\n\"\"\"\\nresult = graphql_query(query)\\nprint(json.dumps(result, indent=2))\\n', 'error': 'Function execute_python arguments:\\n\\nimport os, json, requests, textwrap, sys, re, math, random, datetime, itertools, collections, typing, string, hashlib, base64, functools, time, decimal, fractions, statistics, inspect, uuid, pathlib, csv, html\\n\\ndef graphql_query(query, variables=None):\\n    url = \"https://api.linear.app/graphql\"\\n    headers = {\\n        \"Authorization\": \"Bearer YOUR_TOKEN\",  # placeholder\\n        \"Content-Type\": \"application/json\"\\n    }\\n    payload = {\"query\": query}\\n    if variables:\\n        payload[\"variables\"] = variables\\n    resp = requests.post(url, headers=headers, json=payload)\\n    resp.raise_for_status()\\n    return resp.json()\\n\\n# Step 1: get team ID\\nquery = \"\"\"\\nquery ProductTeam {\\n  teams(filter: {name: {eq: \"Product\"}}) {\\n    nodes {\\n      id\\n      name\\n    }\\n  }\\n}\\n\"\"\"\\nresult = graphql_query(query)\\nprint(json.dumps(result, indent=2))\\n\\n\\nare not valid JSON. Received JSONDecodeError Expecting value: line 1 column 1 (char 0)\\nFor troubleshooting, visit: https://docs.langchain.com/oss/python/langchain/errors/OUTPUT_PARSING_FAILURE '}] usage_metadata={'input_tokens': 283, 'output_tokens': 525, 'total_tokens': 808, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'reasoning': 325}}"
       ]
     },
@@ -3903,7 +3903,7 @@
     "test_id": "daa7652d-ea8f-421e-9fa9-648ab78d4adf"
   },
   {
-    "prompt": "Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
+    "prompt": "Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
     "status": "failed",
     "passed": false,
     "score": 0.0,
@@ -3914,7 +3914,7 @@
     "runId": "c8cd3a5b-8d26-4df7-807d-255541986c75",
     "trace": {
       "messages": [
-        "content='Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='cdd8574c-c63f-4214-ab11-ff065b2df27a'",
+        "content='Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='cdd8574c-c63f-4214-ab11-ff065b2df27a'",
         "content='' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 220, 'prompt_tokens': 312, 'total_tokens': 532, 'completion_tokens_details': {'accepted_prediction_tokens': None, 'audio_tokens': None, 'reasoning_tokens': 155, 'rejected_prediction_tokens': None, 'image_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 272, 'video_tokens': 0}, 'cost': 0.00015976, 'is_byok': False, 'cost_details': {'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 2.776e-05, 'upstream_inference_completions_cost': 0.000132}}, 'model_provider': 'openai', 'model_name': 'openai/gpt-oss-120b', 'system_fingerprint': None, 'id': 'gen-1765415684-EvA99A9QxZpcoBKeZD8R', 'finish_reason': 'tool_calls', 'logprobs': None} id='lc_run--019b0af9-86f6-7e62-a79f-1680913d1255-0' tool_calls=[{'name': 'execute_bash', 'args': {'code': 'curl -s -X POST https://api.linear.app/graphql -H \"Content-Type: application/json\" -H \"Authorization: Bearer YOUR_LINEAR_API_TOKEN\" -d \\'{\"query\":\"{ __schema { mutationType { fields { name } } } }\"}\\''}, 'id': 'chatcmpl-tool-cb3acb6f22af40439ad011aab46b29bb', 'type': 'tool_call'}] usage_metadata={'input_tokens': 312, 'output_tokens': 220, 'total_tokens': 532, 'input_token_details': {'audio': 0, 'cache_read': 272}, 'output_token_details': {'reasoning': 155}}",
         "content='{\"ok\":false,\"error\":\"invalid api key\"}' name='execute_bash' id='755c5d43-2ce2-4189-bf74-337556093c29' tool_call_id='chatcmpl-tool-cb3acb6f22af40439ad011aab46b29bb'",
         "content='' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 160, 'prompt_tokens': 405, 'total_tokens': 565, 'completion_tokens_details': {'accepted_prediction_tokens': None, 'audio_tokens': None, 'reasoning_tokens': 144, 'rejected_prediction_tokens': None, 'image_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 272, 'video_tokens': 0}, 'cost': 0.00013771, 'is_byok': False, 'cost_details': {'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 4.171e-05, 'upstream_inference_completions_cost': 9.6e-05}}, 'model_provider': 'openai', 'model_name': 'openai/gpt-oss-120b', 'system_fingerprint': None, 'id': 'gen-1765415686-aKDwpUzTOBk6pj4Ny3vD', 'finish_reason': 'stop', 'logprobs': None} id='lc_run--019b0af9-9144-73d0-96a1-d43e300a6695-0' usage_metadata={'input_tokens': 405, 'output_tokens': 160, 'total_tokens': 565, 'input_token_details': {'audio': 0, 'cache_read': 272}, 'output_token_details': {'reasoning': 144}}"
@@ -3929,7 +3929,7 @@
     "test_id": "daa7652d-ea8f-421e-9fa9-648ab78d4adf"
   },
   {
-    "prompt": "Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
+    "prompt": "Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
     "status": "failed",
     "passed": false,
     "score": 0.0,
@@ -3940,7 +3940,7 @@
     "runId": "a354f75b-6325-462a-bf8f-67b016eda831",
     "trace": {
       "messages": [
-        "content='Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='6715fdca-1091-4802-9048-f0e3435b163a'",
+        "content='Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.' additional_kwargs={} response_metadata={} id='6715fdca-1091-4802-9048-f0e3435b163a'",
         "content='' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 311, 'prompt_tokens': 293, 'total_tokens': 604, 'completion_tokens_details': {'accepted_prediction_tokens': None, 'audio_tokens': None, 'reasoning_tokens': 311, 'rejected_prediction_tokens': None, 'image_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0, 'video_tokens': 0}, 'cost': 0.00018169, 'is_byok': False, 'cost_details': {'upstream_inference_cost': None, 'upstream_inference_prompt_cost': 2.93e-05, 'upstream_inference_completions_cost': 0.00015239}}, 'model_provider': 'openai', 'model_name': 'openai/gpt-oss-120b', 'system_fingerprint': None, 'id': 'gen-1765415714-BanwHKscpPr8QjIXcRoY', 'finish_reason': None, 'logprobs': None} id='lc_run--019b0af9-fef3-7182-b094-2084bf7d05f1-0' usage_metadata={'input_tokens': 293, 'output_tokens': 311, 'total_tokens': 604, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'reasoning': 311}}"
       ]
     },

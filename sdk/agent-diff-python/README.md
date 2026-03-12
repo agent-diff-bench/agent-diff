@@ -18,7 +18,7 @@ Set these environment variables and the SDK will use them automatically:
 
 ```bash
 export AGENT_DIFF_API_KEY="ad_live_sk_..."
-export AGENT_DIFF_BASE_URL="https://api.agentdiff.dev/api/platform"
+export AGENT_DIFF_BASE_URL="http://localhost:8000"
 ```
 
 Then initialize the client without arguments:

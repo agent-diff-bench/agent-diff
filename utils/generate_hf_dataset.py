@@ -9,7 +9,7 @@ Output: a Parquet file (and optionally pushes to HuggingFace Hub).
 
 Usage:
     python utils/generate_hf_dataset.py                          # save locally
-    python utils/generate_hf_dataset.py --push hubertmarek/agent-diff-bench  # push to HF
+    python utils/generate_hf_dataset.py --push <hf-org>/agent-diff-bench  # push to HF
 """
 
 import argparse
@@ -230,7 +230,7 @@ def main():
         type=str,
         default=None,
         metavar="REPO_ID",
-        help="Push to HuggingFace Hub (e.g. hubertmarek/agent-diff-bench)",
+        help="Push to HuggingFace Hub (e.g. <org>/agent-diff-bench)",
     )
     parser.add_argument(
         "--test-fraction",

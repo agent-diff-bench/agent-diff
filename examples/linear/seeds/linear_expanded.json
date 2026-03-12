@@ -170,9 +170,9 @@
     },
     {
       "id": "b55072d7-ccaa-43cd-8ab7-3dca324e3294",
-      "email": "artebogdanov@agentdiff.com",
-      "name": "Artem Bogdanov",
-      "displayName": "Artem",
+      "email": "alexb@agentdiff.com",
+      "name": "Alex Bogdanov",
+      "displayName": "Alex",
       "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "active": true,
       "admin": true,
@@ -187,7 +187,7 @@
       "disableReason": null,
       "guest": false,
       "initials": "AB",
-      "inviteHash": "artem-invite-hash",
+      "inviteHash": "alex-invite-hash",
       "isAssignable": true,
       "isMe": false,
       "isMentionable": true,
@@ -196,13 +196,13 @@
       "statusLabel": null,
       "statusUntilAt": null,
       "timezone": "Europe/London",
-      "url": "https://linear.app/test-org/user/artem"
+      "url": "https://linear.app/test-org/user/alex"
     },
     {
       "id": "25603d10-0364-407d-bdda-420ce07e9ae5",
-      "email": "hubertmarek@agentdiff.com",
-      "name": "Hubert Marek",
-      "displayName": "Hubert",
+      "email": "admin@agentdiff.com",
+      "name": "Admin User",
+      "displayName": "Admin",
       "organizationId": "18c8630e-1fd6-4c2e-a032-aa2684c16e46",
       "active": true,
       "admin": true,
@@ -4748,7 +4748,7 @@
   ],
   "team_memberships": [
     {
-      "id": "tm-artem-eng",
+      "id": "tm-alex-eng",
       "userId": "b55072d7-ccaa-43cd-8ab7-3dca324e3294",
       "teamId": "ad608998-915c-4bad-bcd9-85ebfccccee8",
       "owner": false,

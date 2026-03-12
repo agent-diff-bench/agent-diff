@@ -1105,7 +1105,7 @@
     {
       "id": "test_27",
       "name": "Create State, Issue, and Comment flow",
-      "prompt": "Add a new workflow state for the product team called 'Done'. Then, create a new issue in this team called 'Mini-demo', mark it as done, and add a comment to it saying 'Marking it as done because Hubert already prepped the demo but forgot to create an issue'.",
+      "prompt": "Add a new workflow state for the product team called 'Done'. Then, create a new issue in this team called 'Mini-demo', mark it as done, and add a comment to it saying 'Marking it as done because Admin already prepped the demo but forgot to create an issue'.",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
@@ -1141,7 +1141,7 @@
           "entity": "comments",
           "where": {
             "body": {
-              "contains": "Hubert already prepped"
+              "contains": "Admin already prepped"
             }
           },
           "expected_count": 1
@@ -1269,7 +1269,7 @@
     {
       "id": "test_30",
       "name": "Add member to team",
-      "prompt": "Add Artem (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
+      "prompt": "Add Alex (b55072d7-ccaa-43cd-8ab7-3dca324e3294) to the Product team.",
       "type": "actionEval",
       "seed_template": "linear_expanded",
       "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
