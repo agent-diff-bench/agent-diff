@@ -3,6 +3,7 @@
     "pythonVersion": "3.14",
     "venv": ".venv",
     "extraPaths": [
-        "backend"
+        "backend",
+        "sdk/agent-diff-python"
     ]
 }
