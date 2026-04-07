@@ -10,6 +10,8 @@ import sys
 import json
 import requests
 import uuid
+
+import pytest
 from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime, timedelta, timezone
 
@@ -17,8 +19,8 @@ GOOGLE_CALENDAR_BASE_URL = "https://www.googleapis.com/calendar/v3"
 REPLICA_PLATFORM_URL = "http://localhost:8000/api/platform"
 REQUEST_TIMEOUT = 30  # Timeout in seconds for HTTP requests
 
-# Test user email - use environment variable or safe default (no real PII)
-TEST_USER_EMAIL = os.environ.get("TEST_USER_EMAIL", "test-user@example.com")
+# Test user email - must match the seeded calendar_users email in calendar_default seed
+TEST_USER_EMAIL = os.environ.get("TEST_USER_EMAIL", "test.user@test.com")
 
 
 class ComprehensiveCalendarParityTester:
@@ -52,6 +54,11 @@ class ComprehensiveCalendarParityTester:
         "recurringEventId",   # Only for event instances
         "originalStartTime",  # Only for event instances
         "recurrence",         # Only for recurring master events
+        "defaultReminders",   # List-level field, depends on calendar settings
+        "guestsCanInviteOthers",   # Event field, depends on event config
+        "guestsCanSeeOtherGuests", # Event field, depends on event config
+        "primary",            # CalendarList field, only on primary calendar
+        "displayName",        # Optional on organizer/attendee objects
     }
 
     def __init__(self, google_access_token: str):
@@ -1768,6 +1775,27 @@ GET /calendar/v3/calendars/nonexistent-calendar-12345 HTTP/1.1
                     print(f"  ✓ Deleted replica test calendar")
                 except Exception as e:
                     print(f"  ⚠️ Failed to delete replica calendar: {e}")
+
+
+@pytest.mark.conformance
+@pytest.mark.external
+def test_calendar_parity():
+    """Run Calendar parity tests as pytest test."""
+    access_token = os.environ.get("GOOGLE_CALENDAR_ACCESS_TOKEN")
+    if not access_token:
+        pytest.skip("GOOGLE_CALENDAR_ACCESS_TOKEN environment variable not set")
+
+    tester = ComprehensiveCalendarParityTester(access_token)
+    try:
+        passed, failed, skipped = tester.run_tests()
+    finally:
+        tester.cleanup()
+
+    total = passed + failed
+    success_rate = passed / total if total > 0 else 0
+    assert success_rate >= 0.7, (
+        f"Parity tests failed: {passed}/{total} ({int(success_rate * 100)}%)"
+    )
 
 
 def main():

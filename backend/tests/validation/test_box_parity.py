@@ -18,6 +18,8 @@ import logging
 import os
 import sys
 import time
+
+import pytest
 from datetime import datetime, timezone
 from typing import Any, Callable, Dict, List, Optional
 
@@ -96,6 +98,8 @@ ENTERPRISE_ONLY_FIELDS = {
     "metadata",
     # Comment fields
     "tagged_message",
+    # Collections (only populated on Business/Enterprise tier accounts)
+    "collections",
 }
 
 
@@ -1899,7 +1903,7 @@ class BoxParityTester:
                         files={
                             "file": (version_filename, io.BytesIO(v2_content)),
                         },
-                        headers={"Authorization": f"Bearer {self.dev_token}"},
+                        headers={"Authorization": f"Bearer {self.prod_headers['Authorization'].split()[-1]}"},
                     )
 
                     replica_version_resp = requests.post(
@@ -1978,7 +1982,7 @@ class BoxParityTester:
                         f"https://upload.box.com/api/2.0/files/{prod_file_id}/content",
                         files={"file": (ifmatch_filename, io.BytesIO(content_v2))},
                         headers={
-                            "Authorization": f"Bearer {self.dev_token}",
+                            "Authorization": f"Bearer {self.prod_headers['Authorization'].split()[-1]}",
                             "If-Match": prod_etag,
                         },
                     )
@@ -2114,6 +2118,53 @@ class BoxParityTester:
             except Exception as e:
                 print(f" {e}")
 
+            # === POST /files/{id}/content (file version upload) ===
+
+            # [COMMON] Upload a new version of an existing file
+            total += 1
+            print("  POST /files/{id}/content (new version)...", end=" ")
+            try:
+                ts = datetime.now(timezone.utc).strftime("%H%M%S%f")
+                version_content = f"Updated content v2 at {ts}".encode("utf-8")
+
+                prod_resp = requests.post(
+                    f"https://upload.box.com/api/2.0/files/{self.prod_file_id}/content",
+                    files={
+                        "file": (f"version_test_{ts}.txt", io.BytesIO(version_content), "application/octet-stream"),
+                    },
+                    headers={"Authorization": self.prod_headers["Authorization"]},
+                )
+                replica_resp = requests.post(
+                    f"{self.replica_url}/files/{self.replica_file_id}/content",
+                    files={
+                        "file": (f"version_test_{ts}.txt", io.BytesIO(version_content), "application/octet-stream"),
+                    },
+                )
+
+                prod_ok = prod_resp.status_code in (200, 201)
+                replica_ok = replica_resp.status_code in (200, 201)
+
+                if prod_ok and replica_ok:
+                    prod_shape = self.extract_shape(prod_resp.json())
+                    replica_shape = self.extract_shape(replica_resp.json())
+                    diffs = self.compare_shapes(prod_shape, replica_shape, "data")
+                    if diffs:
+                        print(" SCHEMA MISMATCH")
+                        for d in diffs[:2]:
+                            print(f"     {d}")
+                    else:
+                        print("✅")
+                        passed += 1
+                elif prod_ok == replica_ok:
+                    print("✅ (both failed)")
+                    passed += 1
+                else:
+                    print(
+                        f" STATUS: prod={prod_resp.status_code}, replica={replica_resp.status_code}"
+                    )
+            except Exception as e:
+                print(f" {e}")
+
         return passed, total
 
     def run_comment_tests(self) -> tuple[int, int]:
@@ -2188,9 +2239,8 @@ class BoxParityTester:
                     else:
                         print("✅")
                         passed += 1
-                        # IDs available for potential follow-up tests:
-                        # prod_comment_id = prod_data.get("id")
-                        # replica_comment_id = replica_data.get("id")
+                        prod_comment_id = prod_data.get("id")
+                        replica_comment_id = replica_data.get("id")
                 else:
                     print(
                         f" STATUS: prod={prod_resp.status_code}, replica={replica_resp.status_code}"
@@ -2370,6 +2420,38 @@ class BoxParityTester:
             ):
                 passed += 1
 
+            # === DELETE /comments/{id} ===
+
+            # [COMMON] Delete a comment
+            if prod_comment_id and replica_comment_id:
+                total += 1
+                print("  DELETE /comments/{id}...", end=" ")
+                try:
+                    prod_resp = self.api_prod("DELETE", f"comments/{prod_comment_id}")
+                    replica_resp = self.api_replica(
+                        "DELETE", f"comments/{replica_comment_id}"
+                    )
+                    prod_ok = prod_resp.status_code in (200, 204)
+                    replica_ok = replica_resp.status_code in (200, 204)
+                    if prod_ok == replica_ok:
+                        print("✅")
+                        passed += 1
+                    else:
+                        print(
+                            f" STATUS: prod={prod_resp.status_code}, replica={replica_resp.status_code}"
+                        )
+                except Exception as e:
+                    print(f" {e}")
+
+            # [EDGE] Delete non-existent comment (404)
+            total += 1
+            if self.test_operation(
+                "DELETE /comments/{id} (non-existent - 404)",
+                lambda: self.api_prod("DELETE", "comments/999999999999999"),
+                lambda: self.api_replica("DELETE", "comments/999999999999999"),
+            ):
+                passed += 1
+
         return passed, total
 
     def run_task_tests(self) -> tuple[int, int]:
@@ -2396,6 +2478,8 @@ class BoxParityTester:
         print("\n✅ Task Operations:")
         passed = 0
         total = 0
+        prod_task_id = None
+        replica_task_id = None
 
         if self.prod_file_id and self.replica_file_id:
             # === POST /tasks ===
@@ -2445,6 +2529,8 @@ class BoxParityTester:
                     else:
                         print("✅")
                         passed += 1
+                        prod_task_id = prod_data.get("id")
+                        replica_task_id = replica_data.get("id")
                 else:
                     print(
                         f" STATUS: prod={prod_resp.status_code}, replica={replica_resp.status_code}"
@@ -2653,6 +2739,38 @@ class BoxParityTester:
                 lambda: self.api_replica(
                     "GET", f"files/{self.replica_file_id}/tasks", params={"limit": 3}
                 ),
+            ):
+                passed += 1
+
+            # === DELETE /tasks/{id} ===
+
+            # [COMMON] Delete a task
+            if prod_task_id and replica_task_id:
+                total += 1
+                print("  DELETE /tasks/{id}...", end=" ")
+                try:
+                    prod_resp = self.api_prod("DELETE", f"tasks/{prod_task_id}")
+                    replica_resp = self.api_replica(
+                        "DELETE", f"tasks/{replica_task_id}"
+                    )
+                    prod_ok = prod_resp.status_code in (200, 204)
+                    replica_ok = replica_resp.status_code in (200, 204)
+                    if prod_ok == replica_ok:
+                        print("✅")
+                        passed += 1
+                    else:
+                        print(
+                            f" STATUS: prod={prod_resp.status_code}, replica={replica_resp.status_code}"
+                        )
+                except Exception as e:
+                    print(f" {e}")
+
+            # [EDGE] Delete non-existent task (404)
+            total += 1
+            if self.test_operation(
+                "DELETE /tasks/{id} (non-existent - 404)",
+                lambda: self.api_prod("DELETE", "tasks/999999999999999"),
+                lambda: self.api_replica("DELETE", "tasks/999999999999999"),
             ):
                 passed += 1
 
@@ -4016,13 +4134,12 @@ class BoxParityTester:
 # =============================================================================
 
 
+@pytest.mark.conformance
+@pytest.mark.external
 def test_box_parity():
     """Run Box parity tests as pytest test."""
     if not BOX_DEV_TOKEN:
-        print("ERROR: BOX_DEV_TOKEN environment variable not set")
-        print("Set it via: export BOX_DEV_TOKEN=<your_token>")
-        print("Or edit the BOX_DEV_TOKEN constant in this file")
-        return
+        pytest.skip("BOX_DEV_TOKEN environment variable not set")
 
     tester = BoxParityTester(BOX_DEV_TOKEN)
     passed, total = tester.run_tests()
