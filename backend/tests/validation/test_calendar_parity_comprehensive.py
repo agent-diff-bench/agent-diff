@@ -1345,6 +1345,135 @@ class ComprehensiveCalendarParityTester:
         )
 
     # =========================================================================
+    # EXTENDED ERROR HANDLING
+    # =========================================================================
+
+    def test_extended_errors(self):
+        """Test additional error scenarios for comprehensive coverage."""
+        print("\n" + "=" * 70)
+        print("⚠️ EXTENDED ERROR HANDLING")
+        print("=" * 70)
+
+        # 400 - Event with end before start
+        from datetime import datetime, timezone
+        bad_event = {
+            "summary": "Bad event",
+            "start": {"dateTime": "2026-06-01T10:00:00Z"},
+            "end": {"dateTime": "2026-05-01T10:00:00Z"},  # End before start
+        }
+        self.test_operation(
+            "ExtErrors", "400 - Event end before start",
+            "POST", "/calendars/primary/events", "/calendars/primary/events",
+            body=bad_event, validate_schema=False, expected_status=400,
+        )
+
+        # 400 - Event missing start/end
+        self.test_operation(
+            "ExtErrors", "400 - Event missing start/end",
+            "POST", "/calendars/primary/events", "/calendars/primary/events",
+            body={"summary": "Missing times"}, validate_schema=False, expected_status=400,
+        )
+
+        # 404 - Delete non-existent calendar
+        self.test_operation(
+            "ExtErrors", "404 - Delete non-existent calendar",
+            "DELETE", "/calendars/nonexistent_cal_xyz", "/calendars/nonexistent_cal_xyz",
+            validate_schema=False, expected_status=404,
+        )
+
+        # 404 - Events for non-existent calendar
+        self.test_operation(
+            "ExtErrors", "404 - Events for non-existent calendar",
+            "GET", "/calendars/nonexistent_cal_xyz/events", "/calendars/nonexistent_cal_xyz/events",
+            validate_schema=False, expected_status=404,
+        )
+
+        # 400 - ACL with invalid role
+        if self.google_calendar_id and self.replica_calendar_id:
+            self.test_operation(
+                "ExtErrors", "400 - ACL with invalid role",
+                "POST",
+                f"/calendars/{self.google_calendar_id}/acl",
+                f"/calendars/{self.replica_calendar_id}/acl",
+                body={"role": "invalid_role", "scope": {"type": "user", "value": "test@test.com"}},
+                validate_schema=False, expected_status=400,
+            )
+
+    # =========================================================================
+    # PAGINATION PARITY
+    # =========================================================================
+
+    def test_pagination_parity(self):
+        """Test pagination behavior matches between prod and replica."""
+        print("\n" + "=" * 70)
+        print("📄 PAGINATION PARITY")
+        print("=" * 70)
+
+        # Events list with maxResults=1
+        print("  Events list (maxResults=1)...", end=" ")
+        google_status, google_data, _ = self.google_api(
+            "GET", "/calendars/primary/events", params={"maxResults": "1"}
+        )
+        replica_status, replica_data, _ = self.replica_api(
+            "GET", "/calendars/primary/events", params={"maxResults": "1"}
+        )
+        if google_status == 200 and replica_status == 200:
+            # Both should have nextPageToken if more events exist
+            google_has_token = "nextPageToken" in google_data
+            replica_has_token = "nextPageToken" in replica_data
+            # Check items count
+            google_count = len(google_data.get("items", []))
+            replica_count = len(replica_data.get("items", []))
+            if google_count <= 1 and replica_count <= 1:
+                print("✅")
+                self.record_result("Pagination", "Events maxResults=1 limit", True)
+            else:
+                print(f"❌ (google={google_count}, replica={replica_count} items)")
+                self.record_result("Pagination", "Events maxResults=1 limit", False)
+        else:
+            print(f"❌ (status: {google_status}/{replica_status})")
+            self.record_result("Pagination", "Events maxResults=1 limit", False)
+
+        # CalendarList with maxResults=1
+        print("  CalendarList (maxResults=1)...", end=" ")
+        google_status, google_data, _ = self.google_api(
+            "GET", "/users/me/calendarList", params={"maxResults": "1"}
+        )
+        replica_status, replica_data, _ = self.replica_api(
+            "GET", "/users/me/calendarList", params={"maxResults": "1"}
+        )
+        if google_status == 200 and replica_status == 200:
+            google_count = len(google_data.get("items", []))
+            replica_count = len(replica_data.get("items", []))
+            if google_count <= 1 and replica_count <= 1:
+                print("✅")
+                self.record_result("Pagination", "CalendarList maxResults=1 limit", True)
+            else:
+                print(f"❌ (google={google_count}, replica={replica_count} items)")
+                self.record_result("Pagination", "CalendarList maxResults=1 limit", False)
+        else:
+            print(f"❌ (status: {google_status}/{replica_status})")
+            self.record_result("Pagination", "CalendarList maxResults=1 limit", False)
+
+        # Follow nextPageToken
+        if google_has_token and replica_has_token:
+            print("  Events follow nextPageToken...", end=" ")
+            google_status2, google_data2, _ = self.google_api(
+                "GET", "/calendars/primary/events",
+                params={"maxResults": "1", "pageToken": google_data["nextPageToken"]},
+            )
+            replica_status2, replica_data2, _ = self.replica_api(
+                "GET", "/calendars/primary/events",
+                params={"maxResults": "1", "pageToken": replica_data["nextPageToken"]},
+            )
+            if google_status2 == 200 and replica_status2 == 200:
+                print("✅")
+                self.record_result("Pagination", "Events follow nextPageToken", True)
+            else:
+                print(f"❌ (status: {google_status2}/{replica_status2})")
+                self.record_result("Pagination", "Events follow nextPageToken", False)
+
+    # =========================================================================
     # RESPONSE FORMAT VALIDATION
     # =========================================================================
 
@@ -1699,6 +1828,8 @@ GET /calendar/v3/calendars/nonexistent-calendar-12345 HTTP/1.1
         self.test_freebusy_resource()
         self.test_acl_resource()
         self.test_error_handling()
+        self.test_extended_errors()
+        self.test_pagination_parity()
         self.test_response_format()
         self.test_etag_behavior()
         self.test_batch_requests()

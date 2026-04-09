@@ -1539,6 +1539,66 @@ class ComprehensiveParityTester:
                 passed += 1
             total += 1
 
+        # === Error Response Parity ===
+        print("\n⚠️ Error Response Parity:")
+
+        error_tests = [
+            {
+                "name": "Query non-existent issue by UUID",
+                "query": 'query { issue(id: "00000000-0000-0000-0000-000000000000") { id title } }',
+            },
+            {
+                "name": "Mutation with invalid team ID",
+                "query": 'mutation { issueCreate(input: { teamId: "00000000-0000-0000-0000-000000000000", title: "test" }) { success } }',
+            },
+            {
+                "name": "Query with malformed UUID",
+                "query": 'query { issue(id: "not-a-uuid") { id } }',
+            },
+        ]
+
+        for et in error_tests:
+            prod_r = self.gql_prod(et["query"])
+            replica_r = self.gql_replica(et["query"])
+            prod_has_err = "errors" in prod_r
+            replica_has_err = "errors" in replica_r
+            total += 1
+            print(f"  {et['name']}...", end=" ")
+            if prod_has_err == replica_has_err:
+                print("✅" if prod_has_err else "✅ (both succeed)")
+                passed += 1
+            else:
+                print(f"❌ (prod errors={prod_has_err}, replica errors={replica_has_err})")
+
+        # === Pagination Parity ===
+        print("\n📄 Pagination Parity:")
+
+        # issues(first: 1) — check pageInfo shape
+        pag_query = "query { issues(first: 1) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } nodes { id } } }"
+        if self.test_operation("Pagination: issues(first:1)", pag_query, pag_query):
+            passed += 1
+        total += 1
+
+        # issues(last: 1) — reverse pagination
+        pag_last = "query { issues(last: 1) { pageInfo { hasNextPage hasPreviousPage startCursor endCursor } nodes { id } } }"
+        if self.test_operation("Pagination: issues(last:1)", pag_last, pag_last):
+            passed += 1
+        total += 1
+
+        # Follow cursor: get first page, then use endCursor
+        first_prod = self.gql_prod("query { issues(first: 1) { pageInfo { endCursor hasNextPage } nodes { id } } }")
+        first_replica = self.gql_replica("query { issues(first: 1) { pageInfo { endCursor hasNextPage } nodes { id } } }")
+
+        if "errors" not in first_prod and "errors" not in first_replica:
+            prod_cursor = first_prod.get("data", {}).get("issues", {}).get("pageInfo", {}).get("endCursor")
+            replica_cursor = first_replica.get("data", {}).get("issues", {}).get("pageInfo", {}).get("endCursor")
+            if prod_cursor and replica_cursor:
+                next_prod = f'query {{ issues(first: 1, after: "{prod_cursor}") {{ pageInfo {{ hasNextPage endCursor }} nodes {{ id }} }} }}'
+                next_replica = f'query {{ issues(first: 1, after: "{replica_cursor}") {{ pageInfo {{ hasNextPage endCursor }} nodes {{ id }} }} }}'
+                if self.test_operation("Pagination: follow cursor", next_prod, next_replica):
+                    passed += 1
+                total += 1
+
         # Summary
         print()
         print("=" * 70)
