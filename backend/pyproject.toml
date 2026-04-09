@@ -27,3 +27,8 @@ dependencies = [
 
 [tool.pytest.ini_options]
 addopts = ["--tb=short"]
+markers = [
+    "conformance: API conformance/parity tests against production APIs",
+    "external: requires live API credentials (tokens/keys)",
+    "replica_only: tests against replica only (no external credentials needed)",
+]
