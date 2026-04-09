@@ -6380,6 +6380,799 @@
         "information_availability": "implicit",
         "prompt_ambiguity": "medium"
       }
+    },
+    {
+      "id": "test_62",
+      "name": "Skyloom Lantern Relay - revoke, watch, relabel, and quick-add",
+      "prompt": "I’m coordinating the Skyloom Lantern Relay oral-history night, and the calendars are messy from duplicate rehearsal logs. First list my settings so we confirm locale/date defaults before touching anything. Then remove outdated mechanic access by deleting ACL rule cal_skyloom_observatory:user:mechanic@skyloom.example from calendar cal_skyloom_observatory. Right after that, start an events watch on cal_skyloom_observatory using channel id chan_skyloom_relay_88, type web_hook, and address https://hooks.example.com/skyloom-relay.\n\nFor my calendar list entry of cal_skyloom_observatory, do a temporary patch to set hidden=true and colorId=7; then fully update that same entry so the final state is hidden=true, selected=false, colorId=11, and summaryOverride=\"Skyloom Lantern Queue\". Also patch ACL rule user:lucia@test.com_brineglass_works on cal_brineglass_works so Lucia becomes a writer.\n\nThen quick-add two reminders on my primary calendar: \"Lantern spool intake drill with Haruka Sato Aug 15 2018 9am\" and \"Riverlight cue-sheet sync with Farhad Rahimi and Aisha Okonkwo Aug 16 2018 3pm\". After adding those, list instances for recurring event evt_used_vacation_day in cal_seabriar_leave over the Aug 2018 window, and finally fetch calendar metadata for cal_skyloom_observatory to confirm final state. Ignore distractor notes involving Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson, plus side chatter from Marta Kowalska.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "cal_skyloom_observatory:user:mechanic@skyloom.example"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_skyloom_relay_88"
+            },
+            "resource_uri": {
+              "eq": "/calendars/cal_skyloom_observatory/events"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            },
+            "selected": {
+              "to": false
+            },
+            "color_id": {
+              "to": {
+                "eq": "11"
+              }
+            },
+            "summary_override": {
+              "to": {
+                "eq": "Skyloom Lantern Queue"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "user:lucia@test.com_brineglass_works"
+            },
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "writer"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Lantern spool intake drill with Haruka Sato"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-15T09:00"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Riverlight cue-sheet sync with Farhad Rahimi and Aisha Okonkwo"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-16T15:00"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "settings.list",
+          "acl.delete",
+          "events.watch",
+          "calendarList.patch",
+          "calendarList.update",
+          "acl.patch",
+          "events.quickAdd",
+          "events.quickAdd",
+          "events.instances",
+          "calendars.get"
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+R+U+C+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_63",
+      "name": "Shadow Lantern Parade - relay watch and archive shuffle",
+      "prompt": "I’m coordinating a shadow-lantern parade across the old harbor archive circuit, and my calendars are inconsistent after three failed dry runs. First run a free/busy check for Haruka Sato and Farhad Rahimi over Aug 14-16, 2018 so we can sanity-check rehearsal overlap, then open event evt_skyloom_alignment on cal_skyloom_observatory to confirm what was previously scheduled. Add cal_city_archives_access to my calendar list, and on cal_brineglass_works set ACL rule user:lucia@test.com_brineglass_works to writer for temporary staging access. Start an events watch on cal_skyloom_observatory with channel id chan_skyloom_relay_94 (web_hook to https://hooks.example.com/skyloom-relay-94).\n\nAfter that, patch evt_skyloom_alignment on cal_skyloom_observatory so location is \"Pier 7 Shadow Lantern Stage\" and the description mentions Haruka Sato and Marta Kowalska. Remove obsolete mechanic access by deleting ACL rule cal_skyloom_observatory:user:mechanic@skyloom.example. Create a temporary calendar called \"Shadow Lantern Overflow Ledger\". Pull colors once to confirm palette IDs before list styling.\n\nThen create a primary-calendar event titled \"Lantern Relay Crew Brief with Haruka Sato and Farhad Rahimi\" for Aug 17, 2018 10:00-11:00 America/Los_Angeles. Fetch ACL rule user:lucia@test.com_brineglass_works to verify it, list my settings, and fully update my calendarList entry for cal_city_archives_access so final state is hidden=true, selected=false, colorId=5, summaryOverride=\"City Archives - Lantern Deck\".\n\nDelete the temporary calendar \"Shadow Lantern Overflow Ledger\" once we’re done with triage. Then patch ACL rule user:lucia@test.com_brineglass_works to freeBusyReader. Import a private event into my primary calendar with iCalUID \"import-shadow-cues-20180818@agentdiff.local\", summary \"Imported cue review with Aisha Okonkwo\", start 2018-08-18T15:00:00-07:00, end 2018-08-18T15:45:00-07:00. Finally stop legacy channel chan_annex_77 with resourceId res_annex_77. Ignore distractor notes from Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_city_archives_access"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            },
+            "hidden": {
+              "eq": true
+            },
+            "selected": {
+              "eq": false
+            },
+            "color_id": {
+              "eq": "5"
+            },
+            "summary_override": {
+              "eq": "City Archives - Lantern Deck"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "user:lucia@test.com_brineglass_works"
+            },
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "freeBusyReader"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_skyloom_relay_94"
+            },
+            "resource_uri": {
+              "eq": "/calendars/cal_skyloom_observatory/events"
+            },
+            "address": {
+              "eq": "https://hooks.example.com/skyloom-relay-94"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_skyloom_alignment"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "location": {
+              "to": {
+                "contains": "Pier 7 Shadow Lantern Stage"
+              }
+            },
+            "description": {
+              "to": {
+                "contains": "Haruka Sato and Marta Kowalska"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "cal_skyloom_observatory:user:mechanic@skyloom.example"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "eq": "Shadow Lantern Overflow Ledger"
+            },
+            "deleted": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Lantern Relay Crew Brief with Haruka Sato and Farhad Rahimi"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-17T10:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-08-17T11:00"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "summary": {
+              "contains": "Imported cue review with Aisha Okonkwo"
+            },
+            "ical_uid": {
+              "eq": "import-shadow-cues-20180818@agentdiff.local"
+            },
+            "visibility": {
+              "eq": "private"
+            },
+            "start.dateTime": {
+              "contains": "2018-08-18T15:00"
+            },
+            "end.dateTime": {
+              "contains": "2018-08-18T15:45"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_annex_77"
+            },
+            "resource_id": {
+              "eq": "res_annex_77"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 17,
+        "tools_required": [
+          "freeBusy.query",
+          "events.get",
+          "calendarList.insert",
+          "acl.update",
+          "events.watch",
+          "events.patch",
+          "acl.delete",
+          "calendars.insert",
+          "colors.get",
+          "events.insert",
+          "acl.get",
+          "settings.list",
+          "calendarList.update",
+          "calendars.delete",
+          "acl.patch",
+          "events.import",
+          "channels.stop"
+        ],
+        "task_horizon": 17,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_64",
+      "name": "Skyloom ACL Rehearsal Purge and Relay Watch",
+      "prompt": "I’m preparing the Skyloom lantern-archive rehearsal board for tonight’s oral-history showcase, and there’s leftover access noise from previous crews. Import this archival event into my primary calendar with iCalUID \"import-lantern-archive-20180820@agentdiff.local\", summary \"Imported lantern cue rehearsal with Haruka Sato and Farhad Rahimi\", start 2018-08-20T10:00:00-07:00, and end 2018-08-20T11:00:00-07:00. Then create an ACL watch on cal_skyloom_observatory using channel id chan_skyloom_relay_101 (type web_hook, address https://hooks.example.com/skyloom-acl-101). Before revoking anyone, fetch ACL rule cal_skyloom_observatory:user:mechanic@skyloom.example from that same calendar so we can confirm current role.\n\nAfter that, clear cal_skyloom_observatory because every old run-sheet event there is obsolete. Pull color definitions once so we can choose a consistent style, then patch cal_skyloom_observatory so description becomes \"Cleared lantern relay archive for re-ingest; cue sheets pending.\" and timezone becomes Europe/Warsaw. Next, delete ACL rule cal_skyloom_observatory:user:mechanic@skyloom.example.\n\nPatch my calendar list entry for cal_skyloom_observatory so hidden=true, colorId=6, and summaryOverride=\"Skyloom ACL Relay Board\". Also patch ACL rule user:lucia@test.com_brineglass_works on cal_brineglass_works so Lucia is a writer during setup. Finally stop legacy channel chan_annex_77 with resourceId res_annex_77. Ignore distractor notes tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson, plus side messages from Oksana Petrenko.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_events",
+          "where": {
+            "calendar_id": {
+              "eq": "test.user@test.com"
+            },
+            "ical_uid": {
+              "eq": "import-lantern-archive-20180820@agentdiff.local"
+            },
+            "summary": {
+              "contains": "Imported lantern cue rehearsal with Haruka Sato and Farhad Rahimi"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_skyloom_relay_101"
+            },
+            "resource_uri": {
+              "eq": "/calendars/cal_skyloom_observatory/acl"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_skyloom_alignment"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "status": {
+              "to": {
+                "eq": "cancelled"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Cleared lantern relay archive for re-ingest; cue sheets pending."
+              }
+            },
+            "time_zone": {
+              "to": {
+                "eq": "Europe/Warsaw"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "cal_skyloom_observatory:user:mechanic@skyloom.example"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "deleted": {
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_changes": {
+            "hidden": {
+              "to": true
+            },
+            "color_id": {
+              "to": {
+                "eq": "6"
+              }
+            },
+            "summary_override": {
+              "to": {
+                "eq": "Skyloom ACL Relay Board"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "user:lucia@test.com_brineglass_works"
+            },
+            "calendar_id": {
+              "eq": "cal_brineglass_works"
+            }
+          },
+          "expected_changes": {
+            "role": {
+              "to": {
+                "eq": "writer"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_annex_77"
+            },
+            "resource_id": {
+              "eq": "res_annex_77"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "events.import",
+          "acl.watch",
+          "acl.get",
+          "calendars.clear",
+          "colors.get",
+          "calendars.patch",
+          "acl.delete",
+          "calendarList.patch",
+          "acl.patch",
+          "channels.stop"
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_65",
+      "name": "Moonspill Procession - retune observatory board and settings relay",
+      "prompt": "I’m curating the Moonspill river-lantern procession ledger for a community night archive, and our rehearsal board is out of sync after duplicate cue sheets. Please fully update calendar cal_skyloom_observatory so the summary is \"Skyloom Observatory Tidal Lantern Board\", description is \"Moonspill procession control board for Haruka Sato, Farhad Rahimi, and Adaeze Okafor; duplicate draft removed.\", location is \"Harbor Ramp 3 Lantern Gantry\", and timezone is Europe/Warsaw. Then patch event evt_skyloom_alignment in that calendar so location becomes \"Pier 7 Prism Platform\" and the description includes \"final cue pass with Haruka Sato and Marta Kowalska\".\n\nAfter patching, list events for cal_skyloom_observatory (singleEvents=true for late June 2018) so we can confirm the duplicate rehearsal text is gone. Create a new secondary calendar named \"Moonspill Lantern Overflow Ledger\" with description \"Overflow captures for river-lantern intake and rescue shifts.\" and timezone Europe/Warsaw.\n\nAlso stop the stale watcher channel id chan_leave_09 with resourceId res_leave_09. Fetch my calendarList entry for cal_skyloom_observatory, run a free/busy check for primary, cal_skyloom_observatory, and cal_brineglass_works from 2018-06-29T19:00:00-07:00 to 2018-06-29T22:00:00-07:00, then create a settings watch channel with id chan_settings_moonspill_265 (type web_hook, address https://hooks.example.com/calendar/settings-moonspill-265). Finish by listing my calendar list so I can verify subscriptions. Ignore distractor requests from Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "calendars",
+          "where": {
+            "id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "summary": {
+              "to": {
+                "eq": "Skyloom Observatory Tidal Lantern Board"
+              }
+            },
+            "description": {
+              "to": {
+                "eq": "Moonspill procession control board for Haruka Sato, Farhad Rahimi, and Adaeze Okafor; duplicate draft removed."
+              }
+            },
+            "location": {
+              "to": {
+                "eq": "Harbor Ramp 3 Lantern Gantry"
+              }
+            },
+            "time_zone": {
+              "to": {
+                "eq": "Europe/Warsaw"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_skyloom_alignment"
+            },
+            "calendar_id": {
+              "eq": "cal_skyloom_observatory"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "final cue pass with Haruka Sato and Marta Kowalska"
+              }
+            },
+            "location": {
+              "to": {
+                "eq": "Pier 7 Prism Platform"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendars",
+          "where": {
+            "summary": {
+              "eq": "Moonspill Lantern Overflow Ledger"
+            },
+            "description": {
+              "eq": "Overflow captures for river-lantern intake and rescue shifts."
+            },
+            "time_zone": {
+              "eq": "Europe/Warsaw"
+            },
+            "deleted": {
+              "eq": false
+            },
+            "owner_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_leave_09"
+            },
+            "resource_id": {
+              "eq": "res_leave_09"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_settings_moonspill_265"
+            },
+            "resource_uri": {
+              "eq": "/users/user_agent/settings"
+            },
+            "type": {
+              "eq": "web_hook"
+            },
+            "address": {
+              "eq": "https://hooks.example.com/calendar/settings-moonspill-265"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "calendars.update",
+          "events.patch",
+          "events.list",
+          "calendars.insert",
+          "channels.stop",
+          "calendarList.get",
+          "freeBusy.query",
+          "settings.watch",
+          "calendarList.list"
+        ],
+        "task_horizon": 9,
+        "operation_type": "search+C+R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      }
+    },
+    {
+      "id": "test_66",
+      "name": "Seabriar Leave Ledger - relay watch with recurring instance audit",
+      "prompt": "I’m coordinating a river-lantern leave ledger audit for our oral-history night crew, and duplicate time-off markers are causing confusion in the dock roster. Before we edit anything, fetch my calendar-list entry for cal_seabriar_leave so we preserve its visibility and color settings. Then list instances for recurring event evt_used_vacation_day on cal_seabriar_leave for August 2018 to inspect duplicate weekend spillover.\n\nAfter that, start a fresh events watch on cal_seabriar_leave using channel id chan_leave_relay_311 (type web_hook, address https://hooks.example.com/calendar/leave-relay-311), then list events on cal_seabriar_leave for late July through August 2018 so we can verify the recurring series context. Also fetch ACL rule user:test.user@test.com_seabriar_leave from cal_seabriar_leave so we confirm ownership was not accidentally downgraded.\n\nFinally, patch evt_used_vacation_day on cal_seabriar_leave so its description includes this exact phrase: \"river lantern leave ledger canonicalized after duplicate weekend sweep by Haruka Sato, Parisa Rahimi, Chinedu Okafor, and Marta Kowalska\". Ignore distractor requests from Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "calendar_default",
+      "impersonate_user_id": "user_agent",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "calendar_channels",
+          "where": {
+            "id": {
+              "eq": "chan_leave_relay_311"
+            },
+            "resource_uri": {
+              "eq": "/calendars/cal_seabriar_leave/events"
+            },
+            "type": {
+              "eq": "web_hook"
+            },
+            "address": {
+              "eq": "https://hooks.example.com/calendar/leave-relay-311"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_events",
+          "where": {
+            "id": {
+              "eq": "evt_used_vacation_day"
+            },
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "from": {
+                "contains": "Recorded leave day"
+              },
+              "to": {
+                "contains": "river lantern leave ledger canonicalized after duplicate weekend sweep by Haruka Sato, Parisa Rahimi, Chinedu Okafor, and Marta Kowalska"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_acl_rules",
+          "where": {
+            "id": {
+              "eq": "user:test.user@test.com_seabriar_leave"
+            },
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            }
+          },
+          "expected_count": 0
+        },
+        {
+          "diff_type": "changed",
+          "entity": "calendar_list_entries",
+          "where": {
+            "calendar_id": {
+              "eq": "cal_seabriar_leave"
+            },
+            "user_id": {
+              "eq": "user_agent"
+            }
+          },
+          "expected_count": 0
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 6,
+        "tools_required": [
+          "calendarList.get",
+          "events.instances",
+          "events.watch",
+          "events.list",
+          "acl.get",
+          "events.patch"
+        ],
+        "task_horizon": 6,
+        "operation_type": "R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      }
     }
   ]
 }

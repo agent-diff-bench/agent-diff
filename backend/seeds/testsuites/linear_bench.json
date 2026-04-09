@@ -3672,6 +3672,1744 @@
         "information_availability": "implicit",
         "prompt_ambiguity": "medium"
       }
+    },
+    {
+      "id": "test_58",
+      "name": "Lantern Night Festival - Volunteer Sync and Board Cleanup",
+      "prompt": "I’m coordinating the Night Lantern Festival prep board and it’s gotten messy.\n\nPlease do all of the following carefully:\n\n1. In the Meeple & Brew Events team, add Kenji Tanaka and Nneka Okonkwo as members. Do not add Hubert Marek or Artem Bogdanov, and ignore an old planning note that still mentions Patrick D. Watson.\n\n2. Update the workspace label with id `f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c` so its description includes: \"Used for attendee-facing experience fixes during Night Lantern Festival week.\"\n\n3. In Meeple & Brew Events, archive the two empty workflow states named \"Planning\" and \"Completed\" (they were left over from last season).\n\n4. Update comment `c4e8d4a1-2b8c-4c2a-9e32-222222222222` by appending: \"BUDGET_RECONCILED: Retries are excluded from the donor billing summary.\"\n\n5. Update comment `d5f9e5b3-3c9d-4e3b-8f43-333333333333` by appending: \"ACCESS_NOTE: Include the SSO handout link in the volunteer packet.\"\n\n6. Create a blocking relation where `mb-issue-registration-003` blocks `mb-issue-championship-001`.\n\n7. Create a new issue in Meeple & Brew Events titled \"Lantern Route Rehearsal - Riverside Walkthrough\" with description containing: \"VENUE: Riverside Lantern Pier\".\n\n8. Add a kickoff comment on that new issue with this text included: \"RUNBOOK_NOTE: stage-light battery pack count 24\".\n\n9. Create a new team named \"Lantern Logistics 2026\" for next-year planning.\n\n10. Find the existing comment that starts with \"Pulled logs for the 02:00–03:00 UTC window\" and update it to include: \"POSTMORTEM_TAG: lantern-night-dry-run\".",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "d4e5f6a7-b8c9-0123-def0-456789012345"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Night Lantern Festival week"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-planning-0001-abcdef01"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "c4e8d4a1-2b8c-4c2a-9e32-222222222222"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "BUDGET_RECONCILED: Retries are excluded from the donor billing summary."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt",
+            "editedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "d5f9e5b3-3c9d-4e3b-8f43-333333333333"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "ACCESS_NOTE: Include the SSO handout link in the volunteer packet."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt",
+            "editedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "relatedIssueId": {
+              "eq": "mb-issue-championship-001"
+            },
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "title": {
+              "contains": "Lantern Route Rehearsal - Riverside Walkthrough"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "VENUE: Riverside Lantern Pier"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "body": {
+              "contains": "RUNBOOK_NOTE: stage-light battery pack count 24"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Lantern Logistics 2026"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "b3f7c3f2-1a7b-4d8e-9f21-111111111111"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "POSTMORTEM_TAG: lantern-night-dry-run"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt",
+            "editedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "users",
+          "teamMembershipCreate",
+          "issueLabelUpdate",
+          "workflowStateArchive",
+          "commentUpdate",
+          "issueRelationCreate",
+          "issueCreate",
+          "commentCreate",
+          "teamCreate",
+          "comments",
+          "workflowStates"
+        ],
+        "task_horizon": 15,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "users",
+          "teamMembershipCreate",
+          "issueLabelUpdate",
+          "workflowStateArchive",
+          "workflowStateArchive",
+          "teamMembershipCreate",
+          "commentUpdate",
+          "commentUpdate",
+          "issueRelationCreate",
+          "issueCreate",
+          "commentCreate",
+          "teamCreate",
+          "comments",
+          "workflowStates",
+          "commentUpdate"
+        ]
+      }
+    },
+    {
+      "id": "test_59",
+      "name": "Night Lantern River Parade - Safety Board Cleanup",
+      "prompt": "I need help cleaning up our Night Lantern River Parade planning board before tonight's dry run.\n\nUse these names for the volunteer context: Kenji Tanaka, Fatima Hosseini, Adaeze Obi, Szymon Kowalski, and Tomas Silva. Also ignore stale references to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson in old notes.\n\nPlease do the following:\n\n1. Archive the problematic comment with id `mod-comment-bad-002`.\n2. Create a new team label in Meeple & Brew Events (team id `e0f1a2b3-c4d5-6789-0123-def012345678`) named `Lantern Marshal`, color `#2D9CDB`, with description `Volunteer marshals for lantern route checkpoints`.\n3. Update workspace label `f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c` so its description includes `guest-navigation bug triage for Lantern Night`.\n4. Archive the two empty Meeple & Brew workflow states named `Planning` and `Completed`.\n5. Find the issue titled `Catan Regional Championship - Spring 2025` and append to its description: `SAFETY_ROUTE: Riverside detour approved for floating lantern flotilla.`\n6. Update label `90c6092d-c060-4bd1-8e0d-da5cdeedaf58` so its description includes `Sponsor invoice holds are tracked under Lantern Finance freeze.`\n7. Add a new comment on issue `mb-issue-registration-003` containing: `SHIFT_BRIEF: Dock A lantern check-in starts at 18:40.`\n8. Find the existing comment that starts with `Pulled logs for the 02:00–03:00 UTC window` and update it to include: `POSTMORTEM_TAG: lantern-fire-drill`.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "mod-comment-bad-002"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Lantern Marshal"
+            },
+            "color": {
+              "eq": "#2D9CDB"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "description": {
+              "contains": "Volunteer marshals for lantern route checkpoints"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "guest-navigation bug triage for Lantern Night"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-planning-0001-abcdef01"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-championship-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "SAFETY_ROUTE: Riverside detour approved for floating lantern flotilla."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "90c6092d-c060-4bd1-8e0d-da5cdeedaf58"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Sponsor invoice holds are tracked under Lantern Finance freeze."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "body": {
+              "contains": "SHIFT_BRIEF: Dock A lantern check-in starts at 18:40."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "b3f7c3f2-1a7b-4d8e-9f21-111111111111"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "POSTMORTEM_TAG: lantern-fire-drill"
+              }
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "users",
+          "commentDelete",
+          "issueLabelCreate",
+          "issueLabelUpdate",
+          "workflowStateArchive",
+          "issueUpdate",
+          "workflowStates",
+          "commentCreate",
+          "issues",
+          "commentUpdate",
+          "comments"
+        ],
+        "task_horizon": 13,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "users",
+          "commentDelete",
+          "issueLabelCreate",
+          "issueLabelUpdate",
+          "workflowStateArchive",
+          "issueUpdate",
+          "workflowStates",
+          "issueLabelUpdate",
+          "workflowStateArchive",
+          "commentCreate",
+          "issues",
+          "commentUpdate",
+          "comments"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Adaeze Obi",
+          "Szymon Kowalski",
+          "Tomas Silva"
+        ]
+      }
+    },
+    {
+      "id": "test_60",
+      "name": "Canal Lantern Parade - Rehearsal Dependency Sweep",
+      "prompt": "I am coordinating the Canal Lantern Parade rehearsal board, and we have to untangle dependencies before tonight.\n\nUse these volunteer names in context notes: Kenji Tanaka, Fatima Hosseini, Adaeze Obi, Szymon Kowalski, and Nadia Kowalczyk.\n\nAlso treat these as distractors from old drafts and do NOT act on them: Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.\n\nPlease complete this checklist:\n\n1. Create a new issue in Meeple & Brew Events (team id `e0f1a2b3-c4d5-6789-0123-def012345678`) titled `Lantern Barge Safety Sweep - Sector Delta` with description containing `RUNBOOK: Verify mooring line tension map before 19:10 launch`.\n2. Search comments and locate the note that starts with `Pulled logs for the 02:00–03:00 UTC window` so we can reference that investigation thread.\n3. Archive the empty workflow state named `Completed` in the Meeple & Brew Events team.\n4. Add Kenji Tanaka to the Meeple & Brew Events team.\n5. Look up issue `mb-issue-registration-003` and confirm it is the registration deadline workstream.\n6. Look up issue `mb-issue-championship-001` and confirm it is the championship planning workstream.\n7. Create a new team label in Meeple & Brew Events named `Night-Operations`, color `#F2994A`, description `After-sunset launch coordination and dock marshal duties`.\n8. Create a blocking relation where `mb-issue-registration-003` blocks `mb-issue-championship-001`.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "title": {
+              "eq": "Lantern Barge Safety Sweep - Sector Delta"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "RUNBOOK: Verify mooring line tension map before 19:10 launch"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Night-Operations"
+            },
+            "color": {
+              "eq": "#F2994A"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "description": {
+              "contains": "After-sunset launch coordination and dock marshal duties"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "relatedIssueId": {
+              "eq": "mb-issue-championship-001"
+            },
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 8,
+        "tools_required": [
+          "issueCreate",
+          "comments",
+          "workflowStateArchive",
+          "teamMembershipCreate",
+          "issue",
+          "issueLabelCreate",
+          "issueRelationCreate"
+        ],
+        "task_horizon": 8,
+        "operation_type": "search+R+C",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "issueCreate",
+          "comments",
+          "workflowStateArchive",
+          "teamMembershipCreate",
+          "issue",
+          "issue",
+          "issueLabelCreate",
+          "issueRelationCreate"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Adaeze Obi",
+          "Szymon Kowalski",
+          "Nadia Kowalczyk"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
+    },
+    {
+      "id": "test_61",
+      "name": "Floating Lantern Fleet - Night Dock Coordination",
+      "prompt": "I need you to clean up and synchronize our Floating Lantern Fleet board before tonight's river rehearsal.\n\nWorking crew names for this plan are Kenji Tanaka, Fatima Hosseini, Nadia Kowalczyk, Adaeze Obi, Bogdan Kovalenko, and Tomas Silva.\n\nIgnore any stale references to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson in legacy notes.\n\nPlease do this carefully:\n\n1. In the Meeple & Brew Events team, add Kenji Tanaka and Fatima Hosseini as members.\n2. Archive the two empty workflow states in that team named `Planning` and `Completed`.\n3. Open issue `mb-issue-registration-003` and confirm you're working against the registration timeline item.\n4. Find the comment that starts with `Pulled logs for the 02:00–03:00 UTC window` and append: `POSTMORTEM_TAG: canal-lantern-fleet`.\n5. Find and archive the toxic comment containing `Who wrote this YOLO_BAD code anyway`.\n6. Create a new issue in Meeple & Brew Events titled `Canal Lantern Towline Audit - Pier 6 Rehearsal` with description including `ROUTE_NOTE: Secondary towline check at marker buoy C-14.`\n7. Update the workspace label named `UX` so its description includes `Night-parade UX triage board for dock volunteers.`\n8. List teams to double-check you are using Meeple & Brew Events and not another festival group.\n9. Add a new comment on `mb-issue-registration-003` containing `DOCK_BRIEF: Lantern float manifests freeze at 17:55.`\n10. Create a relation where `mb-issue-registration-003` blocks `mb-issue-championship-001`.\n11. Create a new label in Meeple & Brew Events named `Towline-Safety` with color `#2F80ED` and description `Towline integrity checks for night water operations`.\n12. List labels again, then update the label named `Billing` so its description includes `Finance hold applies to lantern fuel barge invoices.`",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "b2c3d4e5-f6a7-8901-bcde-f23456789012"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-planning-0001-abcdef01"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "b3f7c3f2-1a7b-4d8e-9f21-111111111111"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "POSTMORTEM_TAG: canal-lantern-fleet"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt",
+            "editedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "mod-comment-bad-003"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "title": {
+              "eq": "Canal Lantern Towline Audit - Pier 6 Rehearsal"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "ROUTE_NOTE: Secondary towline check at marker buoy C-14."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Night-parade UX triage board for dock volunteers."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "body": {
+              "contains": "DOCK_BRIEF: Lantern float manifests freeze at 17:55."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "relatedIssueId": {
+              "eq": "mb-issue-championship-001"
+            },
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Towline-Safety"
+            },
+            "color": {
+              "eq": "#2F80ED"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "description": {
+              "contains": "Towline integrity checks for night water operations"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "90c6092d-c060-4bd1-8e0d-da5cdeedaf58"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Finance hold applies to lantern fuel barge invoices."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 14,
+        "tools_required": [
+          "teamMembershipCreate",
+          "workflowStateArchive",
+          "issue",
+          "commentUpdate",
+          "issueLabels",
+          "commentDelete",
+          "issueCreate",
+          "issueLabelUpdate",
+          "teams",
+          "comments",
+          "commentCreate",
+          "issueRelationCreate",
+          "issueLabelCreate"
+        ],
+        "task_horizon": 17,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "teamMembershipCreate",
+          "teamMembershipCreate",
+          "workflowStateArchive",
+          "workflowStateArchive",
+          "issue",
+          "commentUpdate",
+          "issueLabels",
+          "commentDelete",
+          "issueCreate",
+          "issueLabelUpdate",
+          "teams",
+          "comments",
+          "commentCreate",
+          "issueRelationCreate",
+          "issueLabelCreate",
+          "issueLabels",
+          "issueLabelUpdate"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Nadia Kowalczyk",
+          "Adaeze Obi",
+          "Bogdan Kovalenko",
+          "Tomas Silva"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
+    },
+    {
+      "id": "test_62",
+      "name": "Moonlit River Festival - Mooring Board Rehearsal",
+      "prompt": "I need you to untangle tonight's Moonlit River Festival prep board before the floating-lantern rehearsal starts.\n\nWorking crew names for this run are Kenji Tanaka, Fatima Hosseini, Nadia Kowalczyk, Adaeze Obi, Chinedu Okafor, and Olena Hrytsenko.\n\nIgnore stale names that keep showing up in old drafts: Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.\n\nPlease do this in one cleanup pass:\n\n1. Update issue `mb-issue-championship-001` so its description includes: `SAFETY_GRID: Pier 6 lantern mooring map confirmed for rehearsal lane B.`\n2. Update label `UX` so its description includes: `Volunteer-facing UX checklist for night dock wayfinding.`\n3. Search comments to find the long incident note that starts with `Pulled logs for the 02:00–03:00 UTC window`.\n4. Review workflow states for Meeple & Brew Events and identify the empty `Completed` state.\n5. Re-check workflow states to confirm it is safe to archive.\n6. Create a new issue in Meeple & Brew Events titled `Lantern Towline Drift Check - Basin South` with description including: `DRIFT_PROTOCOL: Verify towline sag thresholds at marker C-14.`\n7. Find Kenji and Fatima in users.\n8. Search comments again to identify the legacy toxic thread for moderation context.\n9. Archive workflow state `mb-state-completed-0004-def01234`.\n10. Update label `Billing` so its description includes: `Night-barge fuel invoice holds are tracked here.`\n11. Query users again and make sure no assignment is made to Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson.\n12. Add Kenji Tanaka to Meeple & Brew Events (team id `e0f1a2b3-c4d5-6789-0123-def012345678`).\n13. Update label `Urgent` so its description includes: `Use for hard safety blockers during lantern launch windows.`\n14. List issues and verify `mb-issue-registration-003` is still the registration anchor.\n15. List labels to verify your wording updates.\n16. Add a comment on `mb-issue-registration-003` containing: `DOCK_LOCK: Float manifests freeze at 17:55 before launch escort.`\n17. Create a new team named `Moonlight Mooring Ops 2026`.\n18. In that new team, create workflow state `Towline Calibration`.\n19. Update the earlier incident comment to include: `POSTMORTEM_TAG: moonlit-river-grid`.\n20. Query comments again to confirm your new coordination note exists.\n21. In that same new team, create workflow state `Dock Final Sweep`.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-championship-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "SAFETY_GRID: Pier 6 lantern mooring map confirmed for rehearsal lane B."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Volunteer-facing UX checklist for night dock wayfinding."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "title": {
+              "eq": "Lantern Towline Drift Check - Basin South"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "DRIFT_PROTOCOL: Verify towline sag thresholds at marker C-14."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "90c6092d-c060-4bd1-8e0d-da5cdeedaf58"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Night-barge fuel invoice holds are tracked here."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "userId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "6c2b0d3c-3d6d-4d91-9a77-b93b59b8d5a0"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Use for hard safety blockers during lantern launch windows."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "comments",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "body": {
+              "contains": "DOCK_LOCK: Float manifests freeze at 17:55 before launch escort."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Moonlight Mooring Ops 2026"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Towline Calibration"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "b3f7c3f2-1a7b-4d8e-9f21-111111111111"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "POSTMORTEM_TAG: moonlit-river-grid"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "workflow_states",
+          "where": {
+            "name": {
+              "eq": "Dock Final Sweep"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 15,
+        "tools_required": [
+          "issueUpdate",
+          "issueLabelUpdate",
+          "comments",
+          "workflowStates",
+          "issueCreate",
+          "users",
+          "workflowStateArchive",
+          "teamMembershipCreate",
+          "issues",
+          "issueLabels",
+          "commentCreate",
+          "teamCreate",
+          "workflowStateCreate",
+          "commentUpdate"
+        ],
+        "task_horizon": 21,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "issueUpdate",
+          "issueLabelUpdate",
+          "comments",
+          "workflowStates",
+          "workflowStates",
+          "issueCreate",
+          "users",
+          "comments",
+          "workflowStateArchive",
+          "issueLabelUpdate",
+          "users",
+          "teamMembershipCreate",
+          "issueLabelUpdate",
+          "issues",
+          "issueLabels",
+          "commentCreate",
+          "teamCreate",
+          "workflowStateCreate",
+          "commentUpdate",
+          "comments",
+          "workflowStateCreate"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Nadia Kowalczyk",
+          "Adaeze Obi",
+          "Chinedu Okafor",
+          "Olena Hrytsenko"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
+    },
+    {
+      "id": "test_63",
+      "name": "Midnight Lantern Fleet - Dockline Triage Sweep",
+      "prompt": "I need a focused cleanup pass for the Midnight Lantern Fleet rehearsal board.\n\nUse these crew names in planning notes: Kenji Tanaka, Fatima Hosseini, Nadia Kowalczyk, Chinedu Okafor, Yuna Park, and Tomas Silva.\n\nIgnore stale distractor references to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.\n\nPlease do all of this:\n\n1. Create a new issue in Meeple & Brew Events titled `Dockline Drift Audit - South Basin Lantern Run` with description including `DRIFT_NOTE: Verify towline slack at buoy marker C-14 before 19:05.`\n2. List issues so you can confirm where this new audit item landed.\n3. List teams and make sure you are operating in Meeple & Brew Events.\n4. List comments to find the major incident thread and any confusing old chatter.\n5. List users and confirm Kenji/Fatima identities for cross-checking ownership notes.\n6. Re-list issues and identify `mb-issue-registration-003` as the registration anchor.\n7. Update the workspace `UX` label so description includes: `Dock volunteer wayfinding triage for lantern-night rehearsals.`\n8. Create a new team label named `Towline Safety` with color `#2F80ED` and description `Safety checks for floating-lantern towline integrity`.\n9. Create another team label named `Water Marshal` with color `#27AE60` and description `Dockside marshal coordination for launch windows`.\n10. Update issue `mb-issue-registration-003` description to include: `CHECKPOINT_LOCK: Float manifest freeze enforced at 17:55.`\n11. Create a relation where the new `Dockline Drift Audit - South Basin Lantern Run` issue blocks `mb-issue-registration-003`.\n12. Create one more team label named `Night Fuel Hold` with color `#EB5757` and description `Tracks temporary holds on lantern-barge fuel invoices`.\n13. List workflow states for Meeple & Brew Events and find the empty `Completed` state.\n14. Archive workflow state `mb-state-completed-0004-def01234`.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "title": {
+              "eq": "Dockline Drift Audit - South Basin Lantern Run"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issues",
+          "where": {
+            "description": {
+              "contains": "DRIFT_NOTE: Verify towline slack at buoy marker C-14 before 19:05."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Dock volunteer wayfinding triage for lantern-night rehearsals."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Towline Safety"
+            },
+            "color": {
+              "eq": "#2F80ED"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Water Marshal"
+            },
+            "color": {
+              "eq": "#27AE60"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-registration-003"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "CHECKPOINT_LOCK: Float manifest freeze enforced at 17:55."
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "relatedIssueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "type": {
+              "eq": "blocks"
+            },
+            "issueTitle": {
+              "contains": "Dockline Drift Audit - South Basin Lantern Run"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Night Fuel Hold"
+            },
+            "color": {
+              "eq": "#EB5757"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "issueCreate",
+          "issues",
+          "teams",
+          "comments",
+          "users",
+          "issueLabelUpdate",
+          "issueLabelCreate",
+          "issueUpdate",
+          "issueRelationCreate",
+          "workflowStates",
+          "workflowStateArchive"
+        ],
+        "task_horizon": 14,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "issueCreate",
+          "issues",
+          "teams",
+          "comments",
+          "users",
+          "issues",
+          "issueLabelUpdate",
+          "issueLabelCreate",
+          "issueLabelCreate",
+          "issueUpdate",
+          "issueRelationCreate",
+          "issueLabelCreate",
+          "workflowStates",
+          "workflowStateArchive"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Nadia Kowalczyk",
+          "Chinedu Okafor",
+          "Yuna Park",
+          "Tomas Silva"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
+    },
+    {
+      "id": "test_64",
+      "name": "River Beacon Night Run - Final Safety Sweep",
+      "prompt": "We are preparing the River Beacon Night Run and the rehearsal board is messy.\n\nUse these names in context: Kenji Tanaka, Fatima Hosseini, Nadia Kowalczyk, Chinedu Okafor, Yuna Park, and Tomas Silva.\n\nPlease ignore stale references to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.\n\nDo the following in one pass:\n\n1. Archive workflow state `mb-state-planning-0001-abcdef01`.\n2. Archive the toxic comment `mod-comment-bad-001`.\n3. Archive the toxic comment `mod-comment-bad-002`.\n4. Create a new team named `Night Pier Logistics 2026`.\n5. Create a blocking relation where `mb-issue-registration-003` blocks `mb-issue-championship-001`.\n6. Create another team named `Lantern Signal Desk 2026`.\n7. Update the incident comment that starts with `Pulled logs for the 02:00–03:00 UTC window` so it includes `POSTMORTEM_TAG: river-beacon-night-run`.\n8. Check users to confirm Kenji and Fatima are active collaborators.\n9. Archive workflow state `mb-state-completed-0004-def01234`.\n10. Create a team label in Meeple & Brew Events named `Harbor Whistle`, color `#56CCF2`, with description `Whistle-signal protocol for night docking lanes`.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-planning-0001-abcdef01"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "mod-comment-bad-001"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "mod-comment-bad-002"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Night Pier Logistics 2026"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_relations",
+          "where": {
+            "issueId": {
+              "eq": "mb-issue-registration-003"
+            },
+            "relatedIssueId": {
+              "eq": "mb-issue-championship-001"
+            },
+            "type": {
+              "eq": "blocks"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "name": {
+              "eq": "Lantern Signal Desk 2026"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "comments",
+          "where": {
+            "id": {
+              "eq": "b3f7c3f2-1a7b-4d8e-9f21-111111111111"
+            }
+          },
+          "expected_changes": {
+            "body": {
+              "to": {
+                "contains": "POSTMORTEM_TAG: river-beacon-night-run"
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt",
+            "editedAt"
+          ]
+        },
+        {
+          "diff_type": "changed",
+          "entity": "workflow_states",
+          "where": {
+            "id": {
+              "eq": "mb-state-completed-0004-def01234"
+            }
+          },
+          "expected_changes": {
+            "archivedAt": {
+              "to": {
+                "exists": true
+              }
+            }
+          },
+          "expected_count": 1,
+          "ignore": [
+            "updatedAt"
+          ]
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Harbor Whistle"
+            },
+            "color": {
+              "eq": "#56CCF2"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 9,
+        "tools_required": [
+          "workflowStateArchive",
+          "commentDelete",
+          "teamCreate",
+          "issueRelationCreate",
+          "commentUpdate",
+          "users",
+          "issueLabelCreate"
+        ],
+        "task_horizon": 10,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "workflowStateArchive",
+          "commentDelete",
+          "commentDelete",
+          "teamCreate",
+          "issueRelationCreate",
+          "teamCreate",
+          "commentUpdate",
+          "users",
+          "workflowStateArchive",
+          "issueLabelCreate"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Nadia Kowalczyk",
+          "Chinedu Okafor",
+          "Yuna Park",
+          "Tomas Silva"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
+    },
+    {
+      "id": "test_65",
+      "name": "Lantern Channel Rehearsal - Crew Board Stitch-Up",
+      "prompt": "We need to stabilize the Lantern Channel rehearsal board before the waterfront dry run.\n\nUse these crew names in your notes: Kenji Tanaka, Fatima Hosseini, Adaeze Obi, Oksana Shevchenko, Priya Sharma, and Szymon Kowalski.\n\nIgnore stale distractors from old drafts: Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.\n\nPlease handle all of this:\n\n1. In Meeple & Brew Events, create a new label named `Current-Drift` with color `#9B51E0` and description `Cross-current drift checks for floating-lantern staging lanes`.\n2. Review comments to identify the major incident thread and noisy leftovers.\n3. Create a new team membership by adding Kenji Tanaka to team `team-night-beacon-2026-001` once that team exists.\n4. Update issue `mb-issue-registration-003` description so it includes `MANIFEST_LOCK: Registration sheets freeze at 17:50 before launch escort.`\n5. Review workflow states to confirm lane transitions and archivable states.\n6. Update issue `mb-issue-championship-001` description so it includes `ROUTE_LOCK: Lane-B reserved for lantern towline rehearsal.`\n7. Create a new team with id `team-night-beacon-2026-001` and name `Night Beacon Dock Ops 2026`.\n8. Open issue `mb-issue-registration-003` and confirm it is the registration anchor.\n9. Update the workspace UX label (`f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c`) so description includes `Volunteer wayfinding notes for lantern-channel night rehearsal.`\n10. Add Fatima Hosseini to team `team-night-beacon-2026-001`.\n11. In team `team-night-beacon-2026-001`, create label `Beacon-Roster` with color `#F2C94C` and description `Shift roster tracking for dock beacon marshals`.\n12. Review labels once to verify both new label families are visible.\n13. Review labels a second time to ensure the UX wording update is present.\n14. Open issue `mb-issue-championship-001` and verify your route-lock note is attached.",
+      "type": "actionEval",
+      "seed_template": "linear_expanded",
+      "impersonate_user_id": "2790a7ee-fde0-4537-9588-e233aa5a68d1",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "e0f1a2b3-c4d5-6789-0123-def012345678"
+            },
+            "name": {
+              "eq": "Current-Drift"
+            },
+            "color": {
+              "eq": "#9B51E0"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-registration-003"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "MANIFEST_LOCK: Registration sheets freeze at 17:50 before launch escort."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issues",
+          "where": {
+            "id": {
+              "eq": "mb-issue-championship-001"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "ROUTE_LOCK: Lane-B reserved for lantern towline rehearsal."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "teams",
+          "where": {
+            "id": {
+              "eq": "team-night-beacon-2026-001"
+            },
+            "name": {
+              "eq": "Night Beacon Dock Ops 2026"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "issue_labels",
+          "where": {
+            "id": {
+              "eq": "f9c5b7c8-3909-4f8b-bc25-73e1b56a9c0c"
+            }
+          },
+          "expected_changes": {
+            "description": {
+              "to": {
+                "contains": "Volunteer wayfinding notes for lantern-channel night rehearsal."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "team-night-beacon-2026-001"
+            },
+            "userId": {
+              "eq": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "team_memberships",
+          "where": {
+            "teamId": {
+              "eq": "team-night-beacon-2026-001"
+            },
+            "userId": {
+              "eq": "b2c3d4e5-f6a7-8901-bcde-f23456789012"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "issue_labels",
+          "where": {
+            "teamId": {
+              "eq": "team-night-beacon-2026-001"
+            },
+            "name": {
+              "eq": "Beacon-Roster"
+            },
+            "color": {
+              "eq": "#F2C94C"
+            }
+          },
+          "expected_count": 1
+        }
+      ],
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "issueLabelCreate",
+          "comments",
+          "teamMembershipCreate",
+          "issueUpdate",
+          "workflowStates",
+          "teamCreate",
+          "issue",
+          "issueLabelUpdate",
+          "issueLabels"
+        ],
+        "task_horizon": 14,
+        "operation_type": "search+R+C+U",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium",
+        "sampled_endpoint_sequence": [
+          "issueLabelCreate",
+          "comments",
+          "teamMembershipCreate",
+          "issueUpdate",
+          "workflowStates",
+          "issueUpdate",
+          "teamCreate",
+          "issue",
+          "issueLabelUpdate",
+          "teamMembershipCreate",
+          "issueLabelCreate",
+          "issueLabels",
+          "issueLabels",
+          "issue"
+        ],
+        "character_names": [
+          "Kenji Tanaka",
+          "Fatima Hosseini",
+          "Adaeze Obi",
+          "Oksana Shevchenko",
+          "Priya Sharma",
+          "Szymon Kowalski"
+        ],
+        "seed_validation": {
+          "seed_template": "linear_expanded",
+          "required_additions": []
+        }
+      }
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
     "id": "box-bench-v2",
     "name": "Box Bench v2",
-    "description": "Curated benchmark tests for Box MCP operations - 48 tests",
+    "description": "Curated benchmark tests for Box MCP operations - 60 tests",
     "service": "box",
     "ignore_fields": {
         "global": [
@@ -377,7 +377,12 @@
                             "eq": "5696874158"
                         }
                     },
-                    "expected_count": 1
+                    "expected_count": 1,
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ]
                 },
                 {
                     "diff_type": "added",
@@ -421,7 +426,12 @@
                             "eq": "Project_Beta"
                         }
                     },
-                    "expected_count": 1
+                    "expected_count": 1,
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ]
                 },
                 {
                     "diff_type": "added",
@@ -2481,6 +2491,2431 @@
                 }
             ],
             "prompt": "You are auditing the \"investments\" folder for the upcoming financial review. Locate the Google earnings report PDF (goog-10-q-q2-2025.pdf). Get its file details to check its size. Condition 1: If the file size is greater than 1MB (1,048,576 bytes), add the tag large_audit. Condition 2: If the file size is less than or equal to 1MB, add the tag standard_audit. Next, create a new Hub called \"Q2 Financial Review\". Search for all files with \"fomc\" in their name. For each file found, add it to the \"Q2 Financial Review\" hub. Find the \"Analysis_2026\" folder (if it exists, otherwise create it). Inside, upload a new text file named audit_summary.txt. The content should be: \"Audit complete. Google report size: [SIZE_IN_BYTES] bytes.\" Finally, add a comment to the Google earnings report: \"Audit status: Tagged based on size ([SIZE_IN_BYTES]b).\" "
+        },
+        {
+            "id": "test_49",
+            "name": "Level 5: Monsoon Archive Intake Cleanup",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 12,
+                "tools_required": [
+                    "GET /collections/{collection_id}",
+                    "POST /hubs",
+                    "GET /hubs",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "GET /folders/{folder_id}",
+                    "POST /comments",
+                    "GET /files/{file_id}/content",
+                    "DELETE /files/{file_id}",
+                    "GET /folders/{folder_id}",
+                    "GET /files/{file_id}/content",
+                    "POST /comments",
+                    "PUT /hubs/{hub_id}"
+                ],
+                "task_horizon": 12,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Monsoon Memory Intake Board"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "not_in": [
+                                "777777",
+                                "888888",
+                                "999999"
+                            ]
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Farhad Rahimi intake"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "9979104500"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Tiago Ribeiro verification"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_hubs",
+                    "where": {
+                        "id": {
+                            "eq": "777777"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "Monsoon intake cleanup completed"
+                            }
+                        }
+                    },
+                    "expected_count": 1,
+                    "ignore": [
+                        "updated_at"
+                    ]
+                }
+            ],
+            "prompt": "You are preparing materials for a community oral-history event called Monsoon Memory Listening Night. First, verify that collection 926489 is the Favorites collection before doing any edits. Create a new hub titled \"Monsoon Memory Intake Board\". Then list hubs to confirm it exists and keep track of the hub ID. Add the canonical history notes file (file id 5696874158) to this new hub. After that, open the history folder and confirm you are working from the canonical history area, not the distractor folders named after Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson. Add a comment to file 5696874158: \"Farhad Rahimi intake: canonical source selected for Aiko Tanaka and Priya Natarajan.\" Download the file content once to confirm it is readable. Delete the accidental root-level duplicate file \"misfiled_crisis_notes.txt\" (id 9979104500). Re-open the root folder to verify the duplicate is gone. Download file 5696874158 again, then add a second comment: \"Tiago Ribeiro verification: file still readable after duplicate purge; Oksana Melnyk approved.\" Finally, update the existing Conservation Lab Archive hub (id 777777) description to include: \"Monsoon intake cleanup completed\"."
+        },
+        {
+            "id": "test_50",
+            "name": "Level 5: Monsoon Listening Night Intake Sequencing",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 15,
+                "tools_required": [
+                    "PUT /folders/{folder_id}",
+                    "POST /tasks",
+                    "POST /files/{file_id}/content",
+                    "POST /files/content",
+                    "GET /collections/{collection_id}",
+                    "GET /users/me",
+                    "GET /hub_items",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections/{collection_id}",
+                    "GET /hub_items",
+                    "GET /users/me",
+                    "POST /hubs",
+                    "POST /hubs",
+                    "POST /files/content",
+                    "GET /hubs/{hub_id}"
+                ],
+                "task_horizon": 15,
+                "operation_type": "R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "community monsoon oral history intake"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Aiko Tanaka and Farhad Rahimi"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ],
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "rain-archive-ingest-ledger-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Monsoon Listening Night - Intake Hub"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Volunteer Transcript Queue - Monsoon 2026"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "rain-archive-ingest-ledger-v2.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I'm curating a neighborhood listening event archive and I need a very specific intake pass done without touching the wrong folders. In the canonical history workspace (folder 1660804823), update the folder description so it clearly says this is the community monsoon oral history intake area. Then create a review task on file 5696874158 with the message: \"Aiko Tanaka and Farhad Rahimi: verify transcript authenticity before volunteer handoff.\" Upload a corrected new version to file 5696874158 because the previous draft had version confusion in the timeline labels. Upload a new text file named rain-archive-ingest-ledger-v1.txt into folder 1660804823 with this exact content: \"Ledger v1: Priya Natarajan queued Reel-04; Oksana Melnyk queued Reel-07.\" Before continuing, verify collection 926489 and confirm who you are logged in as. Check hub items for hub 777777, then list items in folder 1660804823 and make sure you stay in the canonical workspace, not the distractor folders named for Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson. Re-check collection 926489, then inspect hub items for hub 999999 and confirm your user again. Create two new hubs: first \"Monsoon Listening Night - Intake Hub\" (description: \"Intake board for community archive volunteers.\"), then \"Volunteer Transcript Queue - Monsoon 2026\" (description: \"Parallel queue for transcript QA handoff.\"). After that, upload rain-archive-ingest-ledger-v2.txt into folder 1660804823 with this exact content: \"Ledger v2: Tiago Ribeiro reassigned Reel-07 to Maya Johnson; duplicate upload retired.\" Finally, fetch the details of the first hub you created and verify it saved correctly."
+        },
+        {
+            "id": "test_51",
+            "name": "Level 4: Rain Lantern Oral History Intake Pass",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 9,
+                "tools_required": [
+                    "PUT /folders/{folder_id}",
+                    "POST /tasks",
+                    "POST /files/{file_id}/content",
+                    "POST /files/content",
+                    "GET /collections/{collection_id}",
+                    "GET /users/me",
+                    "GET /hub_items",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections/{collection_id}"
+                ],
+                "task_horizon": 9,
+                "operation_type": "U+C+R",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "rain lantern oral-history intake"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Emi Nakamura and Farzad Rahimi"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ],
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "rain-lantern-cue-sheet-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I'm staging a community listening night called Rain Lantern Archive and need one clean intake pass. In the canonical history workspace (folder 1660804823), update the folder description so it clearly says this is the rain lantern oral-history intake area. Then create a review task on file 5696874158 with this message: \"Emi Nakamura and Farzad Rahimi: reconcile timeline mismatch before Neha Kapoor signs off.\" Upload a corrected new version for file 5696874158 because there is version confusion between old reel notes and the current transcript. After that, upload a new text file named rain-lantern-cue-sheet-v1.txt into folder 1660804823 with this exact content: \"Cue sheet: Oksana Hrytsenko intro at 00:45; Chinedu Okafor closing note at 12:10.\" Before wrapping up, verify collection 926489, confirm your current user identity, check hub items for hub 777777, and list items in folder 1660804823 to make sure you stayed in the canonical workspace rather than the distractor folders for Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson. Re-check collection 926489 one final time."
+        },
+        {
+            "id": "test_52",
+            "name": "Level 5: Rooftop Rain Lantern Residency Cutover",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 15,
+                "tools_required": [
+                    "GET /files/{file_id}",
+                    "DELETE /folders/{folder_id}",
+                    "GET /hubs",
+                    "GET /collections/{collection_id}/items",
+                    "POST /hubs",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections",
+                    "GET /files/{file_id}/content",
+                    "GET /collections/{collection_id}",
+                    "POST /files/{file_id}/content",
+                    "PUT /hubs/{hub_id}",
+                    "POST /tasks",
+                    "GET /folders/{folder_id}",
+                    "GET /hubs/{hub_id}",
+                    "GET /files/{file_id}/tasks"
+                ],
+                "task_horizon": 15,
+                "operation_type": "R+U+C",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "7983826892"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Rooftop Rain Lantern Residency 2026"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Rooftop Rain Lantern Residency 2026"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "timeline corrected by Haruka Sato and Priya Menon"
+                            }
+                        }
+                    },
+                    "expected_count": 1,
+                    "ignore": [
+                        "updated_at"
+                    ]
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ],
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Haruka Sato and Chinedu Okoye"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m coordinating a rooftop oral-history installation called Rain Lantern Residency, and we need a careful cutover of one canonical transcript. Start by opening file 5696874158 and confirm what version we currently have. Then retire the old staging folder 7983826892 because it contains duplicate prep artifacts from last season. Check existing hubs so we don’t collide with names, and inspect the items currently in Favorites collection 926489. Create a new hub titled \"Rooftop Rain Lantern Residency 2026\" with an initial description about volunteer intake. Next, list items in folder 1660804823 and make sure you stay in the canonical history workspace, not the distractor folders for Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson. List collections once, then open and read the content of file 5696874158 to verify the timeline section before editing. Re-open collection 926489 by ID to confirm context. Upload a corrected new version for file 5696874158 to fix the version confusion. After that, update your new hub’s description so it includes the phrase \"timeline corrected by Haruka Sato and Priya Menon\". Create a review task on file 5696874158 with this message: \"Haruka Sato and Chinedu Okoye: final residency QA before Farhad Rahimi approval.\" Finally, fetch folder 1660804823 details, fetch your new hub by ID, and list tasks on file 5696874158 to verify the task is present."
+        },
+        {
+            "id": "test_53",
+            "name": "Level 4: Lantern Walk Audio Route Intake",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 10,
+                "tools_required": [
+                    "PUT /folders/{folder_id}",
+                    "POST /tasks",
+                    "POST /files/{file_id}/content",
+                    "POST /files/content",
+                    "GET /collections/{collection_id}",
+                    "GET /users/me",
+                    "GET /hub_items",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections/{collection_id}",
+                    "GET /hub_items"
+                ],
+                "task_horizon": 10,
+                "operation_type": "U+C+R",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "lantern walk audio route intake"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Kenji Watanabe and Nandita Rao"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ],
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "lantern-walk-route-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m preparing a neighborhood Lantern Walk oral-history route and need one precise intake pass. In the canonical history workspace (folder 1660804823), update the folder description so it clearly says this is the lantern walk audio route intake area. Then create a review task on file 5696874158 with this exact message: \"Kenji Watanabe and Nandita Rao: reconcile duplicate timecodes before Olena Shevchenko approval.\" Upload a corrected new version for file 5696874158 because we have version confusion between a draft and the final spoken-word timeline. After that, upload a new text file named lantern-walk-route-v1.txt into folder 1660804823 with this exact content: \"Route v1: Chukwudi Okafor opens at stop 03; Farzana Daryaei closes at stop 09.\" Then verify collection 926489, confirm your current user identity, inspect hub items for hub 777777, and list items in folder 1660804823 to make sure you stayed in the canonical workspace rather than distractor folders for Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson. Re-open collection 926489 and then check hub items for hub 999999 as a final cross-check."
+        },
+        {
+            "id": "test_54",
+            "name": "Level 4: Harbor Memory Walk Route Prep",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 10,
+                "tools_required": [
+                    "GET /folders/{folder_id}",
+                    "PUT /folders/{folder_id}",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "PUT /files/{file_id}",
+                    "GET /search",
+                    "GET /hubs",
+                    "GET /folders/{folder_id}",
+                    "POST /files/content",
+                    "GET /files/{file_id}",
+                    "PUT /folders/{folder_id}"
+                ],
+                "task_horizon": 10,
+                "operation_type": "R+U+C",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "audio route timeline verified by Yuna Kim and Farhad Rahimi"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "harbor-memory-walk-checklist-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "route handoff complete for harbor memory walk"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m curating a Harbor Memory Walk where neighbors listen to oral-history clips at each stop, and I need a structured prep pass. First open folder 1660804823 and confirm it is the canonical history workspace. Then update that folder description to include this phrase exactly: \"harbor memory walk intake in progress\". Add file 5696874158 to the Conservation Lab Archive hub (id 777777) so volunteers can find the core transcript from the hub. Next, update file 5696874158 description to include: \"audio route timeline verified by Yuna Kim and Farhad Rahimi\". Search for \"misfiled_crisis_notes\" and use the result only as a duplicate check reference; do not modify that duplicate in this task. List hubs to verify 777777 is still present, then fetch folder 1660804823 again to confirm you are not operating in distractor folders for Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson. Upload a new text file named harbor-memory-walk-checklist-v1.txt into folder 1660804823 with this exact content: \"Checklist v1: Nandini Iyer lead intro; Olena Marchenko route QA; Joao Pereira backup narration.\" Fetch the newly uploaded file details to verify it landed correctly. Finally, update folder 1660804823 description again so it includes: \"route handoff complete for harbor memory walk\"."
+        },
+        {
+            "id": "test_55",
+            "name": "Level 5: Canal Lantern Storywalk Consolidation",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 17,
+                "tools_required": [
+                    "GET /users/me",
+                    "GET /folders/{folder_id}/items",
+                    "GET /hubs",
+                    "GET /collections/{collection_id}",
+                    "PUT /folders/{folder_id}",
+                    "GET /collections/{collection_id}",
+                    "POST /files/{file_id}/content",
+                    "GET /search",
+                    "GET /collections/{collection_id}/items",
+                    "GET /files/{file_id}/comments",
+                    "GET /folders/{folder_id}",
+                    "GET /folders/{folder_id}",
+                    "GET /hubs/{hub_id}",
+                    "GET /folders/{folder_id}",
+                    "GET /folders/{folder_id}",
+                    "POST /hubs",
+                    "POST /comments"
+                ],
+                "task_horizon": 18,
+                "operation_type": "R+U+C",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "canal lantern soundwalk intake queue"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ],
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Canal Lantern Storywalk 2026"
+                        },
+                        "description": {
+                            "contains": "Audio route governance for canal lantern festival."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "eq": "Aiko Tanaka and Farhad Rahimi approved storywalk revision."
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m curating a canal-side Storywalk where residents trigger oral-history audio at each lantern stop, and I need a full consolidation pass in one run. First confirm who you are logged in as. Then list items in the canonical history folder 1660804823 and review existing hubs and collection 926489 so you have context. Update folder 1660804823 description so it includes this exact phrase: \"canal lantern soundwalk intake queue\". Re-open collection 926489 to confirm context, then upload a corrected new version for file 5696874158 because the route timeline has version confusion. Search for misfiled crisis notes as a duplicate-control check, then inspect collection 926489 items and existing comments on file 5696874158 before adding anything new. Next, fetch folder 1660804823, then briefly open Hubert M. Pysklo’s distractor folder 8712301451, inspect hub 777777, return to folder 1660804823, and briefly open Artem Zhuravel’s distractor folder 8712301452 so you clearly stay oriented away from distractors (including Patrick D. Watson’s folder). After that, create a new hub titled \"Canal Lantern Storywalk 2026\" with description \"Audio route governance for canal lantern festival.\" Finally, add a comment on file 5696874158 with this exact sentence: \"Aiko Tanaka and Farhad Rahimi approved storywalk revision.\""
+        },
+        {
+            "id": "test_56",
+            "name": "Level 3: Night Market Tape Intake Marker",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 7,
+                "tools_required": [
+                    "PUT /folders/{folder_id}",
+                    "POST /folders",
+                    "GET /users/me",
+                    "GET /files/{file_id}/comments",
+                    "GET /collections/{collection_id}",
+                    "GET /collections/{collection_id}/items",
+                    "POST /hubs/{hub_id}/manage_items"
+                ],
+                "task_horizon": 7,
+                "operation_type": "U+C+R",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "night market oral-history tape intake"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Stop_05_Reel_Cleanroom"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {},
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_type": {
+                            "eq": "folder"
+                        },
+                        "item_name": {
+                            "eq": "Stop_05_Reel_Cleanroom"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m prepping a neighborhood night-market sound exhibit and need a quick intake marker pass done in the canonical history workspace. First, update folder 1660804823 description so it includes this exact phrase: \"night market oral-history tape intake\". Then create a subfolder named Stop_05_Reel_Cleanroom inside folder 1660804823. Confirm who you are logged in as, review existing comments on file 5696874158 to avoid duplicate annotation language, and verify collection 926489 plus its current items for context. After that, add the newly created Stop_05_Reel_Cleanroom folder to hub 777777. Do not switch work into distractor folders associated with Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson."
+        },
+        {
+            "id": "test_57",
+            "name": "Level 5: Canal Dock Story Booth Rollup",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 20,
+                "tools_required": [
+                    "GET /folders/{folder_id}/items",
+                    "GET /search",
+                    "GET /users/me",
+                    "POST /folders",
+                    "POST /folders",
+                    "GET /hubs",
+                    "GET /collections/{collection_id}/items",
+                    "PUT /folders/{folder_id}",
+                    "GET /files/{file_id}/tasks",
+                    "POST /comments",
+                    "GET /folders/{folder_id}/items",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "GET /folders/{folder_id}",
+                    "GET /folders/{folder_id}",
+                    "GET /users/me",
+                    "GET /hubs",
+                    "GET /hubs",
+                    "GET /files/{file_id}",
+                    "POST /folders",
+                    "POST /hubs"
+                ],
+                "task_horizon": 20,
+                "operation_type": "R+U+C",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Dock_Stop_03_Raw_Clips"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Dock_Stop_03_QA_Pass"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Dock_Stop_03_QA_Pass"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "verified for midnight route by Hanae Mori and Priya Menon"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "eq": "Hanae Mori and Farhad Rahimi approved dock route chronology."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_type": {
+                            "eq": "folder"
+                        },
+                        "item_name": {
+                            "eq": "Dock_Stop_03_QA_Pass"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "Dock_Stop_03_Final_Publish"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Canal Dock Story Booth - Midnight Edition"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m preparing a midnight Canal Dock Story Booth walkthrough and need a full rollup pass in the canonical history area. Start by listing items in folder 1660804823, then run a search for crisis notes so you can distinguish the canonical source from nearby duplicates. Confirm who you are logged in as. Create two subfolders under 1660804823 named Dock_Stop_03_Raw_Clips and Dock_Stop_03_QA_Pass. List hubs, then inspect favorites collection 926489 items for context. Update Dock_Stop_03_QA_Pass description to include this exact phrase: \"verified for midnight route by Hanae Mori and Priya Menon\". Check tasks on file 5696874158, then add a comment on that file with this exact sentence: \"Hanae Mori and Farhad Rahimi approved dock route chronology.\" List folder 1660804823 items again, add Dock_Stop_03_QA_Pass to hub 777777, fetch folder 1660804823, then fetch Dock_Stop_03_QA_Pass by its folder ID to verify details. Confirm your user identity once more, list hubs twice to confirm no naming collision, and fetch file 5696874158 metadata to verify it remains active. After that, create Dock_Stop_03_Final_Publish under folder 1660804823 and finally create a new hub titled \"Canal Dock Story Booth - Midnight Edition\" with description \"Final publication board for dock-side oral-history stops.\" Stay clear of distractor folders associated with Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_58",
+            "name": "Level 4: Floodplain Lantern Route Intake Pass",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 9,
+                "tools_required": [
+                    "PUT /folders/{folder_id}",
+                    "POST /tasks",
+                    "POST /files/{file_id}/content",
+                    "POST /files/content",
+                    "GET /collections/{collection_id}",
+                    "GET /users/me",
+                    "GET /hub_items",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections/{collection_id}"
+                ],
+                "task_horizon": 9,
+                "operation_type": "U+C+R",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "floodplain lantern route oral-history intake"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Rina Kobayashi and Adaeze Okafor validated marker chronology; Farhad Rahimi needs final sign-off."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "expected_count": 1,
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ]
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "floodplain-lantern-route-cues-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "size": {
+                            "in": [
+                                92,
+                                93,
+                                94
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "739630853c167bd4e548ef994534c3a1e0dc7a94",
+                                "d2046b6405fe759cc8f7690e65af283d3c670bac",
+                                "0d41daa82107a2aeda56921fc9ef5559eb6dbbef"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m coordinating a floodplain lantern walk where each dock marker triggers an oral-history clip, and I need one careful intake pass in the canonical archive area. First, update folder 1660804823 so its description includes this exact phrase: \"floodplain lantern route oral-history intake\". Then create a review task on file 5696874158 with this exact message: \"Rina Kobayashi and Adaeze Okafor validated marker chronology; Farhad Rahimi needs final sign-off.\" After that, upload a corrected new version for file 5696874158 because the route timeline has version confusion. Next, upload a new text file into folder 1660804823 named floodplain-lantern-route-cues-v1.txt with this exact content: \"Piotr Zielinski cue: Marker 04 plays after river chime; Adaeze Okafor intro remains primary.\" Then verify collection 926489, confirm who you are logged in as, and fetch hub items for hub 777777. List items in folder 1660804823 to confirm the new cue file appears, and finally check collection 926489 once more. Stay out of distractor folders linked to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_59",
+            "name": "Level 5: River Lantern Audio Walk Triage",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 18,
+                "tools_required": [
+                    "GET /folders/{folder_id}/items",
+                    "POST /tasks",
+                    "GET /collections/{collection_id}/items",
+                    "GET /collections/{collection_id}",
+                    "POST /files/content",
+                    "POST /tasks",
+                    "GET /folders/{folder_id}/items",
+                    "GET /hub_items",
+                    "GET /collections",
+                    "GET /files/{file_id}/content",
+                    "GET /files/{file_id}",
+                    "GET /hubs/{hub_id}",
+                    "GET /files/{file_id}",
+                    "POST /tasks",
+                    "PUT /folders/{folder_id}",
+                    "GET /users/me",
+                    "GET /collections",
+                    "GET /folders/{folder_id}"
+                ],
+                "task_horizon": 18,
+                "operation_type": "R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Naoko Ishikawa to verify marker audio ordering; Farhad Rahimi confirms timestamp drift."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Aditi Kulkarni and Maya Johnson to reconcile duplicate cue cards before publication."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "dock-lantern-reel-index-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "size": {
+                            "in": [
+                                92,
+                                93,
+                                94
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "a0b8cfddc489b6536316710244c14cfe80619014",
+                                "8e9297415bde8c250dcf44084c101b3fcd1a69a9",
+                                "66d52e1cc9fa5aa5c8adfe251d7fb47976bab5a3"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "name": {
+                            "eq": "dock-lantern-reel-index-v1.txt"
+                        },
+                        "version_number": {
+                            "eq": 1
+                        },
+                        "size": {
+                            "in": [
+                                92,
+                                93,
+                                94
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "a0b8cfddc489b6536316710244c14cfe80619014",
+                                "8e9297415bde8c250dcf44084c101b3fcd1a69a9",
+                                "66d52e1cc9fa5aa5c8adfe251d7fb47976bab5a3"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Chinedu Okafor and Olena Hrytsenko to QA uploaded reel index references."
+                        },
+                        "item_id": {
+                            "not_in": [
+                                "8647156721",
+                                "2466872085",
+                                "2713928524",
+                                "4373646747",
+                                "3094163556",
+                                "2112512450",
+                                "1238342109",
+                                "2211626350",
+                                "3309661031",
+                                "1018029878",
+                                "3180616460",
+                                "1242532496",
+                                "3302188295",
+                                "1891733744",
+                                "1376125085",
+                                "2748861636",
+                                "2772059170",
+                                "7889164469",
+                                "1414825331",
+                                "1585447101",
+                                "1352749393",
+                                "2284320887",
+                                "3205344472",
+                                "3234744487",
+                                "2215195296",
+                                "2665143622",
+                                "1812751520",
+                                "1680035539",
+                                "1731377376",
+                                "2130264605",
+                                "1818721808",
+                                "2208613029",
+                                "3131211280",
+                                "3128241842",
+                                "1698478564",
+                                "2819267910",
+                                "1193919506",
+                                "2152227285",
+                                "3056642419",
+                                "2647359146",
+                                "5500857985",
+                                "1044921469",
+                                "2323418229",
+                                "3649010344",
+                                "1962119681",
+                                "1502930304",
+                                "1494147682",
+                                "1542940481",
+                                "2396992486",
+                                "1302660570",
+                                "2941895851",
+                                "1351294877",
+                                "2127882706",
+                                "9891894086",
+                                "8259080169",
+                                "1891960519",
+                                "1064362959",
+                                "4847599630",
+                                "1115105829",
+                                "1553809035",
+                                "1484641315",
+                                "3024573843",
+                                "7099094335",
+                                "1280559514",
+                                "2641266627",
+                                "6543141533",
+                                "2064689726",
+                                "2543780536",
+                                "8695847712",
+                                "1107398791",
+                                "3379954793",
+                                "2667428831",
+                                "1246789615",
+                                "1439014490",
+                                "1490177849",
+                                "1421498350",
+                                "5696874158",
+                                "2149443392",
+                                "3320893579",
+                                "1779219698",
+                                "2445089842",
+                                "5910703903",
+                                "3304926688",
+                                "2287873181",
+                                "2797160615",
+                                "1078031926",
+                                "2204814480",
+                                "8930492081",
+                                "2503333498",
+                                "2460105954",
+                                "3266469077",
+                                "9979104400",
+                                "1188196703",
+                                "2228856784",
+                                "6478815895",
+                                "1956298215",
+                                "2576277563",
+                                "8847291035",
+                                "9958302146",
+                                "8847291036",
+                                "2219576536",
+                                "2488685816",
+                                "1723962562",
+                                "6322534720",
+                                "9971605863",
+                                "2539173714",
+                                "3166892170",
+                                "9086815882",
+                                "1822613980",
+                                "2358251230",
+                                "2408528068",
+                                "1364279594",
+                                "8268998082",
+                                "1898807902",
+                                "2107290365",
+                                "2350170522",
+                                "1678816614",
+                                "2166760427",
+                                "7827931276",
+                                "6154217723",
+                                "2322959540",
+                                "7577151329",
+                                "1172138282",
+                                "1701916585",
+                                "2893567921",
+                                "2679438618",
+                                "1747153578",
+                                "1062973727",
+                                "3212140342",
+                                "2666248889",
+                                "9979104500"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "floodplain lantern route package locked for community night walk"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I am staging a river-lantern oral-history walk and need a careful triage pass in the canonical archive zone. First list items in folder 1660804823 so we confirm we are in the right place before touching anything. Create a review task on file 5696874158 with this exact message: \"Naoko Ishikawa to verify marker audio ordering; Farhad Rahimi confirms timestamp drift.\" Then inspect the current items in collection 926489 and fetch that same collection's details to verify it is the right curation context. Upload a new text file into folder 1660804823 named dock-lantern-reel-index-v1.txt with this exact content: \"Reel Index v1: Dock 02 intro by Naoko Ishikawa; Dock 05 correction logged by Aditi Kulkarni.\" After uploading, create a second review task on file 5696874158 with this exact message: \"Aditi Kulkarni and Maya Johnson to reconcile duplicate cue cards before publication.\" List folder 1660804823 items again and capture the new file id for dock-lantern-reel-index-v1.txt. Check hub items for hub 777777, then list collections to ensure no curation switch happened. Download file 5696874158 once to ensure it is readable, fetch metadata for file 5696874158, fetch details for hub 777777, and then fetch metadata for the newly uploaded dock-lantern-reel-index-v1.txt by id. Create a third review task on that newly uploaded file with this exact message: \"Chinedu Okafor and Olena Hrytsenko to QA uploaded reel index references.\" Update folder 1660804823 description to include this exact phrase: \"floodplain lantern route package locked for community night walk\". Confirm who you are logged in as, list collections one more time, and finally fetch folder 1660804823 details to close out. Stay out of distractor workspaces tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson, and do not use duplicate notes outside the canonical folder."
+        },
+        {
+            "id": "test_60",
+            "name": "Level 5: Pumping Station Lantern Recovery Sweep",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 23,
+                "tools_required": [
+                    "GET /search",
+                    "POST /tasks",
+                    "DELETE /files/{file_id}",
+                    "GET /hub_items",
+                    "GET /files/{file_id}/tasks",
+                    "DELETE /files/{file_id}",
+                    "GET /files/{file_id}",
+                    "GET /folders/{folder_id}/items",
+                    "GET /folders/{folder_id}",
+                    "POST /hubs",
+                    "GET /files/{file_id}/comments",
+                    "GET /files/{file_id}/tasks",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "GET /collections/{collection_id}",
+                    "GET /collections/{collection_id}/items",
+                    "GET /search",
+                    "GET /collections/{collection_id}/items",
+                    "GET /files/{file_id}/content",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "DELETE /folders/{folder_id}",
+                    "POST /tasks",
+                    "GET /collections/{collection_id}/items",
+                    "GET /hubs"
+                ],
+                "task_horizon": 23,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Keiko Matsuda and Farhad Rahimi triage duplicate lantern transcripts before publishing route audio."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "9979104500"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "1018029878"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Pumping Station Lantern Recovery Board"
+                        },
+                        "description": {
+                            "eq": "Incident sweep board for lantern-route archive recovery."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_id": {
+                            "eq": "1660804823"
+                        },
+                        "item_type": {
+                            "eq": "folder"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "7983826892"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Olena Hrytsenko and Chinedu Okafor confirm no cross-folder bleed after cleanup."
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I am cleaning up assets for a moonlit oral-history walk staged inside the old pumping station, and the archive has mixed in wrong files from other projects. Start by searching for \"misfiled crisis notes\" so you can identify bad duplicates, then create a review task on file 5696874158 with this exact message: \"Keiko Matsuda and Farhad Rahimi triage duplicate lantern transcripts before publishing route audio.\" After that, delete file 9979104500, check hub 777777 items, and inspect current tasks on file 5696874158. Next, delete file 1018029878, fetch file 5696874158 metadata to confirm the canonical transcript is still active, list items in folder 1660804823, and fetch folder 1660804823 details. Create a new hub titled \"Pumping Station Lantern Recovery Board\" with description \"Incident sweep board for lantern-route archive recovery.\" Review existing comments and tasks on file 5696874158 so you avoid duplicating prior notes. Then add file 5696874158 to hub 777777. Confirm collection 926489 and list its items. Run another search for \"deprecated_2024\" to locate stale staging content, then list collection 926489 items again and download file 5696874158 to verify content is readable. Add folder 1660804823 to hub 777777, delete folder 7983826892, and create one final review task on file 5696874158 with this exact message: \"Olena Hrytsenko and Chinedu Okafor confirm no cross-folder bleed after cleanup.\" Recheck collection 926489 items and list hubs to confirm your new board is visible. Stay away from distractor areas linked to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_61",
+            "name": "Level 5: Estuary Lantern Reel Hub Reconciliation",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 16,
+                "tools_required": [
+                    "PUT /files/{file_id}",
+                    "POST /tasks",
+                    "GET /folders/{folder_id}",
+                    "GET /hubs/{hub_id}",
+                    "GET /collections/{collection_id}",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "GET /files/{file_id}/tasks",
+                    "DELETE /files/{file_id}",
+                    "GET /files/{file_id}",
+                    "POST /folders",
+                    "GET /collections/{collection_id}/items",
+                    "GET /collections/{collection_id}/items",
+                    "GET /hubs/{hub_id}",
+                    "GET /folders/{folder_id}",
+                    "GET /files/{file_id}",
+                    "GET /hub_items"
+                ],
+                "task_horizon": 16,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "from": {
+                                "eq": null
+                            },
+                            "to": {
+                                "contains": "estuary lantern oral-history reel is canonical after duplicate sweep"
+                            }
+                        }
+                    },
+                    "expected_count": 1,
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ]
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "message": {
+                            "contains": "Keiko Matsuda, Farhad Rahimi, and Adaeze Okafor to reconcile estuary lantern transcript order"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "9979104500"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "estuary-lantern-caption-queue"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "description": {
+                            "contains": "intake queue for transcript-caption reconciliation"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m curating a night estuary lantern procession archive, and we need a tightly controlled reconciliation pass in the canonical history workspace before volunteers print caption cards. First, update file 5696874158 so its description includes this exact phrase: \"estuary lantern oral-history reel is canonical after duplicate sweep\". Then create a review task on file 5696874158 with this exact message: \"Keiko Matsuda, Farhad Rahimi, and Adaeze Okafor to reconcile estuary lantern transcript order; Piotr Zielinski and Maya Johnson verify timing marks.\" After that, fetch folder 1660804823 details, fetch hub 777777 details, and fetch collection 926489 details.\n\nNext, add file 5696874158 to hub 777777, then list tasks on file 5696874158 to confirm the new review card appears. Delete duplicate file 9979104500, and fetch file 5696874158 metadata to ensure the canonical transcript is still active.\n\nCreate a new folder under 1660804823 named estuary-lantern-caption-queue with description \"intake queue for transcript-caption reconciliation\". Then list collection 926489 items twice (we’re checking for accidental favorites drift), fetch hub 777777 details again, fetch folder 1660804823 details again, and fetch file 5696874158 again. Finally, list hub items for hub 777777 so I can verify the canonical transcript is pinned there. Ignore distractor material tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_62",
+            "name": "Level 5: Tidal Lantern Oral-History Relay Lock",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 18,
+                "tools_required": [
+                    "GET /hubs",
+                    "GET /hubs",
+                    "GET /hub_items",
+                    "POST /tasks",
+                    "POST /tasks",
+                    "POST /folders",
+                    "POST /files/{file_id}/content",
+                    "PUT /files/{file_id}",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "DELETE /files/{file_id}",
+                    "GET /files/{file_id}/comments",
+                    "GET /collections",
+                    "DELETE /folders/{folder_id}",
+                    "GET /files/{file_id}/tasks",
+                    "GET /users/me",
+                    "GET /files/{file_id}/content",
+                    "GET /hub_items",
+                    "GET /collections/{collection_id}"
+                ],
+                "task_horizon": 18,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "from": {
+                                "eq": null
+                            },
+                            "to": {
+                                "contains": "tidal lantern oral-history master transcript locked after duplicate sweep"
+                            }
+                        },
+                        "version_number": {
+                            "from": {
+                                "eq": "1"
+                            },
+                            "to": {
+                                "eq": "2"
+                            }
+                        }
+                    },
+                    "expected_count": 1,
+                    "ignore": [
+                        "file_version_id",
+                        "sha_1",
+                        "size"
+                    ]
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Keiko Matsuda, Parisa Rahimi, and Aditya Kulkarni verify oral-history cue order for lantern dock relays."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Maya Johnson and Oksana Petrenko sign off subtitle timing before estuary screening night."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "eq": "777777"
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "9979104500"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "tidal-lantern-caption-staging"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "item_status": {
+                            "eq": "trashed"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m preparing a community estuary lantern oral-history relay, and we need a strict cleanup pass before tonight’s projection run. First list hubs twice so we confirm there wasn’t a stale board rename, then list hub items for hub 777777. Create two review tasks on file 5696874158 with these exact messages:\n1) \"Keiko Matsuda, Parisa Rahimi, and Aditya Kulkarni verify oral-history cue order for lantern dock relays.\"\n2) \"Maya Johnson and Oksana Petrenko sign off subtitle timing before estuary screening night.\"\n\nCreate a temporary folder under 1660804823 named tidal-lantern-caption-staging. Then upload a corrected new version for file 5696874158 with updated transcript content, and update that same file so its description includes this exact phrase: \"tidal lantern oral-history master transcript locked after duplicate sweep\". Add file 5696874158 to hub 777777.\n\nDelete duplicate file 9979104500. Pull comments for file 5696874158, list collections, then delete the temporary folder you created earlier using the folder id returned from the create-folder response. After that, list tasks on file 5696874158, confirm who you are logged in as, download file 5696874158 to verify it is readable, list hub items for hub 777777 one more time, and finally fetch collection 926489 details.\n\nDo not touch distractor items tied to Hubert M. Pysklo, Artem Zhuravel, or Patrick D. Watson."
+        },
+        {
+            "id": "test_63",
+            "name": "Level 4: Harbor Lantern Storyboard Hub Finalization",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 9,
+                "tools_required": [
+                    "POST /hubs",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "GET /hubs/{hub_id}",
+                    "GET /search",
+                    "GET /folders/{folder_id}",
+                    "PUT /folders/{folder_id}",
+                    "GET /hubs/{hub_id}",
+                    "POST /tasks",
+                    "PUT /hubs/{hub_id}"
+                ],
+                "task_horizon": 9,
+                "operation_type": "R+C+U",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Harbor Lantern Storyboard - Publication Lock"
+                        },
+                        "description": {
+                            "contains": "Final curation board for harbor lantern oral-history route."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {},
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "not_in": [
+                                "777777",
+                                "888888",
+                                "999999"
+                            ]
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        },
+                        "item_name": {
+                            "eq": "2001 crisis notes.txt"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "1660804823"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "to": {
+                                "contains": "harbor lantern storyboard queue is publication-locked after duplicate triage"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Keiko Matsuda, Parisa Rahimi, Daniel Brooks, and Aditya Kulkarni verify cue timing before shoreline screening."
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m preparing a neighborhood harbor lantern oral-history screening, and we need to lock a single storyboard board after cleaning up duplicate notes. Create a new hub titled \"Harbor Lantern Storyboard - Draft Intake\" with description \"Working board for shoreline oral-history relay curation.\" Then add file 5696874158 to that newly created hub.\n\nFetch that hub’s details, run a search for \"misfiled crisis notes\" so we confirm we are not anchoring on duplicate material, and fetch folder 1660804823 details. After checking it, update folder 1660804823 so its description includes this exact phrase: \"harbor lantern storyboard queue is publication-locked after duplicate triage\".\n\nFetch the hub details again, create a review task on file 5696874158 with this exact message: \"Keiko Matsuda, Parisa Rahimi, Daniel Brooks, and Aditya Kulkarni verify cue timing before shoreline screening.\" Finally update the same hub so its final title is \"Harbor Lantern Storyboard - Publication Lock\" and its description includes \"Final curation board for harbor lantern oral-history route.\" Ignore distractor artifacts tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_64",
+            "name": "Level 4: Estuary Lantern Caption Packet Triage",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 12,
+                "tools_required": [
+                    "GET /hub_items",
+                    "POST /folders",
+                    "POST /files/content",
+                    "DELETE /files/{file_id}",
+                    "POST /hubs",
+                    "GET /collections/{collection_id}/items",
+                    "GET /folders/{folder_id}",
+                    "PUT /folders/{folder_id}",
+                    "POST /files/content",
+                    "POST /tasks",
+                    "GET /files/{file_id}/comments",
+                    "GET /files/{file_id}/comments"
+                ],
+                "task_horizon": 12,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "box_folders",
+                    "where": {
+                        "name": {
+                            "eq": "estuary-caption-staging-batch-7"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "description": {
+                            "contains": "staging lane for estuary lantern subtitle packets"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "estuary-caption-cues-v1.txt"
+                        },
+                        "path": {
+                            "contains": "/1660804823/"
+                        },
+                        "size": {
+                            "in": [
+                                71,
+                                72,
+                                73
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "b7cbabf292226c79f6d4e8dff3fea36b90605251",
+                                "0b5c0b8950b95eb5f266598744f2c041274734ab",
+                                "182bb23c225fb6267a13ab41a231fefe250b193e"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "estuary-caption-cues-v2.txt"
+                        },
+                        "path": {
+                            "contains": "/1660804823/"
+                        },
+                        "size": {
+                            "in": [
+                                78,
+                                79,
+                                80
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "61051bbbce00ce4f0047beca9cac4b2ad025a10a",
+                                "0c5e2f65f36b65b93d4e7e7d11e0134486851bbe",
+                                "e05e36752424178c895f7c9b0ab94cccab84d3e5"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "9979104500"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_tasks",
+                    "where": {
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "action": {
+                            "eq": "review"
+                        },
+                        "message": {
+                            "eq": "Yuna Saito, Parisa Moradi, Daniel Brooks, Aditya Kulkarni, and Nneka Okafor verify final caption timing map."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Estuary Lantern Caption Packet Board - Final"
+                        },
+                        "description": {
+                            "contains": "Finalized packet board for shoreline oral-history projection night."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {},
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m coordinating an estuary lantern oral-history projection where printed subtitle cards keep drifting out of sync, so I need a focused packet triage run. First fetch hub items for hub 777777 so we confirm the current curation baseline. Then create a folder under 1660804823 named estuary-caption-staging-batch-7, and update that new folder so its description includes this exact phrase: \"staging lane for estuary lantern subtitle packets\".\n\nUpload a text file named estuary-caption-cues-v1.txt into that new folder with this exact content: \"Cue v1: Dock 03 lantern starts after bell two; narration by Yuna Saito.\" Then delete duplicate file 9979104500. Create a new hub titled \"Estuary Lantern Caption Packet Board - Final\" with description \"Finalized packet board for shoreline oral-history projection night.\" Next list items in collection 926489, and fetch details for the new staging folder you created.\n\nUpload a second text file named estuary-caption-cues-v2.txt into that same staging folder with this exact content: \"Cue v2: Replace Dock 03 offset and lock narration pacing for projection night.\" Create a review task on file 5696874158 with this exact message: \"Yuna Saito, Parisa Moradi, Daniel Brooks, Aditya Kulkarni, and Nneka Okafor verify final caption timing map.\" Pull comments on file 5696874158, and finally fetch comments on file 5696874158 again.\n\nIgnore distractor assets tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
+        },
+        {
+            "id": "test_65",
+            "name": "Level 5: Tidal Lantern Continuity Board and Duplicate Sweep",
+            "type": "compositeEval",
+            "seed_template": "box_default",
+            "impersonate_user_id": "27512847635",
+            "metadata": {
+                "min_tool_calls": 18,
+                "tools_required": [
+                    "GET /files/{file_id}/comments",
+                    "DELETE /folders/{folder_id}",
+                    "PUT /files/{file_id}",
+                    "GET /files/{file_id}/content",
+                    "GET /folders/{folder_id}",
+                    "POST /files/content",
+                    "POST /comments",
+                    "GET /search",
+                    "GET /collections",
+                    "GET /collections",
+                    "POST /hubs",
+                    "GET /files/{file_id}",
+                    "GET /hubs/{hub_id}",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "POST /hubs/{hub_id}/manage_items",
+                    "POST /files/{file_id}/content",
+                    "GET /folders/{folder_id}/items",
+                    "GET /collections/{collection_id}/items"
+                ],
+                "task_horizon": 18,
+                "operation_type": "R+C+U+D",
+                "entity_scope": "multi",
+                "information_availability": "mixed",
+                "prompt_ambiguity": "medium"
+            },
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "box_folders",
+                    "where": {
+                        "id": {
+                            "eq": "7983826892"
+                        }
+                    },
+                    "expected_changes": {
+                        "item_status": {
+                            "from": {
+                                "eq": "active"
+                            },
+                            "to": {
+                                "eq": "trashed"
+                            }
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "changed",
+                    "entity": "box_files",
+                    "where": {
+                        "id": {
+                            "eq": "5696874158"
+                        }
+                    },
+                    "expected_changes": {
+                        "description": {
+                            "from": {
+                                "eq": null
+                            },
+                            "to": {
+                                "contains": "tidal lantern oral-history transcript is canonical after duplicate reel sweep"
+                            }
+                        },
+        "version_number": {
+          "from": {
+            "eq": "1"
+          },
+          "to": {
+            "eq": "2"
+          }
+        }
+      },
+      "ignore": [
+        "file_version_id",
+        "sha_1",
+        "size"
+      ],
+      "expected_count": 1
+    },
+                {
+                    "diff_type": "added",
+                    "entity": "box_file_versions",
+                    "where": {
+                        "file_id": {
+                            "eq": "5696874158"
+                        },
+                        "version_number": {
+                            "eq": 2
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {
+                        "name": {
+                            "eq": "tidal-lantern-run-sheet-v1.txt"
+                        },
+                        "parent_id": {
+                            "eq": "1660804823"
+                        },
+                        "size": {
+                            "in": [
+                                90,
+                                91,
+                                92
+                            ]
+                        },
+                        "sha_1": {
+                            "in": [
+                                "a71dafafec49b972ed063ebebb8d2a284f0d9e1d",
+                                "22cfac008d1689df51e70c1b90c37d0177355634",
+                                "de3b2c12322c2fe25d42c5233f2c9ef7be44e4be"
+                            ]
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_files",
+                    "where": {},
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_comments",
+                    "where": {
+                        "item_type": {
+                            "eq": "file"
+                        },
+                        "file_id": {
+                            "ne": "5696874158"
+                        },
+                        "message": {
+                            "eq": "Keiko Matsuda, Parisa Rahimi, Daniel Brooks, Aditya Kulkarni, Oksana Hrytsenko, and Chinedu Okafor validated subtitle pacing map."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {
+                        "title": {
+                            "eq": "Tidal Lantern Continuity Board - Draft"
+                        },
+                        "description": {
+                            "contains": "Draft continuity board for estuary oral-history projection run."
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hubs",
+                    "where": {},
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "not_in": [
+                                "777777",
+                                "888888",
+                                "999999"
+                            ]
+                        },
+                        "item_id": {
+                            "eq": "5696874158"
+                        },
+                        "item_type": {
+                            "eq": "file"
+                        }
+                    },
+                    "expected_count": 1
+                },
+                {
+                    "diff_type": "added",
+                    "entity": "box_hub_items",
+                    "where": {
+                        "hub_id": {
+                            "not_in": [
+                                "777777",
+                                "888888",
+                                "999999"
+                            ]
+                        },
+                        "item_id": {
+                            "eq": "1660804823"
+                        },
+                        "item_type": {
+                            "eq": "folder"
+                        }
+                    },
+                    "expected_count": 1
+                }
+            ],
+            "prompt": "I’m preparing a tidal-lantern oral-history projection in the estuary quarter, and we need one strict continuity pass to avoid version confusion and duplicate staging debris.\n\nFirst, fetch comments on file 5696874158 so we can see the latest review note context. Then delete deprecated folder 7983826892 because its staging lane is obsolete. Update file 5696874158 so its description includes this exact phrase: \"tidal lantern oral-history transcript is canonical after duplicate reel sweep\". Download file 5696874158 once to verify it is still readable, then fetch folder 1660804823 details.\n\nCreate a new text file in folder 1660804823 named tidal-lantern-run-sheet-v1.txt with this exact content: \"Run-sheet v1: Dock 04 lantern cue follows second bell, with narration transition at 00:43.\" After creating it, post a comment on that newly created file (use the new file id from the upload response) with this exact message: \"Keiko Matsuda, Parisa Rahimi, Daniel Brooks, Aditya Kulkarni, Oksana Hrytsenko, and Chinedu Okafor validated subtitle pacing map.\" Then run a search for \"uncatalogued reels\" to sanity-check distractor bleed, list collections twice, and create a hub titled \"Tidal Lantern Continuity Board - Draft\" with description \"Draft continuity board for estuary oral-history projection run.\".\n\nFetch metadata for file 5696874158, fetch details for the hub you just created, and then add file 5696874158 to that hub. Add folder 1660804823 to the same hub as a second item. Upload a corrected new version for file 5696874158, list items in folder 1660804823 to confirm continuity artifacts are present, and finally fetch items from collection 926489.\n\nIgnore distractor content tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson."
         }
     ]
 }

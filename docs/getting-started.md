@@ -65,22 +65,26 @@ curl -X POST http://localhost:8000/api/platform/initEnv \
   -H "X-API-Key: ak_dev_xxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "template_schema": "slack_default",
-    "ttl_seconds": 3600
+    "templateService": "slack",
+    "templateName": "slack_default",
+    "impersonateUserId": "U01AGENBOT9",
+    "ttlSeconds": 3600
   }'
 ```
 
 Response:
 ```json
 {
-  "environment_id": "env_abc123",
-  "schema_name": "state_abc123",
-  "token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-  "expires_at": "2025-01-15T12:00:00Z"
+  "environmentId": "abc123",
+  "templateSchema": "slack_default",
+  "schemaName": "state_abc123",
+  "service": "slack",
+  "environmentUrl": "/api/env/abc123/services/slack",
+  "expiresAt": "2025-01-15T12:00:00Z"
 }
 ```
 
-Save the `token` and `environment_id`.
+Save the `environmentId`.
 
 ### Step 2: Start a Test Run
 
@@ -89,40 +93,26 @@ curl -X POST http://localhost:8000/api/platform/startRun \
   -H "X-API-Key: ak_dev_xxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "environment_id": "env_abc123",
-    "test_spec": {
-      "version": "0.1",
-      "assertions": [
-        {
-          "diff_type": "added",
-          "entity": "messages",
-          "where": {
-            "channel_id": "C01ABCD1234",
-            "message_text": {"contains": "hello"}
-          },
-          "expected_count": 1
-        }
-      ]
-    }
+    "envId": "abc123"
   }'
 ```
 
 Response:
 ```json
 {
-  "run_id": "run_xyz789",
-  "environment_id": "env_abc123",
-  "status": "running"
+  "runId": "run_xyz789",
+  "status": "running",
+  "beforeSnapshot": "before_abc123_1234567890"
 }
 ```
 
 ### Step 3: Agent Performs Actions
 
-Now use the environment token to call Slack APIs:
+Now call service APIs against the environment:
 
 ```bash
-curl -X POST http://localhost:8000/api/env/env_abc123/services/slack/chat.postMessage \
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc..." \
+curl -X POST http://localhost:8000/api/env/abc123/services/slack/chat.postMessage \
+  -H "X-API-Key: ak_dev_xxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
     "channel": "C01ABCD1234",
@@ -143,41 +133,41 @@ Response:
 }
 ```
 
-### Step 4: End the Run
+### Step 4: Evaluate the Run
 
 ```bash
-curl -X POST http://localhost:8000/api/platform/endRun \
+curl -X POST http://localhost:8000/api/platform/evaluateRun \
   -H "X-API-Key: ak_dev_xxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
-    "run_id": "run_xyz789"
+    "runId": "run_xyz789",
+    "expectedOutput": {
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": "C01ABCD1234",
+            "message_text": {"contains": "hello"}
+          },
+          "expected_count": 1
+        }
+      ]
+    }
   }'
 ```
 
 Response:
 ```json
 {
-  "run_id": "run_xyz789",
+  "runId": "run_xyz789",
+  "status": "completed",
   "passed": true,
   "score": {
     "passed": 1,
     "total": 1,
     "percent": 100.0
-  },
-  "diff": {
-    "inserts": [
-      {
-        "__table__": "messages",
-        "message_id": "1699564800.000123",
-        "channel_id": "C01ABCD1234",
-        "message_text": "hello world",
-        "user_id": "U01AGENBOT9"
-      }
-    ],
-    "updates": [],
-    "deletes": []
-  },
-  "failures": []
+  }
 }
 ```
 
@@ -276,21 +266,23 @@ See [evaluation-dsl.md](evaluation-dsl.md) for full syntax.
   "assertions": [{
     "diff_type": "changed",
     "entity": "issues",
-    "where": {"id": 42},
+    "where": {"id": {"eq": 42}},
     "expected_changes": {
-      "status": {"from": "Todo", "to": "Done"}
+      "status": {"from": {"eq": "Todo"}, "to": {"eq": "Done"}}
     }
   }]
 }
 ```
 
-### Testing No Unwanted Side Effects
+### Testing Deletion
 
 ```json
 {
   "assertions": [{
-    "diff_type": "unchanged",
-    "entity": "users"
+    "diff_type": "removed",
+    "entity": "messages",
+    "where": {"message_id": {"eq": "1699564800.000123"}},
+    "expected_count": 1
   }]
 }
 ```
