@@ -3,7 +3,7 @@
 Assertion-weighted mean scores (0-100) on the **36 newly added tests** only: 17 Box, 5 Google Calendar, 7 Linear, and 6 Slack. All runs included API documentation.
 
 | Model | Weighted Mean
-|---|---|---|
+|---|---|
 | openai/gpt-5 | 88.10
 | openai/gpt-5-mini | 87.61
 | deepseek/deepseek-v3.2 | 84.26
