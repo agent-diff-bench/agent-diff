@@ -357,3 +357,144 @@ class TestSlackDocsGolden:
         }
         assert expected_match_keys <= match.keys()
         assert HIGHLIGHT_START in match["text"] and HIGHLIGHT_END in match["text"]
+
+    async def test_auth_test_doc_shape(self, slack_client: AsyncClient) -> None:
+        resp = await slack_client.post("/auth.test", json={})
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert {"user_id", "user", "team_id", "team"} <= data.keys()
+        assert data["user_id"] == USER_AGENT
+
+    async def test_chat_update_doc_shape(self, slack_client: AsyncClient) -> None:
+        post_resp = await slack_client.post(
+            "/chat.postMessage",
+            json={"channel": CHANNEL_GENERAL, "text": "Original text for update"},
+        )
+        assert post_resp.status_code == 200
+        ts = post_resp.json()["ts"]
+
+        resp = await slack_client.post(
+            "/chat.update",
+            json={"channel": CHANNEL_GENERAL, "ts": ts, "text": "Updated text"},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert {"ok", "channel", "ts", "text"} <= data.keys()
+        assert data["text"] == "Updated text"
+
+    async def test_conversations_archive_doc_shape(
+        self, slack_client: AsyncClient
+    ) -> None:
+        channel_name = _unique_name("doc-archive")
+        create_resp = await slack_client.post(
+            "/conversations.create", json={"name": channel_name, "is_private": False}
+        )
+        assert create_resp.status_code == 200
+        channel_id = create_resp.json()["channel"]["id"]
+
+        resp = await slack_client.post(
+            "/conversations.archive", json={"channel": channel_id}
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+
+    async def test_conversations_unarchive_doc_shape(
+        self, slack_client: AsyncClient
+    ) -> None:
+        channel_name = _unique_name("doc-unarch")
+        create_resp = await slack_client.post(
+            "/conversations.create", json={"name": channel_name, "is_private": False}
+        )
+        assert create_resp.status_code == 200
+        channel_id = create_resp.json()["channel"]["id"]
+
+        await slack_client.post(
+            "/conversations.archive", json={"channel": channel_id}
+        )
+
+        resp = await slack_client.post(
+            "/conversations.unarchive", json={"channel": channel_id}
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+
+    async def test_conversations_rename_doc_shape(
+        self, slack_client: AsyncClient
+    ) -> None:
+        channel_name = _unique_name("doc-rename")
+        create_resp = await slack_client.post(
+            "/conversations.create", json={"name": channel_name, "is_private": False}
+        )
+        assert create_resp.status_code == 200
+        channel_id = create_resp.json()["channel"]["id"]
+
+        new_name = _unique_name("doc-renamed")
+        resp = await slack_client.post(
+            "/conversations.rename",
+            json={"channel": channel_id, "name": new_name},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert data["channel"]["name"] == new_name
+
+    async def test_conversations_kick_doc_shape(
+        self, slack_client: AsyncClient, slack_client_john: AsyncClient
+    ) -> None:
+        channel_name = _unique_name("doc-kick")
+        create_resp = await slack_client.post(
+            "/conversations.create", json={"name": channel_name, "is_private": False}
+        )
+        assert create_resp.status_code == 200
+        channel_id = create_resp.json()["channel"]["id"]
+
+        await slack_client.post(
+            "/conversations.invite",
+            json={"channel": channel_id, "users": USER_JOHN},
+        )
+
+        resp = await slack_client.post(
+            "/conversations.kick",
+            json={"channel": channel_id, "user": USER_JOHN},
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+
+    async def test_conversations_members_doc_shape(
+        self, slack_client: AsyncClient
+    ) -> None:
+        resp = await slack_client.get(
+            f"/conversations.members?channel={CHANNEL_GENERAL}&limit=10"
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert "members" in data
+        assert isinstance(data["members"], list)
+        assert "response_metadata" in data
+
+    async def test_users_list_doc_shape(self, slack_client: AsyncClient) -> None:
+        resp = await slack_client.get("/users.list?limit=5")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert "members" in data
+        assert isinstance(data["members"], list)
+        if data["members"]:
+            user = data["members"][0]
+            assert {"id", "name", "profile"} <= user.keys()
+
+    async def test_users_conversations_doc_shape(
+        self, slack_client: AsyncClient
+    ) -> None:
+        resp = await slack_client.get(f"/users.conversations?user={USER_AGENT}&limit=5")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["ok"] is True
+        assert "channels" in data
+        assert isinstance(data["channels"], list)

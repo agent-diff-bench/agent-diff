@@ -29,6 +29,7 @@ from src.services.box.database import schema as box_schema
 # Tables in foreign key dependency order
 TABLE_ORDER = [
     "box_users",
+    "box_collections",
     "box_folders",
     "box_files",
     "box_file_versions",

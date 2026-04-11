@@ -4342,6 +4342,837 @@
           "description": "Kenji (alphabetically after John) should NOT be added — agent stops at 7 conversations"
         }
       ]
+    },
+    {
+      "id": "test_60",
+      "name": "Lantern Walk Incident Cleanup",
+      "prompt": "I’m coordinating a neighborhood lantern-walk broadcast and need one focused cleanup pass after a messy rehearsal thread. First open a DM with U_LUKAS so we have a side channel, then delete my old logistics post in #general with timestamp 1699564950.000125 because it has stale venue details. Leave channel C06ALPHADEV for a quick membership reset, then open a DM with U_MATEO. Pull profile details for U_MATEO, post this exact message in #random: \"Lantern sweep checkpoint: Keiko Matsuda, Farhad Rahimi, and Luiza Pereira confirmed handoff.\", and inspect thread replies for message 1706110000.000100 in #engineering. After that, pull profile details for U_LUKAS, list current members of #engineering, and remove my :eyes: reaction from message 1706110000.000100. Archive channel C05ALPHA, rejoin C06ALPHADEV, list channels, and set C06ALPHADEV topic to include this exact phrase: \"Aditi Rao and Chinedu Okafor midnight routing board\". Then check conversations for U08NICK23, verify my auth identity twice, and fetch full info for C06ALPHADEV. Invite U_SOPHIE into C06ALPHADEV, add a :rocket: reaction to message 1706110000.000100, create a new channel named lantern-recovery-hotwash, and finally re-open replies for thread 1706110000.000100. Ignore distractor chatter involving Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 22,
+        "tools_required": [
+          "conversations.open",
+          "chat.delete",
+          "conversations.leave",
+          "conversations.open",
+          "users.info",
+          "chat.postMessage",
+          "conversations.replies",
+          "users.info",
+          "conversations.members",
+          "reactions.remove",
+          "conversations.archive",
+          "conversations.join",
+          "conversations.list",
+          "conversations.setTopic",
+          "users.conversations",
+          "auth.test",
+          "auth.test",
+          "conversations.info",
+          "conversations.invite",
+          "reactions.add",
+          "conversations.create",
+          "conversations.replies"
+        ],
+        "task_horizon": 22,
+        "operation_type": "R+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "in": [
+                "U_LUKAS",
+                "U_MATEO"
+              ]
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564950.000125"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C02EFGH5678"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "Lantern sweep checkpoint: Keiko Matsuda, Farhad Rahimi, and Luiza Pereira confirmed handoff."
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1706110000.000100"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "eyes"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": false,
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            }
+          },
+          "expected_changes": {
+            "topic_text": {
+              "to": {
+                "contains": "Aditi Rao and Chinedu Okafor midnight routing board"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            },
+            "user_id": {
+              "eq": "U_SOPHIE"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1706110000.000100"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "rocket"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "eq": "lantern-recovery-hotwash"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_61",
+      "name": "Night Canal Parade Comms Sweep",
+      "prompt": "We’re doing a night-canal lantern parade rehearsal and comms got messy. Create a new channel named dock-archive-salvage for the cleanup crew, then check what conversations user U08NICK23 currently has so we can sanity-check his visibility. Rename the new channel to dock-archive-salvage-v2. Next, remove your :eyes: reaction from message 1706110000.000100 in #engineering, list channels to confirm current channel state, and verify your auth identity. Delete your old joke reply message 1700153200.000999 in #engineering, run a message search for \"circuit-tracer\" to confirm the thread is still discoverable, then delete your stale logistics message 1699564950.000125 in #general. Archive channel C05ALPHA because that scratchpad is retired, re-join C06ALPHADEV, run one more message search for \"lantern\", and invite U_SOPHIE to C06ALPHADEV for final QA. Ignore distractor chatter attributed to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 13,
+        "tools_required": [
+          "conversations.create",
+          "users.conversations",
+          "conversations.rename",
+          "reactions.remove",
+          "conversations.list",
+          "auth.test",
+          "chat.delete",
+          "search.messages",
+          "chat.delete",
+          "conversations.archive",
+          "conversations.join",
+          "search.messages",
+          "conversations.invite"
+        ],
+        "task_horizon": 13,
+        "operation_type": "R+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "eq": "dock-archive-salvage-v2"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1706110000.000100"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "eyes"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1700153200.000999"
+            },
+            "channel_id": {
+              "eq": "C03IJKL9012"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564950.000125"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": false,
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            },
+            "user_id": {
+              "eq": "U_SOPHIE"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_62",
+      "name": "Canal Barge Broadcast Rollback",
+      "prompt": "I’m running comms for a midnight canal-barge parade and need a quick rollback pass after rehearsal confusion. Delete my stale venue-planning message in #general with ts 1699564950.000125. Archive channel C05ALPHA because its old plan is frozen, then verify my identity. Create a new channel named lantern-barge-manifest and invite U_SOPHIE into it. Pull user info for U_SOPHIE and U_LUKAS for handoff context. Next, unarchive C_OLD_PROJECT because legal archives need temporary visibility again. After that, edit my #general message with ts 1699564900.000124 so it includes this exact sentence: \"Canal barge broadcast reset confirmed by Ayaka Nishimura, Farhad Rahimi, and Chinedu Okafor.\" Finally, fetch conversation info for lantern-barge-manifest to confirm the setup. Ignore distractor chatter linked to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 10,
+        "tools_required": [
+          "chat.delete",
+          "conversations.archive",
+          "auth.test",
+          "conversations.create",
+          "conversations.invite",
+          "users.info",
+          "users.info",
+          "conversations.unarchive",
+          "chat.update",
+          "conversations.info"
+        ],
+        "task_horizon": 10,
+        "operation_type": "R+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564950.000125"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": false,
+              "to": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "eq": "lantern-barge-manifest"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U_SOPHIE"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C_OLD_PROJECT"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": true,
+              "to": false
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564900.000124"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "Canal barge broadcast reset confirmed by Ayaka Nishimura, Farhad Rahimi, and Chinedu Okafor."
+              }
+            }
+          },
+          "ignore": ["blocks"],
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_63",
+      "name": "Moonlight Dock Relay Stabilization",
+      "prompt": "I’m coordinating a moonlight dock relay and need a stabilization sweep across comms. First, join C05ALPHA to confirm you can touch it if needed. Then unarchive C_OLD_PROJECT so legal can inspect historical notes. Open a DM with U_MATEO for side-channel coordination, review replies in #engineering thread 1706110000.000100, and remove your :eyes: reaction from that same thread root message. Archive C05ALPHA as part of the shuffle, invite U_SOPHIE into C06ALPHADEV, and update your #general message 1699564900.000124 so it includes this exact sentence: \"Moonlight relay reset validated by Yuna Park, Farhad Rahimi, and Adaeze Okafor.\" Re-open replies for thread 1706110000.000100, then unarchive C05ALPHA again so it stays usable. Search messages for \"circuit-tracer\", list users for roster sanity, invite U08NICK23 to C06ALPHADEV for temporary handoff, leave C05ALPHA yourself, and finally kick U08NICK23 out of C06ALPHADEV to clear that temporary access. Ignore distractor chatter tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 15,
+        "tools_required": [
+          "conversations.join",
+          "conversations.unarchive",
+          "conversations.open",
+          "conversations.replies",
+          "reactions.remove",
+          "conversations.archive",
+          "conversations.invite",
+          "chat.update",
+          "conversations.replies",
+          "conversations.unarchive",
+          "search.messages",
+          "users.list",
+          "conversations.invite",
+          "conversations.leave",
+          "conversations.kick"
+        ],
+        "task_horizon": 15,
+        "operation_type": "R+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C_OLD_PROJECT"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": true,
+              "to": false
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "is_dm": {
+              "eq": true
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "user_id": {
+              "eq": "U_MATEO"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "message_reactions",
+          "where": {
+            "message_id": {
+              "eq": "1706110000.000100"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "reaction_type": {
+              "eq": "eyes"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            },
+            "user_id": {
+              "eq": "U_SOPHIE"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564900.000124"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "Moonlight relay reset validated by Yuna Park, Farhad Rahimi, and Adaeze Okafor."
+              }
+            }
+          },
+          "ignore": ["blocks"],
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_64",
+      "name": "Riverlight Audio-Walk Access Reset",
+      "prompt": "I’m coordinating comms for the Riverlight audio-walk launch at the floating lantern museum, and the workspace is tangled. First check what conversations U_MATEO can currently access so we can compare curator visibility. Then run a workspace search for \"circuit-tracer\" to catch any leftover technical chatter bleeding into launch prep. Unarchive C_OLD_PROJECT because we need last year’s archive notes. In C05ALPHA, set the topic to \"Lantern salvage staging queue - route annotations only\". Update my #general message 1699564900.000124 with a temporary status line that says route signage review is in progress, then rename C05ALPHA to riverlight-ops-archive and leave it so I stop getting noise there. Next, remove U_LUKAS from C06ALPHADEV for a permissions rollback, update message 1699564900.000124 again with a second temporary draft, leave C06ALPHADEV myself, and rename C06ALPHADEV to riverlight-dev-bridge. After that, inspect reactions on #engineering message 1706110000.000100 and also inspect reactions on #general message 1699564800.000123. Set #general (C01ABCD1234) topic to \"Riverlight finale board: docs locked, route confirmed, voice cues synced.\" Then list members of C06ALPHADEV to verify the access rollback, list conversations to confirm the renamed channels, delete my stale #general message 1699564950.000125, and finally update my #general message 1699564900.000124 so it includes this exact sentence: \"Riverlight relay sign-off recorded by Haruka Sato, Farhad Rahimi, and Aisha Okonkwo.\" Ignore distractor chatter tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson; also ignore side-notes from Olena Petrenko and Gabriel Costa unless needed for context.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 18,
+        "tools_required": [
+          "users.conversations",
+          "search.all",
+          "conversations.unarchive",
+          "conversations.setTopic",
+          "chat.update",
+          "conversations.rename",
+          "conversations.leave",
+          "conversations.kick",
+          "chat.update",
+          "conversations.leave",
+          "conversations.rename",
+          "reactions.get",
+          "reactions.get",
+          "conversations.setTopic",
+          "conversations.members",
+          "conversations.list",
+          "chat.delete",
+          "chat.update"
+        ],
+        "task_horizon": 18,
+        "operation_type": "R+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C_OLD_PROJECT"
+            }
+          },
+          "expected_changes": {
+            "is_archived": {
+              "from": true,
+              "to": false
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            }
+          },
+          "expected_changes": {
+            "channel_name": {
+              "to": {
+                "eq": "riverlight-ops-archive"
+              }
+            },
+            "topic_text": {
+              "to": {
+                "contains": "Lantern salvage staging queue"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            },
+            "user_id": {
+              "in": [
+                "U_LUKAS",
+                "U01AGENBOT9"
+              ]
+            }
+          },
+          "expected_count": 2
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C06ALPHADEV"
+            }
+          },
+          "expected_changes": {
+            "channel_name": {
+              "to": {
+                "eq": "riverlight-dev-bridge"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_changes": {
+            "topic_text": {
+              "to": {
+                "contains": "Riverlight finale board: docs locked, route confirmed, voice cues synced."
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "removed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564950.000125"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "messages",
+          "where": {
+            "message_id": {
+              "eq": "1699564900.000124"
+            },
+            "channel_id": {
+              "eq": "C01ABCD1234"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_changes": {
+            "message_text": {
+              "to": {
+                "contains": "Riverlight relay sign-off recorded by Haruka Sato, Farhad Rahimi, and Aisha Okonkwo."
+              }
+            }
+          },
+          "ignore": ["blocks"],
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "test_65",
+      "name": "Lantern Museum Foley Corridor Reset",
+      "prompt": "I’m running comms for a lantern-museum audio walk and we need a clean corridor before tonight’s live foley rehearsal. First leave C04MNOP3456 because that old growth channel is noisy and no longer part of this event. Then pull history for C03IJKL9012 to review the latest engineering chatter before we publish anything. Next list channels so we can verify current workspace naming, create a new public channel called riverlight-foley-desk, and check members in that new channel to confirm only you are there initially. After that, rename C05ALPHA to riverlight-staging-dock for the production team. Run a broad workspace search for \"circuit-tracer\" to make sure technical spillover is tracked, then list channels again to confirm the newly created and renamed spaces. Do one more channel list pass as a final sanity check. After checks pass, join C_GROWTH so we can post the public rehearsal bulletin there, and post this exact sentence in C_GROWTH: \"Riverlight broadcast check confirmed by Haruka Sato, Farhad Rahimi, and Chinedu Okafor.\" Ignore distractor threads tied to Hubert M. Pysklo, Artem Zhuravel, and Patrick D. Watson.",
+      "type": "actionEval",
+      "seed_template": "slack_bench_v2",
+      "impersonate_user_id": "U01AGENBOT9",
+      "metadata": {
+        "min_tool_calls": 11,
+        "tools_required": [
+          "conversations.leave",
+          "conversations.history",
+          "conversations.list",
+          "conversations.create",
+          "conversations.members",
+          "conversations.rename",
+          "search.all",
+          "conversations.list",
+          "conversations.list",
+          "conversations.join",
+          "chat.postMessage"
+        ],
+        "task_horizon": 11,
+        "operation_type": "R+C+U+D",
+        "entity_scope": "multi",
+        "information_availability": "mixed",
+        "prompt_ambiguity": "medium"
+      },
+      "assertions": [
+        {
+          "diff_type": "removed",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C04MNOP3456"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channels",
+          "where": {
+            "channel_name": {
+              "eq": "riverlight-foley-desk"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "changed",
+          "entity": "channels",
+          "where": {
+            "channel_id": {
+              "eq": "C05ALPHA"
+            }
+          },
+          "expected_changes": {
+            "channel_name": {
+              "from": {
+                "eq": "project-alpha"
+              },
+              "to": {
+                "eq": "riverlight-staging-dock"
+              }
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "channel_members",
+          "where": {
+            "channel_id": {
+              "eq": "C_GROWTH"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            }
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "messages",
+          "where": {
+            "channel_id": {
+              "eq": "C_GROWTH"
+            },
+            "user_id": {
+              "eq": "U01AGENBOT9"
+            },
+            "message_text": {
+              "contains": "Riverlight broadcast check confirmed by Haruka Sato, Farhad Rahimi, and Chinedu Okafor."
+            }
+          },
+          "expected_count": 1
+        }
+      ]
     }
   ]
 }

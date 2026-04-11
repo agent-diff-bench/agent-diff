@@ -29,7 +29,7 @@ The evaluation engine consumes a small JSON-based DSL to describe the expected s
 }
 ```
 
-- `diff_type` – one of `added`, `removed`, `changed`, `unchanged`.
+- `diff_type` – one of `added`, `removed`, `changed`.
 - `entity` – table name (as it appears in the service schema).
 - `where` – field predicates composed from the operator set below.
 - `expected_count` – optional exact or bounded (`{"min":1}` / `{"max":2}`) match on results.
@@ -40,43 +40,42 @@ The evaluation engine consumes a small JSON-based DSL to describe the expected s
 
 Scalar comparisons:
 
-| Operator | Meaning                  |
-|----------|--------------------------|
-| `eq`     | equality                 |
-| `neq`    | inequality               |
-| `gt`/`gte` | greater than / or equal |
-| `lt`/`lte` | less than / or equal    |
+| Operator    | Meaning                  |
+|-------------|--------------------------|
+| `eq`        | equality                 |
+| `ne`        | inequality               |
+| `gt`/`gte`  | greater than / or equal  |
+| `lt`/`lte`  | less than / or equal     |
 
 Collection / string helpers:
 
-| Operator          | Meaning                                         |
-|-------------------|-------------------------------------------------|
-| `in` / `not_in`   | membership check on sequences                   |
-| `contains`        | substring match (case sensitive)                |
-| `not_contains`    | substring miss                                  |
-| `starts_with`     | prefix check                                    |
-| `ends_with`       | suffix check                                    |
-| `has_any`         | any overlapping element in arrays               |
-| `has_all`         | all elements present in arrays                  |
+| Operator          | Meaning                                              |
+|-------------------|------------------------------------------------------|
+| `in` / `not_in`   | membership check on sequences                       |
+| `contains`        | substring match (case sensitive)                    |
+| `not_contains`    | substring miss                                      |
+| `i_contains`      | substring match (case insensitive)                  |
+| `starts_with`     | prefix check                                        |
+| `ends_with`       | suffix check                                        |
+| `i_starts_with`   | prefix check (case insensitive)                     |
+| `i_ends_with`     | suffix check (case insensitive)                     |
+| `regex`           | regular expression match                            |
+| `has_any`         | any overlapping element in arrays                   |
+| `has_all`         | all elements present in arrays                      |
 
-Null handling:
+Existence handling:
 
-| Operator   | Meaning                        |
-|------------|--------------------------------|
-| `is_null`  | field is `NULL`                 |
-| `not_null` | field is not `NULL`             |
+| Operator   | Meaning                            |
+|------------|------------------------------------|
+| `exists`   | `true` = field is not NULL, `false` = field is NULL |
 
-Predicates can be nested with logical combinators:
-
-```json
-{"where": {"and": [{"status": {"neq": "archived"}}, {"or": [{"channelId": {"eq": 1}}, {"channelId": {"eq": 2}}]}]}}
-```
+Multiple operators in one predicate object are ANDed. Multiple `where` fields are ANDed. Dot paths are supported for nested objects (e.g. `start.timeZone`).
 
 ## Resources
 
 - JSON schema: `backend/src/platform/evaluationEngine/dsl_schema.json`
 - Engine implementation: `backend/src/platform/evaluationEngine/assertion.py`
 Sample test scenarios for Slack agents:
-- **[slack_bench.json](examples/slack/testsuites/slack_bench.json)** - 11 test cases covering message sending, channel ops, reactions, threading
-- **[slack_default.json](examples/slack/seeds/slack_default.json)** - Seed data (3 users, 2 channels, 3 messages)
+- **[slack_bench_v2.json](examples/slack/testsuites/slack_bench_v2.json)** - Test cases covering message sending, channel ops, reactions, threading
+- **[slack_default.json](examples/slack/seeds/slack_default.json)** - Seed data
 
