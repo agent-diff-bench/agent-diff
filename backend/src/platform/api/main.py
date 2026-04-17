@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from src.platform.isolationEngine.session import SessionManager
@@ -35,7 +37,13 @@ setup_logging()
 
 
 def create_app():
-    app = Starlette()
+    @asynccontextmanager
+    async def lifespan(app_):
+        yield
+        if getattr(app_.state, "replication_service", None):
+            app_.state.replication_service.stop()
+
+    app = Starlette(lifespan=lifespan)
     db_url = environ["DATABASE_URL"]
 
     # Use NullPool when using Neon's PgBouncer (-pooler) to avoid double pooling
@@ -142,12 +150,6 @@ def create_app():
     )
 
     app.mount("/api/env/{env_id}/services/linear", linear_graphql)
-
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        # Stop replication service if running (it's on-demand now)
-        if app.state.replication_service:
-            app.state.replication_service.stop()
 
     return app
 
