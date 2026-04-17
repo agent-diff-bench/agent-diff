@@ -1,0 +1,114 @@
+- confidence: low
+  reason: 'response schema: group_id'
+  source_column: group_id
+  source_table: github_teams
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'request body on POST /orgs/{org}/teams: parent_team_id'
+  source_column: parent_team_id
+  source_table: github_teams
+  target_column: id
+  target_table: github_teams
+- confidence: high
+  reason: 'response schema: fork_of.user.id'
+  source_column: user_id
+  source_table: github_gists
+  target_column: id
+  target_table: github_users
+- confidence: low
+  reason: 'response schema: fork_of.owner.gravatar_id'
+  source_column: gravatar_id
+  source_table: github_gists
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'response schema: user.id'
+  source_column: user_id
+  source_table: github_issues
+  target_column: id
+  target_table: github_users
+- confidence: low
+  reason: 'response schema: assignees[].gravatar_id'
+  source_column: gravatar_id
+  source_table: github_issues
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'response schema: repository.id'
+  source_column: repo_id
+  source_table: github_issues
+  target_column: id
+  target_table: github_repos
+- confidence: low
+  reason: 'response schema: performed_via_github_app.client_id'
+  source_column: client_id
+  source_table: github_issues
+  target_column: id
+  target_table: unknown
+- confidence: low
+  reason: 'response schema: issue_field_values[].issue_field_id'
+  source_column: issue_field_id
+  source_table: github_issues
+  target_column: id
+  target_table: unknown
+- confidence: low
+  reason: 'request body on PATCH /repos/{owner}/{repo}/issues/{issue_number}: issue_field_values[].field_id'
+  source_column: field_id
+  source_table: github_issues
+  target_column: id
+  target_table: unknown
+- confidence: low
+  reason: 'response schema: license.spdx_id'
+  source_column: spdx_id
+  source_table: github_repos
+  target_column: id
+  target_table: unknown
+- confidence: low
+  reason: 'response schema: owner.gravatar_id'
+  source_column: gravatar_id
+  source_table: github_repos
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'request body on POST /orgs/{org}/repos: team_id'
+  source_column: team_id
+  source_table: github_repos
+  target_column: id
+  target_table: github_teams
+- confidence: low
+  reason: 'request body on PATCH /repos/{owner}/{repo}: security_and_analysis.secret_scanning_delegated_bypass_options.reviewers[].reviewer_id'
+  source_column: reviewer_id
+  source_table: github_repos
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'response schema: user.id'
+  source_column: user_id
+  source_table: github_pulls
+  target_column: id
+  target_table: github_users
+- confidence: low
+  reason: 'response schema: milestone.creator.gravatar_id'
+  source_column: gravatar_id
+  source_table: github_pulls
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'response schema: requested_teams[].organization_id'
+  source_column: organization_id
+  source_table: github_pulls
+  target_column: id
+  target_table: github_orgs
+- confidence: low
+  reason: 'response schema: requested_teams[].enterprise_id'
+  source_column: enterprise_id
+  source_table: github_pulls
+  target_column: id
+  target_table: unknown
+- confidence: high
+  reason: 'response schema: head.repo.id'
+  source_column: repo_id
+  source_table: github_pulls
+  target_column: id
+  target_table: github_repos

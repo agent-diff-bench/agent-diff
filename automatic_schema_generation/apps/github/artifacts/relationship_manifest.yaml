@@ -1,0 +1,45 @@
+github_teams:
+  parent_team_id:
+    target_table: github_teams
+    target_column: id
+    confidence: high
+    reason: 'request body on POST /orgs/{org}/teams: parent_team_id'
+github_gists:
+  user_id:
+    target_table: github_users
+    target_column: id
+    confidence: high
+    reason: 'response schema: fork_of.user.id'
+github_issues:
+  user_id:
+    target_table: github_users
+    target_column: id
+    confidence: high
+    reason: 'response schema: user.id'
+  repo_id:
+    target_table: github_repos
+    target_column: id
+    confidence: high
+    reason: 'response schema: repository.id'
+github_repos:
+  team_id:
+    target_table: github_teams
+    target_column: id
+    confidence: high
+    reason: 'request body on POST /orgs/{org}/repos: team_id'
+github_pulls:
+  user_id:
+    target_table: github_users
+    target_column: id
+    confidence: high
+    reason: 'response schema: user.id'
+  organization_id:
+    target_table: github_orgs
+    target_column: id
+    confidence: high
+    reason: 'response schema: requested_teams[].organization_id'
+  repo_id:
+    target_table: github_repos
+    target_column: id
+    confidence: high
+    reason: 'response schema: head.repo.id'

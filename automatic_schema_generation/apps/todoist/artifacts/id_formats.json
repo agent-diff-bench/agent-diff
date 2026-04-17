@@ -1,0 +1,38 @@
+[
+  {
+    "resource": "project",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": "6XGgm6PHrGgMpCFX"
+  },
+  {
+    "resource": "section",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": "6XGgm6PHrGgMpCFX"
+  },
+  {
+    "resource": "task",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": "6XGgmFVcrG5RRjVr"
+  },
+  {
+    "resource": "comment",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": "6XGgmFQrx44wfGHr"
+  },
+  {
+    "resource": "label",
+    "alphabet": "NUMERIC",
+    "length": 10,
+    "example": "(override)"
+  },
+  {
+    "resource": "user",
+    "alphabet": "NUMERIC",
+    "length": 10,
+    "example": "(override)"
+  }
+]

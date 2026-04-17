@@ -1,0 +1,11 @@
+{
+  "constructors": [
+    "bad_request",
+    "unauthorized",
+    "payment_required",
+    "forbidden",
+    "not_found",
+    "internal_server_error",
+    "handle_exception"
+  ]
+}

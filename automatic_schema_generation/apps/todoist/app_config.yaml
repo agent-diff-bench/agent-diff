@@ -1,0 +1,25 @@
+app_name: Todoist
+app_slug: todoist
+service_mount_path: todoist/api/v1
+openapi_path: inputs/openapi.scoped.json
+target_dir: ../../../backend/src/services/todoist
+scoped_resources:
+  - projects
+  - tasks
+  - sections
+  - comments
+  - labels
+  - user
+error_envelope_hint: |
+  Todoist uses: {"error_tag": "...", "error_code": N, "error": "...", "http_code": N}
+model: claude-sonnet-4-20250514
+id_format_overrides:
+  label:
+    alphabet: NUMERIC
+    length: 10
+  user:
+    alphabet: NUMERIC
+    length: 10
+  folder:
+    alphabet: ALPHANUMERIC
+    length: 16

@@ -1,0 +1,1487 @@
+{
+  "app_slug": "asana",
+  "total_spec_endpoints": 245,
+  "implemented_count": 56,
+  "unimplemented_count": 189,
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "section_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "tag_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/user_task_lists/{user_task_list_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "user_task_list_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/search",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/custom_id/{custom_id}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "workspace_gid",
+        "custom_id"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/subtasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/subtasks",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependencies",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependents",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/tags",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependencies",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependents",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependencies",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependents",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addFollowers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeFollowers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addProject",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeProject",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addTag",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeTag",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/duplicate",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/setParent",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects/search",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/custom_field_settings",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_memberships",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_portfolio_settings",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_statuses",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_statuses",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_briefs",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/task_counts",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addCustomFieldSetting",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeCustomFieldSetting",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addFollowers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeFollowers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addMembers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeMembers",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/duplicate",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/saveAsTemplate",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/projects/{project_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/projects/{project_gid}",
+      "has_spec_metadata": true,
+      "tested": false,
+      "test_result": null,
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    }
+  ],
+  "unimplemented": [
+    {
+      "method": "GET",
+      "path": "/access_requests"
+    },
+    {
+      "method": "POST",
+      "path": "/access_requests"
+    },
+    {
+      "method": "POST",
+      "path": "/access_requests/{access_request_gid}/approve"
+    },
+    {
+      "method": "POST",
+      "path": "/access_requests/{access_request_gid}/reject"
+    },
+    {
+      "method": "PUT",
+      "path": "/allocations/{allocation_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/allocations/{allocation_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/allocations/{allocation_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/allocations"
+    },
+    {
+      "method": "POST",
+      "path": "/allocations"
+    },
+    {
+      "method": "GET",
+      "path": "/attachments/{attachment_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/attachments/{attachment_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/attachments"
+    },
+    {
+      "method": "POST",
+      "path": "/attachments"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/audit_log_events"
+    },
+    {
+      "method": "POST",
+      "path": "/batch"
+    },
+    {
+      "method": "GET",
+      "path": "/budgets"
+    },
+    {
+      "method": "POST",
+      "path": "/budgets"
+    },
+    {
+      "method": "PUT",
+      "path": "/budgets/{budget_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/budgets/{budget_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/budgets/{budget_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios/{portfolio_gid}/custom_field_settings"
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}/custom_field_settings"
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/custom_field_settings"
+    },
+    {
+      "method": "POST",
+      "path": "/custom_fields"
+    },
+    {
+      "method": "PUT",
+      "path": "/custom_fields/{custom_field_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/custom_fields/{custom_field_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/custom_fields/{custom_field_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/custom_fields"
+    },
+    {
+      "method": "POST",
+      "path": "/custom_fields/{custom_field_gid}/enum_options"
+    },
+    {
+      "method": "POST",
+      "path": "/custom_fields/{custom_field_gid}/enum_options/insert"
+    },
+    {
+      "method": "PUT",
+      "path": "/enum_options/{enum_option_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/custom_types"
+    },
+    {
+      "method": "GET",
+      "path": "/custom_types/{custom_type_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/events"
+    },
+    {
+      "method": "POST",
+      "path": "/exports/graph"
+    },
+    {
+      "method": "POST",
+      "path": "/exports/resource"
+    },
+    {
+      "method": "PUT",
+      "path": "/goal_relationships/{goal_relationship_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/goal_relationships/{goal_relationship_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/goal_relationships"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/addSupportingRelationship"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/removeSupportingRelationship"
+    },
+    {
+      "method": "PUT",
+      "path": "/goals/{goal_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/goals/{goal_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/goals"
+    },
+    {
+      "method": "POST",
+      "path": "/goals"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/setMetric"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/setMetricCurrentValue"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/addFollowers"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/removeFollowers"
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}/parentGoals"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/addCustomFieldSetting"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/removeCustomFieldSetting"
+    },
+    {
+      "method": "GET",
+      "path": "/jobs/{job_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/memberships"
+    },
+    {
+      "method": "POST",
+      "path": "/memberships"
+    },
+    {
+      "method": "PUT",
+      "path": "/memberships/{membership_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/memberships/{membership_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/memberships/{membership_gid}"
+    },
+    {
+      "method": "PUT",
+      "path": "/ooo_entries/{ooo_entry_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/ooo_entries/{ooo_entry_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/ooo_entries/{ooo_entry_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/ooo_entries"
+    },
+    {
+      "method": "POST",
+      "path": "/ooo_entries"
+    },
+    {
+      "method": "POST",
+      "path": "/organization_exports"
+    },
+    {
+      "method": "GET",
+      "path": "/organization_exports/{organization_export_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolio_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolio_memberships/{portfolio_membership_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios/{portfolio_gid}/portfolio_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios"
+    },
+    {
+      "method": "PUT",
+      "path": "/portfolios/{portfolio_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios/{portfolio_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/portfolios/{portfolio_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios/{portfolio_gid}/items"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/addItem"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/removeItem"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/addCustomFieldSetting"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/removeCustomFieldSetting"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/addMembers"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/removeMembers"
+    },
+    {
+      "method": "POST",
+      "path": "/portfolios/{portfolio_gid}/duplicate"
+    },
+    {
+      "method": "PUT",
+      "path": "/project_briefs/{project_brief_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/project_briefs/{project_brief_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/project_briefs/{project_brief_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/project_memberships/{project_membership_gid}"
+    },
+    {
+      "method": "PUT",
+      "path": "/project_portfolio_settings/{project_portfolio_setting_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/project_portfolio_settings/{project_portfolio_setting_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/portfolios/{portfolio_gid}/project_portfolio_settings"
+    },
+    {
+      "method": "GET",
+      "path": "/project_statuses/{project_status_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/project_statuses/{project_status_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/project_templates/{project_template_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/project_templates/{project_template_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/project_templates"
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/project_templates"
+    },
+    {
+      "method": "POST",
+      "path": "/project_templates/{project_template_gid}/instantiateProject"
+    },
+    {
+      "method": "GET",
+      "path": "/rates"
+    },
+    {
+      "method": "POST",
+      "path": "/rates"
+    },
+    {
+      "method": "PUT",
+      "path": "/rates/{rate_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/rates/{rate_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/rates/{rate_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/reactions"
+    },
+    {
+      "method": "GET",
+      "path": "/roles"
+    },
+    {
+      "method": "POST",
+      "path": "/roles"
+    },
+    {
+      "method": "PUT",
+      "path": "/roles/{role_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/roles/{role_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/roles/{role_gid}"
+    },
+    {
+      "method": "POST",
+      "path": "/rule_triggers/{rule_trigger_gid}/run"
+    },
+    {
+      "method": "PUT",
+      "path": "/sections/{section_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/sections/{section_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/sections"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections"
+    },
+    {
+      "method": "POST",
+      "path": "/sections/{section_gid}/addTask"
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections/insert"
+    },
+    {
+      "method": "GET",
+      "path": "/status_updates/{status_update_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/status_updates/{status_update_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/status_updates"
+    },
+    {
+      "method": "POST",
+      "path": "/status_updates"
+    },
+    {
+      "method": "PUT",
+      "path": "/stories/{story_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/stories/{story_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/stories/{story_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/stories"
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/stories"
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}/stories"
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/stories"
+    },
+    {
+      "method": "GET",
+      "path": "/tags"
+    },
+    {
+      "method": "POST",
+      "path": "/tags"
+    },
+    {
+      "method": "PUT",
+      "path": "/tags/{tag_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/tags/{tag_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tags"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/tags"
+    },
+    {
+      "method": "GET",
+      "path": "/task_templates"
+    },
+    {
+      "method": "GET",
+      "path": "/task_templates/{task_template_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/task_templates/{task_template_gid}"
+    },
+    {
+      "method": "POST",
+      "path": "/task_templates/{task_template_gid}/instantiateTask"
+    },
+    {
+      "method": "GET",
+      "path": "/team_memberships/{team_membership_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/team_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/team_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/team_memberships"
+    },
+    {
+      "method": "POST",
+      "path": "/teams"
+    },
+    {
+      "method": "PUT",
+      "path": "/teams/{team_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/teams"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/teams"
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/addUser"
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/removeUser"
+    },
+    {
+      "method": "GET",
+      "path": "/time_periods/{time_period_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/time_periods"
+    },
+    {
+      "method": "PUT",
+      "path": "/time_tracking_categories/{time_tracking_category_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/time_tracking_categories/{time_tracking_category_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/time_tracking_categories/{time_tracking_category_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/time_tracking_categories/{time_tracking_category_gid}/time_tracking_entries"
+    },
+    {
+      "method": "GET",
+      "path": "/time_tracking_categories"
+    },
+    {
+      "method": "POST",
+      "path": "/time_tracking_categories"
+    },
+    {
+      "method": "PUT",
+      "path": "/time_tracking_entries/{time_tracking_entry_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/time_tracking_entries/{time_tracking_entry_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/time_tracking_entries/{time_tracking_entry_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/time_tracking_entries"
+    },
+    {
+      "method": "PUT",
+      "path": "/timesheet_approval_statuses/{timesheet_approval_status_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/timesheet_approval_statuses/{timesheet_approval_status_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/timesheet_approval_statuses"
+    },
+    {
+      "method": "POST",
+      "path": "/timesheet_approval_statuses"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/typeahead"
+    },
+    {
+      "method": "GET",
+      "path": "/user_task_lists/{user_task_list_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/user_task_list"
+    },
+    {
+      "method": "GET",
+      "path": "/users"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/{user_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/favorites"
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/users"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users"
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/webhooks"
+    },
+    {
+      "method": "POST",
+      "path": "/webhooks"
+    },
+    {
+      "method": "PUT",
+      "path": "/webhooks/{webhook_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/webhooks/{webhook_gid}"
+    },
+    {
+      "method": "DELETE",
+      "path": "/webhooks/{webhook_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspace_memberships/{workspace_membership_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/workspace_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/workspace_memberships"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces"
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/addUser"
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/removeUser"
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/events"
+    }
+  ]
+}

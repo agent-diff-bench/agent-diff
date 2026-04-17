@@ -1,0 +1,9 @@
+{
+  "constructors": [
+    "bad_request",
+    "unauthorized",
+    "forbidden",
+    "not_found",
+    "handle_exception"
+  ]
+}

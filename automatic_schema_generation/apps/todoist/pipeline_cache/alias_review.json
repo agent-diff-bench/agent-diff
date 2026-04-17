@@ -1,0 +1,161 @@
+{
+  "entries": {
+    "174e3a30fee4836391678a39e4dfa06c5ae3fa8cb56aefe31b7f21ac6658a982": {
+      "reason": "Response containing completed tasks (items array of ItemSyncView) for a date range",
+      "verdict": "variant"
+    },
+    "2296df50180159a413247c907fde10916271adac7be5f2590adc8c25d5e5ff3e": {
+      "reason": "Enumeration of valid project visibility values",
+      "verdict": "variant"
+    },
+    "23e5d6e16969eaaf11ee287474fb9f91df0128196ce8bb0d9ba986c30fc479ad": {
+      "reason": "Configuration options specific to team projects",
+      "verdict": "variant"
+    },
+    "2e88a2ea59f8151613d17d158fa8e5088296f884fa6e992eb90fcf9f8922cc92": {
+      "reason": "Weekly aggregate statistics with date range and total_completed count, not a task entity",
+      "verdict": "distinct"
+    },
+    "34906b760edafb476c0d238079bdee2408f1dfe500cc0a0c8023fb10616c42f9": {
+      "reason": "Response wrapper for list operations, not a project entity",
+      "verdict": "distinct"
+    },
+    "450fda37be533ad28fcc4e7ee2642992de07de3b8e312d43e67d5a124c265631": {
+      "reason": "Pagination wrapper, not a user entity itself (though it contains user refs)",
+      "verdict": "distinct"
+    },
+    "47532183e2f5eda6ee89585a47f34a39dce0f5fd29eac9593d0263a1dfbf0919": {
+      "reason": "Completion statistics for a project (id + count), not a task entity",
+      "verdict": "distinct"
+    },
+    "48d682d8dfba704480251d9c07975517c17f85322c3bd7e2ede70be2bf4a6c13": {
+      "reason": "Alternative representation of workspace project with different field structure",
+      "verdict": "variant"
+    },
+    "4968bce0f47cdea754af38e1f3203348657f05224439fcc34dcd708f3926969d": {
+      "reason": "Pagination wrapper around SectionSyncView, still representing the sections resource in list form",
+      "verdict": "variant"
+    },
+    "4d6f6b1fa1a7c1ee59097351124c5343126743d5db6aa1a01e431d5152e9dd44": {
+      "reason": "Enumeration defining how projects can be sorted",
+      "verdict": "variant"
+    },
+    "523a9d1b02dda081a0abfadf528eb4e24b5ef2a90f31872800a85c9b537e3ccd": {
+      "reason": "Statistics view of a project showing completion metrics",
+      "verdict": "variant"
+    },
+    "5718118175ce080945f62b149b3779a0d78016bc7040be68a31e7b8116a2ce05": {
+      "reason": "Pagination wrapper container, not a project entity itself",
+      "verdict": "distinct"
+    },
+    "5f7aadb34782b16f4254a5ee5cd935f458062f3f6155a04f3a870a1fb5420b4f": {
+      "reason": "Configuration options specific to restricted projects",
+      "verdict": "variant"
+    },
+    "6255563339c7171c6ba012956173ed7687c35a2b421a8535a6698519384175af": {
+      "reason": "Pagination wrapper for label lists, contains array of LabelRestView items",
+      "verdict": "variant"
+    },
+    "665f67f1d495d41006a02a71508265fd72d757349f8755c99b2ed7a6afe7b816": {
+      "reason": "Todoist calls tasks 'items' internally; this is a full task representation with project_id, labels, deadline, content fields",
+      "verdict": "variant"
+    },
+    "66cc4cb3b829d7c12e986de5e0a37b5076f9f6a72f8a3a59ed836e3efde35725": {
+      "reason": "Response container for import operations, not a project representation",
+      "verdict": "distinct"
+    },
+    "6996a5f07b34636aa363939ba1286f46f5416e2d96b07f3c5417715fb46d8d5f": {
+      "reason": "Nested access configuration component of project objects",
+      "verdict": "variant"
+    },
+    "6a62ae7e0108cf7feebd4355166334e8450c48d23c16cf2ae47ae08c8e1a8c0a": {
+      "reason": "Request body schema for creation endpoint, not a project representation",
+      "verdict": "distinct"
+    },
+    "6f59061ac2bb044ccb2761fb03a23210c61fe1ef72423f67ad3d784aeea26f0a": {
+      "reason": "Full representation of a workspace project with all attributes",
+      "verdict": "variant"
+    },
+    "7646923f4feeb838d2cb6fdfc92ca2de1d4a6cb98d6c531695d426b092775ab4": {
+      "reason": "Enum of role types, not a user entity",
+      "verdict": "distinct"
+    },
+    "7a061a7e209c80b1bd96e8c4d900d6637dc82941aaacf26f4d25f125701b8f61": {
+      "reason": "Pagination wrapper around NoteSyncView; transport layer for comments collection",
+      "verdict": "variant"
+    },
+    "7c33b619b83c134ca4a258d278aa5bd703113c1dc94594d2a515b5ce7196ba1f": {
+      "reason": "Paginated wrapper around ItemSyncView tasks; same entity just in a list response format",
+      "verdict": "variant"
+    },
+    "7cec8c4ae268b3c464b775bb8a986a87cf1706ddf76374f384ae17a8e84b8eb0": {
+      "reason": "Pagination response wrapper with workspace_users array, not a user entity",
+      "verdict": "distinct"
+    },
+    "7d33fedabe4f5dc35f59ec0f943b84cca10942a38389a59136979b34d874c2a9": {
+      "reason": "User entity in workspace context with user_id and role properties",
+      "verdict": "variant"
+    },
+    "7f2ed2ebba5d3f45bc340162277605b4345d0a3809b3cea341c387fd777095ee": {
+      "reason": "Represents the same section entity with sync-specific metadata fields (added_at, updated_at, archived_at, is_deleted)",
+      "verdict": "variant"
+    },
+    "82f99d38b49e263087e925ad77c3bf2993fb5306d8c51e1c3011f4c4112e1859": {
+      "reason": "Enumeration of valid project status values",
+      "verdict": "variant"
+    },
+    "876df19c1915df06462daadb482fcbbb47df74a69c5e0ab0e5070c1ffcef3a10": {
+      "reason": "Pagination wrapper container, not a project entity itself",
+      "verdict": "distinct"
+    },
+    "971dd1d82c69e5a5a027985520868956be764d5c01253fba18568614e605fe46": {
+      "reason": "Core user entity with id, email, full_name and user-specific properties",
+      "verdict": "variant"
+    },
+    "9a37d5427dd2dc40818b8244a0316f7ad6198fba9fc7388b1408f4df7ee65596": {
+      "reason": "Operation response with status field, not a user entity",
+      "verdict": "distinct"
+    },
+    "9de16a951b933c9d6cb300e528e6e877e7602523bc05109938c80e9b046ed863": {
+      "reason": "Configuration options specific to public projects",
+      "verdict": "variant"
+    },
+    "a9e5ccdd8893b86565a9f65b3953234a8388edec82bd4bf8864ccad10ae10525": {
+      "reason": "Request body schema for import endpoint, not a project representation",
+      "verdict": "distinct"
+    },
+    "c3c9a291209472c58403a92f5727f4533b9817a911514b1c1d15087b9f0880ae": {
+      "reason": "Response wrapper containing list of emails, not user entities",
+      "verdict": "distinct"
+    },
+    "c4cd2cea59b045f31e5e1bc5bea098e14a3d3254aaa0a05cee2170fd30fd778b": {
+      "reason": "Daily aggregate statistics with date and total_completed count, not a task entity",
+      "verdict": "distinct"
+    },
+    "d8bb5d35871b8d6824bb2f4a4a44bb6bb0666b5ad81882350e323234a61143fa": {
+      "reason": "Contains id, content, posted_uid, posted_at, reactions\u2014core comment/note fields; different serialization of same entity",
+      "verdict": "variant"
+    },
+    "e0e2be8d44570fef3d29477c59dfaee1403edda88d13b48f42a2be2536eae7f0": {
+      "reason": "Full representation of a personal project with all attributes",
+      "verdict": "variant"
+    },
+    "e19ac2704a9c19d0abdbdd9b57af01767a074a0be62d0c9ea28018e3d2e9b937": {
+      "reason": "Enumeration of valid project view style values",
+      "verdict": "variant"
+    },
+    "ecd8ab2ddbc81488a363d6dd2a7dcb603fac81df35e7d94e2af77d2e563473e2": {
+      "reason": "User entity with standard user fields (id, full_name, email, timezone, image_id)",
+      "verdict": "variant"
+    },
+    "f930fd6927afa4c4a0c98baebb7c17ce4ee6500af2d6b25f8df1ca3038fb8599": {
+      "reason": "Response container for import-create operations, not a project representation",
+      "verdict": "distinct"
+    },
+    "fcd92473c8294c1980d0c637e73f7e86e8371035559d53c8059bc362d7c31e21": {
+      "reason": "Core label entity representation with standard label fields (id, name, color, order, is_favorite)",
+      "verdict": "variant"
+    }
+  },
+  "version": "1"
+}

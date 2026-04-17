@@ -1,0 +1,50 @@
+app_name: GitHub
+app_slug: github
+service_mount_path: github
+openapi_path: inputs/openapi.scoped.json
+target_dir: ../../../backend/src/services/github
+scoped_resources:
+  - gists
+  - issues
+  - pulls
+  - repos
+  - users
+  - orgs
+  - teams
+error_envelope_hint: |
+  GitHub uses: {"message": "...", "documentation_url": "...", "status": "..."}
+model: claude-sonnet-4-20250514
+
+# GitHub adds three wrinkles on top of the standard ``_id`` REST shape:
+#
+# * ``node_id`` — every entity carries the global GraphQL relay ID
+#   under that name. It is the entity's own primary key, NOT a
+#   foreign key to another table. Adding it to ``self_id_fields``
+#   stops the walker from emitting a spurious
+#   ``<resource>.node_id -> unknown`` candidate on every resource.
+#
+# * Schema/URL naming mismatch — nested objects use the long English
+#   form (``repository``, ``pull_request``, ``organization``) while
+#   the URLs (and therefore our resource buckets) use the short form
+#   (``repos``, ``pulls``, ``orgs``). Without aliases the walker's
+#   "nested ref object" check would look up ``repository`` in the
+#   resource map, miss it, and lose the relationship.
+#
+# * Non-``id`` primary keys — ``commits`` use ``sha`` and ``branches``
+#   use ``name`` (unique within their parent repo). With ``pk_overrides``
+#   the document stage's PK inference picks the right column, the FK
+#   walker recognizes ``commit_sha`` / ``branch_name`` as canonical FK
+#   forms (and ``head_sha`` etc. resolve via the candidate builder
+#   pulling the override column for ``target_column``), and generated
+#   schemas produce ``REFERENCES github_commits(sha)`` instead of the
+#   broken ``REFERENCES github_commits(id)``.
+naming:
+  self_id_fields: ["id", "node_id"]
+  resource_aliases:
+    repository: repo
+    pull_request: pull
+    pullrequest: pull
+    organization: org
+  pk_overrides:
+    commits: sha
+    branches: name

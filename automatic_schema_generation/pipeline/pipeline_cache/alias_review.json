@@ -1,0 +1,1489 @@
+{
+  "entries": {
+    "0215a8f0813942d346723f61b6a87a99859cffbee49cdbc322609bd6203a4223": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "039595521334450dc023e980eb89f2a6d758c1af3c47c8e07c9c5af5513b1ee2": {
+      "reason": "Represents organization webhook event payload, not the organization entity itself",
+      "verdict": "distinct"
+    },
+    "040884c4bd9268e05a918970218184e5087aafa69d9b36a42122716564565324": {
+      "reason": "API usage statistics array, not a user entity",
+      "verdict": "distinct"
+    },
+    "04db9dc8959d9196d0ab290b6d42efa25691214065bcaa99bb7bb2cfa3eca8fe": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "0771d1ac818e2d5bbb52ccb55c7d505fcc2f4a22ba9f22241e2e1ad926cb5495": {
+      "reason": "Milestone data within events, not an issue",
+      "verdict": "distinct"
+    },
+    "07dc2a0bbdebacab7a1428f9581c87c8608077a91ce856c41e0d1a25081be43c": {
+      "reason": "Secret scanning location metadata, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "099234a2c50c6a28b29d698a76d0791732e0ac2fd47d809d74d850698d0aa735": {
+      "reason": "response after committing an autofix, not full commit data",
+      "verdict": "distinct"
+    },
+    "0b017919d4b5061e2884eeb431b1cbf24dee3620810f93585252cdc94fd2076f": {
+      "reason": "webhook event payload for commit comment creation, not the commit itself",
+      "verdict": "distinct"
+    },
+    "0c797b80846d42b906eccc9dd01e95da311e4403d1c6fe53fd67f8b0fbe80366": {
+      "reason": "actor configuration for ruleset bypass, not repository entity",
+      "verdict": "distinct"
+    },
+    "0c7cc3ff5dcb04e6b16cf259c00a2a3a32887fec28c6d5aa7387aa9b0bca9979": {
+      "reason": "file path length rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "0cd8382658a0fc563771b3d6c56e00c95e223e7f99a9480449693337b2142f85": {
+      "reason": "rule for ref creation, not repository entity",
+      "verdict": "distinct"
+    },
+    "0d9732a0356fa13dbfd1f19d61de4d9ddc40e71d2bdb24c6a7150e15ea8c5526": {
+      "reason": "Represents org_block webhook event payload, not the organization entity",
+      "verdict": "distinct"
+    },
+    "0e26dc946c0768213f1874949952db9147d6f0330fd8eaf9219beb942ca7e9ca": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "0e6cb34367f875d1e385431dd08d6e3906d0372b8094b4f684085878fac28153": {
+      "reason": "search result view of repository with core identity (id, node_id, name, full_name)",
+      "verdict": "variant"
+    },
+    "110eef6fd699feb55eaead6c53a533ed1acbca8545a5f023eaac22a599552c2f": {
+      "reason": "Webhook payload for milestone event, not an issue",
+      "verdict": "distinct"
+    },
+    "111908fb55c4207aae5fb2f1d8eb20a1d1d02a6ee12565f6b08175d50887e4c0": {
+      "reason": "Event wrapper for review events, not a pull request",
+      "verdict": "distinct"
+    },
+    "112f6981b36a49d0de3eb590e4154f2c0029d82d1c8db769567b03a44b3a3fd4": {
+      "reason": "Event metadata about project actions, not an issue",
+      "verdict": "distinct"
+    },
+    "11ea356fd5d2320a854bb41075139f719af5277d733ec03511f35f29844193e6": {
+      "reason": "List of requested reviewers, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "1246f84db730b9194fe004d1379381e15e94a558388c57f6c2cdd0e012f259bd": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "1268eb8cdd6f9fbc0f1a20c56d3de1191f8d9e5187cfbc52a16c16adb0566930": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "12e6c5ab6a3c6da32c1cf504b9055aad89c357de0fe2f379cd44759d25a7bc3a": {
+      "reason": "Custom field definition schema, not an issue instance",
+      "verdict": "distinct"
+    },
+    "137afdc5a1ce0b74536b183c1615ff0c8bb13d3e7241f33804e7274dddf5a4d1": {
+      "reason": "code scanning rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "14334e1dacfa6d31e0a1f2e15e726708d2fe618e2e08a0fb52e0eb5559a5e8ef": {
+      "reason": "describes where a secret was found within a wiki commit, not the commit itself",
+      "verdict": "distinct"
+    },
+    "164e6d169957236463ed3321661fbe35e27d834fb2ce20952c4d67947e28c8e3": {
+      "reason": "Repository rule configuration requiring PRs, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "165cef6704defb581c6a0221dd869aa3eb2e1d79ba194c02817aa7699b70e40b": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "16a4e41675b2552e137257dd652f43d39f24d72a637a46fd0c148e0964d5da21": {
+      "reason": "Webhook event payload for team edits with changes object, event wrapper not team",
+      "verdict": "distinct"
+    },
+    "177a80277225fd63bf30abff62cf219c4d30e0d9c7eb77062e05912d0d6bd8aa": {
+      "reason": "Secret scanning location metadata, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "191192bd08bfa5b7f4af6c7c10bf05cd26c1c3ca8a5807c8d54892b89043a92b": {
+      "reason": "Webhook event payload for branch protection changes, not a branch entity",
+      "verdict": "distinct"
+    },
+    "1a0fce67a36c18854f4944896d87b001c93f84a8f1ec77c3b40c10596c541c03": {
+      "reason": "rule for ref deletion, not repository entity",
+      "verdict": "distinct"
+    },
+    "1a4729e6b2c3f8a647a60a47a9e7007ae5a35e989adda0710ce10c8ff2cfc2f8": {
+      "reason": "workflow rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "1a77e2bbf5dcc9957c6f8c54369a83a933a09fb6c52a70c38acd7726355888de": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "1aca9de504860f1110d8bf93f00e83cd3b3cad685ebd252c216132d3b18b4d5f": {
+      "reason": "Webhook payload for dependency events, not an issue",
+      "verdict": "distinct"
+    },
+    "1b5c32c8b6883aa7db4114b2ba1f3da1aad96826f30a145ea6c57559391b00f4": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "1c379e0c77735a7239329477ec07412c636f9762eeb49bf43fc2c1fd7130fb6f": {
+      "reason": "Represents a runner group within an organization, not the organization entity",
+      "verdict": "distinct"
+    },
+    "1c8899acd895fc3712ea8b8eebf22245dbb3917f8769075fc80bf93b03bff348": {
+      "reason": "Repository object with team permissions metadata, represents repo not team",
+      "verdict": "distinct"
+    },
+    "1cd0ebfe2cb377b01f4797d8537c9f6cfd69b927199c0352c3c97a032fd26c50": {
+      "reason": "Webhook payload for open event, not an issue",
+      "verdict": "distinct"
+    },
+    "1cf2fc7dce6ebe0abad4a3537954601d4502df45aa80670fb221aa4e6dff13fe": {
+      "reason": "codespaces secret configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "1dd5d502a5bc0d5b763ff48891fdaab64f6830a7ec294fff699ffa5812989111": {
+      "reason": "repository rule configuration for commit validation, not commit data",
+      "verdict": "distinct"
+    },
+    "1e44aadb9b1a8f3035193cb1176a24c240bf58f630d29b3fa89ffce869870cd7": {
+      "reason": "Extended user object with additional private fields like total_private_repos",
+      "verdict": "variant"
+    },
+    "208b124220142ee0f18ac2fdb21e051bbb71eb30c49da7f97c2357bfc156870a": {
+      "reason": "Represents Copilot content exclusion rules, not the organization entity",
+      "verdict": "distinct"
+    },
+    "20aa0b58ad01c9214de85d300be489fb54067735dd1bbfbebfc852297923f0bb": {
+      "reason": "Git commit metadata (name/email/date), not a GitHub user entity",
+      "verdict": "distinct"
+    },
+    "21b179909deb1d029880e36f7020a778589354fbad6f177d0e6287ca7a0c7ff2": {
+      "reason": "Webhook payload for dependency events, not an issue",
+      "verdict": "distinct"
+    },
+    "22964e774cd933a62331c9d5bb77c2ac036f63dd65024593e22fd13a9130a8ac": {
+      "reason": "Represents cache retention policy settings, not the organization entity",
+      "verdict": "distinct"
+    },
+    "2352ee00f0af65d71d62e30a3a4960ff00fc7d6219e779c2088e466ffd3547b9": {
+      "reason": "Webhook payload for sub-issue events, not an issue",
+      "verdict": "distinct"
+    },
+    "23b66e7da4c98b9f3773a018f16913f4b23355c47eee224d3b2966e0c95299fe": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "2462f3c7627d8a53fe140e08140c2d0370204481fa0b7e1e9b5749244d6c27f8": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "24b296a2cfe9df9643d50c55314d6784a071fbd17c929116e9dfa02b6cb80043": {
+      "reason": "property targeting definition for rulesets, not repository entity",
+      "verdict": "distinct"
+    },
+    "24b6a243f1c99b3f9c0960149744e9b0fdf3e9a28e9e12927d73b07265aa4a2d": {
+      "reason": "security config association with status, not repository entity",
+      "verdict": "distinct"
+    },
+    "269ea26def80274f23c5e7105f63053e2fb94531b229245dbf996b0f8d5849bd": {
+      "reason": "workflow settings configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "2909ad64e75a34cded34127151b7d9d8d0d7624990977afeee7ab11d0d97c18a": {
+      "reason": "Secret scanning location metadata, not an issue",
+      "verdict": "distinct"
+    },
+    "29bd174df2a12148927a83e5ac384d1313a00238c491ca125b53499424c53526": {
+      "reason": "Represents branch protection settings for a specific branch",
+      "verdict": "variant"
+    },
+    "2aac80fa825df1ec6e27315bfd520ffc827546494b16c84b9d619b4955867e82": {
+      "reason": "Reviewer reference for repository rules (Team type), not a GitHub user",
+      "verdict": "distinct"
+    },
+    "2caf785df0d3afee7bb6fb5be4ea567dd6ba0c9c0bb8c991b855c7f7a17e36a7": {
+      "reason": "Event metadata about milestone assignment, not an issue",
+      "verdict": "distinct"
+    },
+    "2cb30dd7e888e23e57bcc60e0f94202b56e902f4d34728f3d39a869f1ba6fe9c": {
+      "reason": "low-level Git commit representation with sha, author, committer, message",
+      "verdict": "variant"
+    },
+    "2d1b224b4347f2bc5c8e28428bd24140fa29b0502bbd95377d38cdbc59b67943": {
+      "reason": "simplified view of a commit with core fields like id, message, author, committer",
+      "verdict": "variant"
+    },
+    "2d62acfd904c38056b4a95924e7160823cb209bb3dd69f528a91ebc5847608c2": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "2d69d8a98ce0fec986c0c5ae5f4f312affb692c9b0d79c1115f1c0b5f58890b3": {
+      "reason": "Public key for Codespaces secrets, not a user entity",
+      "verdict": "distinct"
+    },
+    "2d71b1acbdf924051c398f97354a275637e46f2facaac4022a9e1ae8616671d2": {
+      "reason": "Event metadata about state changes, not an issue",
+      "verdict": "distinct"
+    },
+    "2d8535925be966295c5d73a0ef492de68e8599c5055b7c50c573da834faff346": {
+      "reason": "Represents immutable releases settings, not the organization entity",
+      "verdict": "distinct"
+    },
+    "2e6cce185c47888aa84b7564ee1e659eea4d964d244fb126b27ddd97bdc39dfc": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "2f208e2df8ca7fef92eb5bdfcefe4041748db04cccb65d00c64c20f58d7141ad": {
+      "reason": "Organization object in team context with same core structure as organization-full",
+      "verdict": "variant"
+    },
+    "2f7a51a2774657dd994d31eedc435b15cf377bb9e865424d2eac03d680ec6203": {
+      "reason": "Request body for updating issue types, not an issue",
+      "verdict": "distinct"
+    },
+    "2fbaaeddeb1c92cab99f0480ed7a4214b6271c4463cc2c12dd41f4bb80725e30": {
+      "reason": "Represents a Dependabot secret, not the organization entity",
+      "verdict": "distinct"
+    },
+    "324b677ebc6816ffd22ea5a7ca8f0c1ced27b4b1a4694870e89b921bb93d9771": {
+      "reason": "Webhook payload for dependency events, not an issue",
+      "verdict": "distinct"
+    },
+    "327eb63ec9dc47221308bf6fc60e9e5cea2aaed233219d6ad7023bbd383d25f1": {
+      "reason": "repository identifier with core fields (id, name, full_name, private)",
+      "verdict": "variant"
+    },
+    "34419729b0d5a203767bdb052b52eb94132c0a44959077737c3a4c25e6552c6d": {
+      "reason": "Webhook payload for comment editing, not an issue",
+      "verdict": "distinct"
+    },
+    "3472545f2e9fc9cef3edb10945c68cebd8ad151386bf2275a9dc4d50c2a3ff3b": {
+      "reason": "Aggregated dependency counts, not an issue entity",
+      "verdict": "distinct"
+    },
+    "34ad1116c856bc3c5700ea2165397df735f5e64642efc51475cc54eb3e29523c": {
+      "reason": "Represents request payload to create an issue type, not the organization entity",
+      "verdict": "distinct"
+    },
+    "350e2beba718745cf449aa6dd7ceb0e4be6c8b7a9452c8c0f045f5bd9676ea60": {
+      "reason": "Represents private registry configuration with repository selection, not the organization entity",
+      "verdict": "distinct"
+    },
+    "35a733fb2cd40fd614605359bcb42194dfd162e3eeee7c500f191912f74e4502": {
+      "reason": "Represents a custom role within an organization, not the organization itself",
+      "verdict": "distinct"
+    },
+    "35adbb108b9e494692abef749e6a830bf9fae7c6f6ea16b46dbf57e0ef6e68e9": {
+      "reason": "Repository rule configuration for commit author email patterns",
+      "verdict": "distinct"
+    },
+    "3646f966849fbe5948084b16327f26570bfe8475c2b751891c17f3c5f5bb83c3": {
+      "reason": "file size rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "36b0d30ca93ca5571eb204594323ad5cc7c866e2ee08b780b47494caefdde30f": {
+      "reason": "Organization object associated with a team, not a team entity",
+      "verdict": "distinct"
+    },
+    "3732b8164a8f962fc9e3377cc1ed018f526fc0eebab811c222aa9b4dd05ec82e": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "3785c1a6fa20fd36a9e4ce58f76e080f10fa8d694abcae6ca62830bbabf95f22": {
+      "reason": "Pattern configuration for deployment policies, not a branch entity",
+      "verdict": "distinct"
+    },
+    "392aa9e76f2a7790d2ca213b675e391f9fbf45665daf2c678f37a40ba5f81e6e": {
+      "reason": "access configuration details, not repository entity",
+      "verdict": "distinct"
+    },
+    "3b0a0fae7faf4d57eb32366c2ae6d8105db80300ddd382534f577aff3850b8aa": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "3b61b62724e07e714d7fcda518b986d327e765ae5f18f1c1ffcac8ebd041989b": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "3b7c5a629b97eea90ac368bbf6538d8089fb1682dc18b75f82edbd86a61abb49": {
+      "reason": "webhook representation of a repository with same core identity (id, node_id, name, full_name)",
+      "verdict": "variant"
+    },
+    "3baa77f9587f883d4cca680af6fce27012ea06fa6b44af10468ecea7f7c45ad9": {
+      "reason": "Username string for assignment, not a user object",
+      "verdict": "distinct"
+    },
+    "3bce62279426588c2b2b6d9a81bb03726ae8aeebf1bee51b4bf3b58206a94763": {
+      "reason": "primitive field holding a commit SHA identifier",
+      "verdict": "variant"
+    },
+    "3c3f12c1d34bdb9ed7b7239ff728da599edde66d251f4084784d4fa1e5465ecd": {
+      "reason": "Secret scanning location metadata, not an issue",
+      "verdict": "distinct"
+    },
+    "3e387bd5ef56e7b3409e70bd79d4e0fd0d798e2f1fc41feac2b41210ff365cdb": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "3e3a356909bbeb51e43466000fa396864b75ebdb72c3afbaeab823f5eb1c07e4": {
+      "reason": "rule configuration for branch names, not repository entity",
+      "verdict": "distinct"
+    },
+    "3f357cf33d7b6d3845f266c96d8218803d496be8844b477a0748142044ae7419": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "406080896d60258e30cb0da0aa13feebcade43f60e89c55b1e1bfc10847c34e0": {
+      "reason": "Event metadata about project column moves, not an issue",
+      "verdict": "distinct"
+    },
+    "415cc329bf9d9bd207ec58b8bbb54c4369bae04a1fae99538353db0ddaedd65a": {
+      "reason": "Webhook event payload for branch protection rule changes, not a branch entity",
+      "verdict": "distinct"
+    },
+    "43ab944364ff04c3bc4592dea5b25e783b76dc24fa7d3707862bb1109181c6c5": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "43ae0416513ec6a4b8f84b42db115dc48a621ad4d7ef6a093b177093306b597b": {
+      "reason": "Webhook event for code scanning alerts, references branches but not a branch entity",
+      "verdict": "distinct"
+    },
+    "44ade313db4c4dd54110c097a713b6968bbbaba911f1b27f811be4413e3853a2": {
+      "reason": "Categorical metadata about issue types, not an issue itself",
+      "verdict": "distinct"
+    },
+    "451a8e7c97d938c1dff7f413777bf2f974b1f5bc9b7ab6aa85e2aeee7d722f6a": {
+      "reason": "Represents a webhook configuration for an organization, not the organization itself",
+      "verdict": "distinct"
+    },
+    "45ab77f8afc8c9915915d9ebfb9bb06b0f691280fd1336d43c454f0718fbe02f": {
+      "reason": "Represents request payload to update an issue field, not the organization entity",
+      "verdict": "distinct"
+    },
+    "463d9bbdd44979564b76bad4cc8a2340be9dc4acfec805c485a6f97fadabba86": {
+      "reason": "Project card data within events, not an issue",
+      "verdict": "distinct"
+    },
+    "471e34f38d29812189f2d7d92da09a8204df5df64cf6cf3a4176a29421504e7f": {
+      "reason": "Webhook event payload for team creation, event wrapper not team",
+      "verdict": "distinct"
+    },
+    "4772b7199dc4af974f946bb1681b8be3f946e011373bb9ccd81113eb97845a91": {
+      "reason": "Represents Copilot seat statistics, not the organization entity",
+      "verdict": "distinct"
+    },
+    "48089ef56013852bbdf39e988046c2913c2abfe838b7c3a2fc25c7e01757fe6f": {
+      "reason": "non-fast-forward rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "49900b899df98ac171accb0c6d6efc2aa93c65d75eafb5aa3401e075f0f113f7": {
+      "reason": "webhook event for commit comments, not the commit itself",
+      "verdict": "distinct"
+    },
+    "49d979400ade2b9faeca775702b883983192b383b9369cc6f1664858a7f4d223": {
+      "reason": "request body for updating advisory, not repository entity",
+      "verdict": "distinct"
+    },
+    "49f1720966d613c42a07243835325e8de86e73756f22b61a260ea31b873378e8": {
+      "reason": "primitive field holding a commit SHA identifier",
+      "verdict": "variant"
+    },
+    "4a10d7bbccb5c1cb847916fe6f66885b20d91c11595ea95d5abecb60fd76bb46": {
+      "reason": "Extended pattern configuration for deployment policies, not a branch entity",
+      "verdict": "distinct"
+    },
+    "4a80ca549d4a6a515055991df22450aff70053f0d678c14afb3c72cc39e160ad": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "4a8ab5523d31f773e31839b05fab58b2828b3e3031e29d9673141fb84a2a8c39": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "4b148285399d02d161b2453b98fedc4b40a6dfe6befa0a3a0232948503f1cd58": {
+      "reason": "Issue representation in webhook payloads, same core entity",
+      "verdict": "variant"
+    },
+    "4b73bced7c8e5aa73cc8d96a3ff6df2a5b5c20ad4ca51544e698e97462aae794": {
+      "reason": "request body for workflow settings, not repository entity",
+      "verdict": "distinct"
+    },
+    "4bf6ec7e25dae000047a4560fec736fc5749f6ad9c9f60e28abe77cb944acaa3": {
+      "reason": "signature requirement rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "4eac499d804279ec698985cfccdc66982355605858cd7a06062aaa014c55b524": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "4ef553ea684d3385e5c1150a6c39c6a4c387d036d2961076c56e430bdcb485da": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "510f267f604628ccdcfc67a3390f09a3fca1ac0fd5e0978fc6e1d84eb1905628": {
+      "reason": "security advisory associated with repository but distinct entity type",
+      "verdict": "distinct"
+    },
+    "528af540be6fb903b27f73d17dece896764380756d6e3c38656498424cb98a8b": {
+      "reason": "file path rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "532232d0e4ba39152e874968a818e6c5eabd35377a266c9f2f1ad8a7bb94bb51": {
+      "reason": "minimal view of repository with core identity fields (id, node_id, name, full_name, owner)",
+      "verdict": "variant"
+    },
+    "536e7edb5dc77ada8a80d68f5f8285e3984d0fd75fabb7c77be1d613f190f65f": {
+      "reason": "Represents private registry configuration, not the organization entity",
+      "verdict": "distinct"
+    },
+    "53c0495e2ddb75c3d638ad26ea028bb49ccc1f35ee0e9194ccb20742f677c8a4": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "54c36bdad5133aa1f8a7cec06c730d8bf21aec7cbff3fe5b44bc36658e3a6e2c": {
+      "reason": "Webhook payload for close event, not an issue",
+      "verdict": "distinct"
+    },
+    "5806b9660ad90f903d1582af0f35dcfa4303218c1cd3dca5ed97461fd3c05767": {
+      "reason": "Webhook event payload containing a team reference, not a team schema variant",
+      "verdict": "distinct"
+    },
+    "588ea519ec7f0c5ada1fd6f6bb773046e1e985090de795dbda30b728086d7597": {
+      "reason": "Union type of timeline events, not an issue",
+      "verdict": "distinct"
+    },
+    "58995390b3c161d28fbe22b91cc5bf83994b7ab0c4709e92878db6568baaf419": {
+      "reason": "Webhook event payload for branch protection changes, not a branch entity",
+      "verdict": "distinct"
+    },
+    "59c9129a54680aabb7369ca66fca1bcc49c26eccb58f08b3424fd3ef63db0d6a": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "5a4ca9e82d00d145b536a3504fc9fda5a5ac9ca5f500c5a048c71fbdf29b2de3": {
+      "reason": "Configuration for approval policies, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "5ad7c51be067b8689fb28d1dbb7f001567cec87791eeefccd3a0d0c450b59fb7": {
+      "reason": "Request body for creating issue types, not an issue",
+      "verdict": "distinct"
+    },
+    "5b10a8cedc97aa0aa7a44f2d1fad39ab1a84d9ef2bb87db09c0795605f1a6b2b": {
+      "reason": "credit attribution for advisory, not repository entity",
+      "verdict": "distinct"
+    },
+    "5b270a90528b897eae996588dfb923c70317edf3ff538a0511804e7662b89816": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "5b41fdb006e4ccc327526f14823a573a00ce62c298d66e774c573a3580c728cd": {
+      "reason": "complete repository representation with same identity fields as other repository variants",
+      "verdict": "variant"
+    },
+    "5db626e67a5a9d74248cf01c200806cc72542b3b42a4615fab27e1fb41cfcf53": {
+      "reason": "Secret scanning location metadata, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "5fd39fc6487c0dbf6b5daf05d4d385db6ee618df93f1816c16701c45cad80f1a": {
+      "reason": "Deployment policy configuration that references branches but is not itself a branch entity",
+      "verdict": "distinct"
+    },
+    "6178a2cd589009db39aac5f9a50a5296c536a7b124d43201233a6292e4f0ec96": {
+      "reason": "Webhook event payload for team deletion, event wrapper not team",
+      "verdict": "distinct"
+    },
+    "61ac2ffc44035357119b6d58628c12b865dc9cde9d1136b70a2874997ecde0d4": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "61b019407e5c7950c0496f0de8e9573b595acca194d9121e82783847d4981cb8": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "61bb35421e0e8d907b7fc449498b11b345f8998602479602dac4d318de709d94": {
+      "reason": "Minimal branch representation with name, commit, and protected status",
+      "verdict": "variant"
+    },
+    "6356423885cb9ee4395a012e68206cfcdff3fc62aeba334792205db502144a98": {
+      "reason": "parameters for code scanning tool rule, not repository entity",
+      "verdict": "distinct"
+    },
+    "63fa128af4bf3f4f7beb75eb2af0f8c29d6a38a021e0f95cdac9804be951974c": {
+      "reason": "Event payload for comment actions, not an issue",
+      "verdict": "distinct"
+    },
+    "642900b612ba9402e25b3f160bc46861d01cb9571d155af61ccfca88644aa1a8": {
+      "reason": "timeline event for commit comments, not the commit itself",
+      "verdict": "distinct"
+    },
+    "6444bdbb92d7502a0f0bb74d1fab1ad7260481a97d7d09f0e8475f833ff92612": {
+      "reason": "Result of a merge operation, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "646a1dd47102fa1370222cc2295443b02e68abdf11dbf6d5ad11609d5678d716": {
+      "reason": "Represents a secret scanning alert, not the organization entity",
+      "verdict": "distinct"
+    },
+    "64c2b33a240e3cb9084c7e83866c02528c9212f5036420fc1bbe7f7a810784a6": {
+      "reason": "Minimal organization object with core identifying fields (id, login, node_id, html_url) for Classroom context",
+      "verdict": "variant"
+    },
+    "65f6cf3480b50097cd2531ed2c7c29293301079789512ffc8f9b86568c5a4a67": {
+      "reason": "Webhook event payload for team-repository disassociation, event wrapper not team",
+      "verdict": "distinct"
+    },
+    "6647f03dd6d280eb4ebe332a9514c84cc3c61c07a6725d0eab449e15191209db": {
+      "reason": "Boolean setting for GitHub Actions approval permissions, not a pull request",
+      "verdict": "distinct"
+    },
+    "6674845ec986929d7ca660818a8b07b9dd2a5960a98550142792e89f111e3728": {
+      "reason": "file extension rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "6772bd9c4edd8acfd71ed44d93360931bb8514c7b8a0fe348c1e8a219871c74c": {
+      "reason": "Webhook payload for comment deletion, not an issue",
+      "verdict": "distinct"
+    },
+    "677ea19aea3e6bb6dcbb9910ecc6a00675e737644fb984cedef51f981735906b": {
+      "reason": "Array of username strings for assignment, not user objects",
+      "verdict": "distinct"
+    },
+    "67f852cd2543ee5ae1e11f7d99993f19d81510bcea00f3b8a73fbce594c069f2": {
+      "reason": "Migration/import author metadata, different structure than GitHub user",
+      "verdict": "distinct"
+    },
+    "680efe4076b04393e1fbed26cab13335f6368b6b5a1e90ea860b1c0ffaec653f": {
+      "reason": "Event metadata about assignment, not an issue",
+      "verdict": "distinct"
+    },
+    "68ee1ebc8180e29bad33d7c3d4823a8a71504fd7c52726d5a08099ec0b6cf46d": {
+      "reason": "Simplified team object with core fields, fewer properties than team-full",
+      "verdict": "variant"
+    },
+    "6a8d11a4c451942f2257d152d0b5189e27b86b7c2b8209acac901d56a77ee4ad": {
+      "reason": "Simplified gist view containing fork_of relationship but still represents the gist resource itself",
+      "verdict": "variant"
+    },
+    "6ab68d47f1806c1e781bd7eb1bc080fb2ef5cd82b33c35b47236c24b1b7b429d": {
+      "reason": "Core gist entity with standard fields (id, node_id, files, owner, etc.) - fundamental representation",
+      "verdict": "variant"
+    },
+    "6b922fc3fcee47ae21a738aeeee7fbfbaa1e04c5c932ef9d542382630f3f00aa": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "6bf806a5fe182b38e2464838bacda3765c603785b6d60d0dd0d67cc2f8342482": {
+      "reason": "permissions configuration for actions, not repository entity",
+      "verdict": "distinct"
+    },
+    "6cd5371322e25f878f879e3bb7b435ba2e1a55f3526037aaaf490ce31a5eea15": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "6e1a510f92a708ab05956b702b0115dc8bcae121bdfe523452dc3fd4d14ddef3": {
+      "reason": "merge queue rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "6f034360fca507818a3351f08fd2e29f5f23c978e6bab38c55fcf2f44370b88f": {
+      "reason": "Minimal representation of a pull request with just id, number, url, head, and base",
+      "verdict": "variant"
+    },
+    "6fb3b537f153eecec281af2638e44847375375988aa0c2405c813af253952cac": {
+      "reason": "Repository rule that matches branch names by pattern, not a branch entity itself",
+      "verdict": "distinct"
+    },
+    "70b4f80c9b01253883507534ab85656c92f06a172de43bfb37be3aeee7cf3285": {
+      "reason": "Event metadata about review requests, not an issue",
+      "verdict": "distinct"
+    },
+    "7290cc6e63cb1a3e116e31c91abd802f1fc288a6c3773a141316f1a1aeb38905": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "72ceddd543af239950e787c2f6ebbcf9d40d23033ee19ab217deb5ea310613c4": {
+      "reason": "tag name pattern rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "72f54bbe015ea6e204a958662898feaa6dc0e40b572f471643314e74f34ccef7": {
+      "reason": "Team object for webhook payloads, includes deleted flag and parent team structure",
+      "verdict": "variant"
+    },
+    "734f18f61e0cebea5da20e20c5c3a38bf064612ca7fa702299cdb30e4a7564b5": {
+      "reason": "Secret scanning location metadata, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "749471749d2351e39cdf2733f053815ec3c6a8fbbb5185a5bf6edcb3e46b5b3d": {
+      "reason": "collaborator permission details, not repository entity",
+      "verdict": "distinct"
+    },
+    "7522e84646697bf3a392bb5e0ce4c8a32430e40a678de8c87b9433d127080dd2": {
+      "reason": "Billing usage summary data, not a user entity",
+      "verdict": "distinct"
+    },
+    "77365763c79119773481ba9a1a4ac8ab3f72414c11fc53b965166770a5e4e7f3": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "779aa479154cf170ae3b8d3dbfa40dc32238099c909c7b398a02d90bf4471b8e": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "77c1fdc9c97ec5eaa9fb25f2bad04d36a9ccf149c21ab061d04f056a9d68a326": {
+      "reason": "invitation entity that references repository but has own identity",
+      "verdict": "distinct"
+    },
+    "781fa7110442b90a0f2d89439cd1976e98a1f765a4a83d05f09e898494e283c7": {
+      "reason": "Webhook payload for reopen event, not an issue",
+      "verdict": "distinct"
+    },
+    "784e87f926d841316d3b348672c219e4a23e113ed693f9282d012ab82fc3ae7d": {
+      "reason": "Represents conditions for organization rulesets, not the organization itself",
+      "verdict": "distinct"
+    },
+    "79a251030852651013e88b6014968aa14c1c7a271c287d52a81a04d6f0bcb4d2": {
+      "reason": "User object variant including Mannequin type for placeholder users",
+      "verdict": "variant"
+    },
+    "79da9629c413e745e85af86d1cb2fc879c9ee3069a03e1443db944da8b3b00d1": {
+      "reason": "Extended organization object with same core fields plus additional details like plan, billing info",
+      "verdict": "variant"
+    },
+    "7a077f75e6f5ed399ea60bbebd04055117f945b4837816c14552fbf7f30acea9": {
+      "reason": "Simplified user object for Classroom with id, login, avatar_url, html_url",
+      "verdict": "variant"
+    },
+    "7ae99997d0abefc785591999f5808db3a5476cef9c963630d931410eb886f3ce": {
+      "reason": "Comments on reviews are separate entities, not pull requests",
+      "verdict": "distinct"
+    },
+    "7b20be8adfdf144914954cbefe2ccc51cec61c128be309eb9f85714c6a520822": {
+      "reason": "enum for repository selection type, not repository entity",
+      "verdict": "distinct"
+    },
+    "7b42c71b6eac396afba7b8628e3f0e92ac4d5f3c4a4a5ab64951846655dc64d9": {
+      "reason": "Reviewer requirement configuration, not a user entity",
+      "verdict": "distinct"
+    },
+    "7bf51488c112f62bcd5888eae99bd3c4fc229096d95cf226748c3a78b654453c": {
+      "reason": "Webhook payload for comment unpinning, not an issue",
+      "verdict": "distinct"
+    },
+    "7c69ebcdefecd03d36de4268a5ba387c7cce312eeb44a6bafc40c75e55d22ae6": {
+      "reason": "rule with ruleset metadata, not repository entity",
+      "verdict": "distinct"
+    },
+    "7ca3a99a6770ea801d15b4d36b6a50ca39c6e3f575782d9949fea297748de667": {
+      "reason": "Event metadata about renaming, not an issue",
+      "verdict": "distinct"
+    },
+    "7d7a821ab2bfacf321b4cfe0e6dec54f4fdd562e9a57c35ee11b93f9dc03dbcb": {
+      "reason": "rule configuration for commit patterns, not repository entity",
+      "verdict": "distinct"
+    },
+    "8065025910a3a956bce2fee8cfcd2624cebf54b6bd95e512e233a2edb32ffb4d": {
+      "reason": "Marketplace purchase data, not a user entity",
+      "verdict": "distinct"
+    },
+    "8156133c7fa4bd108ee9602156c464ec57bef025db65e5d195a70a6dcebd3c66": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "81f4c3b5ec7d6ccb3c735b5b58305341935e3ffc11c97cda5ad655cd38e5d310": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "82496137d585e0a76d6b4914f50ff3038a08e4c224269a1a402c564a65d6db7a": {
+      "reason": "Secret scanning location metadata, not an issue",
+      "verdict": "distinct"
+    },
+    "8334fdb07d864bf514979ffc3e6a30cf68022c58fd5ad77973c1bdc1ab4a67d3": {
+      "reason": "rule configuration for committer email, not repository entity",
+      "verdict": "distinct"
+    },
+    "854be5734345ae49100ab6e5b5aed2a1faef3b4d1a19a62a9897f2c517db5487": {
+      "reason": "Request body for creating custom fields, not an issue",
+      "verdict": "distinct"
+    },
+    "85715d19cff5adf8d38b7822c33257a7196ded24ad17332d453ec50988de45fb": {
+      "reason": "analysis task that references repository, distinct entity",
+      "verdict": "distinct"
+    },
+    "85ab8c780dbedcef21a22a35be0000deae1590801f55e645dface45a57be01c3": {
+      "reason": "Represents repository rules, not the organization entity",
+      "verdict": "distinct"
+    },
+    "85ee12725e48493fe0c925138781df8a4b3a2cff0c1fa3e194f88510c756a361": {
+      "reason": "commit data with search metadata, represents the same underlying entity",
+      "verdict": "variant"
+    },
+    "86f14870cd590a42ae544f67aacdc3e0310f3ff64bbb733f14a58673d491bc50": {
+      "reason": "Represents a commit/revision to a gist's history, not the gist itself - tracks changes over time",
+      "verdict": "distinct"
+    },
+    "87bfb4ab9008f86e168ec265aa631104a53ba4aa3d738859c1610153e5203266": {
+      "reason": "ruleset conditions for targeting by name, not repository entity",
+      "verdict": "distinct"
+    },
+    "88cb55292dc85bbd4711c504d356872ddff34617fc26c12e8f312d1df961765a": {
+      "reason": "Usage metrics for Copilot PR summaries, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "891f6e291438fe64d055df0422edbf9c39f1bd54d805d808f3f259c318175cbd": {
+      "reason": "Issue comment in webhook context, distinct from issue",
+      "verdict": "distinct"
+    },
+    "899e792562c565829d7bf2dc21fd5a26f5c7d077f903c24c96d5c8d2f15e4fb4": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "89cbdf1beb89a08c4a05f9ff2dbac04093001839aff421dfed87e3ab55c89972": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "8a507501d08432329f1b93e159c56796b4fae7091b4cc99fdfb70ad0243a6b53": {
+      "reason": "Webhook payload for transfer event, not an issue",
+      "verdict": "distinct"
+    },
+    "8afb8446b19d69a5536b2f00bc76cde2634cf3edfa952a93a52c0c4efc0722fd": {
+      "reason": "Another webhook issue representation, same core entity",
+      "verdict": "variant"
+    },
+    "8baf13c8669b610e8aafe613b97b2190c2e74a80c821fc1147ceec47e97d808c": {
+      "reason": "Event wrapper for review comment events, not a pull request",
+      "verdict": "distinct"
+    },
+    "8bf6ebb7cb2f697857f3f09888c14b4f1862f3f58751d8dbe2d8378472213392": {
+      "reason": "wrapper with starred_at timestamp plus repository reference, distinct entity",
+      "verdict": "distinct"
+    },
+    "8bfd45b5b9a296192ff6ccd82757088bf71af881e74113e4b0d1d5cc51f734fd": {
+      "reason": "Represents code scanning alerts, not the organization entity",
+      "verdict": "distinct"
+    },
+    "8c9117f40e440ed6b95598ae7492d156f0ee1a25b3206dbb4bcac6f036626d6d": {
+      "reason": "Team's relationship to a role with assignment metadata, hybrid concept",
+      "verdict": "distinct"
+    },
+    "8c9675ebf61b81efbe3b4aade8dd4c86620a570b35513fae57190874d8cb4fdd": {
+      "reason": "OIDC customization settings, not repository entity",
+      "verdict": "distinct"
+    },
+    "8cb15a44312c7dd580d22cf7f4295c066c07f7a2801893e48f9651b90a48a9a9": {
+      "reason": "Represents organization webhook event payload, not the organization entity itself",
+      "verdict": "distinct"
+    },
+    "8d3889ba687234105625f2fe5d7a2b2fb5bf791137bce25f768d89f60885fe9d": {
+      "reason": "Event wrapper containing a pull request, not the pull request itself",
+      "verdict": "distinct"
+    },
+    "8ecf20526114b850edfaa356e8905ca0158376ee8dbcaaf9a9ef10a2c4dc68bc": {
+      "reason": "Aggregated sub-issue statistics, not an issue entity",
+      "verdict": "distinct"
+    },
+    "8f11551986b81ca476407d477a729e2545ad2f408cff76e0d6d5e315c1dd92ef": {
+      "reason": "Webhook payload for assignment event, not an issue",
+      "verdict": "distinct"
+    },
+    "8f1f433243bc9faaef1fb24443b4b1da735af78ec92eec30b735af752c63d3e1": {
+      "reason": "pull request rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "90646ca10934cba801f1c256ded535221ba37a1ca35495f4bd096fdf1db9c075": {
+      "reason": "conditions for rulesets, not repository entity",
+      "verdict": "distinct"
+    },
+    "911e24f27dec88df3f0e806caa763935a11720168d86072ca6f163ba21fe0c94": {
+      "reason": "PR review requirements for a protected branch, subset of branch protection settings",
+      "verdict": "variant"
+    },
+    "918e7886555ea7209af80ac63f265803d5f77ad41a717da7f3968d8f1a20091f": {
+      "reason": "Request body for updating custom fields, not an issue",
+      "verdict": "distinct"
+    },
+    "91c2c4e08bad696722bbfab890e34dad4c27497821f33881d0a4eb92d556b668": {
+      "reason": "linear history rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "92632cd1def26d741530d4b3d8cb84f4f29c6d20f2cb2d65b5456b8b06fff24a": {
+      "reason": "Rename data within events, not an issue",
+      "verdict": "distinct"
+    },
+    "93dfe3b77ca73acc2af9c41b44edc218947bebeb9f3d0c222f91d2b1c03245ed": {
+      "reason": "repository rule configuration for commit validation, not commit data",
+      "verdict": "distinct"
+    },
+    "951501fc42cb7d619e7568cce5603e10a79b025d2c1a9fa05c66570a9c58e5cd": {
+      "reason": "Represents organization webhook event payload, not the organization entity itself",
+      "verdict": "distinct"
+    },
+    "9572ab66b16f9b9f7243799521f3f543923946ec27bcfdeef204bb8dfd297637": {
+      "reason": "Event wrapper containing user reference, not the user itself",
+      "verdict": "distinct"
+    },
+    "95b27200bf04bb26082744be4441ceae65868d71e23c523ed299feed7100553a": {
+      "reason": "Represents Copilot subscription and policy settings, not the organization entity",
+      "verdict": "distinct"
+    },
+    "970df97d90e54a6b389c07880f42375254be9cd048b00e8e424b0bb589a250b2": {
+      "reason": "custom properties for repository, distinct concept",
+      "verdict": "distinct"
+    },
+    "9727a2fd6fe2fa254e236903ef8efda4bd45eb7ba13b17301842da678b09e1e4": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "987303f5015ab3f8505947e207c0db68c41e6ce41d16fc14d8e50f8caf06ece2": {
+      "reason": "Extended team object with all fields including permissions, organization, and parent team details",
+      "verdict": "variant"
+    },
+    "99b36a000238318eddfe6860f673ab42d71719e8ea4b7e2ae15a9e826a9e30b2": {
+      "reason": "Enum describing relationship type, not a user entity",
+      "verdict": "distinct"
+    },
+    "99ce0ed26b050c942b969b74df14fe104845c2ffd394f5ea9870ff303b88e835": {
+      "reason": "Branch entity with embedded protection details, extended view of a branch",
+      "verdict": "variant"
+    },
+    "9a5c7d833ddc8bbadbe228135e3bcfb2d46834f4003d926bdef40fb2dad6629a": {
+      "reason": "Timeline event metadata, not an issue",
+      "verdict": "distinct"
+    },
+    "9a94b40317d5d4c57b7aaa3a6e34b28a0be4d843e9c00abd5915924897363c9d": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "9c50262d18dcac1714dac4aad05825814b7c85609b060970b98beb00ec5c7bae": {
+      "reason": "Billing usage report data, not a user entity",
+      "verdict": "distinct"
+    },
+    "9d1e320b9a49e91c0302f77e8e78cfdf75848c892c4e26e84a47858b199c21f8": {
+      "reason": "Webhook payload for unpin event, not an issue",
+      "verdict": "distinct"
+    },
+    "9def2779af01abb0f196364b64b89134f587188d6aba4e0462cba91a0d274d45": {
+      "reason": "Event metadata about locking, not an issue",
+      "verdict": "distinct"
+    },
+    "9e23c04d344abdd7eb24731084cb4093a46f78fa78e39289597c8b8ee4c3a7f7": {
+      "reason": "statistics about commit activity over time, not individual commit data",
+      "verdict": "distinct"
+    },
+    "9e41bef70ecf0e629d224e3180bb6461113055246a95a7db9c522fecf75e54ee": {
+      "reason": "Core organization object with same identifying fields (id, node_id, login, url) used in webhook payloads",
+      "verdict": "variant"
+    },
+    "9e757f65379eafbdfb4ee5a7af4bf622de0f789608eadc6c9f5cf02b5f5e5ccb": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "9e90612b06b1c9a9627be0fbbf74822e1ffc42eae51414b2021edef7b4e96ca5": {
+      "reason": "Request payload for workflow settings, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "9eb68b37bece3852fda60aa89629a6414ae42e48aaf08ca555300ee2113a549d": {
+      "reason": "reviewer configuration parameters, not repository entity",
+      "verdict": "distinct"
+    },
+    "9f20f2931f80538c0e754603f08eb680fc57d0a0a7e4e22a8b70f5e1f1d2cb81": {
+      "reason": "Event metadata about review dismissal, not an issue",
+      "verdict": "distinct"
+    },
+    "9fa9031698af90f676e2b2c353b7e1bbaefc4bb105baf3892536df8889bb14f9": {
+      "reason": "vulnerability details within advisory, not repository entity",
+      "verdict": "distinct"
+    },
+    "9fcdb1fd4a8d53d98d38a62e78df32179c98c8fbb3d10f078bad80148739023f": {
+      "reason": "status check result for a commit, not the commit itself",
+      "verdict": "distinct"
+    },
+    "a003b655d0dc5287301585feaf1c3b8ad95f1c655a958487796926b316411c46": {
+      "reason": "Event metadata about unlabeling, not an issue",
+      "verdict": "distinct"
+    },
+    "a02d583ecb56254a6daac5bf9f22d6da251afbf6902ea3e1ee4b169a322ef183": {
+      "reason": "registry configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "a095a8464d34301c2f9db1bf923a312f80523a935d65d5acfc5f7872042572df": {
+      "reason": "Webhook event payload for team-repository association, event wrapper not team",
+      "verdict": "distinct"
+    },
+    "a118f031264dfd3af9ca882500f8dcb922eeacb7414e9c8b201b16ceb9306099": {
+      "reason": "Webhook payload for dependency events, not an issue",
+      "verdict": "distinct"
+    },
+    "a18757dfb1dc8330a69eb2871b1bc04d9cca352495d97988d8ecd8413cb086f8": {
+      "reason": "Environment deployment policy settings referencing branches, not a branch entity",
+      "verdict": "distinct"
+    },
+    "a193d749867e568c830479d3b864b956f34bee4f95fa50d7c1cc693b9c94bebb": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "a1b068f09d9bbf33342e1cdc92475783c902c43c4fc4e6c6dc548d5a6b56edca": {
+      "reason": "Issue in search results context, same core entity with search metadata",
+      "verdict": "variant"
+    },
+    "a240998fdff88ed2085f7375e86f28f8d57dfea4c94a31506b777503ace38a54": {
+      "reason": "Webhook payload for unlock event, not an issue",
+      "verdict": "distinct"
+    },
+    "a2517c13659e48f3b635874dfe878f1753b066848cc09d214768dff00a1a13f0": {
+      "reason": "Represents billing usage report data, not the organization entity",
+      "verdict": "distinct"
+    },
+    "a29ba5a866892c85ceeadfbde7e210afcf5799aacbad41794b65b855185e295f": {
+      "reason": "Repository rule configuration for committer email patterns",
+      "verdict": "distinct"
+    },
+    "a2bb01b2928a69a14e428d5fc797d0b3a3d11f38cb5674532b9b0513cd46dc20": {
+      "reason": "Represents a PAT grant request, not the organization entity",
+      "verdict": "distinct"
+    },
+    "a318c5e43a853912684798fc18f5ed05b4a0f5d23e0ddd2df0d89392cf07c928": {
+      "reason": "Workflow configuration settings for fork PRs, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "a367034fac023094c109e5dc5ced5710088a6ebc5eff2fc4b6aeeeeb8b58dada": {
+      "reason": "classroom view of repository with core identity (id, node_id, full_name)",
+      "verdict": "variant"
+    },
+    "a397e2c07bc260479ebbe75559a551a6eee06429538bec90e62de4951ff2fccb": {
+      "reason": "Webhook-specific pull request representation with links and properties",
+      "verdict": "variant"
+    },
+    "a3b5fee3097e1d77f06651646de49e926cbdae3e1bc049f625d0e4373f47cc46": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "a537835816c1308221b1a76e7e22a366629a51be2a5eacf3abcabd0adf9814e4": {
+      "reason": "Webhook payload for comment creation, not an issue",
+      "verdict": "distinct"
+    },
+    "a5bf083cd6f72de3799835118b2fdb883e36aab528615835d89ade17ea8615ad": {
+      "reason": "error response for rule violations, not repository entity",
+      "verdict": "distinct"
+    },
+    "a5c0a184555fde3432b4f1376a6dad12604186dd7c4179cf52099637e53b9020": {
+      "reason": "Represents Actions permissions settings, not the organization entity",
+      "verdict": "distinct"
+    },
+    "a5e3320bb8a0b69aa60a90a4be1d6947e18a81e4be6e20d7db2c52951536b7f1": {
+      "reason": "Branch protection settings for PR reviews, not a pull request",
+      "verdict": "distinct"
+    },
+    "a62a407d40710aa297b3c8ee6d8beb39404559a4816f75ce13668ccf0b7bcc9e": {
+      "reason": "Represents custom property values for a repository, not the organization entity",
+      "verdict": "distinct"
+    },
+    "a62e8c64262564bb3d2348da581ea3efda595af26d1377a2cea80389f794f1a0": {
+      "reason": "Represents a user's membership relationship to an organization, not the organization itself",
+      "verdict": "distinct"
+    },
+    "a7bbe78a2a4b025203da09594495ef0c0d09763015f6989df4e343e41e2a0105": {
+      "reason": "Metadata about pinned comments, not an issue",
+      "verdict": "distinct"
+    },
+    "a7c7bd3216cbe4a7a0e480432ef67346c1fdad7c47894d54d47325332c6d8660": {
+      "reason": "User object extended with role assignment metadata",
+      "verdict": "variant"
+    },
+    "a7f848ebf3cddc8c1a7467c39af88a494ead33e384a68ec9d708d43f6ae2f501": {
+      "reason": "array of repository objects with core identity fields",
+      "verdict": "variant"
+    },
+    "a87c29974fa3b44d69b92946f7ce23d1d89cddb2d18015be2153f4eb940cf364": {
+      "reason": "Webhook payload for pin event, not an issue",
+      "verdict": "distinct"
+    },
+    "a8c0df29eebfe0d677ccb274b93eb13734a780e302a43e6e3ac56fcb642527db": {
+      "reason": "Enum for reviewer type (User/Team), not a user entity",
+      "verdict": "distinct"
+    },
+    "a8cf683b8ff680d66b2228ae90e1e945fd6d9c53fb9d82eeafc655aee25f5290": {
+      "reason": "Webhook payload for lock event, not an issue",
+      "verdict": "distinct"
+    },
+    "aa8e1a85f690e2345c3b87820914ac161e119507934e83e7349e6909b313198c": {
+      "reason": "Represents cache usage statistics, not the organization entity",
+      "verdict": "distinct"
+    },
+    "aaa87208576e40c0c99e94be783bc7192375b014f15e78a01ed12ae7a0c63c09": {
+      "reason": "Event metadata about review request removal, not an issue",
+      "verdict": "distinct"
+    },
+    "aac8341e1d5e0f888f0f5593cf44c9d8573dcc15a4d174e8e4a69d9fe687da88": {
+      "reason": "enum for repository selection policy, not repository entity",
+      "verdict": "distinct"
+    },
+    "aae8ab196a4ebdc75dffc1f37fce3c2e0a3ec93bb2e5690623bab76b32fa5f05": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "ab83b8ed5f973f18982b2cf200f5ef1db28799dcd550744ee1396682beca159b": {
+      "reason": "Nested event data structure, not an issue",
+      "verdict": "distinct"
+    },
+    "ac08aca4fa8a56c3f3bd7eb244d1dc1a698a1db058f62c79be866d39dfba32cc": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "ac105e5f83f9668852d399da0cf8571c4624f5ff50bdd9dde8d8ef3b6bf1c74e": {
+      "reason": "status check configuration parameters, not repository entity",
+      "verdict": "distinct"
+    },
+    "ac5baed73891f1daaf4f4a8d5d1f2ee487bbb230416ae0ab692924ae979562a2": {
+      "reason": "grouping metadata for skipped repositories, not repository entity",
+      "verdict": "distinct"
+    },
+    "acaf67e7bf4d7fe34f93799880f5db87832a8a614988a8508a3d6e362a737cee": {
+      "reason": "Draft issue in projects is pre-issue state, distinct entity",
+      "verdict": "distinct"
+    },
+    "adc5be9a58bfb360fba63476a420a4d7d2bee4f65e6479e804eb8e9a8462d28b": {
+      "reason": "cache policy settings, not repository entity itself",
+      "verdict": "distinct"
+    },
+    "ae44c49a0f9bbfe7b3ebfddc07fd989a7f4b6cef1f776cc0b799c1ae9cc2b572": {
+      "reason": "ruleset configuration for repositories, distinct concept from repository entity",
+      "verdict": "distinct"
+    },
+    "ae76bc2ee2c16f7bd099b249b55d09587892877b642459eb9d681c6c44b0443c": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "afecbb3a738d55fd14f072f7447cbadcd2f9cddeda3c49bea5135b5480718e7d": {
+      "reason": "simple view of repository with core identity (id, node_id, name, full_name)",
+      "verdict": "variant"
+    },
+    "b0230c53436e07c38d3b651e8dfd5c85dfecc5484af6dfa285ad2cea488b1cab": {
+      "reason": "request body for creating advisory, not repository entity",
+      "verdict": "distinct"
+    },
+    "b0c1cc3beae73cca7a2d07bd6f9340f912b1e150b0d704d5608c2ba683ddd78f": {
+      "reason": "comparison result between commits showing diffs and statistics",
+      "verdict": "distinct"
+    },
+    "b15bcf1fb16300b3619785c9e413a69f4dcd92487f5883b38d5dbc5dc461e150": {
+      "reason": "ruleset conditions for targeting by ID, not repository entity",
+      "verdict": "distinct"
+    },
+    "b1a3676c194a8400c393b0dec90aad594129abae212444586d257decdbda9be6": {
+      "reason": "Array containing user objects as reviewers",
+      "verdict": "variant"
+    },
+    "b25cbd59140f97de90d7fbb94ec5a16aeb60a0fc0cdaa86a12d6402539b94969": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "b32d40656b94b9b45960235e3563b7f03b192c0b0a6daa06aea830370916cf90": {
+      "reason": "Represents request payload to update an issue type, not the organization entity",
+      "verdict": "distinct"
+    },
+    "b429b87aaef23161958c1058626c3da17bdee68bb133f4d0cbe7b953f555c741": {
+      "reason": "Another webhook team variant, nearly identical to webhooks_team_1",
+      "verdict": "variant"
+    },
+    "b4e4c8d5647da6c0357bd0f9bc58de2229c3d8b2d4356ef01477ca2a5b1e7581": {
+      "reason": "Enterprise-level team with different semantics (group_id, organization_selection_type, sync settings)",
+      "verdict": "distinct"
+    },
+    "b4f860fe7b43877c575bc2892b394553e39653e428d67e050506b519f5c816d8": {
+      "reason": "Event metadata about labeling, not an issue",
+      "verdict": "distinct"
+    },
+    "b5c087b0527081b90b623ac285b6c4930aeb95203c5fc2fc0417f068565d0222": {
+      "reason": "Timeline event metadata, not an issue",
+      "verdict": "distinct"
+    },
+    "b974d76dcd0350ec71f4e463353bb5ddcdec0fecbd7674d5b8ef0168d701f7b9": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "b98685a1e11ebfc2d34ee8662e0d96fddbedbfef7caf331b58a8440c02f03bcf": {
+      "reason": "Represents an Actions variable, not the organization entity",
+      "verdict": "distinct"
+    },
+    "bbad09e30c0d31d33958bdc2b4ee8e428b15ae5374976fc1f59e7f4bea9db686": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "bbc2f535d25cbd9b0c7f9fc3c570b72968f30dca9ebeb89f90357e58118cf759": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "bbca60c1a79cb6cd8798aaac5142d76ca7d8b020033f616df7351cc11b4217f0": {
+      "reason": "commit representation specific to gists with version and change status",
+      "verdict": "variant"
+    },
+    "be71dc42dc08a5b3a06cd029e4b5eb18a630f051fb1c1d8d8ddb8ae6b705f175": {
+      "reason": "Represents billing usage summary data, not the organization entity",
+      "verdict": "distinct"
+    },
+    "bf69056a8fd7a67364f4c462f2da9bd100fb6b12308c02523dfee81226b23a39": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "c2943dcac3f75ed1008f8f08a9a6036f6b033b1710c091bb5121de2214481b8e": {
+      "reason": "Represents cache storage limit settings, not the organization entity",
+      "verdict": "distinct"
+    },
+    "c3c170773b35154d03a4600f2a4cef1a1c84a54eacd6a0bedfc53160cee1ce34": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "c3d894ac632268a60560aa5c3d3101719c0a22be751fc5bc0a3462c03cda83f2": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "c3d98a96f34dc8b17b9b9040a9e24f9ddb6082b1a002d5884af4a9d70c780340": {
+      "reason": "Billing usage report data, not a user entity",
+      "verdict": "distinct"
+    },
+    "c3de66b569e8285fdcaffd0b3279ddc84e647e28b21558b59f1170cbe5403cbc": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "c49c8215abc2cd8fd5dbb72105476cb3662fcbb1634904975ccbd5de3ac94458": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "c65d9c4aa83bc8850b6731197efd1062469359104250dd816eb6f4b903b5d5e7": {
+      "reason": "Defines access restrictions for a branch, part of branch protection configuration",
+      "verdict": "variant"
+    },
+    "c82f7227658d4e99c694f31feb0924e350be05a36db1d87e6a85aeb1bbb1f932": {
+      "reason": "Timeline event on an issue, not the issue itself",
+      "verdict": "distinct"
+    },
+    "caaaf46f87b9b05cfdb996aa515ff338c69af0768da780f48661c38439984a45": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "cac89b365c1662e879660cf231348bb09c063e144ea3742e993b0d8ebb7f222f": {
+      "reason": "Event metadata about milestone changes, not an issue",
+      "verdict": "distinct"
+    },
+    "cb8c3ee8aeffae3dc402b2cbe1705008cd3d16687a7abc5dc76bb8da428808d1": {
+      "reason": "Label data within events, not an issue",
+      "verdict": "distinct"
+    },
+    "ccc0f4e4c861e461aab500d96a4a30896aefdeb140257682e7eeb9dd17984f03": {
+      "reason": "Standard GitHub user object with login, id, node_id, avatar_url - core user entity",
+      "verdict": "variant"
+    },
+    "cdd95a8ed7b9d6b24a04399d05f6ce6520782ee0498f61f459af1348cec2aea2": {
+      "reason": "Webhook payload for deletion event, not an issue",
+      "verdict": "distinct"
+    },
+    "ce57815bdb9d82958d68f287a9117c747c7687ee28c20806ebaae015e8b2a116": {
+      "reason": "Compact branch representation similar to branch-short",
+      "verdict": "variant"
+    },
+    "ce9bce590ed3d53d10c9cbf5737d27592d4c3ba5b2df08997e075b4e803895a6": {
+      "reason": "Webhook payload for type assignment event, not an issue",
+      "verdict": "distinct"
+    },
+    "cf741d71b31d78bdc8ddbe62cf910c9864eb20eaceb9108cafd39c133f8b1a4e": {
+      "reason": "Custom field values attached to issues, not the issue itself",
+      "verdict": "distinct"
+    },
+    "cf906cc2a4081a5b9853d874e4d367804b3fd39fddb0884ef44d8676f82189d9": {
+      "reason": "team access view of repository with core identity fields (id, node_id, name, full_name)",
+      "verdict": "variant"
+    },
+    "cf91ffe774a7257e56bda4fafe9c8da2d538b8b36e7999166e5da3d99e93b84d": {
+      "reason": "access level configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "d020831d2d54a3c67e8f8b3408ec02635195af905eb9e28a42debd0695d26f4e": {
+      "reason": "Represents request payload to create an issue field, not the organization entity",
+      "verdict": "distinct"
+    },
+    "d119b7c8b420b10794635fc45a5b663fa572c9a6f8c45a922455db62e1b2e05f": {
+      "reason": "request body for committing an autofix, not commit data",
+      "verdict": "distinct"
+    },
+    "d2921c939e79689cb92aee96d380ee3df95caf3d7ef28beb528beade17f4ca64": {
+      "reason": "User object extended with search score and additional profile fields",
+      "verdict": "variant"
+    },
+    "d2dd4754929675de9f69ac8dd220e83205f71848ddd831adbb6302076eccd3e2": {
+      "reason": "Represents an invitation to join an organization, not the organization entity",
+      "verdict": "distinct"
+    },
+    "d3c5a2058f7b83f03915eb0748bbbaa1b3b5b1c45f498797128df65bab51c6a5": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "d566044d0240e8abedfb637a69ed8b7f710465f1ddeeae196e02513d53476167": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "d567157a2f32d4e2747917f942f9d605240b26c052a46b40d6696159b177f3dc": {
+      "reason": "individual rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "d5eaa722e6602480e800b75b36ac53693d6fa5a7c4edc10bef11f470c29b0889": {
+      "reason": "Webhook payload for label event, not an issue",
+      "verdict": "distinct"
+    },
+    "d73fd9b5520e0c083953c219ac34f9f2ba2f80eb2e921da98308b7f128679996": {
+      "reason": "Webhook event payload for branch protection rule changes, not a branch entity",
+      "verdict": "distinct"
+    },
+    "d7b783907f6a04a1997f09ab3069af5b31c7281e523a0125f6cf39845a70ec2c": {
+      "reason": "Represents an Actions secret, not the organization entity",
+      "verdict": "distinct"
+    },
+    "d84e2b512f3cbf6340b00cb9cd5f511abe2a10a06118cab6eda3a582bd944457": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "d8fb48e0e91f80462329503bf2fb919db0cceedb852dd3cb9d285ecb58422e19": {
+      "reason": "describes where a secret was found within a commit, not the commit itself",
+      "verdict": "distinct"
+    },
+    "d95015921639c7cb90c8fa1282efab108cd17b2e9dfd0446685c38b3cda8695c": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "da39459d7304e01e9100860f3ce6cef1d458f9d941a9527b596da7e42f2aa7da": {
+      "reason": "ruleset conditions for targeting by property, not repository entity",
+      "verdict": "distinct"
+    },
+    "db5dbd79adaa1458c719a296deac247eb991099b697af35db672c0ab1b848f67": {
+      "reason": "Event metadata about unassignment, not an issue",
+      "verdict": "distinct"
+    },
+    "dda5336fc2f0c41709582dda2a0c839d820251e53960aac2164c5755c621b665": {
+      "reason": "Event payload for issue actions, not an issue",
+      "verdict": "distinct"
+    },
+    "de0cd72bbbe34e4d99f2b5107c1e848905f12fe220e0d91834b29d9acd446998": {
+      "reason": "Webhook payload for sub-issue events, not an issue",
+      "verdict": "distinct"
+    },
+    "de7ffeed98da9d07f2b6a1c8f14325670de29cba0741545aad91196d74cc54dc": {
+      "reason": "reviewer specification, not repository entity",
+      "verdict": "distinct"
+    },
+    "df5cf67f8ac3f201a91eb6cf9887027b4694745f276a91b664fe80a4e2400387": {
+      "reason": "Comments on issues are separate entities with their own lifecycle",
+      "verdict": "distinct"
+    },
+    "df8c32c45a5bdbd82c89e00f78952aae484735b5c1226a183abf730e16cc8bc4": {
+      "reason": "webhook event payload, not repository entity",
+      "verdict": "distinct"
+    },
+    "e066687d56a974cc3dae4c5a458f8f2306b7b4c9649e2e3946c35b95c30e2bfb": {
+      "reason": "Represents org_block webhook event payload, not the organization entity",
+      "verdict": "distinct"
+    },
+    "e0742a3222b3d7b0aab911431df951d2667542e71e22926bd6a70b305a2ba232": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "e08aaa5d4f893a42e042250cc9dc75ede0a39b587f5a1c6e42e2ec1bf380372c": {
+      "reason": "Union type of events, not an issue",
+      "verdict": "distinct"
+    },
+    "e0ea79c3519606cea52203637161a4e8f5915afc64a61f5c4bc0e76ea1ac346e": {
+      "reason": "User's membership relationship to a team (role, state), not the team itself",
+      "verdict": "distinct"
+    },
+    "e10dac472e45cfebac7b9583cbebe4e074148732f2d7c9c698aee37dbed3cf4a": {
+      "reason": "workflow file reference parameters, not repository entity",
+      "verdict": "distinct"
+    },
+    "e1b5a0edf6a528b0641eaa2a3fb72afab257e96dbafdf4b7108f79b7cf1777b8": {
+      "reason": "enum for enforcement level, not repository entity",
+      "verdict": "distinct"
+    },
+    "e1e629d999dc9eb35470bb7dab7e2edb2979e6583a62933bec658b6198593a6f": {
+      "reason": "Webhook payload for sub-issue events, not an issue",
+      "verdict": "distinct"
+    },
+    "e26c50925c07c14e16268617be589c37e60b8dd252fb067f9e1ae0cb5be79e05": {
+      "reason": "Branch protection setting about admin enforcement, not a user",
+      "verdict": "distinct"
+    },
+    "e336c1988f004fba0685a2d40021c2777a161fff4835a008ffc94cc4e2067ea4": {
+      "reason": "Represents a PAT grant approval, not the organization entity",
+      "verdict": "distinct"
+    },
+    "e37e6c84488614d652868d2aaafd24398981ebfc5fbe836857c66629d51f8692": {
+      "reason": "association between config and repository with status, not repository entity",
+      "verdict": "distinct"
+    },
+    "e4e5635673e56feee6b173e8a9f36c8cfb3c34a5d130b52fd33ada2e6dd808ab": {
+      "reason": "Represents organization webhook event payload, not the organization entity itself",
+      "verdict": "distinct"
+    },
+    "e54a3e0922a3ba0231f073189c16c9237330aeb0580e5168ee1a50bd6591c81d": {
+      "reason": "Webhook payload for sub-issue events, not an issue",
+      "verdict": "distinct"
+    },
+    "e62bdb98d521fe74e802a8121688a2b9273d584530bfea49a4f25346cc9497db": {
+      "reason": "storage policy settings, not repository entity itself",
+      "verdict": "distinct"
+    },
+    "e83a12c68b696cfdf8c5a3e692fad73b182af985deda232189922d607d7b6c60": {
+      "reason": "Webhook payload for unlabel event, not an issue",
+      "verdict": "distinct"
+    },
+    "e848051fcfd771acc7fa2d1b92aca9e7a29515d6e59c09e9d7256ba6fee3f0d8": {
+      "reason": "usage statistics with repository reference, not repository entity",
+      "verdict": "distinct"
+    },
+    "ead487154cc084263832d80cca340660f848c93db60e68ed4703c579b8198fb9": {
+      "reason": "Webhook payload for demilestone event, not an issue",
+      "verdict": "distinct"
+    },
+    "eb152b8232e7f9f9aa3baa9ed075888f5f1b5bf35959b16d549fd3b221e5f895": {
+      "reason": "aggregated status checks for a commit, not the commit itself",
+      "verdict": "distinct"
+    },
+    "ed607bd02f261b84cc19952bd830e66cc18084f37bd87ccb6e44df0094844bff": {
+      "reason": "Reviews are separate entities that belong to pull requests, not pull requests themselves",
+      "verdict": "distinct"
+    },
+    "ed9891bcd5fa304722a67e445d57b520b16e2e245bfcb472120a840e8b1d7cc2": {
+      "reason": "wrapper object containing a commit along with file content metadata",
+      "verdict": "variant"
+    },
+    "edfb058a9fe9f61d84a6e3ac2dafcf79239e3061c35bcb2ddf2e3b5f22ddc14b": {
+      "reason": "codespace entity that includes repository reference, distinct entity",
+      "verdict": "distinct"
+    },
+    "ee288d76c1c7d28764d0ef978bf60da410ab81b238898e6dc63a8fb5dc67d0fa": {
+      "reason": "Secret scanning location metadata, not a pull request entity",
+      "verdict": "distinct"
+    },
+    "efa3fe6304a9d34d3b43fdf27b759a6826661a2203c94438aa68cac196fb2b32": {
+      "reason": "metadata about rulesets, not a repository entity itself",
+      "verdict": "distinct"
+    },
+    "efb97697d2e9844ae397910e0929ed9df14296cd9452b539050b0fde186264a9": {
+      "reason": "status check rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "effcd55c3546291e0b2d253b34e16b568bd009daaf4dea9f8f15ab98eb740e7a": {
+      "reason": "Public-facing user object with profile fields like bio, company, blog",
+      "verdict": "variant"
+    },
+    "f00bd3ea4ea8df82bb240fe081acf8b951a8c0b03d6e93d449d3d0585f4e020b": {
+      "reason": "rule configuration for commit messages, not repository entity",
+      "verdict": "distinct"
+    },
+    "f04ed7d9eccbfd5bc98df61c984c25b36910feb7423b0092ef5ef4ffca8e675f": {
+      "reason": "dependabot alert that includes repository reference, distinct entity",
+      "verdict": "distinct"
+    },
+    "f1b84817e1c398ff2fad4c32089ef1467592927fccfcfcb8f18894e029ff96af": {
+      "reason": "Webhook payload for edit event, not an issue",
+      "verdict": "distinct"
+    },
+    "f24aa1b60bc29407682c4dc9a5cc979d213945441f20d03cfa73c410a27e899a": {
+      "reason": "Permission/role wrapper containing user reference, not the user itself",
+      "verdict": "distinct"
+    },
+    "f42ff393724071f15eb9f1ddd41ccbd350beeed14903e40102d29e56a2df6afc": {
+      "reason": "Simplified pull request representation with core fields and URLs",
+      "verdict": "variant"
+    },
+    "f480f57b3a693d7002069ff77c7a68b99c7bb7e614dd4b3c4b69f1cc850e4145": {
+      "reason": "Represents organization webhook event payload, not the organization entity itself",
+      "verdict": "distinct"
+    },
+    "f59d1819d765472f6d66db5fdcb00aa3d1fd1a1560201a60d7313027f7968031": {
+      "reason": "Represents a comment made on a gist, not the gist itself - different entity with own id/body/user",
+      "verdict": "distinct"
+    },
+    "f5bd63b6ae5d646375dc58e42d137c601241bfb308a8b09d29c40947ce9672bb": {
+      "reason": "Complete branch protection configuration, comprehensive view of a protected branch",
+      "verdict": "variant"
+    },
+    "f6d9b81aaf210a683fa850c0a48c6c4832156eac9f1707856d8756ef7b037f9e": {
+      "reason": "deployment requirement rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "f73c881d61522284f8b57f88d1c59cc2796c653e645c4ba16c34fd7971b6a555": {
+      "reason": "Webhook payload for unassignment event, not an issue",
+      "verdict": "distinct"
+    },
+    "f7a84b83fb1430f5cd5445b1011fcf204a94422403a86b46e6d38beb2ee1063f": {
+      "reason": "Webhook event payload, event wrapper not pull request entity",
+      "verdict": "distinct"
+    },
+    "f7cba2466ff9c2fe88e86a344b436dc822afe5e88baef0651e5f0d227a500f08": {
+      "reason": "Represents a secret for Codespaces, not the organization itself",
+      "verdict": "distinct"
+    },
+    "f83da1b74fb9dfdd257c674512a4009c334768b83d259387c0f30387272b4bc3": {
+      "reason": "subscription settings with own identity, references repository",
+      "verdict": "distinct"
+    },
+    "f979fd0da0b0df2c02369898cb16da4073bbd3ee0461d29f87f8c6818894b11d": {
+      "reason": "Webhook payload for type removal event, not an issue",
+      "verdict": "distinct"
+    },
+    "fa782ba8082c4a8b5b46ed4d7f8d15e5780020652d503373b94f26fbd2f21c9b": {
+      "reason": "Event metadata about project removal, not an issue",
+      "verdict": "distinct"
+    },
+    "fadaaeeb803f4ba7733a96da56a043dbe6b66913f4bdf43b8a8832a20499fc82": {
+      "reason": "Webhook payload for comment pinning, not an issue",
+      "verdict": "distinct"
+    },
+    "fafffc9ac5649d03379802e2a4286453ec026f05dd7b427e3bc541206a8638e8": {
+      "reason": "array of repository objects with core identity (id, node_id, name, full_name, private)",
+      "verdict": "variant"
+    },
+    "fb5253a59feb5822886ae3ac22b83da0220a0601a15d102805042e1181b3352d": {
+      "reason": "update rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "fbe8460d70ceb518bb5de5417b81a3ac1255a66f41f5a856c90d6124805b6670": {
+      "reason": "Event metadata about conversion actions, not an issue",
+      "verdict": "distinct"
+    },
+    "fc45921f9aa01225f877545e785a90411a0e8fd6543e25a4858333e7449c3916": {
+      "reason": "Webhook event payload for branch protection rule changes, not a branch entity",
+      "verdict": "distinct"
+    },
+    "fc642126d1b6e451603cc0beaed17b9d56484be9f43b2d5c0017683549009f4a": {
+      "reason": "Webhook event wrapper, not a user entity",
+      "verdict": "distinct"
+    },
+    "fca9ec813e90fea217c319e800b4f5f5c2d75661749ab8bd410e71ffd2552062": {
+      "reason": "copilot review rule configuration, not repository entity",
+      "verdict": "distinct"
+    },
+    "fead0bd59d5cb134946679a4bb52ae80333d3bf79a0177a01506604892dfbfcd": {
+      "reason": "Identical structure to organization-simple-webhooks, just used in different contexts",
+      "verdict": "variant"
+    },
+    "fee9e36d10d5ba9463ac99f355ef48152f8b3e6c7b466e8998fe90dc1097b630": {
+      "reason": "Represents protection rules applied to a branch, an extended view of branch security settings",
+      "verdict": "variant"
+    },
+    "ff2b04877427fa9ca794859daf742bf13b004c179b8ec19636b103ce75a1ed22": {
+      "reason": "Status check requirements for a protected branch, subset of branch protection",
+      "verdict": "variant"
+    },
+    "ff99ce3bcd3f0536841d3c3d7ae10aba5719b6e0e9b0c2e40bf5433ae3505d96": {
+      "reason": "represents a comment on a commit, not the commit itself",
+      "verdict": "distinct"
+    }
+  },
+  "version": "1"
+}

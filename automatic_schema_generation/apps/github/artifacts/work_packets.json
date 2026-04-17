@@ -1,0 +1,51 @@
+[
+  {
+    "resource": "orgs",
+    "model_class": "Org",
+    "table": "github_orgs",
+    "entity_slug": "org",
+    "id_format": "NUMERIC(1)"
+  },
+  {
+    "resource": "teams",
+    "model_class": "Team",
+    "table": "github_teams",
+    "entity_slug": "team",
+    "id_format": "NUMERIC(1)"
+  },
+  {
+    "resource": "users",
+    "model_class": "User",
+    "table": "github_users",
+    "entity_slug": "user",
+    "id_format": "NUMERIC(1)"
+  },
+  {
+    "resource": "repos",
+    "model_class": "Repo",
+    "table": "github_repos",
+    "entity_slug": "repo",
+    "id_format": "NUMERIC(2)"
+  },
+  {
+    "resource": "gists",
+    "model_class": "Gist",
+    "table": "github_gists",
+    "entity_slug": "gist",
+    "id_format": "NUMERIC(1)"
+  },
+  {
+    "resource": "issues",
+    "model_class": "Issue",
+    "table": "github_issues",
+    "entity_slug": "issue",
+    "id_format": "NUMERIC(2)"
+  },
+  {
+    "resource": "pulls",
+    "model_class": "Pull",
+    "table": "github_pulls",
+    "entity_slug": "pull",
+    "id_format": "NUMERIC(1)"
+  }
+]

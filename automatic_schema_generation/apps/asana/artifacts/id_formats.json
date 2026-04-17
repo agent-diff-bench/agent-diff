@@ -1,0 +1,50 @@
+[
+  {
+    "resource": "project",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "section",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "tag",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "task",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "team",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "workspace",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "user_task_list",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  },
+  {
+    "resource": "user",
+    "alphabet": "ALPHANUMERIC",
+    "length": 16,
+    "example": ""
+  }
+]

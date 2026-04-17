@@ -1,0 +1,309 @@
+{
+  "entries": {
+    "0163f0561f66e2436e743d9c768650dca2bb8af8eed660e357460c8ca1aace55": {
+      "reason": "Base schema for team membership, represents user-team relationship not team itself",
+      "verdict": "distinct"
+    },
+    "022f36b9bc55c4cc32d9f562c5c2e522b257f91e34a3175091dc27a9e07c45f4": {
+      "reason": "User task list is a separate resource with owner/workspace properties, not a user",
+      "verdict": "distinct"
+    },
+    "02c8df21f3e14aa35b823e11419d8ed1144844c04993c3e7873e69a523abc37a": {
+      "reason": "Response variant of portfolio setting entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "04d1cdd746bf1c4e7bc68d24ffd006d77456f6707965237fba617a30847847b7": {
+      "reason": "Request payload for adding a task to a project",
+      "verdict": "distinct"
+    },
+    "0a482891a7146b9361c4780655f0fcab2badbe51047a32cb730fcb26e2a92cf0": {
+      "reason": "Full story representation with all fields including created_by, likes, hearts - clear variant of the base story entity",
+      "verdict": "variant"
+    },
+    "0f0684ed434bc7865a44c51d5c7235027aa48dba301f388119c75b930cdaf485": {
+      "reason": "Request payload for duplicating a task",
+      "verdict": "distinct"
+    },
+    "14f5a72cbdc4f7b5008ca034646b5ed4074fbe3a3dc3bf662d9dbe77a9970ead": {
+      "reason": "Aggregate statistics about tasks, not a task representation",
+      "verdict": "distinct"
+    },
+    "1740ead0fb679bdb57d9b13f7406048ee7cdf1b0172685342fc314345fd46764": {
+      "reason": "Request payload for removing a tag from a task",
+      "verdict": "distinct"
+    },
+    "1850a0d3800a2d0562266041e4aa17cd2196443b8b7c5bb9784b0288ac1029e8": {
+      "reason": "Request schema for project brief entity, not a project variant",
+      "verdict": "distinct"
+    },
+    "1d33c30da453240317342da2e9477c8bf3a15e4989ad202a4af7a2316ffe4cb0": {
+      "reason": "Comma-separated string of user identifiers for adding members",
+      "verdict": "variant"
+    },
+    "21cdce71ae0c7ecc85798ff9bb6839d34759b2b5c2f54b40ee38b01eb72f4646": {
+      "reason": "Response variant of project template entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "237004297f1ba66e535c50b8346772b9765cf4a959efca744acab48c4e41752f": {
+      "reason": "Request payload for creating a template from project, not a project representation",
+      "verdict": "distinct"
+    },
+    "23aa6331fb0bd76a79c86ec20de689a79ecdac69cc87495f3a3ac7138079a014": {
+      "reason": "Comma-separated string of user identifiers for removing members",
+      "verdict": "variant"
+    },
+    "26bbd0a1636c59673122e61353645231072e1a4b2449b7819607d380ea9df133": {
+      "reason": "Request payload with a single string field for tag gid, not a representation of the tag entity itself",
+      "verdict": "distinct"
+    },
+    "278a68c952b5bc7d4af205834d28d0b1eebe4227f5a35ac9e54ceeb209ff2f0d": {
+      "reason": "Request payload for reordering sections within a project, not a project variant",
+      "verdict": "distinct"
+    },
+    "29b902cce98a50b2f97704311fbf0436cf32f25870a3379e16c51f3baeb7fe2a": {
+      "reason": "Project briefs are a separate resource explaining the what/why of a project, not a variant of the project entity",
+      "verdict": "distinct"
+    },
+    "2c95c84e8ef0aad1125afb6c0f5ba52b2eb3df2e04bad888458dc81fb77c4fae": {
+      "reason": "Single user identifier string for adding to team",
+      "verdict": "variant"
+    },
+    "2fb59bc443bf9d9dadffcf7a700bcf4d0ce6e2875b18f1d8d44ea903f59a9f95": {
+      "reason": "Alias for WorkspaceMembershipCompact, still represents membership relationship not workspace entity",
+      "verdict": "distinct"
+    },
+    "300abccd87fcf3a152bd2e4b76304cacbe514c9a70bedadd402d55f66c9381a8": {
+      "reason": "Request payload for creating/updating stories, references StoryBase - input variant of story entity",
+      "verdict": "variant"
+    },
+    "31ea216f5004645a91bb277371b2337e4f04e3b6b545387d5f881fec71d25864": {
+      "reason": "Response variant of membership entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "33aa033931d50022e8d7741afd83910096fa6e07fee6ed8c1fba71d7601926fa": {
+      "reason": "Base variant of project template entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "3716c97b6ae64537a39c13ff54f2db68c977e9c751b5ffb4e1334606febca5e0": {
+      "reason": "Update request for portfolio setting entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "37d46fc69b8602ba49c1424a5fb7e5f67a812c141f4359948b2d03d36c997f2d": {
+      "reason": "Template recipe for creating tasks, not a task itself",
+      "verdict": "distinct"
+    },
+    "4465416798d3f8e9cb7e7f4e4a790b911cfa6b01add9f723bc7b9036af3df85f": {
+      "reason": "Represents a user-team relationship/connection, not the team entity itself",
+      "verdict": "distinct"
+    },
+    "468ef3ff3797ba039705b1e52aac0d218da0a87ded197c410e25cd116a7c6175": {
+      "reason": "Single user identifier string for removing from team",
+      "verdict": "variant"
+    },
+    "4c304a06df34b87b56e205a175f41dc4044dcbcad2d6775388ae22e220de94cf": {
+      "reason": "User task list is a separate resource, not a user variant",
+      "verdict": "distinct"
+    },
+    "4c619aafefbdc289682088a671eec15c0d72f5854aad6ded1819a19bf3334258": {
+      "reason": "User task list is a separate resource representing My Tasks view, not a user",
+      "verdict": "distinct"
+    },
+    "50434b0fd9b9acc452a4cec854f8471ad511280007265f9b687b91b448b07e66": {
+      "reason": "Request body for reordering sections within a project, operates on section identifiers",
+      "verdict": "variant"
+    },
+    "51bd74db1fdae52ffcc678dcffaacb0c3ef23df963f60e776d357649ca74909e": {
+      "reason": "Request payload for adding users to workspace, not a representation of the workspace resource",
+      "verdict": "distinct"
+    },
+    "606d568f50ecea05dd1428a108cb24f284673d4ada0edc94e7d20f84423ab3a9": {
+      "reason": "Response variant of membership entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "6208640e7fedee9382ee38726d1c36681a4a5b6934269b4225b1cab7a1c3b19e": {
+      "reason": "Represents either a team OR user, not exclusively a user entity",
+      "verdict": "distinct"
+    },
+    "7ce75a51da5a6f1fa6f1c837b241669815ddc9a2a449f2505f2b87a1c6491af0": {
+      "reason": "Template response containing template metadata, not a task",
+      "verdict": "distinct"
+    },
+    "7f5caba44d09bddb856a72873fa812a0ad8e47b446217a25272f7c1f0520a402": {
+      "reason": "Project templates are a separate entity used to create projects, not a variant of project itself",
+      "verdict": "distinct"
+    },
+    "7fb3e099ee6af1d22c1dd389b5faeed432aab34889a90111e8fa00acd86e752d": {
+      "reason": "Comma-separated string of user identifiers for removing followers",
+      "verdict": "variant"
+    },
+    "83bb89a18ec4d76a405a095e556120e907d1c8773873bed73a03406958a44121": {
+      "reason": "Template for creating tasks, distinct from actual task instances",
+      "verdict": "distinct"
+    },
+    "859cc59af34783e9e78aac0fac4fbcc594b4d738e227f501e6d11cdfdbc21da8": {
+      "reason": "Request body for removing users from teams, not a representation of the team entity",
+      "verdict": "distinct"
+    },
+    "8ebd692f607289fee4a23eab7367f9295fd078a370e1f742ec4191276f3b3002": {
+      "reason": "Container/view of tasks assigned to a user, not a task entity",
+      "verdict": "distinct"
+    },
+    "8ec2f03702e16cb40bdf177384ff785d01af1c47c0c229a84ec4a2c29a3618cc": {
+      "reason": "Extended membership object with user permissions/settings, distinct from workspace entity itself",
+      "verdict": "distinct"
+    },
+    "8ef6c5b70083f402e2ceede58f5847277eb6eb0179bc0cacbcc840f191413915": {
+      "reason": "Template recipe configuration, not a task entity",
+      "verdict": "distinct"
+    },
+    "8fd7532e3fc9a28c1251361d117497210ee265c851cf2285b7976f4f7587fb6a": {
+      "reason": "Project status updates are separate resources tracking project progress, not variants of project",
+      "verdict": "distinct"
+    },
+    "9146f972ceed1b6192a5e42cafe768affa469d07e3b7503842129b2022d45951": {
+      "reason": "Request payload for removing a task from a project",
+      "verdict": "distinct"
+    },
+    "928f24fd9135748a70012e646eb9b0c66140cfc99acfe589a0dd0dba46870916": {
+      "reason": "Project briefs are a separate resource, this is another variant of the brief schema",
+      "verdict": "distinct"
+    },
+    "94f3766485e29441acf06e0d31860ca52a99946e56c2abdd6859fdec5ac7f875": {
+      "reason": "Request schema for project status entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "94f566298983847af7d9c9d09fd70d22a89ff55395e1b6455449438eb58dadcb": {
+      "reason": "Represents the relationship/settings between a project and portfolio, not a project variant",
+      "verdict": "distinct"
+    },
+    "981c72ba1638ca07f2c0eb69a56c4c03c755b597e7aa088696d5849e27db2631": {
+      "reason": "Request payload for creating project from template, not a project representation",
+      "verdict": "distinct"
+    },
+    "98ace742bcfa51b00fb75db2c343ea00233ee2985bf17d85d244a2a9347cae84": {
+      "reason": "Compact variant of project brief, which is a distinct entity from project",
+      "verdict": "distinct"
+    },
+    "9a076a8d7b9ed260f9ad94f3c183672c31c2169a52f1587174d44d78d62d6dcc": {
+      "reason": "Base story entity with core fields (gid, text, resource_type, sticker_name) - foundational variant",
+      "verdict": "variant"
+    },
+    "9b7d036a197ca4040db2b11b8be72f5516f5f79447d60b654a56d5ed61eed1a0": {
+      "reason": "Request payload for setting a task's parent relationship",
+      "verdict": "distinct"
+    },
+    "9ed13e5d52ec998feb648561c467d19ba0e3fa4f141a562d6d8ee5ab7b6d1bb3": {
+      "reason": "Template for creating tasks, distinct from actual task instances",
+      "verdict": "distinct"
+    },
+    "a37196bfc7a4d4dfe7a22be0b6941777222cef68242a21d709dc8c04d94f267f": {
+      "reason": "Request payload for modifying a task's followers",
+      "verdict": "distinct"
+    },
+    "a77c2ff6442875c43b03e402595854ded970d23d167cd619d18cd8c2615dbd2a": {
+      "reason": "Base variant of membership entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "abd0d880520389364402ec9935c92a8297f6e8b8b0829245e7c5a52153fb32a2": {
+      "reason": "Request payload for removing task from project, not a project representation",
+      "verdict": "distinct"
+    },
+    "ad4b0e660a03412920a115e33bad393e51c73dd1135f30d7e51b8103ddf47453": {
+      "reason": "Request body for adding tasks to a section with insertion position, part of section task management",
+      "verdict": "variant"
+    },
+    "b142b07f2785db0d32e74398205ba9df1bee044b9948f1387f4b1793184e7e9d": {
+      "reason": "Request payload for positioning a task within a section",
+      "verdict": "distinct"
+    },
+    "b70b8b0fd0292cc82399ab4927fb406c6796ff4bae01b63df7fdea27f949880a": {
+      "reason": "Array of user identifiers (strings/emails/gids) for adding followers",
+      "verdict": "variant"
+    },
+    "b9a6c8afbb525cc8645dc64fe893909f1fe985e581b9bfd8054ba5315b92561e": {
+      "reason": "Base variant of project status entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "bb45e980a8dedb9bdcddd3fcf509d8b30aa638a0629708991a0afd66107f76b1": {
+      "reason": "Request payload for tagging a task",
+      "verdict": "distinct"
+    },
+    "be1e5572d049170598d221370364c9141fef1773abe3ae17bd5cc5d024a96439": {
+      "reason": "Request payload with a single string field for tag gid, not a representation of the tag entity itself",
+      "verdict": "distinct"
+    },
+    "c246462d851f5bc669f76952fa5300a92bfd97729c3c3c51c2bf2ca223a21c50": {
+      "reason": "Request payload for duplicating a project, not a representation of the project entity itself",
+      "verdict": "distinct"
+    },
+    "c5d1459fd66eeb85ab76107aa2b690f9ac3b00acbea376e9e3ba5cc5987f5b5d": {
+      "reason": "Container/view of tasks assigned to a user, not a task entity",
+      "verdict": "distinct"
+    },
+    "c799d668f77e95b4c6815e9db270606067e06d300315901815032bf7e9b556f3": {
+      "reason": "Request payload for removing users from workspace, not a representation of the workspace resource",
+      "verdict": "distinct"
+    },
+    "ca201a739762444b12335978770ed28562fc0ea4761a5258ca295776a2f0d516": {
+      "reason": "Request body for adding users to teams, not a representation of the team entity",
+      "verdict": "distinct"
+    },
+    "ca32a71781556e59e55deba60f032be14b86a1f104686d8daf6cc32eb88aa5a2": {
+      "reason": "Represents user/team membership relationship to a project, not the project itself",
+      "verdict": "distinct"
+    },
+    "cc1f49c292e80fbf860c88494ee6bac80d2d08a550ef57930d354bf8df760ff1": {
+      "reason": "Request payload for modifying a task, not a task representation",
+      "verdict": "distinct"
+    },
+    "d6cf8d3f68f1ad6122bacbf71417d7999281509079ca439c5c479f91f183d686": {
+      "reason": "Array of user identifiers for removing followers from tasks",
+      "verdict": "variant"
+    },
+    "d831ca5cb25173bc425268c0c92a45f78191570256c2a2892d08e03e638d5b6e": {
+      "reason": "Request body for creating/updating a section resource with name and insertion position fields",
+      "verdict": "variant"
+    },
+    "dd8814f00b5c563b260adb6e778f3bbaf13d80b32c8a9ca5e25d1e51c34297d7": {
+      "reason": "Compact variant of project status entity, which is distinct from project",
+      "verdict": "distinct"
+    },
+    "de7f5345e021165f78c1d8758e902491d70b48d4f0b7be48b68261f01bbd98a7": {
+      "reason": "Single user identifier string for adding to workspace",
+      "verdict": "variant"
+    },
+    "e1288428c52cec16a8039e863d50fddbf0af33474572b68ba04d18ea04c34a08": {
+      "reason": "Request payload for creating a task from a template",
+      "verdict": "distinct"
+    },
+    "e2ed7e21526cf3daa7ad38a628b7fbe70800ed1a07baa4fe5a553248e81d3df6": {
+      "reason": "Date fields for goals/tasks (start_on, due_at, due_on) - not a story variant but a nested dates object",
+      "verdict": "distinct"
+    },
+    "e4ccd3d7b10f389a7102f51df0c6221ecfa721b50c5f3b3861396b3711c26b1e": {
+      "reason": "Response wrapper for team membership data, distinct from team resource",
+      "verdict": "distinct"
+    },
+    "f09391324023b0702c9a218b7e7647265526c6536b66757bcf3d073dc679e1f3": {
+      "reason": "Single user identifier string for removing from workspace",
+      "verdict": "variant"
+    },
+    "f096c2e7115791224f45d39cd3e95ae151e248e9ece22ff740dd2e5c683c363e": {
+      "reason": "Request payload for adding task to project, not a project representation",
+      "verdict": "distinct"
+    },
+    "f99d3ac0cadef479e89eb69b882477839b25c446cadcaa9711ae7d2aefa6e8d1": {
+      "reason": "Container/view of tasks assigned to a user, not a task entity",
+      "verdict": "distinct"
+    },
+    "fdf9c2b3f9cceca2d3529e2ca4133f86faab4cbde68364e45577357386bb197f": {
+      "reason": "Represents the membership relationship between a user and workspace, not the workspace itself",
+      "verdict": "distinct"
+    },
+    "ff7adfec679d7e48ab6ec0101a9cb28d610af0585af9f7e0ce37b03a7708a817": {
+      "reason": "Comma-separated string of user identifiers for adding followers",
+      "verdict": "variant"
+    }
+  },
+  "version": "1"
+}

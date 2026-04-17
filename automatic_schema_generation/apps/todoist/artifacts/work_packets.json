@@ -1,0 +1,44 @@
+[
+  {
+    "resource": "labels",
+    "model_class": "Label",
+    "table": "todoist_labels",
+    "entity_slug": "label",
+    "id_format": "NUMERIC(10)"
+  },
+  {
+    "resource": "user",
+    "model_class": "User",
+    "table": "todoist_user",
+    "entity_slug": "user",
+    "id_format": "NUMERIC(10)"
+  },
+  {
+    "resource": "projects",
+    "model_class": "Project",
+    "table": "todoist_projects",
+    "entity_slug": "project",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "sections",
+    "model_class": "Section",
+    "table": "todoist_sections",
+    "entity_slug": "section",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "tasks",
+    "model_class": "Task",
+    "table": "todoist_tasks",
+    "entity_slug": "task",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "comments",
+    "model_class": "Comment",
+    "table": "todoist_comments",
+    "entity_slug": "comment",
+    "id_format": "ALPHANUMERIC(16)"
+  }
+]

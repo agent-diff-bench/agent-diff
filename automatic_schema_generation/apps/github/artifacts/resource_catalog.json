@@ -1,0 +1,492 @@
+{
+  "teams": {
+    "endpoints": [
+      {
+        "path": "/enterprises/{enterprise}/teams",
+        "method": "GET",
+        "operation_id": "enterprise-teams/list"
+      },
+      {
+        "path": "/enterprises/{enterprise}/teams",
+        "method": "POST",
+        "operation_id": "enterprise-teams/create"
+      },
+      {
+        "path": "/enterprises/{enterprise}/teams/{team_slug}",
+        "method": "GET",
+        "operation_id": "enterprise-teams/get"
+      },
+      {
+        "path": "/enterprises/{enterprise}/teams/{team_slug}",
+        "method": "PATCH",
+        "operation_id": "enterprise-teams/update"
+      },
+      {
+        "path": "/enterprises/{enterprise}/teams/{team_slug}",
+        "method": "DELETE",
+        "operation_id": "enterprise-teams/delete"
+      },
+      {
+        "path": "/orgs/{org}/invitations/{invitation_id}/teams",
+        "method": "GET",
+        "operation_id": "orgs/list-invitation-teams"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/teams/{team_slug}",
+        "method": "DELETE",
+        "operation_id": "orgs/revoke-all-org-roles-team"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}",
+        "method": "PUT",
+        "operation_id": "orgs/assign-team-to-org-role"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/teams/{team_slug}/{role_id}",
+        "method": "DELETE",
+        "operation_id": "orgs/revoke-org-role-team"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/{role_id}/teams",
+        "method": "GET",
+        "operation_id": "orgs/list-org-role-teams"
+      },
+      {
+        "path": "/orgs/{org}/security-managers/teams/{team_slug}",
+        "method": "PUT",
+        "operation_id": "orgs/add-security-manager-team"
+      },
+      {
+        "path": "/orgs/{org}/security-managers/teams/{team_slug}",
+        "method": "DELETE",
+        "operation_id": "orgs/remove-security-manager-team"
+      },
+      {
+        "path": "/orgs/{org}/teams",
+        "method": "GET",
+        "operation_id": "teams/list"
+      },
+      {
+        "path": "/orgs/{org}/teams",
+        "method": "POST",
+        "operation_id": "teams/create"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}",
+        "method": "GET",
+        "operation_id": "teams/get-by-name"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}",
+        "method": "PATCH",
+        "operation_id": "teams/update-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}",
+        "method": "DELETE",
+        "operation_id": "teams/delete-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}/teams",
+        "method": "GET",
+        "operation_id": "teams/list-child-in-org"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
+        "method": "GET",
+        "operation_id": "repos/get-teams-with-access-to-protected-branch"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
+        "method": "POST",
+        "operation_id": "repos/add-team-access-restrictions"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
+        "method": "PUT",
+        "operation_id": "repos/set-team-access-restrictions"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/teams",
+        "method": "DELETE",
+        "operation_id": "repos/remove-team-access-restrictions"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/teams",
+        "method": "GET",
+        "operation_id": "repos/list-teams"
+      },
+      {
+        "path": "/teams/{team_id}",
+        "method": "GET",
+        "operation_id": "teams/get-legacy"
+      },
+      {
+        "path": "/teams/{team_id}",
+        "method": "PATCH",
+        "operation_id": "teams/update-legacy"
+      },
+      {
+        "path": "/teams/{team_id}",
+        "method": "DELETE",
+        "operation_id": "teams/delete-legacy"
+      },
+      {
+        "path": "/teams/{team_id}/teams",
+        "method": "GET",
+        "operation_id": "teams/list-child-legacy"
+      },
+      {
+        "path": "/user/teams",
+        "method": "GET",
+        "operation_id": "teams/list-for-authenticated-user"
+      }
+    ],
+    "field_count": 13
+  },
+  "gists": {
+    "endpoints": [
+      {
+        "path": "/gists",
+        "method": "GET",
+        "operation_id": "gists/list"
+      },
+      {
+        "path": "/gists",
+        "method": "POST",
+        "operation_id": "gists/create"
+      },
+      {
+        "path": "/gists/{gist_id}",
+        "method": "GET",
+        "operation_id": "gists/get"
+      },
+      {
+        "path": "/gists/{gist_id}",
+        "method": "PATCH",
+        "operation_id": "gists/update"
+      },
+      {
+        "path": "/gists/{gist_id}",
+        "method": "DELETE",
+        "operation_id": "gists/delete"
+      },
+      {
+        "path": "/gists/{gist_id}/star",
+        "method": "GET",
+        "operation_id": "gists/check-is-starred"
+      },
+      {
+        "path": "/gists/{gist_id}/star",
+        "method": "PUT",
+        "operation_id": "gists/star"
+      },
+      {
+        "path": "/gists/{gist_id}/star",
+        "method": "DELETE",
+        "operation_id": "gists/unstar"
+      },
+      {
+        "path": "/gists/{gist_id}/{sha}",
+        "method": "GET",
+        "operation_id": "gists/get-revision"
+      },
+      {
+        "path": "/users/{username}/gists",
+        "method": "GET",
+        "operation_id": "gists/list-for-user"
+      }
+    ],
+    "field_count": 20
+  },
+  "issues": {
+    "endpoints": [
+      {
+        "path": "/issues",
+        "method": "GET",
+        "operation_id": "issues/list"
+      },
+      {
+        "path": "/orgs/{org}/issues",
+        "method": "GET",
+        "operation_id": "issues/list-for-org"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/issues",
+        "method": "GET",
+        "operation_id": "issues/list-for-repo"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/issues",
+        "method": "POST",
+        "operation_id": "issues/create"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/issues/{issue_number}",
+        "method": "GET",
+        "operation_id": "issues/get"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/issues/{issue_number}",
+        "method": "PATCH",
+        "operation_id": "issues/update"
+      },
+      {
+        "path": "/search/issues",
+        "method": "GET",
+        "operation_id": "search/issues-and-pull-requests"
+      },
+      {
+        "path": "/user/issues",
+        "method": "GET",
+        "operation_id": "issues/list-for-authenticated-user"
+      }
+    ],
+    "field_count": 39
+  },
+  "orgs": {
+    "endpoints": [
+      {
+        "path": "/orgs/{org}",
+        "method": "GET",
+        "operation_id": "orgs/get"
+      },
+      {
+        "path": "/orgs/{org}",
+        "method": "PATCH",
+        "operation_id": "orgs/update"
+      },
+      {
+        "path": "/orgs/{org}",
+        "method": "DELETE",
+        "operation_id": "orgs/delete"
+      },
+      {
+        "path": "/orgs/{org}/{security_product}/{enablement}",
+        "method": "POST",
+        "operation_id": "orgs/enable-or-disable-security-product-on-all-org-repos"
+      },
+      {
+        "path": "/user/memberships/orgs",
+        "method": "GET",
+        "operation_id": "orgs/list-memberships-for-authenticated-user"
+      },
+      {
+        "path": "/user/memberships/orgs/{org}",
+        "method": "GET",
+        "operation_id": "orgs/get-membership-for-authenticated-user"
+      },
+      {
+        "path": "/user/memberships/orgs/{org}",
+        "method": "PATCH",
+        "operation_id": "orgs/update-membership-for-authenticated-user"
+      },
+      {
+        "path": "/user/orgs",
+        "method": "GET",
+        "operation_id": "orgs/list-for-authenticated-user"
+      },
+      {
+        "path": "/users/{username}/events/orgs/{org}",
+        "method": "GET",
+        "operation_id": "activity/list-org-events-for-authenticated-user"
+      },
+      {
+        "path": "/users/{username}/orgs",
+        "method": "GET",
+        "operation_id": "orgs/list-for-user"
+      }
+    ],
+    "field_count": 66
+  },
+  "users": {
+    "endpoints": [
+      {
+        "path": "/orgs/{org}/insights/api/summary-stats/users/{user_id}",
+        "method": "GET",
+        "operation_id": "api-insights/get-summary-stats-by-user"
+      },
+      {
+        "path": "/orgs/{org}/insights/api/time-stats/users/{user_id}",
+        "method": "GET",
+        "operation_id": "api-insights/get-time-stats-by-user"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/users/{username}",
+        "method": "DELETE",
+        "operation_id": "orgs/revoke-all-org-roles-user"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/users/{username}/{role_id}",
+        "method": "PUT",
+        "operation_id": "orgs/assign-user-to-org-role"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/users/{username}/{role_id}",
+        "method": "DELETE",
+        "operation_id": "orgs/revoke-org-role-user"
+      },
+      {
+        "path": "/orgs/{org}/organization-roles/{role_id}/users",
+        "method": "GET",
+        "operation_id": "orgs/list-org-role-users"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
+        "method": "GET",
+        "operation_id": "repos/get-users-with-access-to-protected-branch"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
+        "method": "POST",
+        "operation_id": "repos/add-user-access-restrictions"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
+        "method": "PUT",
+        "operation_id": "repos/set-user-access-restrictions"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/branches/{branch}/protection/restrictions/users",
+        "method": "DELETE",
+        "operation_id": "repos/remove-user-access-restrictions"
+      },
+      {
+        "path": "/search/users",
+        "method": "GET",
+        "operation_id": "search/users"
+      },
+      {
+        "path": "/users",
+        "method": "GET",
+        "operation_id": "users/list"
+      },
+      {
+        "path": "/users/{username}",
+        "method": "GET",
+        "operation_id": "users/get-by-username"
+      }
+    ],
+    "field_count": 2
+  },
+  "repos": {
+    "endpoints": [
+      {
+        "path": "/orgs/{org}/repos",
+        "method": "GET",
+        "operation_id": "repos/list-for-org"
+      },
+      {
+        "path": "/orgs/{org}/repos",
+        "method": "POST",
+        "operation_id": "repos/create-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}/repos",
+        "method": "GET",
+        "operation_id": "teams/list-repos-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}",
+        "method": "GET",
+        "operation_id": "teams/check-permissions-for-repo-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}",
+        "method": "PUT",
+        "operation_id": "teams/add-or-update-repo-permissions-in-org"
+      },
+      {
+        "path": "/orgs/{org}/teams/{team_slug}/repos/{owner}/{repo}",
+        "method": "DELETE",
+        "operation_id": "teams/remove-repo-in-org"
+      },
+      {
+        "path": "/repos/{owner}/{repo}",
+        "method": "GET",
+        "operation_id": "repos/get"
+      },
+      {
+        "path": "/repos/{owner}/{repo}",
+        "method": "PATCH",
+        "operation_id": "repos/update"
+      },
+      {
+        "path": "/repos/{owner}/{repo}",
+        "method": "DELETE",
+        "operation_id": "repos/delete"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/code-scanning/codeql/variant-analyses/{codeql_variant_analysis_id}/repos/{repo_owner}/{repo_name}",
+        "method": "GET",
+        "operation_id": "code-scanning/get-variant-analysis-repo-task"
+      },
+      {
+        "path": "/teams/{team_id}/repos",
+        "method": "GET",
+        "operation_id": "teams/list-repos-legacy"
+      },
+      {
+        "path": "/teams/{team_id}/repos/{owner}/{repo}",
+        "method": "GET",
+        "operation_id": "teams/check-permissions-for-repo-legacy"
+      },
+      {
+        "path": "/teams/{team_id}/repos/{owner}/{repo}",
+        "method": "PUT",
+        "operation_id": "teams/add-or-update-repo-permissions-legacy"
+      },
+      {
+        "path": "/teams/{team_id}/repos/{owner}/{repo}",
+        "method": "DELETE",
+        "operation_id": "teams/remove-repo-legacy"
+      },
+      {
+        "path": "/user/repos",
+        "method": "GET",
+        "operation_id": "repos/list-for-authenticated-user"
+      },
+      {
+        "path": "/user/repos",
+        "method": "POST",
+        "operation_id": "repos/create-for-authenticated-user"
+      },
+      {
+        "path": "/users/{username}/repos",
+        "method": "GET",
+        "operation_id": "repos/list-for-user"
+      }
+    ],
+    "field_count": 88
+  },
+  "pulls": {
+    "endpoints": [
+      {
+        "path": "/repos/{owner}/{repo}/commits/{commit_sha}/pulls",
+        "method": "GET",
+        "operation_id": "repos/list-pull-requests-associated-with-commit"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/pulls",
+        "method": "GET",
+        "operation_id": "pulls/list"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/pulls",
+        "method": "POST",
+        "operation_id": "pulls/create"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/pulls/{pull_number}",
+        "method": "GET",
+        "operation_id": "pulls/get"
+      },
+      {
+        "path": "/repos/{owner}/{repo}/pulls/{pull_number}",
+        "method": "PATCH",
+        "operation_id": "pulls/update"
+      }
+    ],
+    "field_count": 46
+  }
+}

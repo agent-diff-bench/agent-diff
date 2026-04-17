@@ -1,0 +1,79 @@
+app_slug: todoist
+app_name: Todoist
+openapi_path: ../../open_api_schemas/todoist_openapi.source.json
+target_dir: ../../../backend/src/services/todoist
+resources:
+  projects:
+    aliases:
+    - project
+    - projects
+    - personal_project_sync_view
+    - project_access_view
+    - project_completed_item
+    - project_sort_preference
+    - project_status
+    - project_view_style
+    - project_visibility
+    - public_project_configuration
+    - restricted_project_configuration
+    - team_project_configuration
+    - workspace_project_sync_view
+    - workspace_project_view
+  tasks:
+    aliases:
+    - item
+    - items
+    - task
+    - tasks
+    - item_sync_view
+    - paginated_list_item_sync_view
+    - tasks_completed_date_response
+  sections:
+    aliases:
+    - section
+    - sections
+    - paginated_list_section_sync_view
+    - section_sync_view
+  labels:
+    aliases:
+    - label
+    - labels
+    - label_rest_view
+    - paginated_list_label_rest_view
+  comments:
+    aliases:
+    - comment
+    - comments
+    - note
+    - notes
+    - project_note
+    - project_notes
+    - note_sync_view
+    - paginated_list_note_sync_view
+  users:
+    aliases:
+    - added_by
+    - assigned_by
+    - assignee
+    - author
+    - collaborator
+    - collaborators
+    - creator
+    - initiator
+    - owner
+    - posted
+    - responsible
+    - user
+    - users
+    - exposed_collaborator_sync_view
+    - user_json
+    - workspace_user_view
+naming:
+  qualifier_prefixes:
+  - parent_
+  - source_
+  - target_
+  self_id_fields:
+  - id
+  pk_field_names:
+  - id

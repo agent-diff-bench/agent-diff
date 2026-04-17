@@ -1,0 +1,58 @@
+[
+  {
+    "resource": "user_task_lists",
+    "model_class": "UserTaskList",
+    "table": "asana_user_task_lists",
+    "entity_slug": "user_task_list",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "users",
+    "model_class": "User",
+    "table": "asana_users",
+    "entity_slug": "user",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "workspaces",
+    "model_class": "Workspace",
+    "table": "asana_workspaces",
+    "entity_slug": "workspace",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "tags",
+    "model_class": "Tag",
+    "table": "asana_tags",
+    "entity_slug": "tag",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "projects",
+    "model_class": "Project",
+    "table": "asana_projects",
+    "entity_slug": "project",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "sections",
+    "model_class": "Section",
+    "table": "asana_sections",
+    "entity_slug": "section",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "teams",
+    "model_class": "Team",
+    "table": "asana_teams",
+    "entity_slug": "team",
+    "id_format": "ALPHANUMERIC(16)"
+  },
+  {
+    "resource": "tasks",
+    "model_class": "Task",
+    "table": "asana_tasks",
+    "entity_slug": "task",
+    "id_format": "ALPHANUMERIC(16)"
+  }
+]

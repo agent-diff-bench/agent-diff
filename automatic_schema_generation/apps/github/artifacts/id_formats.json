@@ -1,0 +1,44 @@
+[
+  {
+    "resource": "team",
+    "alphabet": "NUMERIC",
+    "length": 1,
+    "example": "1"
+  },
+  {
+    "resource": "gist",
+    "alphabet": "NUMERIC",
+    "length": 1,
+    "example": "1"
+  },
+  {
+    "resource": "issue",
+    "alphabet": "NUMERIC",
+    "length": 2,
+    "example": "42"
+  },
+  {
+    "resource": "org",
+    "alphabet": "NUMERIC",
+    "length": 1,
+    "example": "1"
+  },
+  {
+    "resource": "user",
+    "alphabet": "NUMERIC",
+    "length": 1,
+    "example": "1"
+  },
+  {
+    "resource": "repo",
+    "alphabet": "NUMERIC",
+    "length": 2,
+    "example": "42"
+  },
+  {
+    "resource": "pull",
+    "alphabet": "NUMERIC",
+    "length": 1,
+    "example": "1"
+  }
+]

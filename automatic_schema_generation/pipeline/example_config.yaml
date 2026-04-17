@@ -1,0 +1,153 @@
+# Pipeline 2.0 config for GitHub.
+
+app_slug: github
+app_name: GitHub
+
+openapi_path: ../apps/github/inputs/openapi.scoped.json
+target_dir: ../../../backend/src/services/github
+
+# Keys are canonical resource names (snake_case, become table names).
+# Aliases are normalized on load — PascalCase/camelCase/kebab-case all work.
+# Override primary_key for non-id PKs (e.g. commits → sha).
+
+resources:
+  users:
+    aliases:
+      - user
+      - owner
+      - owners
+      - author
+      - authors
+      - committer
+      - committers
+      - assignee
+      - assignees
+      - reviewer
+      - reviewers
+      - requested_reviewer
+      - mentioned
+      - creator
+      - creators
+      - admin
+      - admins
+      - member
+      - members
+      - collaborator
+      - collaborators
+      - follower
+      - followers
+      - following
+      - username
+      - login
+      - simple_user
+      - simple-user
+      - private_user
+      - public_user
+      - simple_classroom_user
+      - user_role_assignment
+      - user_search_result_item
+      - webhooks_reviewers
+      - webhooks_user
+      - webhooks_user_mannequin
+
+  repos:
+    aliases:
+      - repo
+      - repository
+      - repositories
+      - repo_id
+      - code_scanning_variant_analysis_repository
+      - full_repository
+      - minimal_repository
+      - repo_search_result_item
+      - repository_webhooks
+      - simple_classroom_repository
+      - simple_repository
+      - team_repository
+      - webhooks_repositories
+      - webhooks_repositories_added
+
+  pulls:
+    aliases:
+      - pull
+      - pull_request
+      - pull_requests
+      - pullrequest
+      - pullrequests
+      - pull-request
+      - pr
+      - pull_request_minimal
+      - pull_request_simple
+      - webhooks_pull_request_5
+
+  issues:
+    aliases:
+      - issue
+      - issue_search_result_item
+      - webhooks_issue
+      - webhooks_issue_2
+
+  orgs:
+    aliases:
+      - org
+      - organization
+      - organizations
+      - organization_full
+      - organization_simple
+      - organization_simple_webhooks
+      - simple_classroom_organization
+      - team_organization
+
+  gists:
+    aliases:
+      - gist
+      - base_gist
+      - gist_simple
+
+  teams:
+    aliases:
+      - team
+      - team_full
+      - team_simple
+      - webhooks_team
+      - webhooks_team_1
+
+  commits:
+    aliases:
+      - commit
+      - code_scanning_analysis_commit_sha
+      - commit_search_result_item
+      - file_commit
+      - gist_commit
+      - git_commit
+      - simple_commit
+      - webhooks_code_scanning_commit_oid
+    primary_key: sha
+
+  branches:
+    aliases:
+      - branch
+      - branch_protection
+      - branch_restriction_policy
+      - branch_short
+      - branch_with_protection
+      - protected_branch
+      - protected_branch_admin_enforced
+      - protected_branch_pull_request_review
+      - protected_branch_required_status_check
+      - short_branch
+    primary_key: name
+
+naming:
+  qualifier_prefixes:
+    - "parent_"
+    - "source_"
+    - "target_"
+    - "linked_"
+    - "requested_"
+  self_id_fields:
+    - "id"
+    - "node_id"
+  pk_field_names:
+    - "id"
+    - "node_id"

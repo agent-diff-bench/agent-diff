@@ -1,0 +1,26 @@
+app_name: Asana
+app_slug: asana
+service_mount_path: asana
+openapi_path: inputs/openapi.scoped.json
+target_dir: ../../../backend/src/services/asana
+scoped_resources:
+  - tasks
+  - projects
+  - sections
+  - workspaces
+  - tags
+  - users
+  - teams
+  - user_task_lists
+error_envelope_hint: |
+  Asana uses: {"errors": [{"message": "...", "help": "...", "phrase": "..."}]}
+model: claude-sonnet-4-20250514
+
+# Asana uses ``gid`` (Global ID) as the universal primary key, and
+# every FK param is named ``<resource>_gid``. Override the FK/PK
+# vocabulary so the inference walker recognizes these as IDs instead
+# of opaque strings.
+naming:
+  fk_suffixes: ["_gid", "_id", "_uid", "_ref"]
+  self_id_fields: ["id", "gid"]
+  pk_field_names: ["gid", "id"]

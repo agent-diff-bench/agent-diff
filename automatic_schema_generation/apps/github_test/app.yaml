@@ -1,0 +1,185 @@
+app_slug: github
+app_name: GitHub
+openapi_path: ../../open_api_schemas/api.github.com.2026-03-10.json
+target_dir: ../../../backend/src/services/github
+resources:
+  repos:
+    aliases:
+    - full_repository
+    - minimal_repository
+    - repo
+    - repos
+    - repositories
+    - repository
+    - simple_repository
+    - code_scanning_variant_analysis_repository
+    - repo_search_result_item
+    - repository_webhooks
+    - simple_classroom_repository
+    - team_repository
+    - webhooks_repositories
+    - webhooks_repositories_added
+    self_id_fields:
+    - id
+    - node_id
+  issues:
+    aliases:
+    - issue
+    - issues
+    - issue_search_result_item
+    - webhooks_issue
+    - webhooks_issue_2
+    primary_key: number
+    self_id_fields:
+    - id
+    - node_id
+    - number
+  pulls:
+    aliases:
+    - pr
+    - prs
+    - pull
+    - pull_request
+    - pull_request_simple
+    - pull_requests
+    - pulls
+    - pull_request_event
+    - pull_request_minimal
+    - webhook_pull_request_assigned
+    - webhook_pull_request_auto_merge_disabled
+    - webhook_pull_request_auto_merge_enabled
+    - webhook_pull_request_closed
+    - webhook_pull_request_converted_to_draft
+    - webhook_pull_request_demilestoned
+    - webhook_pull_request_dequeued
+    - webhook_pull_request_edited
+    - webhook_pull_request_enqueued
+    - webhook_pull_request_labeled
+    - webhook_pull_request_locked
+    - webhook_pull_request_milestoned
+    - webhook_pull_request_opened
+    - webhook_pull_request_ready_for_review
+    - webhook_pull_request_reopened
+    - webhook_pull_request_review_request_removed
+    - webhook_pull_request_review_requested
+    - webhook_pull_request_synchronize
+    - webhook_pull_request_unassigned
+    - webhook_pull_request_unlabeled
+    - webhook_pull_request_unlocked
+    - webhooks_pull_request_5
+    primary_key: number
+    self_id_fields:
+    - id
+    - node_id
+    - number
+  users:
+    aliases:
+    - assignee
+    - assignees
+    - author
+    - closed_by
+    - collaborator
+    - collaborators
+    - committer
+    - creator
+    - git_user
+    - owner
+    - private_user
+    - public_user
+    - requested_reviewer
+    - requested_reviewers
+    - simple_user
+    - user
+    - users
+    - porter_author
+    - simple_classroom_user
+    - user_role_assignment
+    - user_search_result_item
+    - webhooks_user
+    - webhooks_user_mannequin
+    self_id_fields:
+    - id
+    - node_id
+  orgs:
+    aliases:
+    - org
+    - organization
+    - organization_full
+    - organization_simple
+    - organizations
+    - orgs
+    - organization_simple_webhooks
+    - simple_classroom_organization
+    - team_organization
+    self_id_fields:
+    - id
+    - node_id
+  teams:
+    aliases:
+    - enterprise_team
+    - team
+    - team_full
+    - team_simple
+    - teams
+    - webhooks_team
+    - webhooks_team_1
+    self_id_fields:
+    - id
+    - node_id
+  commits:
+    aliases:
+    - commit
+    - commits
+    - gist_commit
+    - git_commit
+    - sha
+    - simple_commit
+    - code_scanning_analysis_commit_sha
+    - commit_search_result_item
+    - file_commit
+    - sha_pinning_required
+    - webhooks_code_scanning_commit_oid
+    primary_key: sha
+    self_id_fields:
+    - sha
+    - node_id
+  branches:
+    aliases:
+    - base
+    - branch
+    - branches
+    - head
+    - protected_branch
+    - short_branch
+    - branch_protection
+    - branch_restriction_policy
+    - branch_short
+    - branch_with_protection
+    - protected_branch_admin_enforced
+    - protected_branch_pull_request_review
+    - protected_branch_required_status_check
+    primary_key: name
+  gists:
+    aliases:
+    - base_gist
+    - gist
+    - gist_simple
+    - gists
+    self_id_fields:
+    - id
+    - node_id
+naming:
+  qualifier_prefixes:
+  - parent_
+  - source_
+  - target_
+  - linked_
+  - requested_
+  self_id_fields:
+  - id
+  - node_id
+  - number
+  - sha
+  pk_field_names:
+  - id
+  - node_id

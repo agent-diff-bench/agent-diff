@@ -1,0 +1,84 @@
+todoist_projects:
+  creator_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: creator_uid'
+  parent_id:
+    target_table: todoist_projects
+    target_column: id
+    confidence: high
+    reason: 'response schema: parent_id'
+todoist_sections:
+  user_id:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: user_id'
+  project_id:
+    target_table: todoist_projects
+    target_column: id
+    confidence: high
+    reason: 'response schema: project_id'
+todoist_tasks:
+  user_id:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: user_id'
+  project_id:
+    target_table: todoist_projects
+    target_column: id
+    confidence: high
+    reason: 'response schema: project_id'
+  section_id:
+    target_table: todoist_sections
+    target_column: id
+    confidence: high
+    reason: 'response schema: section_id'
+  parent_id:
+    target_table: todoist_tasks
+    target_column: id
+    confidence: high
+    reason: 'response schema: parent_id'
+  added_by_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: added_by_uid'
+  assigned_by_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: assigned_by_uid'
+  responsible_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: responsible_uid'
+  completed_by_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: completed_by_uid'
+  assignee_id:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'request body on POST /api/v1/tasks/{task_id}: assignee_id'
+todoist_comments:
+  posted_uid:
+    target_table: todoist_user
+    target_column: id
+    confidence: high
+    reason: 'response schema: posted_uid'
+  project_id:
+    target_table: todoist_projects
+    target_column: id
+    confidence: high
+    reason: 'query param on GET /api/v1/comments: project_id'
+  task_id:
+    target_table: todoist_tasks
+    target_column: id
+    confidence: high
+    reason: 'query param on GET /api/v1/comments: task_id'

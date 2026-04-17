@@ -1,0 +1,367 @@
+{
+  "projects": {
+    "endpoints": [
+      {
+        "path": "/projects",
+        "method": "GET",
+        "operation_id": "getProjects"
+      },
+      {
+        "path": "/projects",
+        "method": "POST",
+        "operation_id": "createProject"
+      },
+      {
+        "path": "/projects/{project_gid}",
+        "method": "GET",
+        "operation_id": "getProject"
+      },
+      {
+        "path": "/projects/{project_gid}",
+        "method": "PUT",
+        "operation_id": "updateProject"
+      },
+      {
+        "path": "/projects/{project_gid}",
+        "method": "DELETE",
+        "operation_id": "deleteProject"
+      },
+      {
+        "path": "/projects/{project_gid}/duplicate",
+        "method": "POST",
+        "operation_id": "duplicateProject"
+      },
+      {
+        "path": "/tasks/{task_gid}/projects",
+        "method": "GET",
+        "operation_id": "getProjectsForTask"
+      },
+      {
+        "path": "/teams/{team_gid}/projects",
+        "method": "GET",
+        "operation_id": "getProjectsForTeam"
+      },
+      {
+        "path": "/teams/{team_gid}/projects",
+        "method": "POST",
+        "operation_id": "createProjectForTeam"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/projects",
+        "method": "GET",
+        "operation_id": "getProjectsForWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/projects",
+        "method": "POST",
+        "operation_id": "createProjectForWorkspace"
+      },
+      {
+        "path": "/projects/{project_gid}/addCustomFieldSetting",
+        "method": "POST",
+        "operation_id": "addCustomFieldSettingForProject"
+      },
+      {
+        "path": "/projects/{project_gid}/removeCustomFieldSetting",
+        "method": "POST",
+        "operation_id": "removeCustomFieldSettingForProject"
+      },
+      {
+        "path": "/projects/{project_gid}/saveAsTemplate",
+        "method": "POST",
+        "operation_id": "projectSaveAsTemplate"
+      }
+    ],
+    "field_count": 1
+  },
+  "sections": {
+    "endpoints": [
+      {
+        "path": "/sections/{section_gid}",
+        "method": "GET",
+        "operation_id": "getSection"
+      },
+      {
+        "path": "/sections/{section_gid}",
+        "method": "PUT",
+        "operation_id": "updateSection"
+      },
+      {
+        "path": "/sections/{section_gid}",
+        "method": "DELETE",
+        "operation_id": "deleteSection"
+      },
+      {
+        "path": "/projects/{project_gid}/sections",
+        "method": "GET",
+        "operation_id": "getSectionsForProject"
+      },
+      {
+        "path": "/projects/{project_gid}/sections",
+        "method": "POST",
+        "operation_id": "createSectionForProject"
+      },
+      {
+        "path": "/sections/{section_gid}/addTask",
+        "method": "POST",
+        "operation_id": "addTaskForSection"
+      }
+    ],
+    "field_count": 1
+  },
+  "tags": {
+    "endpoints": [
+      {
+        "path": "/tags",
+        "method": "GET",
+        "operation_id": "getTags"
+      },
+      {
+        "path": "/tags",
+        "method": "POST",
+        "operation_id": "createTag"
+      },
+      {
+        "path": "/tags/{tag_gid}",
+        "method": "GET",
+        "operation_id": "getTag"
+      },
+      {
+        "path": "/tags/{tag_gid}",
+        "method": "PUT",
+        "operation_id": "updateTag"
+      },
+      {
+        "path": "/tags/{tag_gid}",
+        "method": "DELETE",
+        "operation_id": "deleteTag"
+      },
+      {
+        "path": "/tasks/{task_gid}/tags",
+        "method": "GET",
+        "operation_id": "getTagsForTask"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/tags",
+        "method": "GET",
+        "operation_id": "getTagsForWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/tags",
+        "method": "POST",
+        "operation_id": "createTagForWorkspace"
+      }
+    ],
+    "field_count": 1
+  },
+  "tasks": {
+    "endpoints": [
+      {
+        "path": "/tasks",
+        "method": "GET",
+        "operation_id": "getTasks"
+      },
+      {
+        "path": "/tasks",
+        "method": "POST",
+        "operation_id": "createTask"
+      },
+      {
+        "path": "/tasks/{task_gid}",
+        "method": "GET",
+        "operation_id": "getTask"
+      },
+      {
+        "path": "/tasks/{task_gid}",
+        "method": "PUT",
+        "operation_id": "updateTask"
+      },
+      {
+        "path": "/tasks/{task_gid}",
+        "method": "DELETE",
+        "operation_id": "deleteTask"
+      },
+      {
+        "path": "/tasks/{task_gid}/duplicate",
+        "method": "POST",
+        "operation_id": "duplicateTask"
+      },
+      {
+        "path": "/projects/{project_gid}/tasks",
+        "method": "GET",
+        "operation_id": "getTasksForProject"
+      },
+      {
+        "path": "/sections/{section_gid}/tasks",
+        "method": "GET",
+        "operation_id": "getTasksForSection"
+      },
+      {
+        "path": "/tags/{tag_gid}/tasks",
+        "method": "GET",
+        "operation_id": "getTasksForTag"
+      },
+      {
+        "path": "/user_task_lists/{user_task_list_gid}/tasks",
+        "method": "GET",
+        "operation_id": "getTasksForUserTaskList"
+      },
+      {
+        "path": "/tasks/{task_gid}/setParent",
+        "method": "POST",
+        "operation_id": "setParentForTask"
+      },
+      {
+        "path": "/tasks/{task_gid}/addProject",
+        "method": "POST",
+        "operation_id": "addProjectForTask"
+      },
+      {
+        "path": "/tasks/{task_gid}/removeProject",
+        "method": "POST",
+        "operation_id": "removeProjectForTask"
+      },
+      {
+        "path": "/tasks/{task_gid}/addTag",
+        "method": "POST",
+        "operation_id": "addTagForTask"
+      },
+      {
+        "path": "/tasks/{task_gid}/removeTag",
+        "method": "POST",
+        "operation_id": "removeTagForTask"
+      }
+    ],
+    "field_count": 1
+  },
+  "teams": {
+    "endpoints": [
+      {
+        "path": "/teams",
+        "method": "POST",
+        "operation_id": "createTeam"
+      },
+      {
+        "path": "/teams/{team_gid}",
+        "method": "GET",
+        "operation_id": "getTeam"
+      },
+      {
+        "path": "/teams/{team_gid}",
+        "method": "PUT",
+        "operation_id": "updateTeam"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/teams",
+        "method": "GET",
+        "operation_id": "getTeamsForWorkspace"
+      },
+      {
+        "path": "/users/{user_gid}/teams",
+        "method": "GET",
+        "operation_id": "getTeamsForUser"
+      },
+      {
+        "path": "/teams/{team_gid}/addUser",
+        "method": "POST",
+        "operation_id": "addUserForTeam"
+      },
+      {
+        "path": "/teams/{team_gid}/removeUser",
+        "method": "POST",
+        "operation_id": "removeUserForTeam"
+      }
+    ],
+    "field_count": 1
+  },
+  "workspaces": {
+    "endpoints": [
+      {
+        "path": "/workspaces/{workspace_gid}/typeahead",
+        "method": "GET",
+        "operation_id": "typeaheadForWorkspace"
+      },
+      {
+        "path": "/workspaces",
+        "method": "GET",
+        "operation_id": "getWorkspaces"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}",
+        "method": "GET",
+        "operation_id": "getWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}",
+        "method": "PUT",
+        "operation_id": "updateWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/addUser",
+        "method": "POST",
+        "operation_id": "addUserForWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/removeUser",
+        "method": "POST",
+        "operation_id": "removeUserForWorkspace"
+      }
+    ],
+    "field_count": 1
+  },
+  "user_task_lists": {
+    "endpoints": [
+      {
+        "path": "/user_task_lists/{user_task_list_gid}",
+        "method": "GET",
+        "operation_id": "getUserTaskList"
+      }
+    ],
+    "field_count": 1
+  },
+  "users": {
+    "endpoints": [
+      {
+        "path": "/users/{user_gid}/user_task_list",
+        "method": "GET",
+        "operation_id": "getUserTaskListForUser"
+      },
+      {
+        "path": "/users",
+        "method": "GET",
+        "operation_id": "getUsers"
+      },
+      {
+        "path": "/users/{user_gid}",
+        "method": "GET",
+        "operation_id": "getUser"
+      },
+      {
+        "path": "/users/{user_gid}",
+        "method": "PUT",
+        "operation_id": "updateUser"
+      },
+      {
+        "path": "/teams/{team_gid}/users",
+        "method": "GET",
+        "operation_id": "getUsersForTeam"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/users",
+        "method": "GET",
+        "operation_id": "getUsersForWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+        "method": "GET",
+        "operation_id": "getUserForWorkspace"
+      },
+      {
+        "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+        "method": "PUT",
+        "operation_id": "updateUserForWorkspace"
+      }
+    ],
+    "field_count": 1
+  }
+}

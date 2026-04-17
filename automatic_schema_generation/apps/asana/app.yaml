@@ -1,0 +1,106 @@
+app_slug: asana
+app_name: Asana
+openapi_path: ../../open_api_schemas/asana_oas.json
+target_dir: ../../../backend/src/services/asana
+resources:
+  projects:
+    aliases:
+    - project
+    - project_compact
+    - projects
+    primary_key: gid
+    self_id_fields:
+    - gid
+  tasks:
+    aliases:
+    - task
+    - task_compact
+    - tasks
+    primary_key: gid
+    self_id_fields:
+    - gid
+  sections:
+    aliases:
+    - section
+    - section_compact
+    - sections
+    - project_section_insert_request
+    - section_request
+    - section_task_insert_request
+    primary_key: gid
+    self_id_fields:
+    - gid
+  users:
+    aliases:
+    - assignee
+    - author
+    - completed_by
+    - created_by
+    - creator
+    - follower
+    - followers
+    - liked_by
+    - member
+    - members
+    - modified_by
+    - owner
+    - user
+    - user_compact
+    - users
+    - add_followers_request
+    - add_members_request
+    - remove_followers_request
+    - remove_members_request
+    - task_add_followers_request
+    - task_remove_followers_request
+    - team_add_user_request
+    - team_remove_user_request
+    - workspace_add_user_request
+    - workspace_remove_user_request
+    primary_key: gid
+    self_id_fields:
+    - gid
+  teams:
+    aliases:
+    - team
+    - team_compact
+    - teams
+    primary_key: gid
+    self_id_fields:
+    - gid
+  workspaces:
+    aliases:
+    - workspace
+    - workspace_compact
+    - workspaces
+    primary_key: gid
+    self_id_fields:
+    - gid
+  tags:
+    aliases:
+    - tag
+    - tag_compact
+    - tags
+    primary_key: gid
+    self_id_fields:
+    - gid
+  stories:
+    aliases:
+    - stories
+    - story
+    - story_compact
+    - story_base
+    - story_request
+    - story_response
+    primary_key: gid
+    self_id_fields:
+    - gid
+naming:
+  qualifier_prefixes:
+  - parent_
+  - source_
+  - target_
+  self_id_fields:
+  - gid
+  pk_field_names:
+  - gid
