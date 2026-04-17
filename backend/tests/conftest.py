@@ -145,6 +145,109 @@ def cleanup_test_environments(session_manager, created_schemas):
 
 
 @pytest_asyncio.fixture
+async def replica_client(
+    test_user_id,
+    core_isolation_engine,
+    session_manager,
+    environment_handler,
+):
+    """Factory fixture for any REST replica registered in replicas.yaml.
+
+    Yields an async function ``make_client(slug, ...)`` that:
+      1. Looks up the replica in ``REST_REPLICAS``.
+      2. Provisions an isolated environment from the template
+         (``<slug>_base`` by default — useful for smoke-testing a
+         freshly scaffolded replica with zero implemented endpoints).
+      3. Imports the replica's routes module and wraps them in a
+         minimal Starlette app whose middleware injects a scoped DB
+         session, the impersonated user, and the environment id into
+         ``request.state`` — matching what ``IsolationMiddleware`` does
+         in the full platform path.
+      4. Returns an ``httpx.AsyncClient`` bound to that ASGI app.
+
+    Every client and environment created by the factory is cleaned up
+    when the fixture tears down, so tests can call the factory multiple
+    times without leaking schemas.
+
+    Purpose:
+      - Smoke tests call this with no template override to confirm the
+        replica mounts and returns 404 (not 500) on unknown paths.
+      - Per-resource tests call this once real endpoints land and
+        immediately exercise them against the isolated DB — no extra
+        wiring required.
+    """
+    from importlib import import_module
+
+    from httpx import AsyncClient, ASGITransport
+    from starlette.applications import Starlette
+
+    from src.services._registry import REST_REPLICAS
+
+    created_envs = []
+    opened_clients = []
+
+    async def _make(
+        slug: str,
+        *,
+        template: str | None = None,
+        impersonate_user_id: str = "test-user",
+        impersonate_email: str = "test@example.com",
+    ):
+        replica = next((r for r in REST_REPLICAS if r.slug == slug), None)
+        if replica is None:
+            raise LookupError(
+                f"No REST replica registered with slug {slug!r}. "
+                f"Known: {[r.slug for r in REST_REPLICAS]}"
+            )
+
+        template_schema = template or f"{slug}_base"
+        env_result = core_isolation_engine.create_environment(
+            template_schema=template_schema,
+            ttl_seconds=3600,
+            created_by=test_user_id,
+            impersonate_user_id=impersonate_user_id,
+            impersonate_email=impersonate_email,
+        )
+        created_envs.append(env_result)
+
+        module = import_module(replica.routes_module)
+        routes = getattr(module, replica.routes_attr)
+
+        async def add_request_state(request, call_next):
+            with session_manager.with_session_for_environment(
+                env_result.environment_id
+            ) as session:
+                request.state.db_session = session
+                request.state.environment_id = env_result.environment_id
+                request.state.impersonate_user_id = impersonate_user_id
+                request.state.impersonate_email = impersonate_email
+                return await call_next(request)
+
+        app = Starlette(routes=routes)
+        app.middleware("http")(add_request_state)
+
+        transport = ASGITransport(app=app)
+        client = AsyncClient(transport=transport, base_url="http://test")
+        await client.__aenter__()
+        opened_clients.append(client)
+        return client
+
+    try:
+        yield _make
+    finally:
+        for client in opened_clients:
+            try:
+                await client.__aexit__(None, None, None)
+            except Exception:
+                pass
+        for env in created_envs:
+            try:
+                environment_handler.drop_schema(env.schema_name)
+            except Exception:
+                pass
+
+
+@pytest_asyncio.fixture
 async def slack_client(slack_shared_environment, session_manager):
     """Create an AsyncClient for testing Slack API as U01AGENBOT9 (agent1)."""
     from httpx import AsyncClient, ASGITransport

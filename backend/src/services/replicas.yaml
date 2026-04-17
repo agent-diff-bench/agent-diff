@@ -1,0 +1,81 @@
+# Replica registry for agent-diff.
+#
+# This file is the source of truth for which replica apps exist, how they
+# mount into the Starlette app, and how their seed templates are created.
+# The generation pipeline's scaffold stage appends entries here; runtime
+# consumers (src/services/_registry.py) parse it once at import time into
+# typed dataclasses.
+#
+# Two top-level lists:
+#   rest:    REST replicas that share a common mount pattern — they expose
+#            a Starlette `routes` list that gets wrapped in a Router and
+#            mounted under /api/env/{env_id}/services/<slug>.
+#   graphql: GraphQL replicas. Their wiring is still bespoke per-app
+#            (schema loading, resolver binding, executor construction),
+#            so this list only drives the seed step until that stabilizes.
+#
+# Fields — rest entry:
+#   slug           App slug, also the Postgres schema prefix and service key
+#                  in public.environments.
+#   mount_path     Starlette mount pattern. Must include the {env_id}
+#                  placeholder so IsolationMiddleware can route to the
+#                  right per-env schema.
+#   routes_module  Dotted import path of the module exporting `routes`.
+#   routes_attr    Attribute name on that module that holds the routes
+#                  list (almost always "routes").
+#   seed_command   Shell command to (re)build the app's template schemas.
+#                  Run by utils/seed_all.py at container startup.
+#
+# Fields — graphql entry:
+#   slug           App slug.
+#   seed_command   Shell command to (re)build the app's template schemas.
+
+rest:
+  - slug: slack
+    mount_path: /api/env/{env_id}/services/slack
+    routes_module: src.services.slack.api.methods
+    routes_attr: routes
+    seed_command: python utils/seed_template.py --app slack
+
+  - slug: calendar
+    mount_path: /api/env/{env_id}/services/calendar
+    routes_module: src.services.calendar.api
+    routes_attr: routes
+    seed_command: python utils/seed_template.py --app calendar
+
+  - slug: box
+    mount_path: /api/env/{env_id}/services/box/2.0
+    routes_module: src.services.box.api.routes
+    routes_attr: routes
+    # Box uses a bespoke seeder because it loads binary file contents
+    # from the filesystem into BYTEA columns — the generic seeder only
+    # handles JSON-encodable values.
+    seed_command: python utils/seed_box_template.py
+
+  - slug: todoist
+    mount_path: /api/env/{env_id}/services/todoist/api/v1
+    routes_module: src.services.todoist.api.routes
+    routes_attr: routes
+    seed_command: python utils/seed_template.py --app todoist
+
+  - slug: asana
+    mount_path: /api/env/{env_id}/services/asana
+    routes_module: src.services.asana.api.routes
+    routes_attr: routes
+    seed_command: python utils/seed_template.py --app asana
+
+  - slug: github
+    mount_path: /api/env/{env_id}/services/github
+    routes_module: src.services.github.api.routes
+    routes_attr: routes
+    seed_command: python utils/seed_template.py --app github
+
+graphql:
+  # Linear's mounting is still hand-wired in platform/api/main.py because
+  # its GraphQL executor needs schema + resolver binding. Only its seed
+  # step is driven by this registry today.
+  - slug: linear
+    # Linear predates the standard database/base.py + database/schema.py
+    # layout — its Base lives in schema.py directly, so it can't use the
+    # generic seeder until that layout is migrated.
+    seed_command: python utils/seed_linear_template.py

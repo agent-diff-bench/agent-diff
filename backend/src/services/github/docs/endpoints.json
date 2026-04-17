@@ -1,0 +1,1962 @@
+{
+  "_meta": {
+    "app": "GitHub",
+    "app_slug": "github",
+    "source_openapi": "automatic_schema_generation/apps/github/inputs/openapi.scoped.json",
+    "mount_prefix": "",
+    "generated_at": "2026-04-13T09:47:31.385619+00:00",
+    "generator_version": "1.0.0",
+    "integrity": {
+      "errors": [],
+      "warnings": [
+        {
+          "code": "NO_REQUEST_BODY_FOR_MUTATION",
+          "where": "PUT /gists/{gist_id}/star",
+          "message": "PUT has no requestBody"
+        }
+      ],
+      "info": [
+        {
+          "code": "EMPTY_RESPONSE_SCHEMA",
+          "where": "DELETE /gists/{gist_id}",
+          "message": "a 2xx response has no schema"
+        },
+        {
+          "code": "EMPTY_RESPONSE_SCHEMA",
+          "where": "GET /gists/{gist_id}/star",
+          "message": "a 2xx response has no schema"
+        },
+        {
+          "code": "EMPTY_RESPONSE_SCHEMA",
+          "where": "PUT /gists/{gist_id}/star",
+          "message": "a 2xx response has no schema"
+        },
+        {
+          "code": "EMPTY_RESPONSE_SCHEMA",
+          "where": "DELETE /gists/{gist_id}/star",
+          "message": "a 2xx response has no schema"
+        }
+      ]
+    }
+  },
+  "endpoints": {
+    "GET /gists": {
+      "resource": "gists",
+      "method": "GET",
+      "path": "/gists",
+      "operation_id": "gists/list",
+      "summary": "List gists for the authenticated user",
+      "description": "Lists the authenticated user's gists or if called anonymously, this endpoint returns all public gists:",
+      "parameters": [
+        {
+          "name": "since",
+          "in": "query",
+          "required": false,
+          "description": "Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`.",
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "name": "per_page",
+          "in": "query",
+          "required": false,
+          "description": "The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"",
+          "schema": {
+            "type": "integer",
+            "default": 30
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "required": false,
+          "description": "The page number of the results to fetch. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"",
+          "schema": {
+            "type": "integer",
+            "default": 1
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/schemas/base-gist"
+            }
+          },
+          "examples": {
+            "default": {
+              "$ref": "#/components/examples/base-gist-items"
+            }
+          }
+        },
+        "304": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [],
+      "produces": [],
+      "raw_spec": {
+        "summary": "List gists for the authenticated user",
+        "description": "Lists the authenticated user's gists or if called anonymously, this endpoint returns all public gists:",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/list",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#list-gists-for-the-authenticated-user"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/since"
+          },
+          {
+            "$ref": "#/components/parameters/per-page"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/schemas/base-gist"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/base-gist-items"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/link"
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "GET /gists/{gist_id}": {
+      "resource": "gists",
+      "method": "GET",
+      "path": "/gists/{gist_id}",
+      "operation_id": "gists/get",
+      "summary": "Get a gist",
+      "description": "Gets a specified gist.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "$ref": "#/schemas/gist-simple"
+          },
+          "examples": {
+            "default": {
+              "$ref": "#/components/examples/gist"
+            }
+          }
+        },
+        "403": {
+          "description": ""
+        },
+        "404": {
+          "description": ""
+        },
+        "304": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [],
+      "raw_spec": {
+        "summary": "Get a gist",
+        "description": "Gets a specified gist.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/get",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#get-a-gist"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/schemas/gist-simple"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/gist"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden_gist"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "GET /gists/{gist_id}/star": {
+      "resource": "gists",
+      "method": "GET",
+      "path": "/gists/{gist_id}/star",
+      "operation_id": "gists/check-is-starred",
+      "summary": "Check if a gist is starred",
+      "description": "",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Response if gist is starred"
+        },
+        "404": {
+          "description": "Not Found if gist is not starred",
+          "content_type": "application/json",
+          "schema": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          }
+        },
+        "304": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [],
+      "raw_spec": {
+        "summary": "Check if a gist is starred",
+        "description": "",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/check-is-starred",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#check-if-a-gist-is-starred"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Response if gist is starred"
+          },
+          "404": {
+            "description": "Not Found if gist is not starred",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "additionalProperties": false
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "GET /gists/{gist_id}/{sha}": {
+      "resource": "gists",
+      "method": "GET",
+      "path": "/gists/{gist_id}/{sha}",
+      "operation_id": "gists/get-revision",
+      "summary": "Get a gist revision",
+      "description": "Gets a specified gist revision.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "sha",
+          "in": "path",
+          "required": true,
+          "description": "",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "$ref": "#/schemas/gist-simple"
+          },
+          "examples": {
+            "default": {
+              "$ref": "#/components/examples/gist"
+            }
+          }
+        },
+        "422": {
+          "description": ""
+        },
+        "404": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [],
+      "raw_spec": {
+        "summary": "Get a gist revision",
+        "description": "Gets a specified gist revision.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/get-revision",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#get-a-gist-revision"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          },
+          {
+            "name": "sha",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/schemas/gist-simple"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/gist"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "GET /users/{username}/gists": {
+      "resource": "gists",
+      "method": "GET",
+      "path": "/users/{username}/gists",
+      "operation_id": "gists/list-for-user",
+      "summary": "List gists for a user",
+      "description": "Lists public gists for the specified user:",
+      "parameters": [
+        {
+          "name": "username",
+          "in": "path",
+          "required": true,
+          "description": "The handle for the GitHub user account.",
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "since",
+          "in": "query",
+          "required": false,
+          "description": "Only show results that were last updated after the given time. This is a timestamp in [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601) format: `YYYY-MM-DDTHH:MM:SSZ`.",
+          "schema": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        {
+          "name": "per_page",
+          "in": "query",
+          "required": false,
+          "description": "The number of results per page (max 100). For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"",
+          "schema": {
+            "type": "integer",
+            "default": 30
+          }
+        },
+        {
+          "name": "page",
+          "in": "query",
+          "required": false,
+          "description": "The page number of the results to fetch. For more information, see \"[Using pagination in the REST API](https://docs.github.com/rest/using-the-rest-api/using-pagination-in-the-rest-api).\"",
+          "schema": {
+            "type": "integer",
+            "default": 1
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/schemas/base-gist"
+            }
+          },
+          "examples": {
+            "default": {
+              "$ref": "#/components/examples/base-gist-items"
+            }
+          }
+        },
+        "422": {
+          "description": ""
+        }
+      },
+      "requires": [],
+      "produces": [],
+      "raw_spec": {
+        "summary": "List gists for a user",
+        "description": "Lists public gists for the specified user:",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/list-for-user",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#list-gists-for-a-user"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/username"
+          },
+          {
+            "$ref": "#/components/parameters/since"
+          },
+          {
+            "$ref": "#/components/parameters/per-page"
+          },
+          {
+            "$ref": "#/components/parameters/page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/schemas/base-gist"
+                  }
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/base-gist-items"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Link": {
+                "$ref": "#/components/headers/link"
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "POST /gists": {
+      "resource": "gists",
+      "method": "POST",
+      "path": "/gists",
+      "operation_id": "gists/create",
+      "summary": "Create a gist",
+      "description": "Allows you to add a new gist with one or more files.\n\n> [!NOTE]\n> Don't name your files \"gistfile\" with a numerical suffix. This is the format of the automatic naming scheme that Gist uses internally.",
+      "parameters": [],
+      "request_body": {
+        "content_type": "application/json",
+        "required": true,
+        "description": "",
+        "schema": {
+          "properties": {
+            "description": {
+              "description": "Description of the gist",
+              "type": "string",
+              "examples": [
+                "Example Ruby script"
+              ]
+            },
+            "files": {
+              "description": "Names and content for the files that make up the gist",
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "description": "Content of the file",
+                    "readOnly": false,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              },
+              "examples": [
+                {
+                  "hello.rb": {
+                    "content": "puts \"Hello, World!\""
+                  }
+                }
+              ]
+            },
+            "public": {
+              "oneOf": [
+                {
+                  "description": "Flag indicating whether the gist is public",
+                  "type": "boolean",
+                  "default": false,
+                  "examples": [
+                    true
+                  ]
+                },
+                {
+                  "type": "string",
+                  "default": "false",
+                  "enum": [
+                    "true",
+                    "false"
+                  ],
+                  "examples": [
+                    "true"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "files"
+          ],
+          "type": "object"
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "$ref": "#/schemas/gist-simple"
+          },
+          "examples": {
+            "default": {
+              "$ref": "#/components/examples/gist"
+            }
+          }
+        },
+        "422": {
+          "description": ""
+        },
+        "304": {
+          "description": ""
+        },
+        "404": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [],
+      "produces": [
+        {
+          "entity": "gists",
+          "kind": "create"
+        }
+      ],
+      "raw_spec": {
+        "summary": "Create a gist",
+        "description": "Allows you to add a new gist with one or more files.\n\n> [!NOTE]\n> Don't name your files \"gistfile\" with a numerical suffix. This is the format of the automatic naming scheme that Gist uses internally.",
+        "operationId": "gists/create",
+        "tags": [
+          "gists"
+        ],
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#create-a-gist"
+        },
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "description": "Description of the gist",
+                    "type": "string",
+                    "examples": [
+                      "Example Ruby script"
+                    ]
+                  },
+                  "files": {
+                    "description": "Names and content for the files that make up the gist",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "description": "Content of the file",
+                          "readOnly": false,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "content"
+                      ]
+                    },
+                    "examples": [
+                      {
+                        "hello.rb": {
+                          "content": "puts \"Hello, World!\""
+                        }
+                      }
+                    ]
+                  },
+                  "public": {
+                    "oneOf": [
+                      {
+                        "description": "Flag indicating whether the gist is public",
+                        "type": "boolean",
+                        "default": false,
+                        "examples": [
+                          true
+                        ]
+                      },
+                      {
+                        "type": "string",
+                        "default": "false",
+                        "enum": [
+                          "true",
+                          "false"
+                        ],
+                        "examples": [
+                          "true"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "files"
+                ],
+                "type": "object"
+              },
+              "examples": {
+                "default": {
+                  "summary": "Creating a gist",
+                  "value": {
+                    "description": "Example of a gist",
+                    "public": false,
+                    "files": {
+                      "README.md": {
+                        "content": "Hello World"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/schemas/gist-simple"
+                },
+                "examples": {
+                  "default": {
+                    "$ref": "#/components/examples/gist"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Location": {
+                "example": "https://api.github.com/gists/aa5a315d61ae9438b18d",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "PUT /gists/{gist_id}/star": {
+      "resource": "gists",
+      "method": "PUT",
+      "path": "/gists/{gist_id}/star",
+      "operation_id": "gists/star",
+      "summary": "Star a gist",
+      "description": "Note that you'll need to set `Content-Length` to zero when calling out to this endpoint. For more information, see \"[HTTP method](https://docs.github.com/rest/guides/getting-started-with-the-rest-api#http-method).\"",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Response"
+        },
+        "404": {
+          "description": ""
+        },
+        "304": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [
+        {
+          "entity": "gists",
+          "kind": "update"
+        }
+      ],
+      "raw_spec": {
+        "summary": "Star a gist",
+        "description": "Note that you'll need to set `Content-Length` to zero when calling out to this endpoint. For more information, see \"[HTTP method](https://docs.github.com/rest/guides/getting-started-with-the-rest-api#http-method).\"",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/star",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#star-a-gist"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "PATCH /gists/{gist_id}": {
+      "resource": "gists",
+      "method": "PATCH",
+      "path": "/gists/{gist_id}",
+      "operation_id": "gists/update",
+      "summary": "Update a gist",
+      "description": "Allows you to update a gist's description and to update, delete, or rename gist files. Files\nfrom the previous version of the gist that aren't explicitly changed during an edit\nare unchanged.\n\nAt least one of `description` or `files` is required.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "request_body": {
+        "content_type": "application/json",
+        "required": true,
+        "description": "",
+        "schema": {
+          "properties": {
+            "description": {
+              "description": "The description of the gist.",
+              "type": "string",
+              "examples": [
+                "Example Ruby script"
+              ]
+            },
+            "files": {
+              "description": "The gist files to be updated, renamed, or deleted. Each `key` must match the current filename\n(including extension) of the targeted gist file. For example: `hello.py`.\n\nTo delete a file, set the whole file to null. For example: `hello.py : null`. The file will also be\ndeleted if the specified object does not contain at least one of `content` or `filename`.",
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "properties": {
+                  "content": {
+                    "description": "The new content of the file.",
+                    "type": "string"
+                  },
+                  "filename": {
+                    "description": "The new filename for the file.",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              },
+              "examples": [
+                {
+                  "hello.rb": {
+                    "content": "blah",
+                    "filename": "goodbye.rb"
+                  }
+                }
+              ]
+            }
+          },
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Response",
+          "content_type": "application/json",
+          "schema": {
+            "$ref": "#/schemas/gist-simple"
+          },
+          "examples": {
+            "updateGist": {
+              "$ref": "#/components/examples/gist"
+            },
+            "deleteFile": {
+              "$ref": "#/components/examples/delete-gist-file"
+            },
+            "renameFile": {
+              "$ref": "#/components/examples/rename-gist-file"
+            }
+          }
+        },
+        "422": {
+          "description": ""
+        },
+        "404": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [
+        {
+          "entity": "gists",
+          "kind": "update"
+        }
+      ],
+      "raw_spec": {
+        "summary": "Update a gist",
+        "description": "Allows you to update a gist's description and to update, delete, or rename gist files. Files\nfrom the previous version of the gist that aren't explicitly changed during an edit\nare unchanged.\n\nAt least one of `description` or `files` is required.\n\nThis endpoint supports the following custom media types. For more information, see \"[Media types](https://docs.github.com/rest/using-the-rest-api/getting-started-with-the-rest-api#media-types).\"\n\n- **`application/vnd.github.raw+json`**: Returns the raw markdown. This is the default if you do not pass any specific media type.",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/update",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#update-a-gist"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "description": "The description of the gist.",
+                    "type": "string",
+                    "examples": [
+                      "Example Ruby script"
+                    ]
+                  },
+                  "files": {
+                    "description": "The gist files to be updated, renamed, or deleted. Each `key` must match the current filename\n(including extension) of the targeted gist file. For example: `hello.py`.\n\nTo delete a file, set the whole file to null. For example: `hello.py : null`. The file will also be\ndeleted if the specified object does not contain at least one of `content` or `filename`.",
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "properties": {
+                        "content": {
+                          "description": "The new content of the file.",
+                          "type": "string"
+                        },
+                        "filename": {
+                          "description": "The new filename for the file.",
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "examples": [
+                      {
+                        "hello.rb": {
+                          "content": "blah",
+                          "filename": "goodbye.rb"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "examples": {
+                "updateGist": {
+                  "summary": "Updating a gist",
+                  "value": {
+                    "description": "An updated gist description",
+                    "files": {
+                      "README.md": {
+                        "content": "Hello World from GitHub"
+                      }
+                    }
+                  }
+                },
+                "deleteFile": {
+                  "summary": "Deleting a gist file",
+                  "value": {
+                    "files": {
+                      "hello.py": null
+                    }
+                  }
+                },
+                "renameFile": {
+                  "summary": "Renaming a gist file",
+                  "value": {
+                    "files": {
+                      "hello.py": {
+                        "filename": "goodbye.py"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/schemas/gist-simple"
+                },
+                "examples": {
+                  "updateGist": {
+                    "$ref": "#/components/examples/gist"
+                  },
+                  "deleteFile": {
+                    "$ref": "#/components/examples/delete-gist-file"
+                  },
+                  "renameFile": {
+                    "$ref": "#/components/examples/rename-gist-file"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "$ref": "#/components/responses/validation_failed"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "DELETE /gists/{gist_id}": {
+      "resource": "gists",
+      "method": "DELETE",
+      "path": "/gists/{gist_id}",
+      "operation_id": "gists/delete",
+      "summary": "Delete a gist",
+      "description": "",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Response"
+        },
+        "404": {
+          "description": ""
+        },
+        "304": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [
+        {
+          "entity": "gists",
+          "kind": "delete"
+        }
+      ],
+      "raw_spec": {
+        "summary": "Delete a gist",
+        "description": "",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/delete",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#delete-a-gist"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Response"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    },
+    "DELETE /gists/{gist_id}/star": {
+      "resource": "gists",
+      "method": "DELETE",
+      "path": "/gists/{gist_id}/star",
+      "operation_id": "gists/unstar",
+      "summary": "Unstar a gist",
+      "description": "",
+      "parameters": [
+        {
+          "name": "gist_id",
+          "in": "path",
+          "required": true,
+          "description": "The unique identifier of the gist.",
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "responses": {
+        "204": {
+          "description": "Response"
+        },
+        "304": {
+          "description": ""
+        },
+        "404": {
+          "description": ""
+        },
+        "403": {
+          "description": ""
+        }
+      },
+      "requires": [
+        {
+          "in": "path",
+          "name": "gist_id",
+          "entity": "gists",
+          "confidence": "high",
+          "required": true
+        }
+      ],
+      "produces": [
+        {
+          "entity": "gists",
+          "kind": "delete"
+        }
+      ],
+      "raw_spec": {
+        "summary": "Unstar a gist",
+        "description": "",
+        "tags": [
+          "gists"
+        ],
+        "operationId": "gists/unstar",
+        "externalDocs": {
+          "description": "API method documentation",
+          "url": "https://docs.github.com/rest/gists/gists#unstar-a-gist"
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/gist-id"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Response"
+          },
+          "304": {
+            "$ref": "#/components/responses/not_modified"
+          },
+          "404": {
+            "$ref": "#/components/responses/not_found"
+          },
+          "403": {
+            "$ref": "#/components/responses/forbidden"
+          }
+        },
+        "x-github": {
+          "githubCloudOnly": false,
+          "enabledForGitHubApps": false,
+          "category": "gists",
+          "subcategory": "gists"
+        }
+      },
+      "status": {
+        "state": "not_started",
+        "last_attempt": null,
+        "last_attempt_duration_seconds": null,
+        "error": null,
+        "failing_file": null
+      }
+    }
+  },
+  "schemas": {
+    "base-gist": {
+      "title": "Base Gist",
+      "description": "Base Gist",
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "forks_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "commits_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "id": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "git_pull_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "git_push_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "html_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "filename": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "raw_url": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "encoding": {
+                "type": "string",
+                "description": "The encoding used for `content`. Currently, `\"utf-8\"` and `\"base64\"` are supported.",
+                "default": "utf-8"
+              }
+            }
+          }
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "comments": {
+          "type": "integer"
+        },
+        "comments_enabled": {
+          "type": "boolean"
+        },
+        "comments_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "owner": {
+          "$ref": "#/schemas/simple-user"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "node_id",
+        "url",
+        "forks_url",
+        "commits_url",
+        "git_pull_url",
+        "git_push_url",
+        "html_url",
+        "comments_url",
+        "public",
+        "description",
+        "comments",
+        "files",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    "gist-simple": {
+      "title": "Gist Simple",
+      "description": "Gist Simple",
+      "type": "object",
+      "properties": {
+        "fork_of": {
+          "title": "Gist",
+          "description": "Gist",
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "forks_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "commits_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "id": {
+              "type": "string"
+            },
+            "node_id": {
+              "type": "string"
+            },
+            "git_pull_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "git_push_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "html_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "files": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "filename": {
+                    "type": "string"
+                  },
+                  "type": {
+                    "type": "string"
+                  },
+                  "language": {
+                    "type": "string"
+                  },
+                  "raw_url": {
+                    "type": "string"
+                  },
+                  "size": {
+                    "type": "integer"
+                  }
+                }
+              }
+            },
+            "public": {
+              "type": "boolean"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updated_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "comments": {
+              "type": "integer"
+            },
+            "comments_enabled": {
+              "type": "boolean"
+            },
+            "user": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/schemas/simple-user"
+                }
+              ]
+            },
+            "comments_url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "owner": {
+              "anyOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/schemas/simple-user"
+                }
+              ]
+            },
+            "truncated": {
+              "type": "boolean"
+            },
+            "forks": {
+              "type": "array",
+              "items": {}
+            },
+            "history": {
+              "type": "array",
+              "items": {}
+            }
+          },
+          "required": [
+            "id",
+            "node_id",
+            "url",
+            "forks_url",
+            "commits_url",
+            "git_pull_url",
+            "git_push_url",
+            "html_url",
+            "comments_url",
+            "public",
+            "description",
+            "comments",
+            "user",
+            "files",
+            "created_at",
+            "updated_at"
+          ]
+        },
+        "url": {
+          "type": "string"
+        },
+        "forks_url": {
+          "type": "string"
+        },
+        "commits_url": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "git_pull_url": {
+          "type": "string"
+        },
+        "git_push_url": {
+          "type": "string"
+        },
+        "html_url": {
+          "type": "string"
+        },
+        "files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "filename": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "language": {
+                "type": "string"
+              },
+              "raw_url": {
+                "type": "string"
+              },
+              "size": {
+                "type": "integer"
+              },
+              "truncated": {
+                "type": "boolean"
+              },
+              "content": {
+                "type": "string"
+              },
+              "encoding": {
+                "type": "string",
+                "description": "The encoding used for `content`. Currently, `\"utf-8\"` and `\"base64\"` are supported.",
+                "default": "utf-8"
+              }
+            }
+          }
+        },
+        "public": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "comments": {
+          "type": "integer"
+        },
+        "comments_enabled": {
+          "type": "boolean"
+        },
+        "user": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "comments_url": {
+          "type": "string"
+        },
+        "owner": {
+          "$ref": "#/schemas/simple-user"
+        },
+        "truncated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "simple-user": {
+      "title": "Simple User",
+      "description": "A GitHub user.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "login": {
+          "type": "string",
+          "examples": [
+            "octocat"
+          ]
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64",
+          "examples": [
+            1
+          ]
+        },
+        "node_id": {
+          "type": "string",
+          "examples": [
+            "MDQ6VXNlcjE="
+          ]
+        },
+        "avatar_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://github.com/images/error/octocat_happy.gif"
+          ]
+        },
+        "gravatar_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "examples": [
+            "41d064eb2195891e12d0413f63227ea7"
+          ]
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat"
+          ]
+        },
+        "html_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://github.com/octocat"
+          ]
+        },
+        "followers_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/followers"
+          ]
+        },
+        "following_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/following{/other_user}"
+          ]
+        },
+        "gists_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/gists{/gist_id}"
+          ]
+        },
+        "starred_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/starred{/owner}{/repo}"
+          ]
+        },
+        "subscriptions_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/subscriptions"
+          ]
+        },
+        "organizations_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/orgs"
+          ]
+        },
+        "repos_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/repos"
+          ]
+        },
+        "events_url": {
+          "type": "string",
+          "examples": [
+            "https://api.github.com/users/octocat/events{/privacy}"
+          ]
+        },
+        "received_events_url": {
+          "type": "string",
+          "format": "uri",
+          "examples": [
+            "https://api.github.com/users/octocat/received_events"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "examples": [
+            "User"
+          ]
+        },
+        "site_admin": {
+          "type": "boolean"
+        },
+        "starred_at": {
+          "type": "string",
+          "examples": [
+            "\"2020-07-09T00:17:55Z\""
+          ]
+        },
+        "user_view_type": {
+          "type": "string",
+          "examples": [
+            "public"
+          ]
+        }
+      },
+      "required": [
+        "avatar_url",
+        "events_url",
+        "followers_url",
+        "following_url",
+        "gists_url",
+        "gravatar_id",
+        "html_url",
+        "id",
+        "node_id",
+        "login",
+        "organizations_url",
+        "received_events_url",
+        "repos_url",
+        "site_admin",
+        "starred_url",
+        "subscriptions_url",
+        "type",
+        "url"
+      ]
+    }
+  }
+}

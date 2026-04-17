@@ -1,0 +1,449 @@
+{
+  "_meta": {
+    "app": "Todoist",
+    "app_slug": "todoist",
+    "source_endpoints_hash": "760410cfe549ffd78910be760bab6b2f1736778665eb0f3845c6f3d2b64a7c20",
+    "target_dir": "backend/src/services/todoist",
+    "scaffold_targets": {
+      "schema": "database/schema.py",
+      "operations": "database/operations.py",
+      "serializers": "core/serializers.py",
+      "routes": "api/routes.py",
+      "utils": "core/utils.py",
+      "errors": "core/errors.py"
+    },
+    "generated_at": "2026-04-13T12:33:04.279589+00:00",
+    "generator_version": "1.0.0"
+  },
+  "resources": {
+    "projects": {
+      "table": "todoist_projects",
+      "model_class_name": "TodoistProject",
+      "entity_slug": "project",
+      "id_format": {
+        "alphabet": "ALPHANUMERIC",
+        "length": 16,
+        "example": "6XGgm6PHrGgMpCFX",
+        "inferred_from": "openapi_example"
+      },
+      "description": "Unarchive Project \u2022 Archive Project \u2022 Join \u2022 Delete Project \u2022 Get Project \u2022 Update Project \u2022 Create Project \u2022 Get Projects",
+      "endpoint_keys": [
+        "GET /projects",
+        "GET /projects/{project_id}",
+        "POST /projects",
+        "POST /projects/{project_id}",
+        "POST /projects/{project_id}/archive",
+        "POST /projects/{project_id}/join",
+        "POST /projects/{project_id}/unarchive",
+        "DELETE /projects/{project_id}"
+      ],
+      "depends_on": [
+        "user"
+      ],
+      "dependency_order": 2,
+      "fks": [
+        {
+          "column": "creator_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: creator_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "parent_id",
+          "target_resource": "projects",
+          "target_table": "todoist_projects",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: parent_id",
+          "discovered_in": "body"
+        }
+      ],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/projects/{project_id}"
+      },
+      "implementation_status": {
+        "total_endpoints": 8,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 8,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    },
+    "sections": {
+      "table": "todoist_sections",
+      "model_class_name": "TodoistSection",
+      "entity_slug": "section",
+      "id_format": {
+        "alphabet": "ALPHANUMERIC",
+        "length": 16,
+        "example": "6XGgm6PHrGgMpCFX",
+        "inferred_from": "openapi_example"
+      },
+      "description": "Unarchive Section \u2022 Archive Section \u2022 Delete Section \u2022 Get Section \u2022 Update Section \u2022 Create Section \u2022 Get Sections",
+      "endpoint_keys": [
+        "GET /sections",
+        "GET /sections/{section_id}",
+        "POST /sections",
+        "POST /sections/{section_id}",
+        "POST /sections/{section_id}/archive",
+        "POST /sections/{section_id}/unarchive",
+        "DELETE /sections/{section_id}"
+      ],
+      "depends_on": [
+        "projects",
+        "user"
+      ],
+      "dependency_order": 3,
+      "fks": [
+        {
+          "column": "user_id",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: user_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "project_id",
+          "target_resource": "projects",
+          "target_table": "todoist_projects",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: project_id",
+          "discovered_in": "body"
+        }
+      ],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/sections/{section_id}"
+      },
+      "implementation_status": {
+        "total_endpoints": 7,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 7,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    },
+    "tasks": {
+      "table": "todoist_tasks",
+      "model_class_name": "TodoistTask",
+      "entity_slug": "task",
+      "id_format": {
+        "alphabet": "ALPHANUMERIC",
+        "length": 16,
+        "example": "6XGgmFVcrG5RRjVr",
+        "inferred_from": "openapi_example"
+      },
+      "description": "Reopen Task \u2022 Close Task \u2022 Move Task \u2022 Delete Task \u2022 Get Task \u2022 Update Task \u2022 Create Task \u2022 Get Tasks",
+      "endpoint_keys": [
+        "GET /tasks",
+        "GET /tasks/{task_id}",
+        "POST /tasks",
+        "POST /tasks/{task_id}",
+        "POST /tasks/{task_id}/close",
+        "POST /tasks/{task_id}/move",
+        "POST /tasks/{task_id}/reopen",
+        "DELETE /tasks/{task_id}"
+      ],
+      "depends_on": [
+        "projects",
+        "sections",
+        "user"
+      ],
+      "dependency_order": 4,
+      "fks": [
+        {
+          "column": "user_id",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: user_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "project_id",
+          "target_resource": "projects",
+          "target_table": "todoist_projects",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: project_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "section_id",
+          "target_resource": "sections",
+          "target_table": "todoist_sections",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: section_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "parent_id",
+          "target_resource": "tasks",
+          "target_table": "todoist_tasks",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: parent_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "added_by_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: added_by_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "assigned_by_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: assigned_by_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "responsible_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: responsible_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "completed_by_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: completed_by_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "assignee_id",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "request body on POST /api/v1/tasks/{task_id}: assignee_id",
+          "discovered_in": "body"
+        }
+      ],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/tasks/{task_id}"
+      },
+      "implementation_status": {
+        "total_endpoints": 8,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 8,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    },
+    "comments": {
+      "table": "todoist_comments",
+      "model_class_name": "TodoistComment",
+      "entity_slug": "comment",
+      "id_format": {
+        "alphabet": "ALPHANUMERIC",
+        "length": 16,
+        "example": "6XGgmFQrx44wfGHr",
+        "inferred_from": "openapi_example"
+      },
+      "description": "Delete Comment \u2022 Get Comment \u2022 Update Comment \u2022 Create Comment \u2022 Get Comments",
+      "endpoint_keys": [
+        "GET /comments",
+        "GET /comments/{comment_id}",
+        "POST /comments",
+        "POST /comments/{comment_id}",
+        "DELETE /comments/{comment_id}"
+      ],
+      "depends_on": [
+        "projects",
+        "tasks",
+        "user"
+      ],
+      "dependency_order": 5,
+      "fks": [
+        {
+          "column": "posted_uid",
+          "target_resource": "user",
+          "target_table": "todoist_user",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "response schema: posted_uid",
+          "discovered_in": "body"
+        },
+        {
+          "column": "project_id",
+          "target_resource": "projects",
+          "target_table": "todoist_projects",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "query param on GET /api/v1/comments: project_id",
+          "discovered_in": "body"
+        },
+        {
+          "column": "task_id",
+          "target_resource": "tasks",
+          "target_table": "todoist_tasks",
+          "target_column": "id",
+          "confidence": "high",
+          "reason": "query param on GET /api/v1/comments: task_id",
+          "discovered_in": "body"
+        }
+      ],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/comments/{comment_id}"
+      },
+      "implementation_status": {
+        "total_endpoints": 5,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 5,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    },
+    "labels": {
+      "table": "todoist_labels",
+      "model_class_name": "TodoistLabel",
+      "entity_slug": "label",
+      "id_format": {
+        "alphabet": "NUMERIC",
+        "length": 10,
+        "example": null,
+        "inferred_from": "config_override"
+      },
+      "description": "Delete Label \u2022 Get Label \u2022 Update Label \u2022 Create Label \u2022 Get Labels",
+      "endpoint_keys": [
+        "GET /labels",
+        "GET /labels/{label_id}",
+        "POST /labels",
+        "POST /labels/{label_id}",
+        "DELETE /labels/{label_id}"
+      ],
+      "depends_on": [],
+      "dependency_order": 0,
+      "fks": [],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/labels/{label_id}"
+      },
+      "implementation_status": {
+        "total_endpoints": 5,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 5,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    },
+    "user": {
+      "table": "todoist_user",
+      "model_class_name": "TodoistUser",
+      "entity_slug": "user",
+      "id_format": {
+        "alphabet": "NUMERIC",
+        "length": 10,
+        "example": null,
+        "inferred_from": "config_override"
+      },
+      "description": "User Info",
+      "endpoint_keys": [
+        "GET /user"
+      ],
+      "depends_on": [],
+      "dependency_order": 1,
+      "fks": [],
+      "primary_key": {
+        "column": "id",
+        "type": "string",
+        "format": null,
+        "source_endpoint": "GET /api/v1/user"
+      },
+      "implementation_status": {
+        "total_endpoints": 1,
+        "implemented_endpoints": 0,
+        "in_progress_endpoints": 0,
+        "failed_endpoints": 0,
+        "not_started_endpoints": 1,
+        "last_attempt": null,
+        "last_error": null
+      },
+      "integrity_notes": [
+        {
+          "code": "DESCRIPTION_CONCATENATED_FROM_ENDPOINTS",
+          "severity": "info",
+          "message": "no tag description; built from endpoint summaries"
+        }
+      ]
+    }
+  }
+}

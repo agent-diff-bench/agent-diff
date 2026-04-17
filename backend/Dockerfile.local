@@ -10,7 +10,11 @@ RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml ./
 
-RUN uv pip install --system -r pyproject.toml
+# Install dependencies from pyproject.toml
+# Copy a minimal package so uv can resolve the project
+RUN mkdir -p src && touch src/__init__.py && \
+    uv pip install --system . && \
+    rm -rf src
 
 COPY . .
 

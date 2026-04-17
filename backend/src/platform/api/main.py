@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from src.platform.isolationEngine.session import SessionManager
@@ -17,12 +19,13 @@ from src.platform.isolationEngine.maintenance import (
     parse_pool_targets,
 )
 from src.platform.testManager.core import CoreTestManager
+from importlib import import_module
+import logging
+
 from starlette.routing import Router
 from src.platform.api.routes import routes as platform_routes
 from src.platform.api.middleware import IsolationMiddleware, PlatformMiddleware
-from src.services.slack.api.methods import routes as slack_routes
-from src.services.calendar.api import routes as calendar_routes
-from src.services.box.api.routes import routes as box_routes
+from src.services._registry import REST_REPLICAS
 from src.platform.logging_config import setup_logging
 from src.platform.isolationEngine.pool import PoolManager
 from src.platform.db.schema import TemplateEnvironment
@@ -34,7 +37,13 @@ setup_logging()
 
 
 def create_app():
-    app = Starlette()
+    @asynccontextmanager
+    async def lifespan(application):
+        yield
+        if hasattr(application.state, "replication_service") and application.state.replication_service:
+            application.state.replication_service.stop()
+
+    app = Starlette(lifespan=lifespan)
     db_url = environ["DATABASE_URL"]
 
     # Use NullPool when using Neon's PgBouncer (-pooler) to avoid double pooling
@@ -118,13 +127,26 @@ def create_app():
     )
     app.mount("/api/platform", platform_router)
 
-    slack_router = Router(slack_routes)
-    app.mount("/api/env/{env_id}/services/slack", slack_router)
-
-    calendar_router = Router(calendar_routes)
-    app.mount("/api/env/{env_id}/services/calendar", calendar_router)
-    box_router = Router(box_routes)
-    app.mount("/api/env/{env_id}/services/box/2.0", box_router)
+    # Mount every REST replica declared in src/services/replicas.yaml.
+    # Each entry is imported and mounted independently so one broken
+    # replica cannot take down the platform — it's logged and skipped.
+    logger = logging.getLogger(__name__)
+    for replica in REST_REPLICAS:
+        try:
+            module = import_module(replica.routes_module)
+            routes = getattr(module, replica.routes_attr)
+            app.mount(replica.mount_path, Router(routes))
+            logger.info(
+                "Mounted REST replica %s at %s", replica.slug, replica.mount_path
+            )
+        except Exception as exc:
+            logger.error(
+                "Failed to mount REST replica %s (%s.%s): %s",
+                replica.slug,
+                replica.routes_module,
+                replica.routes_attr,
+                exc,
+            )
 
     linear_schema_path = "src/services/linear/api/schema/Linear-API.graphql"
     linear_type_defs = load_schema_from_path(linear_schema_path)
@@ -138,12 +160,6 @@ def create_app():
     )
 
     app.mount("/api/env/{env_id}/services/linear", linear_graphql)
-
-    @app.on_event("shutdown")
-    async def shutdown_event():
-        # Stop replication service if running (it's on-demand now)
-        if app.state.replication_service:
-            app.state.replication_service.stop()
 
     return app
 
