@@ -1,0 +1,214 @@
+{
+  "id": "github-bench",
+  "name": "GitHub Bench",
+  "description": "Benchmark tests for GitHub issue, pull-request, comment, and label operations.",
+  "service": "github",
+  "owner": "dev-user",
+  "ignore_fields": {
+    "global": ["created_at", "updated_at", "closed_at", "merged_at"]
+  },
+  "tests": [
+    {
+      "id": "issue_create_bug",
+      "name": "Open a new bug report",
+      "prompt": "Open a new issue in acme/widgets titled 'Widget factory leaks memory' describing a leak when processing large inputs. Apply the 'bug' label.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000001",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_issues",
+          "where": {
+            "title": {"eq": "Widget factory leaks memory"},
+            "is_pull_request": {"eq": false},
+            "state": {"eq": "open"}
+          },
+          "expected_count": 1
+        },
+        {
+          "diff_type": "added",
+          "entity": "github_issue_labels",
+          "where": {"label_id": {"eq": "30000001"}},
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "issue_close_resolved",
+      "name": "Close issue as completed",
+      "prompt": "Close issue #2 in acme/widgets with state_reason 'completed' now that async renderer support has shipped.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "updated",
+          "entity": "github_issues",
+          "where": {"id": {"eq": "40000002"}},
+          "changes": {
+            "state": {"from": "open", "to": "closed"},
+            "state_reason": {"to": "completed"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "issue_triage_label",
+      "name": "Add needs-triage label to issue",
+      "prompt": "Add the 'needs-triage' label to issue #2 in acme/widgets.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_issue_labels",
+          "where": {
+            "issue_id": {"eq": "40000002"},
+            "label_id": {"eq": "30000005"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "issue_assign_user",
+      "name": "Assign issue to user",
+      "prompt": "Assign bob to issue #1 in acme/widgets so he can investigate the panic.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_issue_assignees",
+          "where": {
+            "issue_id": {"eq": "40000001"},
+            "user_id": {"eq": "10000003"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "issue_comment_reply",
+      "name": "Comment on an issue",
+      "prompt": "Comment on issue #1 in acme/widgets saying 'I can reproduce on 0.5.0 as well — will pick this up.'",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000001",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_issue_comments",
+          "where": {
+            "issue_id": {"eq": "40000001"},
+            "body": {"contains": "reproduce"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "comment_edit_typo",
+      "name": "Edit an existing comment",
+      "prompt": "Alice noticed a typo in comment 50000001 on issue #1 of acme/widgets. Update the comment body to 'Reproduced on 0.4.1 and 0.5.0 — triaging.'",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "updated",
+          "entity": "github_issue_comments",
+          "where": {"id": {"eq": "50000001"}},
+          "changes": {
+            "body": {"to": "Reproduced on 0.4.1 and 0.5.0 — triaging."}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "label_create_security",
+      "name": "Create a security label",
+      "prompt": "Create a new label called 'security' in acme/widgets with color 'b60205' and description 'Security-sensitive issue'.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_labels",
+          "where": {
+            "repository_id": {"eq": "20000001"},
+            "name": {"eq": "security"},
+            "color": {"eq": "b60205"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "pr_open_docs_fix",
+      "name": "Open a pull request",
+      "prompt": "Open a pull request in acme/widgets titled 'Docs: clarify lifecycle hooks' from branch 'agent-bot/lifecycle-docs' into 'main', body 'Expands README §3 based on #3.'",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000001",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_issues",
+          "where": {
+            "is_pull_request": {"eq": true},
+            "title": {"eq": "Docs: clarify lifecycle hooks"},
+            "head_ref": {"eq": "agent-bot/lifecycle-docs"},
+            "base_ref": {"eq": "main"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "pr_request_review",
+      "name": "Request reviewers on a PR",
+      "prompt": "Request alice and carol as reviewers on PR #4 in acme/widgets.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000003",
+      "assertions": [
+        {
+          "diff_type": "added",
+          "entity": "github_pull_request_reviewers",
+          "where": {
+            "issue_id": {"eq": "40000004"},
+            "user_id": {"eq": "10000004"}
+          },
+          "expected_count": 1
+        }
+      ]
+    },
+    {
+      "id": "pr_merge",
+      "name": "Merge a pull request",
+      "prompt": "Merge PR #4 in acme/widgets now that review is complete.",
+      "type": "actionEval",
+      "seed_template": "github_default",
+      "impersonate_user_id": "10000002",
+      "assertions": [
+        {
+          "diff_type": "updated",
+          "entity": "github_issues",
+          "where": {"id": {"eq": "40000004"}},
+          "changes": {
+            "state": {"from": "open", "to": "closed"},
+            "merged": {"from": false, "to": true}
+          },
+          "expected_count": 1
+        }
+      ]
+    }
+  ]
+}

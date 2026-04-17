@@ -1,0 +1,202 @@
+{
+  "github_users": [
+    {
+      "id": "10000001",
+      "login": "agent-bot",
+      "name": "Agent Bot",
+      "email": "agent@example.com",
+      "type": "Bot",
+      "site_admin": false,
+      "created_at": "2024-01-10T09:00:00"
+    },
+    {
+      "id": "10000002",
+      "login": "alice",
+      "name": "Alice Maintainer",
+      "email": "alice@example.com",
+      "type": "User",
+      "site_admin": true,
+      "created_at": "2023-06-01T12:00:00"
+    },
+    {
+      "id": "10000003",
+      "login": "bob",
+      "name": "Bob Contributor",
+      "email": "bob@example.com",
+      "type": "User",
+      "site_admin": false,
+      "created_at": "2023-07-15T12:00:00"
+    },
+    {
+      "id": "10000004",
+      "login": "carol",
+      "name": "Carol Reviewer",
+      "email": "carol@example.com",
+      "type": "User",
+      "site_admin": false,
+      "created_at": "2023-08-22T12:00:00"
+    }
+  ],
+  "github_repositories": [
+    {
+      "id": "20000001",
+      "owner_id": "10000002",
+      "name": "widgets",
+      "full_name": "acme/widgets",
+      "description": "Reference widgets library",
+      "private": false,
+      "default_branch": "main",
+      "created_at": "2024-01-15T10:00:00"
+    }
+  ],
+  "github_labels": [
+    {
+      "id": "30000001",
+      "repository_id": "20000001",
+      "name": "bug",
+      "color": "d73a4a",
+      "description": "Something isn't working",
+      "is_default": true
+    },
+    {
+      "id": "30000002",
+      "repository_id": "20000001",
+      "name": "enhancement",
+      "color": "a2eeef",
+      "description": "New feature or request",
+      "is_default": true
+    },
+    {
+      "id": "30000003",
+      "repository_id": "20000001",
+      "name": "documentation",
+      "color": "0075ca",
+      "description": "Improvements or additions to documentation",
+      "is_default": true
+    },
+    {
+      "id": "30000004",
+      "repository_id": "20000001",
+      "name": "good first issue",
+      "color": "7057ff",
+      "description": "Good for newcomers",
+      "is_default": true
+    },
+    {
+      "id": "30000005",
+      "repository_id": "20000001",
+      "name": "needs-triage",
+      "color": "ededed",
+      "description": "Awaiting maintainer triage",
+      "is_default": false
+    }
+  ],
+  "github_issues": [
+    {
+      "id": "40000001",
+      "repository_id": "20000001",
+      "number": 1,
+      "title": "Widget factory panics on empty input",
+      "body": "Calling `build()` with no components raises an unhandled exception.",
+      "state": "open",
+      "user_id": "10000003",
+      "locked": false,
+      "comments_count": 1,
+      "is_pull_request": false,
+      "created_at": "2024-02-01T09:00:00",
+      "updated_at": "2024-02-01T09:00:00"
+    },
+    {
+      "id": "40000002",
+      "repository_id": "20000001",
+      "number": 2,
+      "title": "Add async support to renderer",
+      "body": "We need `render_async()` to integrate with asyncio servers.",
+      "state": "open",
+      "user_id": "10000004",
+      "locked": false,
+      "comments_count": 0,
+      "is_pull_request": false,
+      "created_at": "2024-02-05T11:30:00",
+      "updated_at": "2024-02-05T11:30:00"
+    },
+    {
+      "id": "40000003",
+      "repository_id": "20000001",
+      "number": 3,
+      "title": "Docs: document widget lifecycle",
+      "body": "The README skips over lifecycle hooks.",
+      "state": "closed",
+      "state_reason": "completed",
+      "user_id": "10000002",
+      "locked": false,
+      "comments_count": 0,
+      "is_pull_request": false,
+      "created_at": "2024-01-20T14:00:00",
+      "updated_at": "2024-01-25T09:00:00",
+      "closed_at": "2024-01-25T09:00:00"
+    },
+    {
+      "id": "40000004",
+      "repository_id": "20000001",
+      "number": 4,
+      "title": "Fix widget factory panic",
+      "body": "Closes #1. Adds guard for empty components list.",
+      "state": "open",
+      "user_id": "10000003",
+      "locked": false,
+      "comments_count": 0,
+      "is_pull_request": true,
+      "draft": false,
+      "merged": false,
+      "head_ref": "bob/fix-empty-input",
+      "base_ref": "main",
+      "head_sha": "aaaaaaaabbbbbbbbccccccccdddddddd11111111",
+      "base_sha": "ffffffffeeeeeeeeddddddddcccccccc22222222",
+      "created_at": "2024-02-10T15:00:00",
+      "updated_at": "2024-02-10T15:00:00"
+    },
+    {
+      "id": "40000005",
+      "repository_id": "20000001",
+      "number": 5,
+      "title": "Async renderer prototype",
+      "body": "Initial pass at `render_async`. Draft — please review API shape.",
+      "state": "open",
+      "user_id": "10000004",
+      "locked": false,
+      "comments_count": 0,
+      "is_pull_request": true,
+      "draft": true,
+      "merged": false,
+      "head_ref": "carol/async-renderer",
+      "base_ref": "main",
+      "head_sha": "1111111122222222333333334444444455555555",
+      "base_sha": "ffffffffeeeeeeeeddddddddcccccccc22222222",
+      "created_at": "2024-02-12T10:00:00",
+      "updated_at": "2024-02-12T10:00:00"
+    }
+  ],
+  "github_issue_labels": [
+    {"issue_id": "40000001", "label_id": "30000001"},
+    {"issue_id": "40000001", "label_id": "30000005"},
+    {"issue_id": "40000002", "label_id": "30000002"},
+    {"issue_id": "40000003", "label_id": "30000003"}
+  ],
+  "github_issue_assignees": [
+    {"issue_id": "40000002", "user_id": "10000004"}
+  ],
+  "github_pull_request_reviewers": [
+    {"issue_id": "40000004", "user_id": "10000002"}
+  ],
+  "github_issue_comments": [
+    {
+      "id": "50000001",
+      "issue_id": "40000001",
+      "user_id": "10000002",
+      "body": "Reproduced on 0.4.1 — triaging.",
+      "created_at": "2024-02-01T10:00:00",
+      "updated_at": "2024-02-01T10:00:00"
+    }
+  ]
+}
