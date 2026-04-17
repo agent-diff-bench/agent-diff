@@ -1,0 +1,610 @@
+╭─── Claude Code v2.1.112 ─────────────────────────────────────────────────────╮
+│                                                    │ Tips for getting        │
+│                Welcome back Hubert!                │ started                 │
+│                                                    │ Run /init to create a … │
+│                       ▐▛███▜▌                      │ ─────────────────────── │
+│                      ▝▜█████▛▘                     │ Recent activity         │
+│                        ▘▘ ▝▝                       │ No recent activity      │
+│        Opus 4.7 (1M context) · Claude Max ·        │                         │
+│        hubert@uni.minerva.edu's Organization       │                         │
+│          ~/Documents/Github/agent-diff/ops         │                         │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❯ /clear                                                                        
+  ⎿  (no content)
+
+❯ /login                                                                        
+  ⎿  Login successful
+
+❯ Following the instructions in AGENTS.md, add a new GitHub service to the      
+  benchmark using the OpenAPI specification at ./api.github.com. Cover issues,  
+  pull requests, comments, and labels. Produce a seed script, example bench     
+  suite, and pytest integration tests. The docker deamon is already running in  
+  the background.                                                               
+
+  Read 1 file (ctrl+o to expand)
+
+  Read 6 files, listed 3 directories (ctrl+o to expand)
+
+  Listed 1 directory (ctrl+o to expand)
+
+⏺ Bash(python3 -c "
+      import json…)
+  ⎿  /repos/{owner}/{repo}/issues ['get', 'post']
+     /repos/{owner}/{repo}/issues/comments ['get']
+     /repos/{owner}/{repo}/issues/comments/{comment_id} ['get', 'patch', 'd
+     … +44 lines (ctrl+o to expand)
+⏺ Bash(ls /Users/hubertpysklo/Documents/Github/agent-diff/examples/slack/testsui
+      tes/slack_docs/ 2>/dev/null; cat
+      /Users/hubertpysklo/Documents/Github/agent-diff/exampl…)
+  ⎿  slack_api_full_docs.json
+     {
+       "id": "slack-bench",
+     … +34 lines (ctrl+o to expand)
+
+  Searched for 1 pattern, read 5 files, listed 1 directory (ctrl+o to expand)
+
+⏺ Starting implementation. Creating the service directory structure and schema.
+
+⏺ Bash(mkdir -p /Users/hubertpysklo/Documents/Github/agent-diff/backend/src/serv
+      ices/github/database
+      /Users/hubertpysklo/Documents/Github/agent-diff/backend/src/servic…)
+  ⎿  Done
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/__init__.py)
+  ⎿  Wrote 5 lines to ../backend/src/services/github/__init__.py
+      1 """GitHub API replica for agent-diff benchmarks.
+      2 
+      3 Covers issues, pull requests, comments, and labels — enough to ev
+        aluate
+      4 agents that triage issues, land PRs, and manage repo labels.
+      5 """
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/database/__ini
+       t__.py)
+  ⎿  Wrote 1 lines to ../backend/src/services/github/database/__init__.py
+      1 (No content)
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/database/base.
+       py)
+  ⎿  Wrote 5 lines to ../backend/src/services/github/database/base.py
+      1 from sqlalchemy.orm import DeclarativeBase
+      2 
+      3 
+      4 class Base(DeclarativeBase):
+      5     pass
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/api/__init__.p
+       y)
+  ⎿  Wrote 1 lines to ../backend/src/services/github/api/__init__.py
+      1 (No content)
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/utils/__init__
+       .py)
+  ⎿  Wrote 1 lines to ../backend/src/services/github/utils/__init__.py
+      1 (No content)
+
+⏺ Now the schema. I'll use a unified issues table (with is_pull_request
+  discriminator) that mirrors GitHub's own data model — issues and PRs share a
+  number space in a repo, so this keeps comments/labels routing natural.
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/database/schem
+       a.py)
+  ⎿  Wrote 361 lines to ../backend/src/services/github/database/schema.py
+       2 """GitHub API replica schema.
+       3 Follows GitHub's real data model: issues and pull requests live 
+       4 number space per repo. A single ``github_issues`` table stores b
+         oth, with
+         able.pull_request`` distinguishing them. PR-only fields are null
+       6 
+          labels, surface needed for the bench is modeled: issues, pulls,
+       8 assignees, requested reviewers, and issue/PR comments (GitHub ca
+       9 "issue comments" even when attached to a PR).
+      10 """
+     … +410 lines (ctrl+o to expand)
+
+⏺ Now the operations layer and routes.
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/database/opera
+       tions.py)
+  ⎿  Wrote 374 lines to
+     ../backend/src/services/github/database/operations.py
+       2 """CRUD helpers for the GitHub replica.
+       3 Each function takes a SQLAlchemy session and returns ORM objects
+         . Route
+       4 handlers are responsible for formatting responses.
+       5 """
+       6 
+       7 from __future__ import annotations
+       8 
+       9 import random
+      10 from datetime import datetime
+     … +386 lines (ctrl+o to expand)
+
+⏺ Now the routes.
+
+⏺ Write(~/Documents/Github/agent-diff/backend/src/services/github/api/routes.py)
+  ⎿  Wrote 821 lines to ../backend/src/services/github/api/routes.py
+       2 """GitHub REST routes.
+       3 Mounted at ``/api/env/{env_id}/services/github``. Paths mirror
+       4 ``https://api.github.com`` so existing GitHub clients work again
+         st the
+       5 replica by swapping the base URL.
+       6 """
+       7 
+       8 from __future__ import annotations
+       9 
+      10 import json
+     … +889 lines (ctrl+o to expand)
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/services/github/api/routes.py
+        )
+  ⎿  Removed 4 lines
+      302      )
+      303      if "assignees" in body:
+      304          assignees = _resolve_users(session, list(body.get("ass
+           ignees") or []))
+      305 -        session.query(type(issue.assignees[0]) if issue.assign
+          -ees else object).filter(                                      
+      306 -            False                                             
+      307 -        )  # no-op to keep types calm                         
+      308 -        # Full replacement per GitHub semantics for PATCH issu
+          -es.                                                           
+      305          for ia in list(issue.assignees):
+      306              session.delete(ia)
+      307          session.flush()
+⏺ Now the seed data and seed script.
+
+⏺ Write(~/Documents/Github/agent-diff/examples/github/seeds/github_default.json)
+  ⎿  Wrote 202 lines to ../examples/github/seeds/github_default.json
+       1 {
+       2   "github_users": [
+       3     {
+       4       "id": "10000001",
+       5       "login": "agent-bot",
+       6       "name": "Agent Bot",
+       7       "email": "agent@example.com",
+       8       "type": "Bot",
+       9       "site_admin": false,
+      10       "created_at": "2024-01-10T09:00:00"
+     … +195 lines (ctrl+o to expand)
+
+⏺ Now the seed script. I'll mirror the slack pattern.
+
+  Read 1 file (ctrl+o to expand)
+
+⏺ Write(~/Documents/Github/agent-diff/backend/utils/seed_github_template.py)
+  ⎿  Wrote 181 lines to ../backend/utils/seed_github_template.py
+       2 """Seed script for GitHub template schemas.
+       3 
+       4 Creates:
+       5 - ``github_base``: empty schema (tables only), handy as a clean-
+         slate template.
+         po containingfault``: pre-populated with a small ACME widgets re
+       7   issues, pull requests, labels, assignees, and comments.
+       8 
+       9 Usage:
+      10     python backend/utils/seed_github_template.py
+     … +185 lines (ctrl+o to expand)
+
+⏺ Now copy seed data to backend/seeds for Docker builds.
+
+⏺ Bash(cp /Users/hubertpysklo/Documents/Github/agent-diff/examples/github/seeds/
+      github_default.json
+      /Users/hubertpysklo/Documents/Github/agent-diff/backend/seeds/githu…)
+  ⎿  Done
+
+⏺ Now the example test suite with state-diff assertions.
+
+⏺ Write(~/Documents/Github/agent-diff/examples/github/testsuites/github_bench.js
+       on)
+  ⎿  Wrote 214 lines to ../examples/github/testsuites/github_bench.json
+       2   "id": "github-bench",
+       3   "name": "GitHub Bench",
+       4   "description": "Benchmark tests for GitHub issue, pull-request
+         , comment, and label operations.",
+       5   "service": "github",
+       7   "ignore_fields": {",
+       8     "global": ["created_at", "updated_at", "closed_at", "merged_
+         at"]
+       9   },
+      10   "tests": [
+     … +219 lines (ctrl+o to expand)
+
+⏺ Bash(cp /Users/hubertpysklo/Documents/Github/agent-diff/examples/github/testsu
+      ites/github_bench.json
+      /Users/hubertpysklo/Documents/Github/agent-diff/backend/seeds/te…)
+  ⎿  Done
+
+⏺ Wiring the service into main.py and docker-compose.yml.
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/platform/api/main.py)
+  ⎿  Added 1 line
+      23  from src.services.slack.api.methods import routes as slack_rout
+          es
+      24  from src.services.calendar.api import routes as calendar_routes
+      25  from src.services.box.api.routes import routes as box_routes
+      26 +from src.services.github.api.routes import routes as github_rou
+         +tes                                                            
+      27  from src.platform.logging_config import setup_logging
+      28  from src.platform.isolationEngine.pool import PoolManager
+      29  from src.platform.db.schema import TemplateEnvironment
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/platform/api/main.py)
+  ⎿  Added 3 lines
+      127      box_router = Router(box_routes)
+      128      app.mount("/api/env/{env_id}/services/box/2.0", box_router
+           )
+      129  
+      130 +    github_router = Router(github_routes)                     
+      131 +    app.mount("/api/env/{env_id}/services/github", github_rout
+          +er)                                                           
+      132 +                                                              
+      133      linear_schema_path = "src/services/linear/api/schema/Linea
+           r-API.graphql"
+      134      linear_type_defs = load_schema_from_path(linear_schema_pat
+           h)
+      135      linear_schema = make_executable_schema(linear_type_defs, *
+           bindables)
+
+⏺ Update(docker-compose.yml)
+  ⎿  Added 2 lines
+      45            python utils/seed_linear_template.py &&
+      46            python utils/seed_box_template.py &&
+      47            python utils/seed_calendar_template.py &&
+      48 +          python utils/seed_github_template.py &&              
+      49            python utils/seed_tests.py;
+      50          else
+      51            echo '=== Skipping seed (use SEED=true to enable) ===
+          ';
+     ...
+      79            python utils/seed_linear_template.py &&
+      80            python utils/seed_box_template.py &&
+      81            python utils/seed_calendar_template.py &&
+      82 +          python utils/seed_github_template.py &&              
+      83            python utils/seed_tests.py;
+      84          else
+      85            echo '=== Skipping seed (use SEED=true to enable) ===
+          ';
+
+⏺ Now the pytest integration tests.
+
+⏺ Write(~/Documents/Github/agent-diff/backend/tests/integration/test_github_api.
+       py)
+  ⎿  Wrote 357 lines to ../backend/tests/integration/test_github_api.py
+       2 """Integration tests for the GitHub API replica.
+       3 These exercise the routes over an ASGI transport against a fresh
+         ly cloned
+       4 ``github_default`` schema. Each test gets its own environment so
+          that
+       6 """ations don't bleed across cases.
+       7 
+       8 from __future__ import annotations
+       9 
+      10 import pytest
+     … +390 lines (ctrl+o to expand)
+⏺ Now verify the code works end-to-end. First, spin up Postgres via
+  docker-compose and run the seed + tests.
+
+⏺ Bash(ls backend/.env 2>/dev/null; cat backend/.env 2>/dev/null | head -5;
+      docker ps --format '{{.Names}} {{.Ports}}' 2>&1 | head)
+  ⎿  (No output)
+
+⏺ Bash(ls backend/.env 2>&1; docker ps 2>&1 | head -10)
+  ⎿  ls: backend/.env: No such file or directory
+     CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+⏺ Bash(cd /Users/hubertpysklo/Documents/Github/agent-diff/ops && docker compose
+      up -d postgres 2>&1 | tail -20)
+  ⎿   b2a0d297a925 Extracting 18.92kB
+      b2a0d297a925 Pull complete 0B
+      659fe7415ce8 Extracting 128B
+     … +17 lines (ctrl+o to expand)
+
+⏺ Bash(until docker exec ops-postgres-1 pg_isready -U postgres >/dev/null 2>&1;
+      do sleep 2; done && echo "postgres ready")
+  ⎿  postgres ready
+
+⏺ Bash(cd /Users/hubertpysklo/Documents/Github/agent-diff/backend && ls
+      requirements*.txt 2>/dev/null; python3 --version)
+  ⎿  (eval):1: no matches found: requirements*.txt
+     Python 3.9.6
+
+  Read 1 file, listed 1 directory (ctrl+o to expand)
+
+⏺ I'll run the backend container which will run migrations and seeds, then exec
+  pytest inside it.
+
+⏺ Bash(cd /Users/hubertpysklo/Documents/Github/agent-diff/ops && SEED=true
+      docker compose up --build -d backend 2>&1 | tail -30)
+  ⎿  #11 1.996  + sqlalchemy==2.0.49
+     #11 1.996  + starlette==1.0.0
+     #11 1.996  + typing-extensions==4.15.0
+     … +27 lines (ctrl+o to expand)
+
+⏺ Bash(sleep 8 && docker compose logs backend 2>&1 | tail -80)
+  ⎿  backend-1  |     ~~~~~~~~~~~~~~~~~~~~~~~^
+     backend-1  |         cursor, str_statement, effective_parameters, cont
+     ext
+     … +69 lines (ctrl+o to expand)
+
+⏺ default is a PostgreSQL reserved word. I'll rename the column to is_default
+  while keeping the API field as default.
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/services/github/database/sche
+        ma.py)
+  ⎿  Added 2 lines, removed 2 lines
+      103      name: Mapped[str] = mapped_column(String(128))
+      104      color: Mapped[str] = mapped_column(String(8), default="ede
+           ded")
+      105      description: Mapped[Optional[str]] = mapped_column(Text)
+      106 -    default: Mapped[bool] = mapped_column(Boolean, default=Fal
+          -se)                                                           
+      106 +    is_default: Mapped[bool] = mapped_column(Boolean, default=
+          +False)                                                        
+      107  
+      108      repository: Mapped["Repository"] = relationship(
+      109          "Repository", back_populates="labels"
+     ...
+      116              "name": self.name,
+      117              "color": self.color,
+      118              "description": self.description,
+      119 -            "default": self.default,                          
+      119 +            "default": self.is_default,                       
+      120              "url": (
+      121                  f"https://api.github.com/repos/{self.repositor
+           y.full_name}/labels/{self.name}"
+      122                  if self.repository
+
+⏺ Update(~/Documents/Github/agent-diff/examples/github/seeds/github_default.json
+        )
+  ⎿  Added 4 lines, removed 4 lines
+      56        "name": "bug",
+      57        "color": "d73a4a",
+      58        "description": "Something isn't working",
+      59 -      "default": true                                          
+      59 +      "is_default": true                                       
+      60      },
+      61      {
+      62        "id": "30000002",
+     ...
+      64        "name": "enhancement",
+      65        "color": "a2eeef",
+      66        "description": "New feature or request",
+      67 -      "default": true                                          
+      67 +      "is_default": true                                       
+      68      },
+      69      {
+      70        "id": "30000003",
+     ...
+      72        "name": "documentation",
+      73        "color": "0075ca",
+      74        "description": "Improvements or additions to documentatio
+          n",
+      75 -      "default": true                                          
+      75 +      "is_default": true                                       
+      76      },
+      77      {
+      78        "id": "30000004",
+     ...
+      80        "name": "good first issue",
+      81        "color": "7057ff",
+      82        "description": "Good for newcomers",
+      83 -      "default": true                                          
+      83 +      "is_default": true                                       
+      84      },
+      85      {
+      86        "id": "30000005",
+
+⏺ Update(~/Documents/Github/agent-diff/examples/github/seeds/github_default.json
+        )
+  ⎿  Added 1 line, removed 1 line
+      88        "name": "needs-triage",
+      89        "color": "ededed",
+      90        "description": "Awaiting maintainer triage",
+      91 -      "default": false                                         
+      91 +      "is_default": false                                      
+      92      }
+      93    ],
+      94    "github_issues": [
+
+⏺ Bash(cp /Users/hubertpysklo/Documents/Github/agent-diff/examples/github/seeds/
+      github_default.json
+      /Users/hubertpysklo/Documents/Github/agent-diff/backend/seeds/githu…)
+  ⎿  Done
+
+⏺ Bash(docker compose restart backend 2>&1 | tail -5 && sleep 10 && docker
+      compose logs backend 2>&1 | tail -40)
+  ⎿  time="2026-04-18T00:55:26+05:30" level=warning msg="The \"DATABASE_URL
+     \" variable is not set. Defaulting to a blank string."
+      Container ops-backend-1 Restarting
+     … +40 lines (ctrl+o to expand)
+
+⏺ Bash(docker compose logs backend 2>&1 | grep -E
+      "(Creating|All|template|seed|Error|error)" | tail -60)
+  ⎿  backend-1  | === Creating github_base ===
+     backend-1  | Empty template github_base ready
+     backend-1  | Registered public template: github_base
+     … +46 lines (ctrl+o to expand)
+
+⏺ Seeds succeeded. The on_event error is pre-existing (Starlette 1.0 removed it)
+   — unrelated to my changes. My integration tests use ASGITransport directly,
+  not uvicorn, so they can bypass it.
+
+⏺ Bash(docker compose exec -T backend sh -c "cd /app && python -m pytest
+      tests/integration/test_github_api.py -v 2>&1" 2>&1 | tail -80)
+  ⎿  time="2026-04-18T00:55:53+05:30" level=warning msg="The \"DATABASE_URL
+     \" variable is not set. Defaulting to a blank string."
+     service "backend" is not running
+
+⏺ The backend container crashes on startup due to the pre-existing Starlette
+  bug. Let me run tests via a one-shot exec with the same image.
+
+⏺ Bash(docker compose run --rm --entrypoint /bin/sh -e DATABASE_URL="postgresql:
+      //postgres:postgres@postgres:5432/diff_the_universe" backend -c "cd /app
+      && python -m p…)
+  ⎿      app = _app_for(session_manager, env.environment_id, AGENT_USER_ID)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     tests/integration/test_github_api.py:36: in _app_for
+     … +101 lines (ctrl+o to expand)
+⏺ Starlette 1.0 removed app.middleware(...). I'll use BaseHTTPMiddleware via
+  add_middleware instead.
+
+⏺ Update(~/Documents/Github/agent-diff/backend/tests/integration/test_github_api
+        .py)
+  ⎿  Added 2 lines
+      11  import pytest_asyncio
+      12  from httpx import ASGITransport, AsyncClient
+      13  from starlette.applications import Starlette
+      14 +from starlette.middleware import Middleware                    
+      15 +from starlette.middleware.base import BaseHTTPMiddleware       
+      16  
+      17  from src.services.github.api.routes import routes as github_rou
+          tes
+      18  
+
+⏺ Update(~/Documents/Github/agent-diff/backend/tests/integration/test_github_api
+        .py)
+  ⎿  Added 2 lines, removed 3 lines
+      34              request.state.impersonate_email = None
+      35              return await call_next(request)
+      36  
+      37 -    app = Starlette(routes=github_routes)                      
+      38 -    app.middleware("http")(add_db_session)                     
+      39 -    return app                                                 
+      37 +    middleware = [Middleware(BaseHTTPMiddleware, dispatch=add_d
+         +b_session)]                                                    
+      38 +    return Starlette(routes=github_routes, middleware=middlewar
+         +e)                                                             
+      39  
+      40  
+      41  @pytest_asyncio.fixture
+
+⏺ Bash(docker compose run --rm --entrypoint /bin/sh -e DATABASE_URL="postgresql:
+      //postgres:postgres@postgres:5432/diff_the_universe" backend -c "cd /app
+      && python -m p…)
+  ⎿  ============================= test session starts ====================
+     ==========
+     collecting ... collected 29 items
+     … +84 lines (ctrl+o to expand)
+
+⏺ The relationship cache isn't being refreshed after bulk adds. Let me fix.
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/services/github/database/oper
+        ations.py)
+  ⎿  Added 2 lines
+      231          added.append(u)
+      232          existing.add(u.id)
+      233      session.flush()
+      234 +    session.refresh(issue)                                    
+      235      return added
+      236  
+      237  
+     ...
+      243      for ia in removed:
+      244          session.delete(ia)
+      245      session.flush()
+      246 +    session.refresh(issue)                                    
+      247      return [ia.user for ia in removed if ia.user]
+      248  
+      249  
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/services/github/database/oper
+        ations.py)
+  ⎿  Added 2 lines
+      344          added.append(u)
+      345          existing.add(u.id)
+      346      session.flush()
+      347 +    session.refresh(pr)                                       
+      348      return added
+      349  
+      350  
+     ...
+      357          PullRequestReviewer.user_id.in_(ids),
+      358      ).delete(synchronize_session=False)
+      359      session.flush()
+      360 +    session.refresh(pr)                                       
+      361  
+      362  
+      363  def merge_pull(
+
+⏺ Bash(docker compose run --rm --entrypoint /bin/sh -e DATABASE_URL="postgresql:
+      //postgres:postgres@postgres:5432/diff_the_universe" backend -c "cd /app
+      && python -m p…)
+  ⎿             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+     /usr/local/lib/python3.14/site-packages/sqlalchemy/orm/strategies.py:9
+     31: in _load_for_state
+     … +45 lines (ctrl+o to expand)
+
+⏺ Update(~/Documents/Github/agent-diff/backend/src/services/github/database/oper
+        ations.py)
+  ⎿  Added 4 lines, removed 3 lines
+      239      session: Session, issue: Issue, users: Iterable[User]
+      240  ) -> List[User]:
+      241      ids = {u.id for u in users}
+      242 -    removed = [ia for ia in issue.assignees if ia.user_id in i
+          -ds]                                                           
+      243 -    for ia in removed:                                        
+      242 +    to_remove = [ia for ia in issue.assignees if ia.user_id in
+          + ids]                                                         
+      243 +    removed_users = [ia.user for ia in to_remove if ia.user]  
+      244 +    for ia in to_remove:                                      
+      245          session.delete(ia)
+      246      session.flush()
+      247      session.refresh(issue)
+      247 -    return [ia.user for ia in removed if ia.user]             
+      248 +    return removed_users                                      
+      249  
+      250  
+      251  def set_issue_labels(
+
+⏺ Bash(docker compose run --rm --entrypoint /bin/sh -e DATABASE_URL="postgresql:
+      //postgres:postgres@postgres:5432/diff_the_universe" backend -c "cd /app
+      && python -m p…)
+  ⎿  tests/integration/test_github_api.py::TestIssues::test_list_open_issue
+     s PASSED [ 24%]
+     tests/integration/test_github_api.py::TestIssues::test_list_all_states
+     … +49 lines (ctrl+o to expand)
+
+⏺ All 29 tests pass. Cleaning up the container.
+
+⏺ Bash(docker compose stop 2>&1 | tail -5)
+  ⎿  time="2026-04-18T00:57:20+05:30" level=warning msg="The \"DATABASE_URL
+     \" variable is not set. Defaulting to a blank string."
+      Container ops-backend-1 Stopping
+     … +3 lines (ctrl+o to expand)
+
+⏺ All 29 integration tests pass. Summary of what was added:
+
+  Service code (backend/src/services/github/)
+  - database/base.py, database/schema.py — ORM models: User, Repository, Label,
+  Issue (unified issue/PR row via is_pull_request), IssueLabel, IssueAssignee,
+  PullRequestReviewer, IssueComment.
+  - database/operations.py — session-taking CRUD helpers.
+  - api/routes.py — ~30 Starlette routes covering /repos/{owner}/{repo}/issues,
+  /pulls, /issues/{n}/comments, /issues/comments/{id}, /labels, assignee and
+  requested-reviewer management, and PR merge.
+
+  Seed (backend/utils/seed_github_template.py,
+  examples/github/seeds/github_default.json, mirrored to backend/seeds/github/)
+  - Creates github_base and github_default templates; default seeds an
+  acme/widgets repo with 4 users, 5 labels, 3 issues, 2 PRs, an assignee, a
+  requested reviewer, and a comment.
+
+  Bench suite (examples/github/testsuites/github_bench.json, mirrored to
+  backend/seeds/testsuites/)
+  - 10 tests with state-diff assertions: create/close/triage/assign/comment
+  issues, edit comments, create labels, open/review/merge PRs.
+
+  Wiring
+  - backend/src/platform/api/main.py mounts the service at
+  /api/env/{env_id}/services/github.
+  - ops/docker-compose.yml runs seed_github_template.py alongside the other
+  seeders.
+
+  Tests (backend/tests/integration/test_github_api.py)
+  - 29 tests across TestRepository, TestLabels, TestIssues, TestIssueLabels,
+  TestIssueAssignees, TestIssueComments, TestPullRequests — all passing against
+  a freshly cloned github_default schema.
+
+✻ Cogitated for 12m 20s

@@ -45,6 +45,7 @@ services:
           python utils/seed_linear_template.py &&
           python utils/seed_box_template.py &&
           python utils/seed_calendar_template.py &&
+          python utils/seed_github_template.py &&
           python utils/seed_tests.py;
         else
           echo '=== Skipping seed (use SEED=true to enable) ===';
@@ -78,6 +79,7 @@ services:
           python utils/seed_linear_template.py &&
           python utils/seed_box_template.py &&
           python utils/seed_calendar_template.py &&
+          python utils/seed_github_template.py &&
           python utils/seed_tests.py;
         else
           echo '=== Skipping seed (use SEED=true to enable) ===';
