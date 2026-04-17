@@ -410,7 +410,23 @@ myservice_router = Router(myservice_routes)
 app.mount("/api/env/{env_id}/services/myservice", myservice_router)
 ```
 
-**5. Write a seed script** in `backend/utils/seed_myservice_template.py` that:
+**5. Register the service with the platform API** in `src/platform/api/models.py`.
+Add it to the `Service` enum so `initEnv` (and other platform endpoints that take
+a `templateService`) will accept the new value:
+
+```python
+class Service(str, Enum):
+    slack = "slack"
+    linear = "linear"
+    calendar = "calendar"
+    box = "box"
+    myservice = "myservice"   # ← add this
+```
+
+If you skip this step, `POST /api/platform/initEnv` returns a Pydantic enum
+validation error even though the template rows exist and the router is mounted.
+
+**6. Write a seed script** in `backend/utils/seed_myservice_template.py` that:
 - Creates the PostgreSQL schema (e.g. `myservice_default`)
 - Uses `Base.metadata.create_all()` to create tables
 - Inserts seed data from a JSON file
@@ -419,10 +435,10 @@ app.mount("/api/env/{env_id}/services/myservice", myservice_router)
 Follow `seed_slack_template.py` as a reference — it shows the full pattern including
 schema creation, table ordering, and template registration.
 
-**6. Add seed data** in `examples/myservice/seeds/myservice_default.json` and copy to
+**7. Add seed data** in `examples/myservice/seeds/myservice_default.json` and copy to
 `backend/seeds/myservice/` for Docker builds.
 
-**7. Register the seed script** in the Docker startup command in `ops/docker-compose.yml`:
+**8. Register the seed script** in the Docker startup command in `ops/docker-compose.yml`:
 
 ```yaml
 command: >
