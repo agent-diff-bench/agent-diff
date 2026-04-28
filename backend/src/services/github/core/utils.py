@@ -26,60 +26,11 @@ NUMERIC = string.digits                               # 0-9
 HEX_LOWER = string.digits + "abcdef"                  # 0-9a-f
 
 ID_FORMATS: dict[str, dict] = {
-    "team": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "gist": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "gist": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "gist": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-    "issue": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "org": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "user": {"alphabet": NUMERIC, "length": 1},  # example: 1
-    "repo": {"alphabet": NUMERIC, "length": 2},  # example: 42
-    "pull": {"alphabet": NUMERIC, "length": 1},  # example: 1
-},  # example: 1
-},  # example: 1
-},
+    "gist": {"alphabet": HEX_LOWER, "length": 20},
+    "issue": {"alphabet": NUMERIC, "length": 10},
+    "issue_comment": {"alphabet": NUMERIC, "length": 10},
+    "issue_event": {"alphabet": NUMERIC, "length": 10},
+    "issue_reaction": {"alphabet": NUMERIC, "length": 10},
 }
 
 

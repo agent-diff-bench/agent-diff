@@ -13,7 +13,6 @@ class Service(str, Enum):
     linear = "linear"
     calendar = "calendar"
     box = "box"
-    todoist = "todoist"
     asana = "asana"
     github = "github"
 

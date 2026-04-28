@@ -90,6 +90,7 @@ async def list_environment_templates(
 
     templates = template_manager.list_templates(session, principal_id)
 
+    valid_services = {member.value for member in Service}
     response = TemplateEnvironmentListResponse(
         templates=[
             TemplateEnvironmentSummary(
@@ -99,6 +100,7 @@ async def list_environment_templates(
                 name=template.name,
             )
             for template in templates
+            if template.service in valid_services
         ]
     )
     return JSONResponse(response.model_dump(mode="json"))

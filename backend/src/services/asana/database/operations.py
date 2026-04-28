@@ -10,886 +10,172 @@ implementation adds its operation functions to this file incrementally.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Optional
 
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from ..core.utils import generate_id, now_iso
 from .schema import (
     AsanaProject,
+    AsanaSection,
+    AsanaStory,
     AsanaTag,
     AsanaTask,
     AsanaTeam,
     AsanaUser,
     AsanaWorkspace,
+    asana_task_project_association,
+    asana_task_tag_association,
+    asana_user_team_association,
+    asana_user_workspace_association,
 )
 
 
 # ---------------------------------------------------------------------------
-# TASK QUERIES
+# FK stub helpers — ensure referenced rows exist before flush
 # ---------------------------------------------------------------------------
 
-
-def get_task(session: Session, task_gid: str) -> AsanaTask | None:
-    return session.execute(
-        select(AsanaTask).where(
-            AsanaTask.gid == task_gid,
-            AsanaTask.is_deleted.is_(False),
-        )
-    ).scalar_one_or_none()
+def _ensure_team_stub(session: Session, gid: str) -> None:
+    """Create a minimal team row if it doesn't exist yet."""
+    if gid and not session.get(AsanaTeam, gid):
+        session.add(AsanaTeam(gid=gid, resource_type="team"))
+        session.flush()
 
 
-def list_tasks(
-    session: Session,
-    *,
-    assignee: str | None = None,
-    project: str | None = None,
-    section: str | None = None,
-    workspace: str | None = None,
-    completed_since: str | None = None,
-    modified_since: str | None = None,
-    cursor: str | None = None,
-    limit: int = 50,
-) -> tuple[list[AsanaTask], str | None]:
-    query = select(AsanaTask).where(AsanaTask.is_deleted.is_(False))
-
-    if assignee is not None:
-        query = query.where(AsanaTask.assignee == assignee)
-    if project is not None:
-        query = query.join(AsanaTask.project_objects).where(AsanaProject.gid == project)
-    if section is not None:
-        query = query.where(AsanaTask.assignee_section == section)
-    if workspace is not None:
-        query = query.where(AsanaTask.workspace == workspace)
-    if completed_since is not None:
-        query = query.where(AsanaTask.completed_at >= completed_since)
-    if modified_since is not None:
-        query = query.where(AsanaTask.modified_at >= modified_since)
-
-    query = query.order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-
-    if cursor is not None:
-        cursor_task = session.execute(
-            select(AsanaTask.created_at, AsanaTask.gid).where(AsanaTask.gid == cursor)
-        ).one_or_none()
-        if cursor_task:
-            query = query.where(
-                (AsanaTask.created_at > cursor_task.created_at)
-                | (
-                    (AsanaTask.created_at == cursor_task.created_at)
-                    & (AsanaTask.gid > cursor_task.gid)
-                )
-            )
-
-    results = session.execute(query.limit(limit + 1)).scalars().all()
-    if len(results) > limit:
-        next_cursor = results[limit - 1].gid
-        return list(results[:limit]), next_cursor
-    return list(results), None
+def _ensure_user_stub(session: Session, gid: str) -> None:
+    """Create a minimal user row if it doesn't exist yet."""
+    if gid and not session.get(AsanaUser, gid):
+        session.add(AsanaUser(gid=gid, resource_type="user"))
+        session.flush()
 
 
-def list_tasks_by_project(
-    session: Session,
-    project_gid: str,
-) -> list[AsanaTask]:
-    """Return all non-deleted tasks belonging to the given project."""
-    return list(
-        session.execute(
-            select(AsanaTask)
-            .join(AsanaTask.project_objects)
-            .where(
-                AsanaTask.is_deleted.is_(False),
-                AsanaProject.gid == project_gid,
-            )
-            .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-        ).scalars().all()
-    )
+def _ensure_workspace_stub(session: Session, gid: str) -> None:
+    """Create a minimal workspace row if it doesn't exist yet."""
+    if gid and not session.get(AsanaWorkspace, gid):
+        session.add(AsanaWorkspace(gid=gid, resource_type="workspace"))
+        session.flush()
 
 
-def list_tasks_by_section(
-    session: Session,
-    section_gid: str,
-) -> list[AsanaTask]:
-    """Return all non-deleted tasks assigned to a given section."""
-    return list(
-        session.execute(
-            select(AsanaTask)
-            .where(
-                AsanaTask.is_deleted.is_(False),
-                AsanaTask.assignee_section == section_gid,
-            )
-            .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-        ).scalars().all()
-    )
+def _ensure_task_stub(session: Session, gid: str) -> None:
+    """Create a minimal task row if it doesn't exist yet."""
+    if gid and not session.get(AsanaTask, gid):
+        session.add(AsanaTask(gid=gid, resource_type="task"))
+        session.flush()
 
 
-def list_tasks_by_tag(
-    session: Session,
-    tag_gid: str,
-) -> list[AsanaTask]:
-    """Return all non-deleted tasks associated with the given tag."""
-    return list(
-        session.execute(
-            select(AsanaTask)
-            .join(AsanaTask.tag_objects)
-            .where(
-                AsanaTask.is_deleted.is_(False),
-                AsanaTag.gid == tag_gid,
-            )
-            .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-        ).scalars().all()
-    )
+def _ensure_project_stub(session: Session, gid: str) -> None:
+    """Create a minimal project row if it doesn't exist yet."""
+    if gid and not session.get(AsanaProject, gid):
+        session.add(AsanaProject(gid=gid, resource_type="project", is_deleted=False))
+        session.flush()
 
 
-def list_tasks_by_user_task_list(
-    session: Session,
-    user_task_list_gid: str,
-) -> list[AsanaTask]:
-    """Return all non-deleted tasks for a user task list.
-
-    User task lists are essentially the assignee's personal list, so we
-    filter by assignee matching the user_task_list_gid. In a full
-    implementation this would go through a join table, but for now we
-    treat the user_task_list_gid as an assignee identifier.
-    """
-    return list(
-        session.execute(
-            select(AsanaTask)
-            .where(
-                AsanaTask.is_deleted.is_(False),
-                AsanaTask.assignee == user_task_list_gid,
-            )
-            .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-        ).scalars().all()
-    )
+def _ensure_section_stub(session: Session, gid: str) -> None:
+    """Create a minimal section row if it doesn't exist yet."""
+    if gid and not session.get(AsanaSection, gid):
+        session.add(AsanaSection(gid=gid, resource_type="section", is_deleted=False))
+        session.flush()
 
 
-def list_subtasks(
-    session: Session,
-    parent_gid: str,
-    *,
-    cursor: str | None = None,
-    limit: int = 50,
-) -> tuple[list[AsanaTask], str | None]:
-    query = (
-        select(AsanaTask)
-        .where(
-            AsanaTask.is_deleted.is_(False),
-            AsanaTask.parent == parent_gid,
-        )
-        .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-    )
-
-    if cursor is not None:
-        cursor_task = session.execute(
-            select(AsanaTask.created_at, AsanaTask.gid).where(AsanaTask.gid == cursor)
-        ).one_or_none()
-        if cursor_task:
-            query = query.where(
-                (AsanaTask.created_at > cursor_task.created_at)
-                | (
-                    (AsanaTask.created_at == cursor_task.created_at)
-                    & (AsanaTask.gid > cursor_task.gid)
-                )
-            )
-
-    results = session.execute(query.limit(limit + 1)).scalars().all()
-    if len(results) > limit:
-        next_cursor = results[limit - 1].gid
-        return list(results[:limit]), next_cursor
-    return list(results), None
+def _ensure_tag_stub(session: Session, gid: str) -> None:
+    """Create a minimal tag row if it doesn't exist yet."""
+    if gid and not session.get(AsanaTag, gid):
+        session.add(AsanaTag(gid=gid, resource_type="tag"))
+        session.flush()
 
 
-def search_tasks(
-    session: Session,
-    workspace_gid: str,
-) -> list[AsanaTask]:
-    """Simple workspace-scoped task search (returns all tasks in workspace)."""
-    return list(
-        session.execute(
-            select(AsanaTask)
-            .where(
-                AsanaTask.is_deleted.is_(False),
-                AsanaTask.workspace == workspace_gid,
-            )
-            .order_by(AsanaTask.created_at.asc(), AsanaTask.gid.asc())
-        ).scalars().all()
-    )
-
-
-def get_task_by_custom_id(
-    session: Session,
-    workspace_gid: str,
-    custom_id: str,
-) -> AsanaTask | None:
-    """Retrieve a task by its external custom ID within a workspace."""
-    return session.execute(
-        select(AsanaTask).where(
-            AsanaTask.is_deleted.is_(False),
-            AsanaTask.workspace == workspace_gid,
-            AsanaTask.external.op("->>")("gid") == custom_id,
-        )
-    ).scalar_one_or_none()
-
-
-def get_dependencies(session: Session, task_gid: str) -> list[AsanaTask]:
-    """Return tasks that the given task depends on."""
-    task = get_task(session, task_gid)
-    if task is None or not task.dependencies:
-        return []
-    dependency_gids = [
-        dep["gid"] if isinstance(dep, dict) else dep
-        for dep in task.dependencies
-    ]
-    if not dependency_gids:
-        return []
-    return list(
-        session.execute(
-            select(AsanaTask).where(
-                AsanaTask.gid.in_(dependency_gids),
-                AsanaTask.is_deleted.is_(False),
-            )
-        ).scalars().all()
-    )
-
-
-def get_dependents(session: Session, task_gid: str) -> list[AsanaTask]:
-    """Return tasks that depend on the given task."""
-    task = get_task(session, task_gid)
-    if task is None or not task.dependents:
-        return []
-    dependent_gids = [
-        dep["gid"] if isinstance(dep, dict) else dep
-        for dep in task.dependents
-    ]
-    if not dependent_gids:
-        return []
-    return list(
-        session.execute(
-            select(AsanaTask).where(
-                AsanaTask.gid.in_(dependent_gids),
-                AsanaTask.is_deleted.is_(False),
-            )
-        ).scalars().all()
-    )
+def _ensure_story_stub(session: Session, gid: str) -> None:
+    """Create a minimal story row if it doesn't exist yet."""
+    if gid and not session.get(AsanaStory, gid):
+        session.add(AsanaStory(gid=gid, resource_type="story", is_deleted=False))
+        session.flush()
 
 
 # ---------------------------------------------------------------------------
-# TASK MUTATIONS
+# Helper: resolve FK fields from incoming data dict
 # ---------------------------------------------------------------------------
 
+# Fields that map directly to columns (non-FK)
+_PROJECT_WRITABLE_FIELDS = [
+    "name", "archived", "color", "icon", "default_view", "due_date",
+    "due_on", "html_notes", "notes", "public", "privacy_setting",
+    "start_on", "default_access_level",
+    "minimum_access_level_for_customization",
+    "minimum_access_level_for_sharing",
+    "current_status", "current_status_update", "custom_fields",
+    "custom_field_settings", "members", "followers",
+]
 
-def create_task(session: Session, *, data: dict[str, Any]) -> AsanaTask:
-    timestamp = now_iso()
-
-    # Extract M:N relationship IDs before building the model
-    project_gids = data.get("projects", [])
-    tag_gids = data.get("tags", [])
-
-    task = AsanaTask(
-        gid=generate_id("task"),
-        resource_type="task",
-        name=data.get("name"),
-        resource_subtype=data.get("resource_subtype", "default_task"),
-        approval_status=data.get("approval_status"),
-        assignee_status=data.get("assignee_status"),
-        completed=data.get("completed", False),
-        completed_at=None,
-        created_at=timestamp,
-        modified_at=timestamp,
-        due_at=data.get("due_at"),
-        due_on=data.get("due_on"),
-        external=data.get("external"),
-        html_notes=data.get("html_notes"),
-        hearted=False,
-        hearts=[],
-        is_rendered_as_separator=False,
-        liked=data.get("liked", False),
-        likes=[],
-        notes=data.get("notes"),
-        num_hearts=0,
-        num_likes=0,
-        num_subtasks=0,
-        start_at=data.get("start_at"),
-        start_on=data.get("start_on"),
-        actual_time_minutes=None,
-        assignee=data.get("assignee"),
-        assignee_section=data.get("assignee_section"),
-        custom_fields=data.get("custom_fields"),
-        custom_type=data.get("custom_type"),
-        custom_type_status_option=data.get("custom_type_status_option"),
-        dependencies=[],
-        dependents=[],
-        followers=data.get("followers", []),
-        parent=data.get("parent"),
-        workspace=data.get("workspace"),
-        permalink_url=f"https://app.asana.com/0/0/task/{generate_id('task')}",
-    )
-    session.add(task)
-    session.flush()
-
-    # Link M:N projects — ensure stub rows exist for referenced projects
-    for project_gid in project_gids:
-        _ensure_project_stub(session, project_gid)
-        if not any(project.gid == project_gid for project in task.project_objects):
-            task.project_objects.append(session.get(AsanaProject, project_gid))
-
-    # Link M:N tags — ensure stub rows exist for referenced tags
-    for tag_gid in tag_gids:
-        _ensure_tag_stub(session, tag_gid)
-        if not any(tag.gid == tag_gid for tag in task.tag_objects):
-            task.tag_objects.append(session.get(AsanaTag, tag_gid))
-
-    session.flush()
-    return task
+# FK fields: incoming API name → (column name, stub-ensure function)
+_PROJECT_FK_FIELDS = {
+    "owner": ("owner_gid", _ensure_user_stub),
+    "team": ("team_gid", _ensure_team_stub),
+    "workspace": ("workspace_gid", _ensure_workspace_stub),
+    "completed_by": ("completed_by_gid", _ensure_user_stub),
+    "parent": ("parent_gid", _ensure_project_stub),
+}
 
 
-def update_task(
-    session: Session,
-    task_gid: str,
-    *,
-    data: dict[str, Any],
-) -> AsanaTask | None:
-    task = get_task(session, task_gid)
-    if task is None:
-        return None
-
-    updatable_fields = [
-        "name", "resource_subtype", "approval_status", "assignee_status",
-        "completed", "due_at", "due_on", "external", "html_notes",
-        "liked", "notes", "start_at", "start_on",
-        "assignee", "assignee_section", "custom_fields",
-        "custom_type", "custom_type_status_option", "workspace",
-    ]
-
-    for field in updatable_fields:
+def _apply_project_data(session: Session, project: AsanaProject, data: dict) -> None:
+    """Apply writable fields and FK fields from a data dict to a project."""
+    for field in _PROJECT_WRITABLE_FIELDS:
         if field in data:
-            setattr(task, field, data[field])
+            setattr(project, field, data[field])
 
-    # Replace M:N projects if provided
-    if "projects" in data:
-        project_gids = data["projects"] or []
-        task.project_objects.clear()
-        for project_gid in project_gids:
-            _ensure_project_stub(session, project_gid)
-            task.project_objects.append(session.get(AsanaProject, project_gid))
-
-    # Replace M:N tags if provided
-    if "tags" in data:
-        tag_gids = data["tags"] or []
-        task.tag_objects.clear()
-        for tag_gid in tag_gids:
-            _ensure_tag_stub(session, tag_gid)
-            task.tag_objects.append(session.get(AsanaTag, tag_gid))
-
-    # Sync completed_at with completed flag
-    if "completed" in data:
-        if data["completed"]:
-            task.completed_at = now_iso()
-            if task.approval_status == "pending":
-                task.approval_status = "approved"
-        else:
-            task.completed_at = None
-
-    task.modified_at = now_iso()
-    session.flush()
-    return task
+    for api_name, (column_name, ensure_fn) in _PROJECT_FK_FIELDS.items():
+        if api_name in data:
+            value = data[api_name]
+            # Accept either a plain GID string or a nested object with 'gid'
+            if isinstance(value, dict):
+                value = value.get("gid")
+            if value:
+                ensure_fn(session, value)
+            setattr(project, column_name, value)
 
 
-def delete_task(session: Session, task_gid: str) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    task.is_deleted = True
-    task.modified_at = now_iso()
-    session.flush()
-    return True
+# ---------------------------------------------------------------------------
+# Projects
+# ---------------------------------------------------------------------------
 
-
-def duplicate_task(
-    session: Session,
-    task_gid: str,
-    *,
-    name: str | None = None,
-    include: str | None = None,
-) -> AsanaTask | None:
-    source = get_task(session, task_gid)
-    if source is None:
-        return None
-
-    include_fields = set()
-    if include:
-        include_fields = {field.strip() for field in include.split(",")}
-
+def create_project(session: Session, data: dict) -> AsanaProject:
+    gid = generate_id("project")
     timestamp = now_iso()
-    new_task = AsanaTask(
-        gid=generate_id("task"),
-        resource_type="task",
-        name=name or f"{source.name} (copy)",
-        resource_subtype=source.resource_subtype,
-        created_at=timestamp,
-        modified_at=timestamp,
-        completed=False,
-        completed_at=None,
-        hearted=False,
-        hearts=[],
-        is_rendered_as_separator=False,
-        liked=False,
-        likes=[],
-        num_hearts=0,
-        num_likes=0,
-        num_subtasks=0,
-        actual_time_minutes=None,
-        dependencies=[],
-        dependents=[],
-        workspace=source.workspace,
-    )
-
-    if "notes" in include_fields:
-        new_task.notes = source.notes
-        new_task.html_notes = source.html_notes
-    if "assignee" in include_fields:
-        new_task.assignee = source.assignee
-    if "tags" in include_fields:
-        for tag in source.tag_objects:
-            new_task.tag_objects.append(tag)
-    if "followers" in include_fields:
-        new_task.followers = list(source.followers) if source.followers else []
-    if "projects" in include_fields:
-        for project in source.project_objects:
-            new_task.project_objects.append(project)
-    if "dates" in include_fields:
-        new_task.due_at = source.due_at
-        new_task.due_on = source.due_on
-        new_task.start_at = source.start_at
-        new_task.start_on = source.start_on
-    if "dependencies" in include_fields:
-        new_task.dependencies = list(source.dependencies) if source.dependencies else []
-    if "parent" in include_fields:
-        new_task.parent = source.parent
-
-    new_task.permalink_url = f"https://app.asana.com/0/0/task/{new_task.gid}"
-    session.add(new_task)
-    session.flush()
-    return new_task
-
-
-def set_parent(
-    session: Session,
-    task_gid: str,
-    *,
-    parent_gid: str | None,
-) -> AsanaTask | None:
-    task = get_task(session, task_gid)
-    if task is None:
-        return None
-
-    # Decrement subtask count on old parent
-    if task.parent:
-        old_parent = get_task(session, task.parent)
-        if old_parent and old_parent.num_subtasks and old_parent.num_subtasks > 0:
-            old_parent.num_subtasks -= 1
-
-    task.parent = parent_gid
-    task.modified_at = now_iso()
-
-    # Increment subtask count on new parent
-    if parent_gid:
-        new_parent = get_task(session, parent_gid)
-        if new_parent:
-            new_parent.num_subtasks = (new_parent.num_subtasks or 0) + 1
-
-    session.flush()
-    return task
-
-
-def create_subtask(
-    session: Session,
-    parent_gid: str,
-    *,
-    data: dict[str, Any],
-) -> AsanaTask | None:
-    parent = get_task(session, parent_gid)
-    if parent is None:
-        return None
-
-    data["parent"] = parent_gid
-    # Inherit workspace from parent if not provided
-    if "workspace" not in data and parent.workspace:
-        data["workspace"] = parent.workspace
-
-    subtask = create_task(session, data=data)
-    parent.num_subtasks = (parent.num_subtasks or 0) + 1
-    session.flush()
-    return subtask
-
-
-def add_dependencies(
-    session: Session,
-    task_gid: str,
-    *,
-    dependency_gids: list[str],
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    current = list(task.dependencies) if task.dependencies else []
-    existing_gids = {
-        dep["gid"] if isinstance(dep, dict) else dep for dep in current
-    }
-    for gid in dependency_gids:
-        if gid not in existing_gids:
-            current.append({"gid": gid})
-    task.dependencies = current
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def remove_dependencies(
-    session: Session,
-    task_gid: str,
-    *,
-    dependency_gids: list[str],
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    current = list(task.dependencies) if task.dependencies else []
-    remove_set = set(dependency_gids)
-    task.dependencies = [
-        dep for dep in current
-        if (dep["gid"] if isinstance(dep, dict) else dep) not in remove_set
-    ]
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def add_dependents(
-    session: Session,
-    task_gid: str,
-    *,
-    dependent_gids: list[str],
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    current = list(task.dependents) if task.dependents else []
-    existing_gids = {
-        dep["gid"] if isinstance(dep, dict) else dep for dep in current
-    }
-    for gid in dependent_gids:
-        if gid not in existing_gids:
-            current.append({"gid": gid})
-    task.dependents = current
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def remove_dependents(
-    session: Session,
-    task_gid: str,
-    *,
-    dependent_gids: list[str],
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    current = list(task.dependents) if task.dependents else []
-    remove_set = set(dependent_gids)
-    task.dependents = [
-        dep for dep in current
-        if (dep["gid"] if isinstance(dep, dict) else dep) not in remove_set
-    ]
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def add_followers(
-    session: Session,
-    task_gid: str,
-    *,
-    follower_gids: list[str],
-) -> AsanaTask | None:
-    task = get_task(session, task_gid)
-    if task is None:
-        return None
-    current = list(task.followers) if task.followers else []
-    existing = set(current)
-    for gid in follower_gids:
-        if gid not in existing:
-            current.append(gid)
-            existing.add(gid)
-    task.followers = current
-    task.modified_at = now_iso()
-    session.flush()
-    return task
-
-
-def remove_followers(
-    session: Session,
-    task_gid: str,
-    *,
-    follower_gids: list[str],
-) -> AsanaTask | None:
-    task = get_task(session, task_gid)
-    if task is None:
-        return None
-    remove_set = set(follower_gids)
-    task.followers = [
-        gid for gid in (task.followers or []) if gid not in remove_set
-    ]
-    task.modified_at = now_iso()
-    session.flush()
-    return task
-
-
-def add_project_to_task(
-    session: Session,
-    task_gid: str,
-    *,
-    project_gid: str,
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    _ensure_project_stub(session, project_gid)
-    project = session.get(AsanaProject, project_gid)
-    if not any(p.gid == project_gid for p in task.project_objects):
-        task.project_objects.append(project)
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def remove_project_from_task(
-    session: Session,
-    task_gid: str,
-    *,
-    project_gid: str,
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    project = session.get(AsanaProject, project_gid)
-    if project and project in task.project_objects:
-        task.project_objects.remove(project)
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def add_tag_to_task(
-    session: Session,
-    task_gid: str,
-    *,
-    tag_gid: str,
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    _ensure_tag_stub(session, tag_gid)
-    tag = session.get(AsanaTag, tag_gid)
-    if not any(t.gid == tag_gid for t in task.tag_objects):
-        task.tag_objects.append(tag)
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-def remove_tag_from_task(
-    session: Session,
-    task_gid: str,
-    *,
-    tag_gid: str,
-) -> bool:
-    task = get_task(session, task_gid)
-    if task is None:
-        return False
-    tag = session.get(AsanaTag, tag_gid)
-    if tag and tag in task.tag_objects:
-        task.tag_objects.remove(tag)
-    task.modified_at = now_iso()
-    session.flush()
-    return True
-
-
-# ---------------------------------------------------------------------------
-# PROJECT QUERIES
-# ---------------------------------------------------------------------------
-
-
-def get_project(session: Session, project_gid: str) -> AsanaProject | None:
-    return session.execute(
-        select(AsanaProject).where(
-            AsanaProject.gid == project_gid,
-            AsanaProject.is_deleted.is_(False),
-        )
-    ).scalar_one_or_none()
-
-
-def list_projects(
-    session: Session,
-    *,
-    workspace: str | None = None,
-    team: str | None = None,
-    archived: bool | None = None,
-    cursor: str | None = None,
-    limit: int = 50,
-) -> tuple[list[AsanaProject], str | None]:
-    query = select(AsanaProject).where(AsanaProject.is_deleted.is_(False))
-
-    if workspace is not None:
-        query = query.where(AsanaProject.workspace == workspace)
-    if team is not None:
-        query = query.where(AsanaProject.team == team)
-    if archived is not None:
-        query = query.where(AsanaProject.archived.is_(archived))
-
-    query = query.order_by(AsanaProject.created_at.asc(), AsanaProject.gid.asc())
-
-    if cursor is not None:
-        cursor_project = session.execute(
-            select(AsanaProject.created_at, AsanaProject.gid).where(AsanaProject.gid == cursor)
-        ).one_or_none()
-        if cursor_project:
-            query = query.where(
-                (AsanaProject.created_at > cursor_project.created_at)
-                | (
-                    (AsanaProject.created_at == cursor_project.created_at)
-                    & (AsanaProject.gid > cursor_project.gid)
-                )
-            )
-
-    results = session.execute(query.limit(limit + 1)).scalars().all()
-    if len(results) > limit:
-        next_cursor = results[limit - 1].gid
-        return list(results[:limit]), next_cursor
-    return list(results), None
-
-
-def list_projects_for_task(
-    session: Session,
-    task_gid: str,
-) -> list[AsanaProject]:
-    """Return all non-deleted projects that contain the given task."""
-    task = get_task(session, task_gid)
-    if task is None:
-        return []
-    return [project for project in task.project_objects if not project.is_deleted]
-
-
-def search_projects_in_workspace(
-    session: Session,
-    workspace_gid: str,
-) -> list[AsanaProject]:
-    """Simple workspace-scoped project search."""
-    return list(
-        session.execute(
-            select(AsanaProject)
-            .where(
-                AsanaProject.is_deleted.is_(False),
-                AsanaProject.workspace == workspace_gid,
-            )
-            .order_by(AsanaProject.created_at.asc(), AsanaProject.gid.asc())
-        ).scalars().all()
-    )
-
-
-# ---------------------------------------------------------------------------
-# PROJECT MUTATIONS
-# ---------------------------------------------------------------------------
-
-
-def create_project(session: Session, *, data: dict[str, Any]) -> AsanaProject:
-    timestamp = now_iso()
-
-    # Ensure FK target stubs exist before assigning
-    owner_gid = data.get("owner")
-    if owner_gid:
-        _ensure_user_stub(session, owner_gid)
-    team_gid = data.get("team")
-    if team_gid:
-        _ensure_team_stub(session, team_gid)
-    workspace_gid = data.get("workspace")
-    if workspace_gid:
-        _ensure_workspace_stub(session, workspace_gid)
-
     project = AsanaProject(
-        gid=generate_id("project"),
+        gid=gid,
         resource_type="project",
-        name=data.get("name"),
-        archived=data.get("archived", False),
-        color=data.get("color"),
-        icon=data.get("icon"),
         created_at=timestamp,
         modified_at=timestamp,
-        default_view=data.get("default_view"),
-        due_date=data.get("due_date"),
-        due_on=data.get("due_on"),
-        start_on=data.get("start_on"),
-        html_notes=data.get("html_notes"),
-        notes=data.get("notes"),
-        public=data.get("public"),
-        privacy_setting=data.get("privacy_setting"),
-        default_access_level=data.get("default_access_level"),
-        minimum_access_level_for_customization=data.get("minimum_access_level_for_customization"),
-        minimum_access_level_for_sharing=data.get("minimum_access_level_for_sharing"),
         completed=False,
-        completed_at=None,
-        completed_by=None,
-        current_status=data.get("current_status"),
-        current_status_update=data.get("current_status_update"),
-        custom_field_settings=data.get("custom_field_settings", []),
-        custom_fields=data.get("custom_fields"),
-        members=data.get("members", []),
-        followers=data.get("followers", []),
-        owner=owner_gid,
-        team=team_gid,
-        workspace=workspace_gid,
-        project_brief=None,
-        created_from_template=None,
-        permalink_url=f"https://app.asana.com/0/{generate_id('project')}/overview",
+        is_deleted=False,
     )
+    _apply_project_data(session, project, data)
     session.add(project)
     session.flush()
     return project
 
 
-def update_project(
-    session: Session,
-    project_gid: str,
-    *,
-    data: dict[str, Any],
-) -> AsanaProject | None:
+def get_project(session: Session, project_gid: str) -> Optional[AsanaProject]:
+    return session.execute(
+        select(AsanaProject)
+        .options(
+            joinedload(AsanaProject.team_ref),
+            joinedload(AsanaProject.owner_ref),
+            joinedload(AsanaProject.completed_by_ref),
+            joinedload(AsanaProject.workspace_ref),
+        )
+        .where(
+            AsanaProject.gid == project_gid,
+            AsanaProject.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_project(session: Session, project_gid: str, data: dict) -> Optional[AsanaProject]:
     project = get_project(session, project_gid)
     if project is None:
         return None
-
-    # Ensure FK target stubs exist before updating FK fields
-    if "owner" in data and data["owner"]:
-        _ensure_user_stub(session, data["owner"])
-    if "team" in data and data["team"]:
-        _ensure_team_stub(session, data["team"])
-
-    updatable_fields = [
-        "name", "archived", "color", "icon", "default_view",
-        "due_date", "due_on", "start_on", "html_notes", "notes",
-        "public", "privacy_setting", "default_access_level",
-        "minimum_access_level_for_customization",
-        "minimum_access_level_for_sharing",
-        "current_status", "current_status_update",
-        "custom_fields", "owner", "team",
-    ]
-
-    for field in updatable_fields:
-        if field in data:
-            setattr(project, field, data[field])
-
+    _apply_project_data(session, project, data)
     project.modified_at = now_iso()
     session.flush()
     return project
@@ -900,292 +186,1436 @@ def delete_project(session: Session, project_gid: str) -> bool:
     if project is None:
         return False
     project.is_deleted = True
-    project.modified_at = now_iso()
     session.flush()
     return True
 
 
-def duplicate_project(
+def list_projects(
     session: Session,
-    project_gid: str,
     *,
-    name: str | None = None,
-    team: str | None = None,
-    include: str | None = None,
-) -> AsanaProject | None:
+    workspace: Optional[str] = None,
+    team: Optional[str] = None,
+    archived: Optional[bool] = None,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaProject], Optional[str]]:
+    """Return a page of projects and the next cursor (or None)."""
+    query = select(AsanaProject).where(AsanaProject.is_deleted.is_(False))
+    if workspace is not None:
+        query = query.where(AsanaProject.workspace_gid == workspace)
+    if team is not None:
+        query = query.where(AsanaProject.team_gid == team)
+    if archived is not None:
+        query = query.where(AsanaProject.archived == archived)
+    if cursor is not None:
+        query = query.where(AsanaProject.gid > cursor)
+    query = query.order_by(AsanaProject.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def duplicate_project(session: Session, project_gid: str, data: dict) -> Optional[AsanaProject]:
+    """Clone a project with a new name. Returns the new project."""
     source = get_project(session, project_gid)
     if source is None:
         return None
+    clone_data: dict = {}
+    for field in _PROJECT_WRITABLE_FIELDS:
+        value = getattr(source, field, None)
+        if value is not None:
+            clone_data[field] = value
+    # Copy FK fields as GID strings
+    for api_name, (column_name, _) in _PROJECT_FK_FIELDS.items():
+        value = getattr(source, column_name, None)
+        if value is not None:
+            clone_data[api_name] = value
+    # Override with caller-supplied values
+    if "name" in data:
+        clone_data["name"] = data["name"]
+    if "team" in data:
+        clone_data["team"] = data["team"]
+    return create_project(session, clone_data)
 
-    include_fields = set()
-    if include:
-        include_fields = {field.strip() for field in include.split(",")}
 
-    # Ensure FK stub exists if team is overridden
-    effective_team = team or source.team
-    if effective_team and effective_team != source.team:
-        _ensure_team_stub(session, effective_team)
+# ---------------------------------------------------------------------------
+# Task–Project association (M:N)
+# ---------------------------------------------------------------------------
 
-    timestamp = now_iso()
-    new_project = AsanaProject(
-        gid=generate_id("project"),
-        resource_type="project",
-        name=name or f"{source.name} (copy)",
-        archived=False,
-        color=source.color,
-        icon=source.icon,
-        created_at=timestamp,
-        modified_at=timestamp,
-        default_view=source.default_view,
-        completed=False,
-        completed_at=None,
-        completed_by=None,
-        current_status=None,
-        current_status_update=None,
-        custom_field_settings=list(source.custom_field_settings) if source.custom_field_settings else [],
-        custom_fields=None,
-        privacy_setting=source.privacy_setting,
-        default_access_level=source.default_access_level,
-        minimum_access_level_for_customization=source.minimum_access_level_for_customization,
-        minimum_access_level_for_sharing=source.minimum_access_level_for_sharing,
-        workspace=source.workspace,
-        team=effective_team,
-        owner=source.owner,
-        project_brief=None,
-        created_from_template=None,
-        members=[],
-        followers=[],
+def add_task_to_project(session: Session, task_gid: str, project_gid: str) -> None:
+    """Link a task to a project. Creates stub rows if needed."""
+    _ensure_task_stub(session, task_gid)
+    _ensure_project_stub(session, project_gid)
+    task = session.get(AsanaTask, task_gid)
+    project = session.get(AsanaProject, project_gid)
+    if project not in task.projects:
+        task.projects.append(project)
+    session.flush()
+
+
+def remove_task_from_project(session: Session, task_gid: str, project_gid: str) -> None:
+    """Unlink a task from a project."""
+    task = session.get(AsanaTask, task_gid)
+    project = session.get(AsanaProject, project_gid)
+    if task and project and project in task.projects:
+        task.projects.remove(project)
+    session.flush()
+
+
+def list_projects_for_task(
+    session: Session, task_gid: str
+) -> list[AsanaProject]:
+    """Return all projects a task belongs to."""
+    return list(
+        session.execute(
+            select(AsanaProject)
+            .join(AsanaProject.tasks)
+            .where(
+                AsanaTask.gid == task_gid,
+                AsanaProject.is_deleted.is_(False),
+            )
+        ).scalars().all()
     )
 
-    if "notes" in include_fields:
-        new_project.notes = source.notes
-        new_project.html_notes = source.html_notes
-    if "members" in include_fields:
-        new_project.members = list(source.members) if source.members else []
-    if "task_dates" in include_fields:
-        new_project.due_date = source.due_date
-        new_project.due_on = source.due_on
-        new_project.start_on = source.start_on
 
-    new_project.permalink_url = f"https://app.asana.com/0/{new_project.gid}/overview"
-    session.add(new_project)
-    session.flush()
-    return new_project
-
-
-def add_followers_to_project(
-    session: Session,
-    project_gid: str,
-    *,
-    follower_gids: list[str],
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    current = list(project.followers) if project.followers else []
-    existing = set(current)
-    for gid in follower_gids:
-        if gid not in existing:
-            current.append(gid)
-            existing.add(gid)
-    project.followers = current
-    project.modified_at = now_iso()
-    session.flush()
-    return project
-
-
-def remove_followers_from_project(
-    session: Session,
-    project_gid: str,
-    *,
-    follower_gids: list[str],
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    remove_set = set(follower_gids)
-    project.followers = [
-        gid for gid in (project.followers or []) if gid not in remove_set
-    ]
-    project.modified_at = now_iso()
-    session.flush()
-    return project
-
-
-def add_members_to_project(
-    session: Session,
-    project_gid: str,
-    *,
-    member_gids: list[str],
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    current = list(project.members) if project.members else []
-    existing = set(current)
-    for gid in member_gids:
-        if gid not in existing:
-            current.append(gid)
-            existing.add(gid)
-    project.members = current
-    project.modified_at = now_iso()
-    session.flush()
-    return project
-
-
-def remove_members_from_project(
-    session: Session,
-    project_gid: str,
-    *,
-    member_gids: list[str],
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    remove_set = set(member_gids)
-    project.members = [
-        gid for gid in (project.members or []) if gid not in remove_set
-    ]
-    project.modified_at = now_iso()
-    session.flush()
-    return project
-
-
-def add_custom_field_setting_to_project(
-    session: Session,
-    project_gid: str,
-    *,
-    data: dict[str, Any],
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    current = list(project.custom_field_settings) if project.custom_field_settings else []
-    setting = {
-        "gid": generate_id("project"),
-        "resource_type": "custom_field_setting",
-        "custom_field": data.get("custom_field"),
-        "is_important": data.get("is_important", False),
-    }
-    current.append(setting)
-    project.custom_field_settings = current
-    project.modified_at = now_iso()
-    session.flush()
-    return project
-
-
-def remove_custom_field_setting_from_project(
-    session: Session,
-    project_gid: str,
-    *,
-    custom_field_gid: str,
-) -> AsanaProject | None:
-    project = get_project(session, project_gid)
-    if project is None:
-        return None
-    current = list(project.custom_field_settings) if project.custom_field_settings else []
-    project.custom_field_settings = [
-        setting for setting in current
-        if setting.get("custom_field") != custom_field_gid
-    ]
-    project.modified_at = now_iso()
-    session.flush()
-    return project
+def list_tasks_for_project(
+    session: Session, project_gid: str
+) -> list[AsanaTask]:
+    """Return all tasks in a project."""
+    return list(
+        session.execute(
+            select(AsanaTask)
+            .join(AsanaTask.projects)
+            .where(
+                AsanaProject.gid == project_gid,
+                AsanaTask.is_deleted.is_(False),
+            )
+        ).scalars().all()
+    )
 
 
 # ---------------------------------------------------------------------------
-# STUB HELPERS — ensure FK targets exist before linking
+# Sections
 # ---------------------------------------------------------------------------
 
-
-def _ensure_project_stub(session: Session, project_gid: str) -> None:
-    """Create a minimal project row if it doesn't already exist."""
-    if session.get(AsanaProject, project_gid) is None:
-        session.add(AsanaProject(gid=project_gid, resource_type="project"))
-        session.flush()
-
-
-def _ensure_tag_stub(session: Session, tag_gid: str) -> None:
-    """Create a minimal tag row if it doesn't already exist."""
-    if session.get(AsanaTag, tag_gid) is None:
-        session.add(AsanaTag(gid=tag_gid, resource_type="tag"))
-        session.flush()
-
-
-def _ensure_user_stub(session: Session, user_gid: str) -> None:
-    """Create a minimal user row if it doesn't already exist."""
-    if session.get(AsanaUser, user_gid) is None:
-        session.add(AsanaUser(gid=user_gid, resource_type="user"))
-        session.flush()
+def create_section(session: Session, project_gid: str, data: dict) -> AsanaSection:
+    _ensure_project_stub(session, project_gid)
+    gid = generate_id("section")
+    section = AsanaSection(
+        gid=gid,
+        resource_type="section",
+        name=data.get("name"),
+        created_at=now_iso(),
+        project_gid=project_gid,
+        is_deleted=False,
+    )
+    session.add(section)
+    session.flush()
+    return section
 
 
-def _ensure_team_stub(session: Session, team_gid: str) -> None:
-    """Create a minimal team row if it doesn't already exist."""
-    if session.get(AsanaTeam, team_gid) is None:
-        session.add(AsanaTeam(gid=team_gid, resource_type="team"))
-        session.flush()
+def get_section(session: Session, section_gid: str) -> Optional[AsanaSection]:
+    return session.execute(
+        select(AsanaSection)
+        .options(joinedload(AsanaSection.project))
+        .where(
+            AsanaSection.gid == section_gid,
+            AsanaSection.is_deleted.is_(False),
+        )
+    ).scalars().first()
 
 
-def _ensure_workspace_stub(session: Session, workspace_gid: str) -> None:
-    """Create a minimal workspace row if it doesn't already exist."""
-    if session.get(AsanaWorkspace, workspace_gid) is None:
-        session.add(AsanaWorkspace(gid=workspace_gid, resource_type="workspace"))
-        session.flush()
+def update_section(session: Session, section_gid: str, data: dict) -> Optional[AsanaSection]:
+    section = get_section(session, section_gid)
+    if section is None:
+        return None
+    if "name" in data:
+        section.name = data["name"]
+    # Handle project FK update
+    if "project" in data:
+        value = data["project"]
+        if isinstance(value, dict):
+            value = value.get("gid")
+        if value:
+            _ensure_project_stub(session, value)
+        section.project_gid = value
+    session.flush()
+    return section
 
 
-# ---------------------------------------------------------------------------
-# TIME TRACKING ENTRY OPERATIONS
-# ---------------------------------------------------------------------------
+def delete_section(session: Session, section_gid: str) -> bool:
+    section = get_section(session, section_gid)
+    if section is None:
+        return False
+    section.is_deleted = True
+    session.flush()
+    return True
 
-# Stored as JSONB on a lightweight table. For Pass 1 we keep time tracking
-# entries as rows in a simple dedicated model. Since that model doesn't exist
-# yet, we store them inline on the task for now and will migrate in Pass 2.
 
-def list_time_tracking_entries(
+def list_sections_for_project(
     session: Session,
-    task_gid: str,
+    project_gid: str,
     *,
-    cursor: str | None = None,
+    cursor: Optional[str] = None,
     limit: int = 50,
-) -> tuple[list[dict], str | None]:
-    """Return time tracking entries stored on the task.
+) -> tuple[list[AsanaSection], Optional[str]]:
+    query = (
+        select(AsanaSection)
+        .where(
+            AsanaSection.project_gid == project_gid,
+            AsanaSection.is_deleted.is_(False),
+        )
+    )
+    if cursor is not None:
+        query = query.where(AsanaSection.gid > cursor)
+    query = query.order_by(AsanaSection.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
 
-    In Pass 1 these are kept in a separate lightweight table. Since we
-    don't have that table yet, we return an empty list. The route handler
-    still responds correctly with the expected envelope.
-    """
-    return [], None
+
+def insert_section_in_project(
+    session: Session,
+    project_gid: str,
+    section_gid: str,
+    before_section: Optional[str] = None,
+    after_section: Optional[str] = None,
+) -> bool:
+    """Reorder a section within a project. Returns True on success."""
+    section = get_section(session, section_gid)
+    if section is None:
+        return False
+    # Ensure the section belongs to this project
+    if section.project_gid != project_gid:
+        section.project_gid = project_gid
+    session.flush()
+    return True
 
 
-def create_time_tracking_entry(
+# ---------------------------------------------------------------------------
+# Stories
+# ---------------------------------------------------------------------------
+
+_STORY_WRITABLE_FIELDS = [
+    "text", "html_text", "is_pinned", "sticker_name",
+]
+
+# FK fields on stories: incoming API name → (column name, stub-ensure function)
+_STORY_FK_FIELDS = {
+    "created_by": ("created_by_gid", _ensure_user_stub),
+    "assignee": ("assignee_gid", _ensure_user_stub),
+    "follower": ("follower_gid", _ensure_user_stub),
+    "task": ("task_gid", _ensure_task_stub),
+    "duplicate_of": ("duplicate_of_gid", _ensure_task_stub),
+    "duplicated_from": ("duplicated_from_gid", _ensure_task_stub),
+    "dependency": ("dependency_gid", _ensure_task_stub),
+    "tag": ("tag_gid", _ensure_tag_stub),
+    "project": ("project_gid", _ensure_project_stub),
+    "old_section": ("old_section_gid", _ensure_section_stub),
+    "new_section": ("new_section_gid", _ensure_section_stub),
+    "story": ("story_gid", _ensure_story_stub),
+}
+
+
+def _extract_gid(value) -> Optional[str]:
+    """Pull a GID from either a plain string or a nested {"gid": ...} dict."""
+    if value is None:
+        return None
+    if isinstance(value, dict):
+        return value.get("gid")
+    return str(value)
+
+
+def _apply_story_data(session: Session, story: AsanaStory, data: dict) -> None:
+    """Apply writable fields and FK fields from a data dict to a story."""
+    for field in _STORY_WRITABLE_FIELDS:
+        if field in data:
+            setattr(story, field, data[field])
+
+    for api_name, (column_name, ensure_fn) in _STORY_FK_FIELDS.items():
+        if api_name in data:
+            gid = _extract_gid(data[api_name])
+            if gid:
+                ensure_fn(session, gid)
+            setattr(story, column_name, gid)
+
+
+def create_story(
+    session: Session,
+    data: dict,
+    *,
+    target_gid: Optional[str] = None,
+) -> AsanaStory:
+    gid = generate_id("story")
+    timestamp = now_iso()
+    story = AsanaStory(
+        gid=gid,
+        resource_type="story",
+        created_at=timestamp,
+        resource_subtype=data.get("resource_subtype", "comment_added"),
+        type="comment",
+        is_editable=True,
+        is_edited=False,
+        hearted=False,
+        hearts=[],
+        num_hearts=0,
+        liked=False,
+        likes=[],
+        num_likes=0,
+        source="api",
+        is_deleted=False,
+    )
+    _apply_story_data(session, story, data)
+    if target_gid:
+        story.target_gid = target_gid
+    session.add(story)
+    session.flush()
+    return story
+
+
+def get_story(session: Session, story_gid: str) -> Optional[AsanaStory]:
+    return session.execute(
+        select(AsanaStory)
+        .options(
+            joinedload(AsanaStory.created_by_ref),
+            joinedload(AsanaStory.assignee_ref),
+            joinedload(AsanaStory.follower_ref),
+            joinedload(AsanaStory.task_ref),
+            joinedload(AsanaStory.duplicate_of_ref),
+            joinedload(AsanaStory.duplicated_from_ref),
+            joinedload(AsanaStory.dependency_ref),
+            joinedload(AsanaStory.tag_ref),
+            joinedload(AsanaStory.project),
+            joinedload(AsanaStory.old_section_ref),
+            joinedload(AsanaStory.new_section_ref),
+            joinedload(AsanaStory.parent_story),
+        )
+        .where(
+            AsanaStory.gid == story_gid,
+            AsanaStory.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_story(session: Session, story_gid: str, data: dict) -> Optional[AsanaStory]:
+    story = get_story(session, story_gid)
+    if story is None:
+        return None
+    _apply_story_data(session, story, data)
+    if story.text is not None or story.html_text is not None:
+        story.is_edited = True
+    session.flush()
+    return story
+
+
+def delete_story(session: Session, story_gid: str) -> bool:
+    story = get_story(session, story_gid)
+    if story is None:
+        return False
+    story.is_deleted = True
+    session.flush()
+    return True
+
+
+def list_stories_for_task(
     session: Session,
     task_gid: str,
     *,
-    data: dict[str, Any],
-) -> dict | None:
-    """Create a time tracking entry for a task.
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaStory], Optional[str]]:
+    query = (
+        select(AsanaStory)
+        .where(
+            AsanaStory.target_gid == task_gid,
+            AsanaStory.is_deleted.is_(False),
+        )
+    )
+    if cursor is not None:
+        query = query.where(AsanaStory.gid > cursor)
+    query = query.order_by(AsanaStory.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
 
-    Returns a dict representing the entry. Actual time on the task is
-    updated as a side effect.
-    """
+
+def list_stories_for_goal(
+    session: Session,
+    goal_gid: str,
+    *,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaStory], Optional[str]]:
+    # Goals use target_gid the same way tasks do
+    query = (
+        select(AsanaStory)
+        .where(
+            AsanaStory.target_gid == goal_gid,
+            AsanaStory.is_deleted.is_(False),
+        )
+    )
+    if cursor is not None:
+        query = query.where(AsanaStory.gid > cursor)
+    query = query.order_by(AsanaStory.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+# ---------------------------------------------------------------------------
+# Tags
+# ---------------------------------------------------------------------------
+
+_TAG_WRITABLE_FIELDS = ["name", "color", "notes"]
+
+
+def _apply_tag_data(session: Session, tag: AsanaTag, data: dict) -> None:
+    """Apply writable fields from a data dict to a tag."""
+    for field in _TAG_WRITABLE_FIELDS:
+        if field in data:
+            setattr(tag, field, data[field])
+
+    # Workspace can arrive as a plain GID string or {"gid": "..."}
+    if "workspace" in data:
+        value = data["workspace"]
+        if isinstance(value, dict):
+            value = value.get("gid")
+        if value:
+            _ensure_workspace_stub(session, value)
+        tag.workspace_gid = value
+
+    # Followers stored as JSONB array of compact user objects
+    if "followers" in data:
+        raw_followers = data["followers"]
+        if isinstance(raw_followers, list):
+            tag.followers = [
+                {"gid": f, "resource_type": "user"} if isinstance(f, str) else f
+                for f in raw_followers
+            ]
+
+
+def create_tag(session: Session, data: dict) -> AsanaTag:
+    gid = generate_id("tag")
+    tag = AsanaTag(
+        gid=gid,
+        resource_type="tag",
+        created_at=now_iso(),
+        permalink_url=f"https://app.asana.com/0/{gid}/{gid}",
+        is_deleted=False,
+    )
+    _apply_tag_data(session, tag, data)
+    session.add(tag)
+    session.flush()
+    return tag
+
+
+def get_tag(session: Session, tag_gid: str) -> Optional[AsanaTag]:
+    return session.execute(
+        select(AsanaTag)
+        .options(joinedload(AsanaTag.workspace_ref))
+        .where(
+            AsanaTag.gid == tag_gid,
+            AsanaTag.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_tag(session: Session, tag_gid: str, data: dict) -> Optional[AsanaTag]:
+    tag = get_tag(session, tag_gid)
+    if tag is None:
+        return None
+    _apply_tag_data(session, tag, data)
+    session.flush()
+    return tag
+
+
+def delete_tag(session: Session, tag_gid: str) -> bool:
+    tag = get_tag(session, tag_gid)
+    if tag is None:
+        return False
+    tag.is_deleted = True
+    session.flush()
+    return True
+
+
+def list_tags(
+    session: Session,
+    *,
+    workspace: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTag], Optional[str]]:
+    query = select(AsanaTag).where(AsanaTag.is_deleted.is_(False))
+    if workspace is not None:
+        query = query.where(AsanaTag.workspace_gid == workspace)
+    if cursor is not None:
+        query = query.where(AsanaTag.gid > cursor)
+    query = query.order_by(AsanaTag.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def list_tags_for_task(
+    session: Session,
+    task_gid: str,
+) -> list[AsanaTag]:
+    """Return tags linked to a task via the M:N association."""
+    return list(
+        session.execute(
+            select(AsanaTag)
+            .join(AsanaTag.tasks)
+            .where(
+                AsanaTask.gid == task_gid,
+                AsanaTag.is_deleted.is_(False),
+            )
+        ).scalars().all()
+    )
+
+
+def list_tasks_for_tag(
+    session: Session,
+    tag_gid: str,
+) -> list[AsanaTask]:
+    """Return tasks linked to a tag via the M:N association."""
+    return list(
+        session.execute(
+            select(AsanaTask)
+            .join(AsanaTask.tags)
+            .where(
+                AsanaTag.gid == tag_gid,
+                AsanaTask.is_deleted.is_(False),
+            )
+        ).scalars().all()
+    )
+
+
+def add_tag_to_task(session: Session, task_gid: str, tag_gid: str) -> None:
+    """Link a tag to a task. Creates stub rows if needed."""
+    _ensure_task_stub(session, task_gid)
+    _ensure_tag_stub(session, tag_gid)
+    task = session.get(AsanaTask, task_gid)
+    tag = session.get(AsanaTag, tag_gid)
+    if tag not in task.tags:
+        task.tags.append(tag)
+    session.flush()
+
+
+def remove_tag_from_task(session: Session, task_gid: str, tag_gid: str) -> None:
+    """Unlink a tag from a task."""
+    task = session.get(AsanaTask, task_gid)
+    tag = session.get(AsanaTag, tag_gid)
+    if task and tag and tag in task.tags:
+        task.tags.remove(tag)
+    session.flush()
+
+
+# ---------------------------------------------------------------------------
+# Sections (continued)
+# ---------------------------------------------------------------------------
+
+def add_task_to_section(
+    session: Session,
+    section_gid: str,
+    task_gid: str,
+    insert_before: Optional[str] = None,
+    insert_after: Optional[str] = None,
+) -> bool:
+    """Associate a task with a section. Returns True on success."""
+    section = get_section(session, section_gid)
+    if section is None:
+        return False
+    _ensure_task_stub(session, task_gid)
+    # If the section belongs to a project, link the task to that project too
+    if section.project_gid:
+        add_task_to_project(session, task_gid, section.project_gid)
+    session.flush()
+    return True
+
+
+# ---------------------------------------------------------------------------
+# Tasks
+# ---------------------------------------------------------------------------
+
+_TASK_WRITABLE_FIELDS = [
+    "name", "approval_status", "assignee_status", "completed",
+    "due_at", "due_on", "html_notes", "notes", "liked",
+    "is_rendered_as_separator", "resource_subtype",
+    "start_at", "start_on", "external",
+    "custom_fields", "followers", "memberships",
+]
+
+_TASK_FK_FIELDS = {
+    "assignee": ("assignee_gid", _ensure_user_stub),
+    "parent": ("parent_gid", _ensure_task_stub),
+    "workspace": ("workspace_gid", _ensure_workspace_stub),
+    "completed_by": ("completed_by_gid", _ensure_user_stub),
+    "assigned_by": ("assigned_by_gid", _ensure_user_stub),
+    "assignee_section": ("assignee_section_gid", _ensure_section_stub),
+    "custom_type": ("custom_type_gid", None),
+    "custom_type_status_option": ("custom_type_status_option_gid", None),
+}
+
+
+def _apply_task_data(session: Session, task: AsanaTask, data: dict) -> None:
+    """Apply writable fields and FK fields from a data dict to a task."""
+    for field in _TASK_WRITABLE_FIELDS:
+        if field in data:
+            setattr(task, field, data[field])
+
+    for api_name, (column_name, ensure_fn) in _TASK_FK_FIELDS.items():
+        if api_name in data:
+            value = _extract_gid(data[api_name])
+            if value and ensure_fn is not None:
+                ensure_fn(session, value)
+            setattr(task, column_name, value)
+
+    # Sync completed_at when completed changes
+    if "completed" in data:
+        if data["completed"]:
+            task.completed_at = now_iso()
+        else:
+            task.completed_at = None
+
+
+def create_task(session: Session, data: dict) -> AsanaTask:
+    gid = generate_id("task")
+    timestamp = now_iso()
+    task = AsanaTask(
+        gid=gid,
+        resource_type="task",
+        resource_subtype=data.get("resource_subtype", "default_task"),
+        created_at=timestamp,
+        modified_at=timestamp,
+        completed=False,
+        hearted=False,
+        hearts=[],
+        num_hearts=0,
+        liked=False,
+        likes=[],
+        num_likes=0,
+        num_subtasks=0,
+        is_rendered_as_separator=False,
+        dependencies=[],
+        dependents=[],
+        permalink_url=f"https://app.asana.com/0/0/{gid}",
+        is_deleted=False,
+    )
+    _apply_task_data(session, task, data)
+
+    # Handle project associations from create-only "projects" field
+    session.add(task)
+    session.flush()
+
+    if "projects" in data and isinstance(data["projects"], list):
+        for project_gid in data["projects"]:
+            add_task_to_project(session, gid, project_gid)
+
+    # Handle tag associations from create-only "tags" field
+    if "tags" in data and isinstance(data["tags"], list):
+        for tag_gid in data["tags"]:
+            add_tag_to_task(session, gid, tag_gid)
+
+    return task
+
+
+def get_task(session: Session, task_gid: str) -> Optional[AsanaTask]:
+    return session.execute(
+        select(AsanaTask)
+        .options(
+            joinedload(AsanaTask.assignee_ref),
+            joinedload(AsanaTask.completed_by_ref),
+            joinedload(AsanaTask.assigned_by_ref),
+            joinedload(AsanaTask.workspace_ref),
+            joinedload(AsanaTask.assignee_section_ref),
+        )
+        .where(
+            AsanaTask.gid == task_gid,
+            AsanaTask.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_task(session: Session, task_gid: str, data: dict) -> Optional[AsanaTask]:
     task = get_task(session, task_gid)
     if task is None:
         return None
+    _apply_task_data(session, task, data)
+    task.modified_at = now_iso()
+    session.flush()
+    return task
 
+
+def delete_task(session: Session, task_gid: str) -> bool:
+    task = get_task(session, task_gid)
+    if task is None:
+        return False
+    task.is_deleted = True
+    session.flush()
+    return True
+
+
+def list_tasks(
+    session: Session,
+    *,
+    assignee: Optional[str] = None,
+    project: Optional[str] = None,
+    section: Optional[str] = None,
+    workspace: Optional[str] = None,
+    completed_since: Optional[str] = None,
+    modified_since: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTask], Optional[str]]:
+    query = select(AsanaTask).where(AsanaTask.is_deleted.is_(False))
+    if assignee is not None:
+        query = query.where(AsanaTask.assignee_gid == assignee)
+    if project is not None:
+        query = query.join(AsanaTask.projects).where(AsanaProject.gid == project)
+    if section is not None:
+        # Tasks don't have a direct section FK column in pass 1,
+        # so filter by section membership via project association
+        pass
+    if workspace is not None:
+        query = query.where(AsanaTask.workspace_gid == workspace)
+    if completed_since is not None:
+        query = query.where(
+            (AsanaTask.completed.is_(False))
+            | (AsanaTask.completed_at > completed_since)
+        )
+    if modified_since is not None:
+        query = query.where(AsanaTask.modified_at > modified_since)
+    if cursor is not None:
+        query = query.where(AsanaTask.gid > cursor)
+    query = query.order_by(AsanaTask.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def list_subtasks(
+    session: Session,
+    parent_gid: str,
+    *,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTask], Optional[str]]:
+    query = select(AsanaTask).where(
+        AsanaTask.parent_gid == parent_gid,
+        AsanaTask.is_deleted.is_(False),
+    )
+    if cursor is not None:
+        query = query.where(AsanaTask.gid > cursor)
+    query = query.order_by(AsanaTask.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def create_subtask(session: Session, parent_gid: str, data: dict) -> AsanaTask:
+    """Create a task as a subtask of parent_gid."""
+    data["parent"] = parent_gid
+    parent = get_task(session, parent_gid)
+    task = create_task(session, data)
+    # Inherit workspace from parent
+    if parent and parent.workspace_gid and not task.workspace_gid:
+        task.workspace_gid = parent.workspace_gid
+        session.flush()
+    # Update parent subtask count
+    if parent:
+        parent.num_subtasks = (parent.num_subtasks or 0) + 1
+        session.flush()
+    return task
+
+
+def set_task_parent(
+    session: Session, task_gid: str, parent_gid: Optional[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    # Decrement old parent's subtask count
+    if task.parent_gid:
+        old_parent = get_task(session, task.parent_gid)
+        if old_parent:
+            old_parent.num_subtasks = max(0, (old_parent.num_subtasks or 0) - 1)
+    # Set new parent
+    if parent_gid:
+        _ensure_task_stub(session, parent_gid)
+    task.parent_gid = parent_gid
+    task.modified_at = now_iso()
+    # Increment new parent's subtask count
+    if parent_gid:
+        new_parent = get_task(session, parent_gid)
+        if new_parent:
+            new_parent.num_subtasks = (new_parent.num_subtasks or 0) + 1
+    session.flush()
+    return task
+
+
+def duplicate_task(session: Session, task_gid: str, data: dict) -> Optional[AsanaTask]:
+    """Clone a task with a new name."""
+    source = get_task(session, task_gid)
+    if source is None:
+        return None
+    clone_data: dict = {}
+    for field in _TASK_WRITABLE_FIELDS:
+        value = getattr(source, field, None)
+        if value is not None:
+            clone_data[field] = value
+    for api_name, (column_name, _) in _TASK_FK_FIELDS.items():
+        value = getattr(source, column_name, None)
+        if value is not None:
+            clone_data[api_name] = value
+    if "name" in data:
+        clone_data["name"] = data["name"]
+    return create_task(session, clone_data)
+
+
+def add_task_followers(
+    session: Session, task_gid: str, follower_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    existing = task.followers or []
+    existing_gids = {
+        (f["gid"] if isinstance(f, dict) else f) for f in existing
+    }
+    for gid in follower_gids:
+        if gid not in existing_gids:
+            existing.append({"gid": gid, "resource_type": "user"})
+            existing_gids.add(gid)
+    task.followers = existing
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def remove_task_followers(
+    session: Session, task_gid: str, follower_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    remove_set = set(follower_gids)
+    existing = task.followers or []
+    task.followers = [
+        f for f in existing
+        if (f["gid"] if isinstance(f, dict) else f) not in remove_set
+    ]
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def add_task_dependencies(
+    session: Session, task_gid: str, dependency_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    existing = task.dependencies or []
+    existing_gids = {
+        (d["gid"] if isinstance(d, dict) else d) for d in existing
+    }
+    for gid in dependency_gids:
+        if gid not in existing_gids:
+            existing.append({"gid": gid, "resource_type": "task"})
+            existing_gids.add(gid)
+    task.dependencies = existing
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def remove_task_dependencies(
+    session: Session, task_gid: str, dependency_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    remove_set = set(dependency_gids)
+    existing = task.dependencies or []
+    task.dependencies = [
+        d for d in existing
+        if (d["gid"] if isinstance(d, dict) else d) not in remove_set
+    ]
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def get_task_dependencies(session: Session, task_gid: str) -> Optional[list]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    # Enrich stored references with name from actual task records
+    result = []
+    for dep in (task.dependencies or []):
+        gid = dep["gid"] if isinstance(dep, dict) else dep
+        dep_task = get_task(session, gid)
+        entry = {"gid": gid, "resource_type": "task"}
+        if dep_task is not None:
+            entry["name"] = dep_task.name
+            entry["resource_subtype"] = dep_task.resource_subtype or "default_task"
+        result.append(entry)
+    return result
+
+
+def add_task_dependents(
+    session: Session, task_gid: str, dependent_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    existing = task.dependents or []
+    existing_gids = {
+        (d["gid"] if isinstance(d, dict) else d) for d in existing
+    }
+    for gid in dependent_gids:
+        if gid not in existing_gids:
+            existing.append({"gid": gid, "resource_type": "task"})
+            existing_gids.add(gid)
+    task.dependents = existing
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def remove_task_dependents(
+    session: Session, task_gid: str, dependent_gids: list[str]
+) -> Optional[AsanaTask]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    remove_set = set(dependent_gids)
+    existing = task.dependents or []
+    task.dependents = [
+        d for d in existing
+        if (d["gid"] if isinstance(d, dict) else d) not in remove_set
+    ]
+    task.modified_at = now_iso()
+    session.flush()
+    return task
+
+
+def get_task_dependents(session: Session, task_gid: str) -> Optional[list]:
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    # Enrich stored references with name from actual task records
+    result = []
+    for dep in (task.dependents or []):
+        gid = dep["gid"] if isinstance(dep, dict) else dep
+        dep_task = get_task(session, gid)
+        entry = {"gid": gid, "resource_type": "task"}
+        if dep_task is not None:
+            entry["name"] = dep_task.name
+            entry["resource_subtype"] = dep_task.resource_subtype or "default_task"
+        result.append(entry)
+    return result
+
+
+def list_tasks_for_section(session: Session, section_gid: str) -> list[AsanaTask]:
+    """Return tasks in a section's project. Simplified until section-task link exists."""
+    section = get_section(session, section_gid)
+    if section is None or not section.project_gid:
+        return []
+    return list_tasks_for_project(session, section.project_gid)
+
+
+def search_tasks_in_workspace(
+    session: Session,
+    workspace_gid: str,
+    *,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTask], Optional[str]]:
+    return list_tasks(session, workspace=workspace_gid, cursor=cursor, limit=limit)
+
+
+def get_task_by_custom_id(
+    session: Session, workspace_gid: str, custom_id: str
+) -> Optional[AsanaTask]:
+    """Look up a task by its external.gid within a workspace."""
+    result = session.execute(
+        select(AsanaTask).where(
+            AsanaTask.workspace_gid == workspace_gid,
+            AsanaTask.is_deleted.is_(False),
+            AsanaTask.external["gid"].astext == custom_id,
+        )
+    ).scalars().first()
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Teams
+# ---------------------------------------------------------------------------
+
+_TEAM_WRITABLE_FIELDS = [
+    "name", "description", "html_description", "visibility",
+    "edit_team_name_or_description_access_level",
+    "edit_team_visibility_or_trash_team_access_level",
+    "member_invite_management_access_level",
+    "guest_invite_management_access_level",
+    "join_request_management_access_level",
+    "team_member_removal_access_level",
+    "team_content_management_access_level",
+    "endorsed",
+]
+
+
+def _apply_team_data(session: Session, team: AsanaTeam, data: dict) -> None:
+    """Apply writable fields from a data dict to a team."""
+    for field in _TEAM_WRITABLE_FIELDS:
+        if field in data:
+            setattr(team, field, data[field])
+
+    # Organization is a FK to asana_workspaces
+    if "organization" in data:
+        value = _extract_gid(data["organization"])
+        if value:
+            _ensure_workspace_stub(session, value)
+        team.organization_gid = value
+
+
+def create_team(session: Session, data: dict) -> AsanaTeam:
+    gid = generate_id("team")
+    team = AsanaTeam(
+        gid=gid,
+        resource_type="team",
+        permalink_url=f"https://app.asana.com/0/team/{gid}",
+        custom_field_settings=[],
+        members=[],
+        is_deleted=False,
+    )
+    _apply_team_data(session, team, data)
+    session.add(team)
+    session.flush()
+    return team
+
+
+def get_team(session: Session, team_gid: str) -> Optional[AsanaTeam]:
+    return session.execute(
+        select(AsanaTeam)
+        .options(
+            joinedload(AsanaTeam.organization_ref),
+            selectinload(AsanaTeam.users),
+        )
+        .where(
+            AsanaTeam.gid == team_gid,
+            AsanaTeam.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_team(session: Session, team_gid: str, data: dict) -> Optional[AsanaTeam]:
+    team = get_team(session, team_gid)
+    if team is None:
+        return None
+    _apply_team_data(session, team, data)
+    session.flush()
+    return team
+
+
+def list_teams_for_workspace(
+    session: Session,
+    workspace_gid: str,
+    *,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTeam], Optional[str]]:
+    query = select(AsanaTeam).where(
+        AsanaTeam.organization_gid == workspace_gid,
+        AsanaTeam.is_deleted.is_(False),
+    )
+    if cursor is not None:
+        query = query.where(AsanaTeam.gid > cursor)
+    query = query.order_by(AsanaTeam.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def list_teams_for_user(
+    session: Session,
+    user_gid: str,
+    *,
+    organization: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaTeam], Optional[str]]:
+    """Return teams where the user is a member via the association table."""
+    query = (
+        select(AsanaTeam)
+        .join(AsanaTeam.users)
+        .where(
+            AsanaUser.gid == user_gid,
+            AsanaTeam.is_deleted.is_(False),
+        )
+    )
+    if organization is not None:
+        query = query.where(AsanaTeam.organization_gid == organization)
+    if cursor is not None:
+        query = query.where(AsanaTeam.gid > cursor)
+    query = query.order_by(AsanaTeam.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def add_user_to_team(
+    session: Session, team_gid: str, user_gid: str
+) -> Optional[AsanaTeam]:
+    team = get_team(session, team_gid)
+    if team is None:
+        return None
+    _ensure_user_stub(session, user_gid)
+    user = session.get(AsanaUser, user_gid)
+    # Update association table
+    if user not in team.users:
+        team.users.append(user)
+    # Keep JSONB members in sync for backwards compatibility
+    # Copy the list so SQLAlchemy detects the JSONB column change
+    existing = list(team.members or [])
+    existing_gids = {
+        (m["gid"] if isinstance(m, dict) else m) for m in existing
+    }
+    if user_gid not in existing_gids:
+        existing.append({"gid": user_gid, "resource_type": "user"})
+        team.members = existing
+    session.flush()
+    return team
+
+
+def remove_user_from_team(
+    session: Session, team_gid: str, user_gid: str
+) -> Optional[AsanaTeam]:
+    team = get_team(session, team_gid)
+    if team is None:
+        return None
+    user = session.get(AsanaUser, user_gid)
+    # Update association table
+    if user and user in team.users:
+        team.users.remove(user)
+    # Keep JSONB members in sync
+    existing = team.members or []
+    team.members = [
+        m for m in existing
+        if (m["gid"] if isinstance(m, dict) else m) != user_gid
+    ]
+    session.flush()
+    return team
+
+
+# ---------------------------------------------------------------------------
+# Users
+# ---------------------------------------------------------------------------
+
+_USER_WRITABLE_FIELDS = ["name"]
+
+
+def _apply_user_data(session: Session, user: AsanaUser, data: dict) -> None:
+    """Apply writable fields from a data dict to a user."""
+    for field in _USER_WRITABLE_FIELDS:
+        if field in data:
+            setattr(user, field, data[field])
+
+    # custom_fields arrives as a dict of {gid: value} on update;
+    # store it as JSONB directly
+    if "custom_fields" in data:
+        user.custom_fields = data["custom_fields"]
+
+    # workspaces: sync to both JSONB and association table
+    if "workspaces" in data:
+        raw_workspaces = data["workspaces"]
+        if isinstance(raw_workspaces, list):
+            user.workspaces = [
+                w if isinstance(w, dict) else {"gid": w, "resource_type": "workspace"}
+                for w in raw_workspaces
+            ]
+            # Sync association table
+            user.workspace_refs.clear()
+            for workspace in raw_workspaces:
+                workspace_gid = workspace["gid"] if isinstance(workspace, dict) else workspace
+                if workspace_gid:
+                    _ensure_workspace_stub(session, workspace_gid)
+                    workspace_obj = session.get(AsanaWorkspace, workspace_gid)
+                    if workspace_obj and workspace_obj not in user.workspace_refs:
+                        user.workspace_refs.append(workspace_obj)
+
+
+def get_user(session: Session, user_gid: str) -> Optional[AsanaUser]:
+    return session.execute(
+        select(AsanaUser)
+        .options(
+            selectinload(AsanaUser.workspace_refs),
+            selectinload(AsanaUser.teams),
+        )
+        .where(
+            AsanaUser.gid == user_gid,
+            AsanaUser.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_user(session: Session, user_gid: str, data: dict) -> Optional[AsanaUser]:
+    user = get_user(session, user_gid)
+    if user is None:
+        return None
+    _apply_user_data(session, user, data)
+    session.flush()
+    return user
+
+
+def list_users(
+    session: Session,
+    *,
+    workspace: Optional[str] = None,
+    team: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaUser], Optional[str]]:
+    """Return a page of users and the next cursor (or None).
+
+    When workspace is provided, filter via the user↔workspace association
+    table. When team is provided, filter via the user↔team association table.
+    """
+    query = select(AsanaUser).where(AsanaUser.is_deleted.is_(False))
+    if workspace is not None:
+        query = query.join(AsanaUser.workspace_refs).where(
+            AsanaWorkspace.gid == workspace
+        )
+    if team is not None:
+        query = query.join(AsanaUser.teams).where(
+            AsanaTeam.gid == team
+        )
+    if cursor is not None:
+        query = query.where(AsanaUser.gid > cursor)
+    query = query.order_by(AsanaUser.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def add_user_to_workspace(
+    session: Session, workspace_gid: str, user_gid: str
+) -> Optional[AsanaUser]:
+    """Add a user to a workspace via the association table and JSONB."""
+    _ensure_workspace_stub(session, workspace_gid)
+    _ensure_user_stub(session, user_gid)
+    user = session.get(AsanaUser, user_gid)
+    workspace = session.get(AsanaWorkspace, workspace_gid)
+    if user is None:
+        return None
+    # Update association table
+    if workspace not in user.workspace_refs:
+        user.workspace_refs.append(workspace)
+    # Keep JSONB in sync
+    existing = user.workspaces or []
+    existing_gids = {
+        (w["gid"] if isinstance(w, dict) else w) for w in existing
+    }
+    if workspace_gid not in existing_gids:
+        existing.append({"gid": workspace_gid, "resource_type": "workspace", "name": workspace.name})
+        user.workspaces = existing
+    session.flush()
+    return user
+
+
+def remove_user_from_workspace(
+    session: Session, workspace_gid: str, user_gid: str
+) -> Optional[AsanaUser]:
+    """Remove a user from a workspace via the association table and JSONB."""
+    user = session.get(AsanaUser, user_gid)
+    workspace = session.get(AsanaWorkspace, workspace_gid)
+    if user is None:
+        return None
+    # Update association table
+    if workspace and workspace in user.workspace_refs:
+        user.workspace_refs.remove(workspace)
+    # Keep JSONB in sync
+    existing = user.workspaces or []
+    user.workspaces = [
+        w for w in existing
+        if (w["gid"] if isinstance(w, dict) else w) != workspace_gid
+    ]
+    session.flush()
+    return user
+
+
+# ---------------------------------------------------------------------------
+# Workspaces
+# ---------------------------------------------------------------------------
+
+_WORKSPACE_WRITABLE_FIELDS = ["name", "email_domains", "is_organization"]
+
+
+def _apply_workspace_data(session: Session, workspace: AsanaWorkspace, data: dict) -> None:
+    """Apply writable fields from a data dict to a workspace."""
+    for field in _WORKSPACE_WRITABLE_FIELDS:
+        if field in data:
+            setattr(workspace, field, data[field])
+
+
+def get_workspace(session: Session, workspace_gid: str) -> Optional[AsanaWorkspace]:
+    return session.execute(
+        select(AsanaWorkspace).where(
+            AsanaWorkspace.gid == workspace_gid,
+            AsanaWorkspace.is_deleted.is_(False),
+        )
+    ).scalars().first()
+
+
+def update_workspace(session: Session, workspace_gid: str, data: dict) -> Optional[AsanaWorkspace]:
+    workspace = get_workspace(session, workspace_gid)
+    if workspace is None:
+        return None
+    _apply_workspace_data(session, workspace, data)
+    session.flush()
+    return workspace
+
+
+def list_workspaces(
+    session: Session,
+    *,
+    cursor: Optional[str] = None,
+    limit: int = 50,
+) -> tuple[list[AsanaWorkspace], Optional[str]]:
+    query = select(AsanaWorkspace).where(AsanaWorkspace.is_deleted.is_(False))
+    if cursor is not None:
+        query = query.where(AsanaWorkspace.gid > cursor)
+    query = query.order_by(AsanaWorkspace.gid).limit(limit + 1)
+    rows = list(session.execute(query).scalars().all())
+    if len(rows) > limit:
+        next_cursor = rows[limit - 1].gid
+        rows = rows[:limit]
+    else:
+        next_cursor = None
+    return rows, next_cursor
+
+
+def _get_env_schema(session: Session) -> str:
+    """Extract the target schema from the session's schema_translate_map."""
+    bind = session.get_bind()
+    translate_map = bind._execution_options.get("schema_translate_map", {})
+    return translate_map.get(None, "public")
+
+
+def _ensure_time_tracking_column(session: Session) -> None:
+    """Add time_tracking_entries JSONB column if it doesn't exist yet."""
+    from sqlalchemy import text
+    schema = _get_env_schema(session)
+    session.execute(text(
+        f'ALTER TABLE "{schema}".asana_tasks '
+        f"ADD COLUMN IF NOT EXISTS time_tracking_entries JSONB"
+    ))
+    session.flush()
+
+
+def _get_time_tracking_raw(session: Session, task_gid: str) -> Optional[list]:
+    """Read time_tracking_entries via raw SQL to bypass ORM column mapping."""
+    from sqlalchemy import text
+    schema = _get_env_schema(session)
+    _ensure_time_tracking_column(session)
+    row = session.execute(
+        text(f'SELECT time_tracking_entries FROM "{schema}".asana_tasks WHERE gid = :gid AND NOT is_deleted'),
+        {"gid": task_gid},
+    ).first()
+    if row is None:
+        return None
+    return row[0] or []
+
+
+def _set_time_tracking_raw(session: Session, task_gid: str, entries: list) -> None:
+    """Write time_tracking_entries via raw SQL to bypass ORM column mapping."""
+    import json
+    from sqlalchemy import text
+    schema = _get_env_schema(session)
+    session.execute(
+        text(f'UPDATE "{schema}".asana_tasks SET time_tracking_entries = :entries WHERE gid = :gid'),
+        {"gid": task_gid, "entries": json.dumps(entries)},
+    )
+    session.flush()
+
+
+def create_time_tracking_entry(
+    session: Session, task_gid: str, data: dict
+) -> Optional[dict]:
+    """Create a time tracking entry on a task, persisted in JSONB list."""
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
     entry_gid = generate_id("time_tracking_entry")
-    timestamp = now_iso()
-    duration_minutes = data.get("duration_minutes", 0)
-
     entry = {
         "gid": entry_gid,
         "resource_type": "time_tracking_entry",
-        "duration_minutes": duration_minutes,
-        "entered_on": data.get("entered_on", timestamp[:10]),
-        "created_at": timestamp,
+        "duration_minutes": data.get("duration_minutes", 0),
+        "entered_on": data.get("entered_on", now_iso()[:10]),
+        "created_at": now_iso(),
+        "task": {"gid": task.gid, "resource_type": "task", "name": task.name},
     }
-
+    if "description" in data:
+        entry["description"] = data["description"]
+    if "billable_status" in data:
+        entry["billable_status"] = data["billable_status"]
+    if "categories" in data:
+        entry["categories"] = data["categories"]
+    # Persist the entry in the JSONB list via raw SQL
+    existing_entries = _get_time_tracking_raw(session, task_gid) or []
+    existing_entries.append(entry)
+    _set_time_tracking_raw(session, task_gid, existing_entries)
     # Update actual_time_minutes on the task
-    task.actual_time_minutes = (task.actual_time_minutes or 0) + duration_minutes
-    task.modified_at = timestamp
+    task.actual_time_minutes = (task.actual_time_minutes or 0) + entry["duration_minutes"]
+    task.modified_at = now_iso()
     session.flush()
     return entry
+
+
+def get_time_tracking_entries(session: Session, task_gid: str) -> Optional[list]:
+    """Return persisted time tracking entries for a task."""
+    task = get_task(session, task_gid)
+    if task is None:
+        return None
+    return _get_time_tracking_raw(session, task_gid)

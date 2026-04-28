@@ -46,7 +46,7 @@ services:
         else
           echo '=== Skipping seed (use SEED=true to enable) ===';
         fi &&
-        uvicorn src.platform.api.main:app --host 0.0.0.0 --port 8000
+        uvicorn src.platform.api.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/src
       "
 
   # External DB mode (Neon, etc) - use: docker-compose --profile external up backend-external

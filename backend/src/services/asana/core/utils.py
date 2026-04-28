@@ -13,22 +13,32 @@ from datetime import datetime, timezone
 # ---------------------------------------------------------------------------
 # ID generation
 # ---------------------------------------------------------------------------
+# AGENT INSTRUCTION: Fill in ID_FORMATS from the contract freeze artifacts.
+# Each entry is derived from OpenAPI example IDs for that resource:
+#   - Analyze the example string to determine alphabet (alphanumeric, numeric,
+#     hex, etc.) and length.
+#   - Example: "6XGgm6PHrGgMpCFX" -> alphabet=ALPHANUMERIC, length=16
+#   - Example: "2147509004"        -> alphabet=NUMERIC, length=10
+# ---------------------------------------------------------------------------
 
 ALPHANUMERIC = string.ascii_letters + string.digits  # a-zA-Z0-9
 NUMERIC = string.digits                               # 0-9
 HEX_LOWER = string.digits + "abcdef"                  # 0-9a-f
 
 ID_FORMATS: dict[str, dict] = {
-    "project": {"alphabet": ALPHANUMERIC, "length": 16},
-    "section": {"alphabet": ALPHANUMERIC, "length": 16},
-    "tag": {"alphabet": ALPHANUMERIC, "length": 16},
-    "task": {"alphabet": ALPHANUMERIC, "length": 16},
-    "team": {"alphabet": ALPHANUMERIC, "length": 16},
-    "time_tracking_entry": {"alphabet": ALPHANUMERIC, "length": 16},
-    "job": {"alphabet": ALPHANUMERIC, "length": 16},
-    "user_task_list": {"alphabet": ALPHANUMERIC, "length": 16},
-    "user": {"alphabet": ALPHANUMERIC, "length": 16},
-    "workspace": {"alphabet": ALPHANUMERIC, "length": 16},
+    "project": {"alphabet": NUMERIC, "length": 10},
+    "section": {"alphabet": NUMERIC, "length": 10},
+    "story": {"alphabet": NUMERIC, "length": 10},
+    "tag": {"alphabet": NUMERIC, "length": 10},
+    "task": {"alphabet": NUMERIC, "length": 10},
+    "time_tracking_entry": {"alphabet": NUMERIC, "length": 10},
+    "job": {"alphabet": NUMERIC, "length": 10},
+    "team": {"alphabet": NUMERIC, "length": 10},
+    "team_membership": {"alphabet": NUMERIC, "length": 10},
+    "user": {"alphabet": NUMERIC, "length": 10},
+    "user_task_list": {"alphabet": NUMERIC, "length": 10},
+    "workspace": {"alphabet": NUMERIC, "length": 10},
+    "workspace_membership": {"alphabet": NUMERIC, "length": 10},
 }
 
 

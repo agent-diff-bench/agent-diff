@@ -1,11 +1,11 @@
 """Error primitives for the Asana API replica.
 
-Asana errors use the ErrorResponse envelope:
+Asana error envelope shape (ErrorResponse):
   {"errors": [{"message": "...", "help": "...", "phrase": "..."}]}
 
-The `help` field is optional and provides links to documentation.
-The `phrase` field is only present on 500 errors (used by Asana support
-to look up specific incidents).
+The `errors` array contains Error objects. Each has a required `message` field
+and optional `help` (documentation link) and `phrase` (incident lookup key for
+server errors).
 """
 
 from __future__ import annotations
@@ -14,8 +14,12 @@ from starlette import status
 from starlette.responses import JSONResponse
 
 
-class AsanaAPIError(Exception):
-    """Base Asana-shaped API error."""
+# ---------------------------------------------------------------------------
+# Base error class — returns Asana's ErrorResponse envelope
+# ---------------------------------------------------------------------------
+
+class AppAPIError(Exception):
+    """Asana-shaped API error."""
 
     def __init__(
         self,
@@ -32,12 +36,12 @@ class AsanaAPIError(Exception):
         self.phrase = phrase
 
     def to_dict(self) -> dict:
-        error: dict = {"message": self.message}
+        error_object: dict = {"message": self.message}
         if self.help_url is not None:
-            error["help"] = self.help_url
+            error_object["help"] = self.help_url
         if self.phrase is not None:
-            error["phrase"] = self.phrase
-        return {"errors": [error]}
+            error_object["phrase"] = self.phrase
+        return {"errors": [error_object]}
 
     def to_response(self) -> JSONResponse:
         return JSONResponse(content=self.to_dict(), status_code=self.http_code)
@@ -47,30 +51,31 @@ class AsanaAPIError(Exception):
 # Convenience constructors — one per standard HTTP error in the Asana spec
 # ---------------------------------------------------------------------------
 
-def bad_request(message: str = "Bad request") -> AsanaAPIError:
-    return AsanaAPIError(message=message, http_code=status.HTTP_400_BAD_REQUEST)
+def bad_request(message: str = "Bad Request") -> AppAPIError:
+    return AppAPIError(message=message, http_code=status.HTTP_400_BAD_REQUEST)
 
 
-def unauthorized(message: str = "Not authorized") -> AsanaAPIError:
-    return AsanaAPIError(message=message, http_code=status.HTTP_401_UNAUTHORIZED)
+def unauthorized(message: str = "Unauthorized") -> AppAPIError:
+    return AppAPIError(message=message, http_code=status.HTTP_401_UNAUTHORIZED)
 
 
-def payment_required(message: str = "Payment required") -> AsanaAPIError:
-    return AsanaAPIError(message=message, http_code=status.HTTP_402_PAYMENT_REQUIRED)
+def payment_required(message: str = "Payment Required") -> AppAPIError:
+    return AppAPIError(message=message, http_code=status.HTTP_402_PAYMENT_REQUIRED)
 
 
-def forbidden(message: str = "Forbidden") -> AsanaAPIError:
-    return AsanaAPIError(message=message, http_code=status.HTTP_403_FORBIDDEN)
+def forbidden(message: str = "Forbidden") -> AppAPIError:
+    return AppAPIError(message=message, http_code=status.HTTP_403_FORBIDDEN)
 
 
-def not_found(message: str = "Not found") -> AsanaAPIError:
-    return AsanaAPIError(message=message, http_code=status.HTTP_404_NOT_FOUND)
+def not_found(message: str = "Not Found") -> AppAPIError:
+    return AppAPIError(message=message, http_code=status.HTTP_404_NOT_FOUND)
 
 
 def internal_server_error(
-    message: str = "Server error", phrase: str | None = None
-) -> AsanaAPIError:
-    return AsanaAPIError(
+    message: str = "Internal Server Error",
+    phrase: str | None = None,
+) -> AppAPIError:
+    return AppAPIError(
         message=message,
         http_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         phrase=phrase,
@@ -78,12 +83,12 @@ def internal_server_error(
 
 
 # ---------------------------------------------------------------------------
-# Catch-all handler
+# Catch-all — universal across apps
 # ---------------------------------------------------------------------------
 
-def handle_exception(exception: Exception) -> JSONResponse:
+def handle_exception(exc: Exception) -> JSONResponse:
     """Convert unhandled exceptions into an Asana-shaped error response."""
-    if isinstance(exception, AsanaAPIError):
-        return exception.to_response()
-    fallback = internal_server_error(message=f"Server error: {exception}")
+    if isinstance(exc, AppAPIError):
+        return exc.to_response()
+    fallback = internal_server_error(message=f"Internal server error: {exc}")
     return fallback.to_response()
