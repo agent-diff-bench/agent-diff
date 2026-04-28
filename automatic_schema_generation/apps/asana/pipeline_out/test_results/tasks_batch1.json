@@ -1,0 +1,94 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TaskCompact array with next_page for tasks in a project; 404 on bogus project_gid with proper error envelope.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/tasks"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TaskCompact array with next_page for tasks linked to a tag; 404 on bogus tag_gid with proper error envelope.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tags/<tag_gid>/tasks"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addTag",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with empty data object on success; tag confirmed on subsequent GET. Initially returned 200 on bogus task_gid due to stub creation; fixed by adding task existence check in route handler.",
+      "curl_examples": [
+        "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'",
+        "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999/addTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added task existence check before calling ops.add_tag_to_task to return 404 for unknown task_gid"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeTag",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with empty data object on success; tag confirmed removed on subsequent GET. Initially returned 200 on bogus task_gid; fixed by adding task existence check in route handler.",
+      "curl_examples": [
+        "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'",
+        "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999/removeTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added task existence check before calling ops.remove_tag_from_task to return 404 for unknown task_gid"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with full TaskResponse shape including gid, resource_type, name, resource_subtype, timestamps, and all expected fields. GET on bogus task_gid returns 404.",
+      "curl_examples": [
+        "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks -d '{\"data\": {\"name\": \"Test Task\"}}'",
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with data array of TaskCompact objects and next_page field. Supports query params assignee, project, workspace, completed_since, modified_since.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/subtasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TaskCompact array with next_page for subtasks of a parent task; 404 on bogus task_gid with proper error envelope.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/subtasks"
+      ],
+      "code_changes": []
+    }
+  ]
+}

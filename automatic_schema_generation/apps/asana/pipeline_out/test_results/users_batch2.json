@@ -1,0 +1,52 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/users",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns UserCompact list for team members with correct schema; returns 404 error envelope for non-existent team after fix.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/users"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added team existence check in get_users_in_team to return 404 for unknown teams"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns full UserResponse for a user in a workspace; returns 404 error envelope for non-existent user_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users/<user_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Updates user name successfully and returns updated UserResponse; returns 404 error envelope for non-existent user_gid.",
+      "curl_examples": [
+        "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Name\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users/<user_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns paginated UserCompact list for workspace members with correct schema; returns 404 error envelope for non-existent workspace after fix.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added workspace existence check in get_users_in_workspace to return 404 for unknown workspaces"}
+      ]
+    }
+  ]
+}

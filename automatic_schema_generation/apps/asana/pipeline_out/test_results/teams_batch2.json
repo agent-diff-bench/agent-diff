@@ -1,0 +1,38 @@
+{
+  "results": [
+    {
+      "method": "PUT",
+      "path": "/teams/{team_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Update correctly modifies name, description, visibility and returns full TeamResponse shape; 404 with Asana error envelope on bogus team_gid.",
+      "curl_examples": [
+        "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid> -d '{\"data\": {\"name\": \"Updated Team\", \"description\": \"Updated\", \"visibility\": \"secret\"}}'",
+        "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/999999999 -d '{\"data\": {\"name\": \"Fail\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/teams",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TeamCompact array for user after adding user to team via addUser; empty array for unknown user_gid; response includes next_page field.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/12345/teams"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/teams",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TeamCompact array filtered by workspace organization_gid; two teams created in same workspace both returned; empty array for nonexistent workspace; response includes next_page field.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/workspace-123/teams"
+      ],
+      "code_changes": []
+    }
+  ]
+}

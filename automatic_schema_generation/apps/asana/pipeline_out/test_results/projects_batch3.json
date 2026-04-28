@@ -1,0 +1,96 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_portfolio_settings",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns empty data array with next_page null for valid project; 404 with Asana error envelope on bogus project_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_portfolio_settings"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_statuses",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns statuses from current_status JSONB field as a list with correct ProjectStatusCompact shape (gid, resource_type, title); 404 on bogus project_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_statuses"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added author and created_by user compact fields to status_entry in create_project_status (also affects GET which reads from current_status)"
+        }
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_statuses",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Creates project status with correct ProjectStatusResponse shape including gid, resource_type, title, text, html_text, color, author, created_by, created_at, modified_at; returns 201; 404 on bogus project_gid.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"title\":\"Status\",\"text\":\"On track\",\"color\":\"green\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_statuses"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added author and created_by user compact fields to status_entry in create_project_status"
+        }
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/task_counts",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TaskCountResponse object with all six count fields (num_tasks, num_incomplete_tasks, num_completed_tasks, num_milestones, num_incomplete_milestones, num_completed_milestones) as integers; 404 on bogus project_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/task_counts"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_briefs",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Creates project brief with correct ProjectBriefResponse shape (gid, resource_type, title, html_text, text, permalink_url, project compact); returns 201; 404 on bogus project_gid.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"title\":\"Brief\",\"text\":\"Text\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_briefs"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/saveAsTemplate",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns JobResponse with gid, resource_type=job, resource_subtype=save_project_as_template, status=succeeded, and new_project_template compact object; returns 201; 404 on bogus project_gid.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Template\",\"public\":true}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/saveAsTemplate"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/projects",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns ProjectCompact array for task's associated projects with correct shape (gid, resource_type, name); 404 on bogus task_gid after fix.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/projects"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added task existence check before listing projects, returning 404 for unknown task_gid"
+        }
+      ]
+    }
+  ]
+}

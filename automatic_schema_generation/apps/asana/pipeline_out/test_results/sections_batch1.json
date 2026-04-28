@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections/insert",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object on valid reorder; 404 on fake section or fake project with proper error envelope.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"section\":\"<section_gid>\",\"before_section\":\"<other_section_gid>\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections/insert"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/sections",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with data array of SectionCompact objects and next_page null; 404 on non-existent project with proper error envelope.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with full SectionResponse including gid, resource_type, name, created_at, project, and projects fields; 404 on non-existent project.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"To Do\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/sections/{section_gid}/addTask",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object when adding task to section; 404 on non-existent section with proper error envelope.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"task\":\"<task_gid>\"}}' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>/addTask"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full SectionResponse including project compact; 404 on non-existent section with proper error envelope.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/sections/{section_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with updated SectionResponse; name change persists on subsequent GET; 404 on non-existent section.",
+      "curl_examples": [
+        "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated\"}}' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/sections/{section_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object; subsequent GET returns 404 confirming soft-delete; 404 on non-existent section.",
+      "curl_examples": [
+        "curl -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+      ],
+      "code_changes": []
+    }
+  ]
+}

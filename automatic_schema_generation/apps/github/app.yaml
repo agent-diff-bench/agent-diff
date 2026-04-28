@@ -1,0 +1,147 @@
+app_slug: github
+app_name: GitHub
+openapi_path: inputs/openapi.scoped.json
+target_dir: ../../../backend/src/services/github
+resources:
+  gists:
+    aliases:
+    - base_gist
+    - gist
+    - gist_comment
+    - gist_commit
+    - gist_simple
+    - gists
+    self_id_fields:
+    - id
+    - node_id
+  issues:
+    aliases:
+    - issue
+    - issue_comment
+    - issue_event
+    - issue_search_result_item
+    - issues
+    - projects_v2_draft_issue
+    - webhooks_issue
+    - webhooks_issue_2
+    self_id_fields:
+    - id
+    - node_id
+    - number
+  pulls:
+    aliases:
+    - pr
+    - protected_branch_pull_request_review
+    - prs
+    - pull
+    - pull_request
+    - pull_request_minimal
+    - pull_request_review
+    - pull_request_review_comment
+    - pull_request_simple
+    - pull_requests
+    - pulls
+    - webhooks_pull_request_5
+    self_id_fields:
+    - id
+    - node_id
+    - number
+  repos:
+    aliases:
+    - full_repository
+    - minimal_repository
+    - parent
+    - repo
+    - repo_search_result_item
+    - repos
+    - repositories
+    - repository
+    - simple_repository
+    - source
+    - starred_repository
+    - team_repository
+    - template_repository
+    - code_scanning_variant_analysis_repository
+    - repository_webhooks
+    - simple_classroom_repository
+    - webhooks_repositories
+    - webhooks_repositories_added
+    self_id_fields:
+    - id
+    - node_id
+  users:
+    aliases:
+    - actor
+    - assignee
+    - assignees
+    - author
+    - closed_by
+    - collaborator
+    - collaborators
+    - committer
+    - creator
+    - git_user
+    - maintainer
+    - member
+    - members
+    - merged_by
+    - owner
+    - private_user
+    - public_user
+    - requested_reviewers
+    - requester
+    - reviewer
+    - simple_user
+    - target_user
+    - user
+    - users
+    - porter_author
+    - simple_classroom_user
+    - user_role_assignment
+    - user_search_result_item
+    - webhooks_user
+    - webhooks_user_mannequin
+    self_id_fields:
+    - id
+    - node_id
+  orgs:
+    aliases:
+    - org
+    - org_hook
+    - org_membership
+    - organization
+    - organization_full
+    - organization_simple
+    - organizations
+    - orgs
+    - simple_classroom_organization
+    - team_organization
+    - organization_simple_webhooks
+    self_id_fields:
+    - id
+    - node_id
+  teams:
+    aliases:
+    - enterprise_team
+    - requested_teams
+    - team
+    - team_full
+    - team_membership
+    - team_simple
+    - teams
+    - webhooks_team
+    - webhooks_team_1
+    self_id_fields:
+    - id
+    - node_id
+naming:
+  qualifier_prefixes:
+  - parent_
+  - source_
+  - target_
+  pk_field_names:
+  - id
+  self_id_fields:
+  - id
+  - node_id
+  - number

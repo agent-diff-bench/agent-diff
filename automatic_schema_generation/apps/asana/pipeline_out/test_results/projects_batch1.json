@@ -1,0 +1,84 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with full ProjectResponse shape including gid, resource_type, name, timestamps, arrays for followers/members/custom_fields. Returns 400 with Asana error envelope when name is missing.",
+      "curl_examples": [
+        "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"My Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Changed all 'except AppAPIError: raise' to 'except AppAPIError as error: return error.to_response()' so errors are returned as proper Asana error envelopes instead of being swallowed by the middleware as 500s"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with paginated collection envelope containing data (array of ProjectCompact with gid/resource_type/name) and next_page (null when no more pages). Supports workspace and team query filters.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects",
+        "curl -s -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV/services/asana/projects?workspace=ws1'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full ProjectResponse for valid gid. Returns 404 with Asana error envelope for non-existent gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/projects/{project_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with updated ProjectResponse. Name, notes, color and other writable fields are correctly persisted. Returns 404 for non-existent gid.",
+      "curl_examples": [
+        "curl -s -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/projects/{project_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object. Subsequent GET for the same gid returns 404, confirming soft-delete consistency. Returns 404 for non-existent gid.",
+      "curl_examples": [
+        "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/duplicate",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with JobResponse containing gid, resource_type=job, resource_subtype=duplicate_project, status=succeeded, and new_project compact reference with the cloned project's gid and name. Returns 404 for non-existent source project gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Cloned\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>/duplicate"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addFollowers",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full ProjectResponse including the newly added followers in the followers array. Returns 404 for non-existent project gid. Returns 400 when followers field is missing.",
+      "curl_examples": [
+        "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"followers\":\"user1,user2\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>/addFollowers"
+      ],
+      "code_changes": []
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeFollowers",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with full ProjectResponse after removing specified followers from the JSONB array; 404 with Asana error envelope on bogus project gid. Fixed JSONB mutation tracking with flag_modified to ensure persistence.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeFollowers -d '{\"data\": {\"followers\": \"user-1,user-3\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeFollowers -d '{\"data\": {\"followers\": \"user-1\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added flag_modified import and calls on all JSONB field mutations (followers, members, custom_field_settings) to fix SQLAlchemy change detection"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addMembers",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with full ProjectResponse containing updated members array; members accumulate correctly across multiple calls after JSONB fix; 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/addMembers -d '{\"data\": {\"members\": \"user-1,user-2\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/addMembers -d '{\"data\": {\"members\": \"user-1\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added flag_modified call on members field and list() copy to ensure JSONB mutation is persisted"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeMembers",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with full ProjectResponse after removing specified members; list comprehension creates a new list so persistence works; 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeMembers -d '{\"data\": {\"members\": \"user-1,user-3\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeMembers -d '{\"data\": {\"members\": \"user-1\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added flag_modified call on members field to ensure JSONB mutation is detected by SQLAlchemy"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/addCustomFieldSetting",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with CustomFieldSettingResponse containing gid, resource_type, is_important, custom_field, project, and parent fields; multiple settings accumulate correctly after JSONB fix; 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/addCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\", \"is_important\": true}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/addCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added list() copy and flag_modified call on custom_field_settings to fix JSONB persistence for repeated adds"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/removeCustomFieldSetting",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with EmptyResponse ({\"data\": {}}) after removing the custom field setting; removal persists correctly in DB (verified via subsequent GET); 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added flag_modified call on custom_field_settings after list-comprehension removal"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/custom_field_settings",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with array of CustomFieldSettingResponse objects (gid, resource_type, is_important, custom_field, project, parent) and next_page field; correctly returns seeded settings after JSONB fix; 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/custom_field_settings",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/custom_field_settings"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "No direct changes to this handler; JSONB fix in addCustomFieldSetting ensures data is correctly seeded"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_memberships",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with array of ProjectMembershipCompact objects (gid, resource_type, member, access_level) and next_page field; correctly derives memberships from project members array; 404 on bogus project gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_memberships",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/project_memberships"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "No direct changes to this handler; JSONB fix in addMembers ensures members data is correctly seeded"}
+      ]
+    }
+  ]
+}

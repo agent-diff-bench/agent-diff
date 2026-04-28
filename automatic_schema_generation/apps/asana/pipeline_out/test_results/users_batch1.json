@@ -1,0 +1,85 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/users",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns paginated list of UserCompact objects with next_page; empty collection returns empty data array with next_page null.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/favorites",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns empty array of AsanaNamedResource with next_page null for valid user; 404 with error envelope on bogus user_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/favorites"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/team_memberships",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns array of TeamMembershipCompact objects with user, team, is_guest, is_limited_access, is_admin fields; 404 on bogus user_gid. Requires team to be created and user added via POST /teams and POST /teams/{team_gid}/addUser.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/team_memberships?workspace=9999999999'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/user_task_list",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns synthesized UserTaskListResponse with gid, resource_type, name, owner, and workspace. Fixed name generation to handle null workspace name gracefully.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/user_task_list"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Fixed user_task_list to prefer workspace_refs relationship objects and handle null workspace name with or-fallback"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/workspace_memberships",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns array of WorkspaceMembershipCompact objects with user and workspace compacts; 404 on bogus user_gid. Fixed to prefer workspace_refs relationship objects over JSONB for accurate data.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/workspace_memberships"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Fixed workspace_memberships to prefer workspace_refs relationship objects over JSONB workspaces column"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns full UserResponse with gid, resource_type, name, email, photo, workspaces, and custom_fields; 404 with Asana error envelope on bogus user_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/users/{user_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Updates user name and custom_fields; returns full UserResponse with updated values; 404 with error envelope on bogus user_gid.",
+      "curl_examples": [
+        "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111 -d '{\"data\": {\"name\": \"Updated Name\"}}'"
+      ],
+      "code_changes": []
+    }
+  ]
+}

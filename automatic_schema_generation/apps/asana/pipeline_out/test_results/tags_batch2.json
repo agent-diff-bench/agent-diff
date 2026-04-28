@@ -1,0 +1,15 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/tags",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with correct TagResponse schema including gid, resource_type, name, color, notes, created_at, followers, workspace, and permalink_url. Followers passed as string GIDs are correctly converted to UserCompact objects. Not-found test not applicable for POST endpoints.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tags -d '{\"data\": {\"name\": \"Urgent\", \"color\": \"light-red\", \"notes\": \"High priority items\"}}'"
+      ],
+      "code_changes": []
+    }
+  ]
+}

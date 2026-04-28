@@ -1,0 +1,83 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/addUser",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with UserBaseResponse shape (gid, resource_type, name, email, photo) on valid input; returns 400 when user field is missing.",
+      "curl_examples": [
+        "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_test_001/addUser -d '{\"data\": {\"user\": \"user_test_001\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/removeUser",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object after removing user; returns 400 when user field is missing; returns 404 for nonexistent user.",
+      "curl_examples": [
+        "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_rem_001/removeUser -d '{\"data\": {\"user\": \"user_rem_001\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with paginated list of WorkspaceCompact objects (gid, resource_type, name) and next_page field.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/audit_log_events",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data array and next_page null for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ale_001/audit_log_events"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/custom_fields",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data array and next_page null for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_cf_001/custom_fields"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/events",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with data array, sync token, and has_more boolean for existing workspace; returns 404 for nonexistent workspace. Fixed missing has_more field in response.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ev_001/events"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added has_more field to events stub response"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/typeahead",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data array for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ta_001/typeahead"
+      ],
+      "code_changes": []
+    }
+  ]
+}

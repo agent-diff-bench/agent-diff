@@ -1,541 +1,109 @@
 {
   "app_slug": "asana",
   "total_spec_endpoints": 245,
-  "implemented_count": 56,
-  "unimplemented_count": 189,
+  "implemented_count": 108,
+  "unimplemented_count": 137,
   "endpoints": [
     {
-      "method": "GET",
-      "path": "/tasks",
+      "method": "POST",
+      "path": "/projects",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with full ProjectResponse shape including gid, resource_type, name, timestamps, arrays for followers/members/custom_fields. Returns 400 with Asana error envelope when name is missing.",
+        "curl_examples": [
+          "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"My Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Changed all 'except AppAPIError: raise' to 'except AppAPIError as error: return error.to_response()' so errors are returned as proper Asana error envelopes instead of being swallowed by the middleware as 500s"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
       "path_params": [],
       "needs_seed": false
     },
     {
-      "method": "POST",
-      "path": "/tasks",
+      "method": "GET",
+      "path": "/projects",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with paginated collection envelope containing data (array of ProjectCompact with gid/resource_type/name) and next_page (null when no more pages). Supports workspace and team query filters.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects",
+          "curl -s -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV/services/asana/projects?workspace=ws1'"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
       "path_params": [],
       "needs_seed": false
     },
     {
       "method": "GET",
-      "path": "/projects/{project_gid}/tasks",
+      "path": "/projects/{project_gid}",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/sections/{section_gid}/tasks",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "section_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tags/{tag_gid}/tasks",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "tag_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/user_task_lists/{user_task_list_gid}/tasks",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "user_task_list_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/tasks/search",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "workspace_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/tasks/custom_id/{custom_id}",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "workspace_gid",
-        "custom_id"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/subtasks",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/subtasks",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/dependencies",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/dependents",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full ProjectResponse for valid gid. Returns 404 with Asana error envelope for non-existent gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+        ],
+        "code_changes": []
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/tags",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tags",
-      "summary": "tags",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/time_tracking_entries",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/time_tracking_entries",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/addDependencies",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/addDependents",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/removeDependencies",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/removeDependents",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/addFollowers",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/removeFollowers",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/addProject",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/removeProject",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/addTag",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/removeTag",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/duplicate",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/setParent",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
+        "project_gid"
       ],
       "needs_seed": true
     },
     {
       "method": "PUT",
-      "path": "/tasks/{task_gid}",
+      "path": "/projects/{project_gid}",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with updated ProjectResponse. Name, notes, color and other writable fields are correctly persisted. Returns 404 for non-existent gid.",
+        "curl_examples": [
+          "curl -s -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
       "path_params": [
-        "task_gid"
+        "project_gid"
       ],
       "needs_seed": true
     },
     {
       "method": "DELETE",
-      "path": "/tasks/{task_gid}",
+      "path": "/projects/{project_gid}",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "tasks",
-      "summary": "tasks",
-      "path_params": [
-        "task_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/teams/{team_gid}/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "team_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "POST",
-      "path": "/teams/{team_gid}/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "team_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/projects/search",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "workspace_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "workspace_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_gid}/projects",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "workspace_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/custom_field_settings",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/project_memberships",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/project_portfolio_settings",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/project_statuses",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object. Subsequent GET for the same gid returns 404, confirming soft-delete consistency. Returns 404 for non-existent gid.",
+        "curl_examples": [
+          "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>"
+        ],
+        "code_changes": []
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -545,62 +113,18 @@
     },
     {
       "method": "POST",
-      "path": "/projects/{project_gid}/project_statuses",
+      "path": "/projects/{project_gid}/duplicate",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/projects/{project_gid}/project_briefs",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/task_counts",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": true
-    },
-    {
-      "method": "POST",
-      "path": "/projects/{project_gid}/addCustomFieldSetting",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
-      "path_params": [
-        "project_gid"
-      ],
-      "needs_seed": false
-    },
-    {
-      "method": "POST",
-      "path": "/projects/{project_gid}/removeCustomFieldSetting",
-      "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with JobResponse containing gid, resource_type=job, resource_subtype=duplicate_project, status=succeeded, and new_project compact reference with the cloned project's gid and name. Returns 404 for non-existent source project gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Cloned\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>/duplicate"
+        ],
+        "code_changes": []
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -612,8 +136,16 @@
       "method": "POST",
       "path": "/projects/{project_gid}/addFollowers",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full ProjectResponse including the newly added followers in the followers array. Returns 404 for non-existent project gid. Returns 400 when followers field is missing.",
+        "curl_examples": [
+          "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"followers\":\"user1,user2\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<gid>/addFollowers"
+        ],
+        "code_changes": []
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -625,8 +157,22 @@
       "method": "POST",
       "path": "/projects/{project_gid}/removeFollowers",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with full ProjectResponse after removing specified followers from the JSONB array; 404 with Asana error envelope on bogus project gid. Fixed JSONB mutation tracking with flag_modified to ensure persistence.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeFollowers -d '{\"data\": {\"followers\": \"user-1,user-3\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeFollowers -d '{\"data\": {\"followers\": \"user-1\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added flag_modified import and calls on all JSONB field mutations (followers, members, custom_field_settings) to fix SQLAlchemy change detection"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -638,8 +184,22 @@
       "method": "POST",
       "path": "/projects/{project_gid}/addMembers",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with full ProjectResponse containing updated members array; members accumulate correctly across multiple calls after JSONB fix; 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/addMembers -d '{\"data\": {\"members\": \"user-1,user-2\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/addMembers -d '{\"data\": {\"members\": \"user-1\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added flag_modified call on members field and list() copy to ensure JSONB mutation is persisted"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -651,8 +211,22 @@
       "method": "POST",
       "path": "/projects/{project_gid}/removeMembers",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with full ProjectResponse after removing specified members; list comprehension creates a new list so persistence works; 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeMembers -d '{\"data\": {\"members\": \"user-1,user-3\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeMembers -d '{\"data\": {\"members\": \"user-1\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added flag_modified call on members field to ensure JSONB mutation is detected by SQLAlchemy"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -662,10 +236,24 @@
     },
     {
       "method": "POST",
-      "path": "/projects/{project_gid}/duplicate",
+      "path": "/projects/{project_gid}/addCustomFieldSetting",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with CustomFieldSettingResponse containing gid, resource_type, is_important, custom_field, project, and parent fields; multiple settings accumulate correctly after JSONB fix; 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/addCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\", \"is_important\": true}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/addCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added list() copy and flag_modified call on custom_field_settings to fix JSONB persistence for repeated adds"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -675,10 +263,24 @@
     },
     {
       "method": "POST",
-      "path": "/projects/{project_gid}/saveAsTemplate",
+      "path": "/projects/{project_gid}/removeCustomFieldSetting",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with EmptyResponse ({\"data\": {}}) after removing the custom field setting; removal persists correctly in DB (verified via subsequent GET); 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/removeCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/removeCustomFieldSetting -d '{\"data\": {\"custom_field\": \"cf-14916\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added flag_modified call on custom_field_settings after list-comprehension removal"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
@@ -688,40 +290,2163 @@
     },
     {
       "method": "GET",
-      "path": "/projects/{project_gid}",
+      "path": "/projects/{project_gid}/custom_field_settings",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with array of CustomFieldSettingResponse objects (gid, resource_type, is_important, custom_field, project, parent) and next_page field; correctly returns seeded settings after JSONB fix; 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/custom_field_settings",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/custom_field_settings"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "No direct changes to this handler; JSONB fix in addCustomFieldSetting ensures data is correctly seeded"
+          }
+        ]
+      },
       "subject": "projects",
       "summary": "projects",
       "path_params": [
         "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_memberships",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with array of ProjectMembershipCompact objects (gid, resource_type, member, access_level) and next_page field; correctly derives memberships from project members array; 404 on bogus project gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_memberships",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/fake-999/project_memberships"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "No direct changes to this handler; JSONB fix in addMembers ensures members data is correctly seeded"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_portfolio_settings",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns empty data array with next_page null for valid project; 404 with Asana error envelope on bogus project_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_portfolio_settings"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/project_statuses",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns statuses from current_status JSONB field as a list with correct ProjectStatusCompact shape (gid, resource_type, title); 404 on bogus project_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_statuses"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added author and created_by user compact fields to status_entry in create_project_status (also affects GET which reads from current_status)"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_statuses",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Creates project status with correct ProjectStatusResponse shape including gid, resource_type, title, text, html_text, color, author, created_by, created_at, modified_at; returns 201; 404 on bogus project_gid.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"title\":\"Status\",\"text\":\"On track\",\"color\":\"green\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_statuses"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added author and created_by user compact fields to status_entry in create_project_status"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/task_counts",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TaskCountResponse object with all six count fields (num_tasks, num_incomplete_tasks, num_completed_tasks, num_milestones, num_incomplete_milestones, num_completed_milestones) as integers; 404 on bogus project_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/task_counts"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/project_briefs",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Creates project brief with correct ProjectBriefResponse shape (gid, resource_type, title, html_text, text, permalink_url, project compact); returns 201; 404 on bogus project_gid.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"title\":\"Brief\",\"text\":\"Text\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/project_briefs"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TaskCompact array with next_page for tasks in a project; 404 on bogus project_gid with proper error envelope.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/tasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/saveAsTemplate",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns JobResponse with gid, resource_type=job, resource_subtype=save_project_as_template, status=succeeded, and new_project_template compact object; returns 201; 404 on bogus project_gid.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Template\",\"public\":true}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/saveAsTemplate"
+        ],
+        "code_changes": []
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns ProjectCompact array for task's associated projects with correct shape (gid, resource_type, name); 404 on bogus task_gid after fix.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added task existence check before listing projects, returning 404 for unknown task_gid"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns paginated ProjectCompact list for a valid team; 404 with error envelope for non-existent team_gid after adding existence check.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added team existence check in get_projects_for_team to return 404 for unknown team_gid"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Creates project under team with 201 status and full ProjectResponse shape including team compact; 404 for non-existent team_gid after adding existence check.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added team existence check in create_project_in_team to return 404 for unknown team_gid"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects/search",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns matching ProjectCompact array without next_page (per spec); 404 for non-existent workspace_gid. Fixed response to omit next_page field and added workspace existence check.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects/search"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added workspace existence check and changed response to return data-only envelope without next_page for search endpoint"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns paginated ProjectCompact list with next_page for a valid workspace; 404 with error envelope for non-existent workspace_gid after adding existence check.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added workspace existence check in get_projects_for_workspace to return 404 for unknown workspace_gid"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Creates project in workspace with 201 status and full ProjectResponse shape including workspace compact; 404 for non-existent workspace_gid after adding existence check.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added workspace existence check in create_project_in_workspace to return 404 for unknown workspace_gid"
+          }
+        ]
+      },
+      "subject": "projects",
+      "summary": "projects",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections/insert",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object on valid reorder; 404 on fake section or fake project with proper error envelope.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"section\":\"<section_gid>\",\"before_section\":\"<other_section_gid>\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections/insert"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/projects/{project_gid}/sections",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with data array of SectionCompact objects and next_page null; 404 on non-existent project with proper error envelope.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/projects/{project_gid}/sections",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with full SectionResponse including gid, resource_type, name, created_at, project, and projects fields; 404 on non-existent project.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"To Do\"}}' http://localhost:8000/api/env/$ENV/services/asana/projects/<project_gid>/sections"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
+      "path_params": [
+        "project_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/sections/{section_gid}/addTask",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object when adding task to section; 404 on non-existent section with proper error envelope.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"task\":\"<task_gid>\"}}' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>/addTask"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
+      "path_params": [
+        "section_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full SectionResponse including project compact; 404 on non-existent section with proper error envelope.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
+      "path_params": [
+        "section_gid"
       ],
       "needs_seed": true
     },
     {
       "method": "PUT",
-      "path": "/projects/{project_gid}",
+      "path": "/sections/{section_gid}",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with updated SectionResponse; name change persists on subsequent GET; 404 on non-existent section.",
+        "curl_examples": [
+          "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated\"}}' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
       "path_params": [
-        "project_gid"
+        "section_gid"
       ],
       "needs_seed": true
     },
     {
       "method": "DELETE",
-      "path": "/projects/{project_gid}",
+      "path": "/sections/{section_gid}",
       "has_spec_metadata": true,
-      "tested": false,
-      "test_result": null,
-      "subject": "projects",
-      "summary": "projects",
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object; subsequent GET returns 404 confirming soft-delete; 404 on non-existent section.",
+        "curl_examples": [
+          "curl -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "sections",
+      "summary": "sections",
       "path_params": [
-        "project_gid"
+        "section_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/stories/{story_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns full StoryResponse by gid with correct shape (gid, resource_type, created_at, text, type, is_editable, hearts, likes, target, etc.); 404 with error envelope on bogus id.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "story_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/stories/{story_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Updates text and is_pinned fields; sets is_edited to true when text changes; returns 200 with full StoryResponse; 404 with error envelope on bogus id.",
+        "curl_examples": [
+          "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid> -d '{\"data\":{\"text\":\"Updated\",\"is_pinned\":true}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "story_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/stories/{story_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with {\"data\":{}} (EmptyResponse); subsequent GET returns 404 confirming soft-delete; 404 with error envelope on bogus id.",
+        "curl_examples": [
+          "curl -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "story_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/stories",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns paginated array of StoryCompact objects (gid, resource_type, created_at, created_by, resource_subtype, text) with next_page; empty array for tasks with no stories.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/stories"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/stories",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Creates story with target_gid set to the task; returns 201 with full StoryResponse including generated gid, created_at, source=api, type=comment.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/stories -d '{\"data\":{\"text\":\"A comment\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}/stories",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns paginated array of StoryCompact objects filtered by goal target_gid; empty array when no stories exist for a goal.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/goals/<goal_gid>/stories"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "goal_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/stories",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Creates story with target_gid set to the goal; returns 201 with full StoryResponse; story appears in subsequent GET /goals/{goal_gid}/stories.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/goals/<goal_gid>/stories -d '{\"data\":{\"text\":\"Goal comment\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "stories",
+      "summary": "stories",
+      "path_params": [
+        "goal_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tags",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with correct TagResponse shape including gid, resource_type, name, color, notes, created_at, followers, workspace, and permalink_url.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags -d '{\"data\": {\"name\": \"Test Tag\", \"color\": \"light-green\", \"notes\": \"Some notes\", \"workspace\": \"workspace-1\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tags",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with paginated array of TagCompact objects (gid, resource_type, name) and next_page field. Workspace query filter works correctly.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags",
+          "curl -s -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV_ID/services/asana/tags?workspace=ws-1'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TaskCompact array with next_page for tasks linked to a tag; 404 on bogus tag_gid with proper error envelope.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tags/<tag_gid>/tasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "tag_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full TagResponse for valid gid; returns 404 with Asana error envelope for nonexistent gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "tag_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/tags/{tag_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with updated TagResponse reflecting changed fields; returns 404 with Asana error envelope for nonexistent gid.",
+        "curl_examples": [
+          "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid> -d '{\"data\": {\"name\": \"Updated\", \"color\": \"light-green\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "tag_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/tags/{tag_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object; subsequent GET returns 404 confirming soft-delete consistency; DELETE on nonexistent gid returns 404.",
+        "curl_examples": [
+          "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "tag_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addTag",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with empty data object on success; tag confirmed on subsequent GET. Initially returned 200 on bogus task_gid due to stub creation; fixed by adding task existence check in route handler.",
+        "curl_examples": [
+          "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'",
+          "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999/addTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added task existence check before calling ops.add_tag_to_task to return 404 for unknown task_gid"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeTag",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with empty data object on success; tag confirmed removed on subsequent GET. Initially returned 200 on bogus task_gid; fixed by adding task existence check in route handler.",
+        "curl_examples": [
+          "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'",
+          "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999/removeTag -d '{\"data\": {\"tag\": \"<tag_gid>\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added task existence check before calling ops.remove_tag_from_task to return 404 for unknown task_gid"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/tags",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with array of TagCompact objects linked to the task via addTag, plus next_page field.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/tags"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tags",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with paginated array of TagCompact objects filtered by workspace; returns empty array for nonexistent workspace.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/<workspace_gid>/tags"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/tags",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with correct TagResponse schema including gid, resource_type, name, color, notes, created_at, followers, workspace, and permalink_url. Followers passed as string GIDs are correctly converted to UserCompact objects. Not-found test not applicable for POST endpoints.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tags -d '{\"data\": {\"name\": \"Urgent\", \"color\": \"light-red\", \"notes\": \"High priority items\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tags",
+      "summary": "tags",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/teams",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with TeamResponse shape including gid, resource_type, name, description, organization compact, permalink_url, visibility, access level fields, endorsed, and custom_field_settings. No path parameter so no 404 test needed.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Engineering\",\"description\":\"The engineering team\",\"organization\":\"org-123\",\"visibility\":\"public\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/addUser",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with TeamMembershipResponse including gid, resource_type, user compact, team compact, is_guest, is_limited_access, is_admin. Returns 404 with error envelope for bogus team gid.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"user\":\"user-123\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/addUser"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/removeUser",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object {\"data\": {}} matching EmptyResponse. Returns 404 with error envelope for bogus team gid.",
+        "curl_examples": [
+          "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"user\":\"user-to-remove\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/removeUser"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/team_memberships",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns 200 with array of TeamMembershipCompact objects and next_page. Initially only returned 1 of 2 added members due to SQLAlchemy JSONB mutation tracking bug; fixed by copying the list before appending. Returns 404 for bogus team gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/team_memberships"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Copy JSONB members list before appending in add_user_to_team to fix SQLAlchemy mutation tracking"
+          }
+        ]
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/custom_field_settings",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with data array of CustomFieldSettingResponse objects (empty for newly created teams). Returns 404 for bogus team gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/custom_field_settings"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/project_templates",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data array and next_page null (project templates are not a modeled resource). Returns 404 for bogus team gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/project_templates"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full TeamResponse including gid, resource_type, name, description, organization compact, permalink_url, visibility, all access level fields, endorsed, and custom_field_settings. Returns 404 with error envelope for bogus team gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/teams/{team_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Update correctly modifies name, description, visibility and returns full TeamResponse shape; 404 with Asana error envelope on bogus team_gid.",
+        "curl_examples": [
+          "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid> -d '{\"data\": {\"name\": \"Updated Team\", \"description\": \"Updated\", \"visibility\": \"secret\"}}'",
+          "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/999999999 -d '{\"data\": {\"name\": \"Fail\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/teams",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TeamCompact array for user after adding user to team via addUser; empty array for unknown user_gid; response includes next_page field.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/12345/teams"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/teams",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TeamCompact array filtered by workspace organization_gid; two teams created in same workspace both returned; empty array for nonexistent workspace; response includes next_page field.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/workspace-123/teams"
+        ],
+        "code_changes": []
+      },
+      "subject": "teams",
+      "summary": "teams",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns paginated list of UserCompact objects with next_page; empty collection returns empty data array with next_page null.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/favorites",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns empty array of AsanaNamedResource with next_page null for valid user; 404 with error envelope on bogus user_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/favorites"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/team_memberships",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns array of TeamMembershipCompact objects with user, team, is_guest, is_limited_access, is_admin fields; 404 on bogus user_gid. Requires team to be created and user added via POST /teams and POST /teams/{team_gid}/addUser.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/team_memberships?workspace=9999999999'"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/user_task_list",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns synthesized UserTaskListResponse with gid, resource_type, name, owner, and workspace. Fixed name generation to handle null workspace name gracefully.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/user_task_list"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Fixed user_task_list to prefer workspace_refs relationship objects and handle null workspace name with or-fallback"
+          }
+        ]
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}/workspace_memberships",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns array of WorkspaceMembershipCompact objects with user and workspace compacts; 404 on bogus user_gid. Fixed to prefer workspace_refs relationship objects over JSONB for accurate data.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111/workspace_memberships"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Fixed workspace_memberships to prefer workspace_refs relationship objects over JSONB workspaces column"
+          }
+        ]
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/users/{user_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns full UserResponse with gid, resource_type, name, email, photo, workspaces, and custom_fields; 404 with Asana error envelope on bogus user_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/users/{user_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Updates user name and custom_fields; returns full UserResponse with updated values; 404 with error envelope on bogus user_gid.",
+        "curl_examples": [
+          "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/users/1111111111 -d '{\"data\": {\"name\": \"Updated Name\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/users",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns UserCompact list for team members with correct schema; returns 404 error envelope for non-existent team after fix.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/users"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added team existence check in get_users_in_team to return 404 for unknown teams"
+          }
+        ]
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "team_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/addUser",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with UserBaseResponse shape (gid, resource_type, name, email, photo) on valid input; returns 400 when user field is missing.",
+        "curl_examples": [
+          "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_test_001/addUser -d '{\"data\": {\"user\": \"user_test_001\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/removeUser",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object after removing user; returns 400 when user field is missing; returns 404 for nonexistent user.",
+        "curl_examples": [
+          "curl -s -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_rem_001/removeUser -d '{\"data\": {\"user\": \"user_rem_001\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns full UserResponse for a user in a workspace; returns 404 error envelope for non-existent user_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users/<user_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "workspace_gid",
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}/users/{user_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Updates user name successfully and returns updated UserResponse; returns 404 error envelope for non-existent user_gid.",
+        "curl_examples": [
+          "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Name\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users/<user_gid>"
+        ],
+        "code_changes": []
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "workspace_gid",
+        "user_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/users",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns paginated UserCompact list for workspace members with correct schema; returns 404 error envelope for non-existent workspace after fix.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/users"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added workspace existence check in get_users_in_workspace to return 404 for unknown workspaces"
+          }
+        ]
+      },
+      "subject": "users",
+      "summary": "users",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with full TaskResponse shape including gid, resource_type, name, resource_subtype, timestamps, and all expected fields. GET on bogus task_gid returns 404.",
+        "curl_examples": [
+          "curl -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks -d '{\"data\": {\"name\": \"Test Task\"}}'",
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/9999999999"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with data array of TaskCompact objects and next_page field. Supports query params assignee, project, workspace, completed_since, modified_since.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/subtasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TaskCompact array with next_page for subtasks of a parent task; 404 on bogus task_gid with proper error envelope.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/subtasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/subtasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with full TaskResponse shape including parent reference; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<parent_gid>/subtasks -d '{\"data\": {\"name\": \"Child Task\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/subtasks -d '{\"data\": {\"name\": \"Child\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/setParent",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with TaskResponse showing updated parent; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/setParent -d '{\"data\": {\"parent\": \"<new_parent_gid>\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/setParent -d '{\"data\": {\"parent\": \"123\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/duplicate",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with JobResponse containing gid, resource_type, resource_subtype, status, and new_task compact; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/duplicate -d '{\"data\": {\"name\": \"Duplicated Task\", \"include\": \"notes,assignee\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/duplicate -d '{\"data\": {\"name\": \"Dup\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addFollowers",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with TaskResponse including updated followers array; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/addFollowers -d '{\"data\": {\"followers\": [\"user-123\", \"user-456\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/addFollowers -d '{\"data\": {\"followers\": [\"user-123\"]}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeFollowers",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with TaskResponse; specified follower removed from followers array; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/removeFollowers -d '{\"data\": {\"followers\": [\"user-456\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/removeFollowers -d '{\"data\": {\"followers\": [\"user-123\"]}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addProject",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object; subsequent GET confirms project association; 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/addProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/addProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeProject",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object; subsequent GET confirms project removed; 404 with error envelope on bogus task_gid after fix to add task existence check.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/removeProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/removeProject -d '{\"data\": {\"project\": \"123\"}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added task existence check in remove_project_from_task to return 404 for non-existent tasks"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependencies",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object on success; returns 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addDependencies -d '{\"data\": {\"dependencies\": [\"<dep_gid>\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/addDependencies -d '{\"data\": {\"dependencies\": [\"123\"]}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Enriched get_task_dependencies to return TaskCompact with name and resource_subtype"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependencies",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object on success; dependency is actually removed (verified via GET). Returns 404 on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeDependencies -d '{\"data\": {\"dependencies\": [\"<dep_gid>\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/removeDependencies -d '{\"data\": {\"dependencies\": [\"123\"]}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependencies",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns array of TaskCompact objects (gid, resource_type, name, resource_subtype) with next_page null. Returns 404 on bogus task_gid. Fixed: enriched dependency objects to include name and resource_subtype from actual task records.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/dependencies",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/dependencies"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Enriched get_task_dependencies to look up each dependency task and include name and resource_subtype in response"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependents",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object on success; returns 404 with error envelope on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addDependents -d '{\"data\": {\"dependents\": [\"<dep_gid>\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/addDependents -d '{\"data\": {\"dependents\": [\"123\"]}}'"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Enriched get_task_dependents to return TaskCompact with name and resource_subtype"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependents",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object on success; dependent is actually removed (verified via GET). Returns 404 on bogus task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeDependents -d '{\"data\": {\"dependents\": [\"<dep_gid>\"]}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/removeDependents -d '{\"data\": {\"dependents\": [\"123\"]}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependents",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 2,
+        "diagnosis": "Returns array of TaskCompact objects (gid, resource_type, name, resource_subtype) with next_page null. Returns 404 on bogus task_gid. Fixed: enriched dependent objects to include name and resource_subtype from actual task records.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/dependents",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/dependents"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Enriched get_task_dependents to look up each dependent task and include name and resource_subtype in response"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 3,
+        "diagnosis": "Returns array of TimeTrackingEntryCompact objects with next_page null after seeding via POST. Returns 404 on bogus task_gid. Fixed: entries were not persisted (GET always returned empty); added JSONB column via ALTER TABLE and raw SQL read/write to persist entries alongside the task.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/time_tracking_entries",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/time_tracking_entries"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/database/operations.py",
+            "summary": "Added _get_env_schema, _ensure_time_tracking_column, _get_time_tracking_raw, _set_time_tracking_raw, get_time_tracking_entries functions; updated create_time_tracking_entry to persist entries in JSONB column via raw SQL"
+          },
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Updated get_time_tracking_entries_for_task to call ops.get_time_tracking_entries instead of returning empty list"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 201 with TimeTrackingEntryBase shape including gid, resource_type, duration_minutes, entered_on, created_at, task, and optional description/billable_status. Returns 404 with error envelope for non-existent task_gid.",
+        "curl_examples": [
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/time_tracking_entries -d '{\"data\":{\"duration_minutes\":30,\"entered_on\":\"2026-04-25\",\"description\":\"Working on feature\"}}'",
+          "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999/time_tracking_entries -d '{\"data\":{\"duration_minutes\":10}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full TaskResponse shape including all expected fields (gid, resource_type, name, resource_subtype, assignee, workspace, custom_fields, followers, projects, tags, etc.). Returns 404 with error envelope for non-existent task_gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with updated TaskResponse. Setting completed=true correctly sets completed_at timestamp. Returns 404 with error envelope for non-existent task_gid.",
+        "curl_examples": [
+          "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid> -d '{\"data\":{\"name\":\"Updated name\",\"completed\":true}}'",
+          "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999 -d '{\"data\":{\"name\":\"Should fail\"}}'"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/{task_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data object. Subsequent GET for the same gid returns 404, confirming soft-delete consistency. Returns 404 for non-existent task_gid.",
+        "curl_examples": [
+          "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>",
+          "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "task_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with array of TaskCompact objects and next_page field. Tasks added to section via addTask appear in results. Returns 404 with error envelope for non-existent section_gid.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>/tasks",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/999999999/tasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "section_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/user_task_lists/{user_task_list_gid}/tasks",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with correct schema shape (data: array, next_page: null). Handler is a stub that always returns empty data without validating the user_task_list_gid, so no 404 path is exercised.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/user_task_lists/<utl_gid>/tasks"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "user_task_list_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/custom_id/{custom_id}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with full TaskResponse for a task seeded with an external.gid matching the custom_id. Returns 404 with error envelope for non-existent custom_id.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tasks/custom_id/MY-CUSTOM-123",
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tasks/custom_id/NONEXISTENT"
+        ],
+        "code_changes": []
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "workspace_gid",
+        "custom_id"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/search",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns TaskCompact array for valid workspace after seeding a task; returns 404 with Asana error envelope for non-existent workspace_gid (fixed: added workspace existence check).",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/1234567890/tasks/search",
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/9999999999/tasks/search"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added workspace existence check to search_tasks_in_workspace, returning 404 for unknown workspace_gid"
+          }
+        ]
+      },
+      "subject": "tasks",
+      "summary": "tasks",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with paginated list of WorkspaceCompact objects (gid, resource_type, name) and next_page field.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [],
+      "needs_seed": false
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/audit_log_events",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data array and next_page null for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ale_001/audit_log_events"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/custom_fields",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data array and next_page null for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_cf_001/custom_fields"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/events",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with data array, sync token, and has_more boolean for existing workspace; returns 404 for nonexistent workspace. Fixed missing has_more field in response.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ev_001/events"
+        ],
+        "code_changes": [
+          {
+            "file": "backend/src/services/asana/api/routes.py",
+            "summary": "Added has_more field to events stub response"
+          }
+        ]
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/typeahead",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns 200 with empty data array for existing workspace; returns 404 for nonexistent workspace. Stub implementation with correct schema shape.",
+        "curl_examples": [
+          "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws_ta_001/typeahead"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/workspace_memberships",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns array of WorkspaceMembershipCompact objects with user and workspace compact shapes; 404 with error envelope on nonexistent workspace_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/workspace-1/workspace_memberships"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Returns full WorkspaceResponse with gid, resource_type, name, email_domains, and is_organization; 404 with error envelope on nonexistent workspace_gid.",
+        "curl_examples": [
+          "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws-test-1"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
+      ],
+      "needs_seed": true
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}",
+      "has_spec_metadata": true,
+      "tested": true,
+      "test_result": {
+        "passed": true,
+        "iterations": 1,
+        "diagnosis": "Updates workspace fields (name, is_organization, email_domains) and returns updated WorkspaceResponse; changes persist on subsequent GET; 404 with error envelope on nonexistent workspace_gid.",
+        "curl_examples": [
+          "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated Name\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws-put-1"
+        ],
+        "code_changes": []
+      },
+      "subject": "workspaces",
+      "summary": "workspaces",
+      "path_params": [
+        "workspace_gid"
       ],
       "needs_seed": true
     }
@@ -744,19 +2469,19 @@
       "path": "/access_requests/{access_request_gid}/reject"
     },
     {
+      "method": "DELETE",
+      "path": "/allocations/{allocation_gid}"
+    },
+    {
+      "method": "GET",
+      "path": "/allocations/{allocation_gid}"
+    },
+    {
       "method": "PUT",
       "path": "/allocations/{allocation_gid}"
     },
     {
       "method": "GET",
-      "path": "/allocations/{allocation_gid}"
-    },
-    {
-      "method": "DELETE",
-      "path": "/allocations/{allocation_gid}"
-    },
-    {
-      "method": "GET",
       "path": "/allocations"
     },
     {
@@ -764,11 +2489,11 @@
       "path": "/allocations"
     },
     {
-      "method": "GET",
+      "method": "DELETE",
       "path": "/attachments/{attachment_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "GET",
       "path": "/attachments/{attachment_gid}"
     },
     {
@@ -778,10 +2503,6 @@
     {
       "method": "POST",
       "path": "/attachments"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/audit_log_events"
     },
     {
       "method": "POST",
@@ -796,7 +2517,7 @@
       "path": "/budgets"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/budgets/{budget_gid}"
     },
     {
@@ -804,7 +2525,7 @@
       "path": "/budgets/{budget_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/budgets/{budget_gid}"
     },
     {
@@ -816,20 +2537,8 @@
       "path": "/goals/{goal_gid}/custom_field_settings"
     },
     {
-      "method": "GET",
-      "path": "/teams/{team_gid}/custom_field_settings"
-    },
-    {
       "method": "POST",
       "path": "/custom_fields"
-    },
-    {
-      "method": "PUT",
-      "path": "/custom_fields/{custom_field_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/custom_fields/{custom_field_gid}"
     },
     {
       "method": "DELETE",
@@ -837,7 +2546,11 @@
     },
     {
       "method": "GET",
-      "path": "/workspaces/{workspace_gid}/custom_fields"
+      "path": "/custom_fields/{custom_field_gid}"
+    },
+    {
+      "method": "PUT",
+      "path": "/custom_fields/{custom_field_gid}"
     },
     {
       "method": "POST",
@@ -872,11 +2585,11 @@
       "path": "/exports/resource"
     },
     {
-      "method": "PUT",
+      "method": "GET",
       "path": "/goal_relationships/{goal_relationship_gid}"
     },
     {
-      "method": "GET",
+      "method": "PUT",
       "path": "/goal_relationships/{goal_relationship_gid}"
     },
     {
@@ -892,7 +2605,7 @@
       "path": "/goals/{goal_gid}/removeSupportingRelationship"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/goals/{goal_gid}"
     },
     {
@@ -900,7 +2613,7 @@
       "path": "/goals/{goal_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/goals/{goal_gid}"
     },
     {
@@ -952,7 +2665,7 @@
       "path": "/memberships"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/memberships/{membership_gid}"
     },
     {
@@ -960,11 +2673,11 @@
       "path": "/memberships/{membership_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/memberships/{membership_gid}"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/ooo_entries/{ooo_entry_gid}"
     },
     {
@@ -972,7 +2685,7 @@
       "path": "/ooo_entries/{ooo_entry_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/ooo_entries/{ooo_entry_gid}"
     },
     {
@@ -1012,7 +2725,7 @@
       "path": "/portfolios"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/portfolios/{portfolio_gid}"
     },
     {
@@ -1020,7 +2733,7 @@
       "path": "/portfolios/{portfolio_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/portfolios/{portfolio_gid}"
     },
     {
@@ -1056,7 +2769,7 @@
       "path": "/portfolios/{portfolio_gid}/duplicate"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/project_briefs/{project_brief_gid}"
     },
     {
@@ -1064,7 +2777,7 @@
       "path": "/project_briefs/{project_brief_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/project_briefs/{project_brief_gid}"
     },
     {
@@ -1072,11 +2785,11 @@
       "path": "/project_memberships/{project_membership_gid}"
     },
     {
-      "method": "PUT",
+      "method": "GET",
       "path": "/project_portfolio_settings/{project_portfolio_setting_gid}"
     },
     {
-      "method": "GET",
+      "method": "PUT",
       "path": "/project_portfolio_settings/{project_portfolio_setting_gid}"
     },
     {
@@ -1084,28 +2797,24 @@
       "path": "/portfolios/{portfolio_gid}/project_portfolio_settings"
     },
     {
-      "method": "GET",
-      "path": "/project_statuses/{project_status_gid}"
-    },
-    {
       "method": "DELETE",
       "path": "/project_statuses/{project_status_gid}"
     },
     {
       "method": "GET",
+      "path": "/project_statuses/{project_status_gid}"
+    },
+    {
+      "method": "DELETE",
       "path": "/project_templates/{project_template_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "GET",
       "path": "/project_templates/{project_template_gid}"
     },
     {
       "method": "GET",
       "path": "/project_templates"
-    },
-    {
-      "method": "GET",
-      "path": "/teams/{team_gid}/project_templates"
     },
     {
       "method": "POST",
@@ -1120,7 +2829,7 @@
       "path": "/rates"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/rates/{rate_gid}"
     },
     {
@@ -1128,7 +2837,7 @@
       "path": "/rates/{rate_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/rates/{rate_gid}"
     },
     {
@@ -1144,7 +2853,7 @@
       "path": "/roles"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/roles/{role_gid}"
     },
     {
@@ -1152,7 +2861,7 @@
       "path": "/roles/{role_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/roles/{role_gid}"
     },
     {
@@ -1160,39 +2869,11 @@
       "path": "/rule_triggers/{rule_trigger_gid}/run"
     },
     {
-      "method": "PUT",
-      "path": "/sections/{section_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/sections/{section_gid}"
-    },
-    {
       "method": "DELETE",
-      "path": "/sections/{section_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/projects/{project_gid}/sections"
-    },
-    {
-      "method": "POST",
-      "path": "/projects/{project_gid}/sections"
-    },
-    {
-      "method": "POST",
-      "path": "/sections/{section_gid}/addTask"
-    },
-    {
-      "method": "POST",
-      "path": "/projects/{project_gid}/sections/insert"
-    },
-    {
-      "method": "GET",
       "path": "/status_updates/{status_update_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "GET",
       "path": "/status_updates/{status_update_gid}"
     },
     {
@@ -1202,73 +2883,17 @@
     {
       "method": "POST",
       "path": "/status_updates"
-    },
-    {
-      "method": "PUT",
-      "path": "/stories/{story_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/stories/{story_gid}"
-    },
-    {
-      "method": "DELETE",
-      "path": "/stories/{story_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/tasks/{task_gid}/stories"
-    },
-    {
-      "method": "POST",
-      "path": "/tasks/{task_gid}/stories"
-    },
-    {
-      "method": "GET",
-      "path": "/goals/{goal_gid}/stories"
-    },
-    {
-      "method": "POST",
-      "path": "/goals/{goal_gid}/stories"
-    },
-    {
-      "method": "GET",
-      "path": "/tags"
-    },
-    {
-      "method": "POST",
-      "path": "/tags"
-    },
-    {
-      "method": "PUT",
-      "path": "/tags/{tag_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/tags/{tag_gid}"
-    },
-    {
-      "method": "DELETE",
-      "path": "/tags/{tag_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/tags"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_gid}/tags"
     },
     {
       "method": "GET",
       "path": "/task_templates"
     },
     {
-      "method": "GET",
+      "method": "DELETE",
       "path": "/task_templates/{task_template_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "GET",
       "path": "/task_templates/{task_template_gid}"
     },
     {
@@ -1285,42 +2910,6 @@
     },
     {
       "method": "GET",
-      "path": "/teams/{team_gid}/team_memberships"
-    },
-    {
-      "method": "GET",
-      "path": "/users/{user_gid}/team_memberships"
-    },
-    {
-      "method": "POST",
-      "path": "/teams"
-    },
-    {
-      "method": "PUT",
-      "path": "/teams/{team_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/teams/{team_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/teams"
-    },
-    {
-      "method": "GET",
-      "path": "/users/{user_gid}/teams"
-    },
-    {
-      "method": "POST",
-      "path": "/teams/{team_gid}/addUser"
-    },
-    {
-      "method": "POST",
-      "path": "/teams/{team_gid}/removeUser"
-    },
-    {
-      "method": "GET",
       "path": "/time_periods/{time_period_gid}"
     },
     {
@@ -1328,7 +2917,7 @@
       "path": "/time_periods"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/time_tracking_categories/{time_tracking_category_gid}"
     },
     {
@@ -1336,7 +2925,7 @@
       "path": "/time_tracking_categories/{time_tracking_category_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/time_tracking_categories/{time_tracking_category_gid}"
     },
     {
@@ -1352,7 +2941,7 @@
       "path": "/time_tracking_categories"
     },
     {
-      "method": "PUT",
+      "method": "DELETE",
       "path": "/time_tracking_entries/{time_tracking_entry_gid}"
     },
     {
@@ -1360,7 +2949,7 @@
       "path": "/time_tracking_entries/{time_tracking_entry_gid}"
     },
     {
-      "method": "DELETE",
+      "method": "PUT",
       "path": "/time_tracking_entries/{time_tracking_entry_gid}"
     },
     {
@@ -1368,11 +2957,11 @@
       "path": "/time_tracking_entries"
     },
     {
-      "method": "PUT",
+      "method": "GET",
       "path": "/timesheet_approval_statuses/{timesheet_approval_status_gid}"
     },
     {
-      "method": "GET",
+      "method": "PUT",
       "path": "/timesheet_approval_statuses/{timesheet_approval_status_gid}"
     },
     {
@@ -1382,10 +2971,6 @@
     {
       "method": "POST",
       "path": "/timesheet_approval_statuses"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/typeahead"
     },
     {
       "method": "GET",
@@ -1393,55 +2978,11 @@
     },
     {
       "method": "GET",
-      "path": "/users/{user_gid}/user_task_list"
-    },
-    {
-      "method": "GET",
-      "path": "/users"
-    },
-    {
-      "method": "PUT",
-      "path": "/users/{user_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/users/{user_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/users/{user_gid}/favorites"
-    },
-    {
-      "method": "GET",
-      "path": "/teams/{team_gid}/users"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/users"
-    },
-    {
-      "method": "PUT",
-      "path": "/workspaces/{workspace_gid}/users/{user_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/users/{user_gid}"
-    },
-    {
-      "method": "GET",
       "path": "/webhooks"
     },
     {
       "method": "POST",
       "path": "/webhooks"
-    },
-    {
-      "method": "PUT",
-      "path": "/webhooks/{webhook_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/webhooks/{webhook_gid}"
     },
     {
       "method": "DELETE",
@@ -1449,39 +2990,15 @@
     },
     {
       "method": "GET",
-      "path": "/workspace_memberships/{workspace_membership_gid}"
-    },
-    {
-      "method": "GET",
-      "path": "/users/{user_gid}/workspace_memberships"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/workspace_memberships"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces"
+      "path": "/webhooks/{webhook_gid}"
     },
     {
       "method": "PUT",
-      "path": "/workspaces/{workspace_gid}"
+      "path": "/webhooks/{webhook_gid}"
     },
     {
       "method": "GET",
-      "path": "/workspaces/{workspace_gid}"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_gid}/addUser"
-    },
-    {
-      "method": "POST",
-      "path": "/workspaces/{workspace_gid}/removeUser"
-    },
-    {
-      "method": "GET",
-      "path": "/workspaces/{workspace_gid}/events"
+      "path": "/workspace_memberships/{workspace_membership_gid}"
     }
   ]
 }

@@ -1,0 +1,81 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/stories/{story_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns full StoryResponse by gid with correct shape (gid, resource_type, created_at, text, type, is_editable, hearts, likes, target, etc.); 404 with error envelope on bogus id.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/stories/{story_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Updates text and is_pinned fields; sets is_edited to true when text changes; returns 200 with full StoryResponse; 404 with error envelope on bogus id.",
+      "curl_examples": [
+        "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid> -d '{\"data\":{\"text\":\"Updated\",\"is_pinned\":true}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/stories/{story_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with {\"data\":{}} (EmptyResponse); subsequent GET returns 404 confirming soft-delete; 404 with error envelope on bogus id.",
+      "curl_examples": [
+        "curl -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/stories/<story_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/stories",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns paginated array of StoryCompact objects (gid, resource_type, created_at, created_by, resource_subtype, text) with next_page; empty array for tasks with no stories.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/stories"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/stories",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Creates story with target_gid set to the task; returns 201 with full StoryResponse including generated gid, created_at, source=api, type=comment.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/stories -d '{\"data\":{\"text\":\"A comment\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/goals/{goal_gid}/stories",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns paginated array of StoryCompact objects filtered by goal target_gid; empty array when no stories exist for a goal.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/goals/<goal_gid>/stories"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/goals/{goal_gid}/stories",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Creates story with target_gid set to the goal; returns 201 with full StoryResponse; story appears in subsequent GET /goals/{goal_gid}/stories.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' http://localhost:8000/api/env/$ENV/services/asana/goals/<goal_gid>/stories -d '{\"data\":{\"text\":\"Goal comment\"}}'"
+      ],
+      "code_changes": []
+    }
+  ]
+}

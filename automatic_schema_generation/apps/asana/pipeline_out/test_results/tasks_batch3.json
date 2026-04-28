@@ -1,0 +1,99 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependencies",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object on success; returns 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addDependencies -d '{\"data\": {\"dependencies\": [\"<dep_gid>\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/addDependencies -d '{\"data\": {\"dependencies\": [\"123\"]}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Enriched get_task_dependencies to return TaskCompact with name and resource_subtype"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependencies",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object on success; dependency is actually removed (verified via GET). Returns 404 on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeDependencies -d '{\"data\": {\"dependencies\": [\"<dep_gid>\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/removeDependencies -d '{\"data\": {\"dependencies\": [\"123\"]}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependencies",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns array of TaskCompact objects (gid, resource_type, name, resource_subtype) with next_page null. Returns 404 on bogus task_gid. Fixed: enriched dependency objects to include name and resource_subtype from actual task records.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/dependencies",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/dependencies"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Enriched get_task_dependencies to look up each dependency task and include name and resource_subtype in response"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addDependents",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object on success; returns 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/addDependents -d '{\"data\": {\"dependents\": [\"<dep_gid>\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/addDependents -d '{\"data\": {\"dependents\": [\"123\"]}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Enriched get_task_dependents to return TaskCompact with name and resource_subtype"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeDependents",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object on success; dependent is actually removed (verified via GET). Returns 404 on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/removeDependents -d '{\"data\": {\"dependents\": [\"<dep_gid>\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/removeDependents -d '{\"data\": {\"dependents\": [\"123\"]}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/dependents",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns array of TaskCompact objects (gid, resource_type, name, resource_subtype) with next_page null. Returns 404 on bogus task_gid. Fixed: enriched dependent objects to include name and resource_subtype from actual task records.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/dependents",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/dependents"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Enriched get_task_dependents to look up each dependent task and include name and resource_subtype in response"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "passed": true,
+      "iterations": 3,
+      "diagnosis": "Returns array of TimeTrackingEntryCompact objects with next_page null after seeding via POST. Returns 404 on bogus task_gid. Fixed: entries were not persisted (GET always returned empty); added JSONB column via ALTER TABLE and raw SQL read/write to persist entries alongside the task.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/time_tracking_entries",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/bogus-999/time_tracking_entries"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Added _get_env_schema, _ensure_time_tracking_column, _get_time_tracking_raw, _set_time_tracking_raw, get_time_tracking_entries functions; updated create_time_tracking_entry to persist entries in JSONB column via raw SQL"},
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Updated get_time_tracking_entries_for_task to call ops.get_time_tracking_entries instead of returning empty list"}
+      ]
+    }
+  ]
+}

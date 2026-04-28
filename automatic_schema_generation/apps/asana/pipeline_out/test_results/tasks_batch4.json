@@ -1,0 +1,87 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/time_tracking_entries",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with TimeTrackingEntryBase shape including gid, resource_type, duration_minutes, entered_on, created_at, task, and optional description/billable_status. Returns 404 with error envelope for non-existent task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>/time_tracking_entries -d '{\"data\":{\"duration_minutes\":30,\"entered_on\":\"2026-04-25\",\"description\":\"Working on feature\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999/time_tracking_entries -d '{\"data\":{\"duration_minutes\":10}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full TaskResponse shape including all expected fields (gid, resource_type, name, resource_subtype, assignee, workspace, custom_fields, followers, projects, tags, etc.). Returns 404 with error envelope for non-existent task_gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/tasks/{task_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with updated TaskResponse. Setting completed=true correctly sets completed_at timestamp. Returns 404 with error envelope for non-existent task_gid.",
+      "curl_examples": [
+        "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid> -d '{\"data\":{\"name\":\"Updated name\",\"completed\":true}}'",
+        "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999 -d '{\"data\":{\"name\":\"Should fail\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/tasks/{task_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object. Subsequent GET for the same gid returns 404, confirming soft-delete consistency. Returns 404 for non-existent task_gid.",
+      "curl_examples": [
+        "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<task_gid>",
+        "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/999999999"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/sections/{section_gid}/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with array of TaskCompact objects and next_page field. Tasks added to section via addTask appear in results. Returns 404 with error envelope for non-existent section_gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/<section_gid>/tasks",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/sections/999999999/tasks"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/user_task_lists/{user_task_list_gid}/tasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with correct schema shape (data: array, next_page: null). Handler is a stub that always returns empty data without validating the user_task_list_gid, so no 404 path is exercised.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/user_task_lists/<utl_gid>/tasks"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/custom_id/{custom_id}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full TaskResponse for a task seeded with an external.gid matching the custom_id. Returns 404 with error envelope for non-existent custom_id.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tasks/custom_id/MY-CUSTOM-123",
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/12345/tasks/custom_id/NONEXISTENT"
+      ],
+      "code_changes": []
+    }
+  ]
+}

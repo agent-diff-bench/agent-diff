@@ -1,0 +1,69 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns paginated ProjectCompact list for a valid team; 404 with error envelope for non-existent team_gid after adding existence check.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/projects"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added team existence check in get_projects_for_team to return 404 for unknown team_gid"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Creates project under team with 201 status and full ProjectResponse shape including team compact; 404 for non-existent team_gid after adding existence check.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/projects"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added team existence check in create_project_in_team to return 404 for unknown team_gid"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects/search",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns matching ProjectCompact array without next_page (per spec); 404 for non-existent workspace_gid. Fixed response to omit next_page field and added workspace existence check.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects/search"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added workspace existence check and changed response to return data-only envelope without next_page for search endpoint"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns paginated ProjectCompact list with next_page for a valid workspace; 404 with error envelope for non-existent workspace_gid after adding existence check.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added workspace existence check in get_projects_for_workspace to return 404 for unknown workspace_gid"}
+      ]
+    },
+    {
+      "method": "POST",
+      "path": "/workspaces/{workspace_gid}/projects",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Creates project in workspace with 201 status and full ProjectResponse shape including workspace compact; 404 for non-existent workspace_gid after adding existence check.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"New Project\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/<workspace_gid>/projects"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added workspace existence check in create_project_in_workspace to return 404 for unknown workspace_gid"}
+      ]
+    }
+  ]
+}

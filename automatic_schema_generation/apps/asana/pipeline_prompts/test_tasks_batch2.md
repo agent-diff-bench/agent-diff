@@ -1,252 +1,153 @@
-# Entity Implementation (Pass 1 — Base): tasks
+# Endpoint Verification: Asana — tasks (batch 2/5)
 
-You are implementing the **tasks** resource for the Asana API
-replica. Build the base model, CRUD operations, serializers, and route handlers.
+You are verifying that **7** endpoints of the `asana`
+replica behave correctly when called over HTTP. The replica has already been
+implemented; your job is to drive it, observe the responses, fix the
+implementation when it is wrong, and report the outcome.
 
-**Do NOT add ForeignKey columns, relationship() declarations, or association
-tables in this pass.** Those will be added in a separate step. Focus only on
-the resource's own columns, operations, and endpoints.
+## How the platform is wired
 
-The full OpenAPI spec is available at: `/Users/azh/agent-diff/automatic_schema_generation/apps/asana/inputs/openapi.scoped.json`
-If any information in this prompt is unclear or seems incorrect, read the
-spec directly to resolve ambiguities.
+The backend runs in Docker on `http://localhost:8000`. It exposes a
+control-plane API at `/api/platform/*` and mounts each service replica at
+`/api/env/{env_id}/services/{app_slug}`.
 
-Files to edit (all under `/Users/azh/agent-diff/backend/src/services/asana`):
-- `database/schema.py`
-- `database/operations.py`
-- `core/serializers.py`
-- `api/routes.py`
+To call any endpoint of `asana` you first need an environment id:
 
----
+```bash
+# 1. List templates and pick one for this service
+curl -s http://localhost:8000/api/platform/templates | jq '.templates[] | select(.service == "asana")'
 
-## Section 1: tasks
-
-### Identity
-
-- Table name: `asana_tasks`
-- Model class: `AsanaTask`
-- Primary key: `gid`
-
-### Schemas
-
-These component schemas represent **tasks** in the API. Build your
-ORM model to cover the union of all fields across these schemas. Fields that
-appear in only some schemas should be nullable.
-
-```json
-{}
+# 2. Initialise an isolated runtime environment from a template.
+#    impersonateUserId is required when there is no testId — pick any
+#    stable string ("test-user" works) and reuse it in the request header.
+curl -s -X POST http://localhost:8000/api/platform/initEnv \
+  -H 'Content-Type: application/json' \
+  -d '{"templateService": "asana", "templateName": "<template-name-from-step-1>", "impersonateUserId": "test-user"}'
+# -> returns {"environmentId": "...", ...}
 ```
 
-### Endpoints
+Then call the replica with the returned environmentId and the impersonation
+header (the platform middleware requires it):
 
-Each entry below is an endpoint that operates on **tasks**. Build
-one operation function and one route handler per endpoint.
+```bash
+ENV_ID=<environmentId>
+curl -s -H 'x-impersonate-user-id: test-user' \
+  http://localhost:8000/api/env/$ENV_ID/services/asana/<endpoint-path>
+```
 
-#### DELETE /tasks/{task_gid}
-_Delete a task_
-Errors: 400, 401, 403, 404, 500
+Each endpoint test must run inside its own freshly initialised environment.
+Do not reuse one environmentId across multiple endpoint tests — state leaks
+between tests will cause false failures.
 
-#### GET /projects/{project_gid}/tasks
-_Get tasks from a project_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+## How to fix bugs and re-run
 
-#### GET /sections/{section_gid}/tasks
-_Get tasks from a section_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+If an endpoint misbehaves, edit the replica source under
+`backend/src/services/asana` (typically `database/operations.py`,
+`core/serializers.py`, or `api/routes.py`). The dev backend runs uvicorn
+with `--reload`, so file edits take effect within ~1 second — **no restart
+is needed**. If you ever do need a hard restart (rare — only for
+import-time errors), run from the repo's `ops/` directory:
 
-#### GET /tags/{tag_gid}/tasks
-_Get tasks from a tag_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+```bash
+cd <repo>/ops && SEED=false docker compose up -d --force-recreate backend
+```
 
-#### GET /tasks
-_Get multiple tasks_
-Parameters:
-  - limit (query, optional): integer
-  - offset (query, optional): string
-  - assignee (query, optional): string
-  - project (query, optional): string
-  - section (query, optional): string
-  - workspace (query, optional): string
-  - completed_since (query, optional): string
-  - modified_since (query, optional): string
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+`SEED=false` is critical: a normal restart re-seeds every template database
+from scratch, which wipes any environment you have already initialised.
 
-#### GET /tasks/{task_gid}
-_Get a task_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+After any code edit, re-test the endpoint that triggered the fix from a
+**fresh environment** (init a new env), since the previous env may hold state
+from the broken behaviour.
 
-#### GET /tasks/{task_gid}/dependencies
-_Get dependencies from a task_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 402, 403, 404, 500
+You may not edit any file outside `backend/src/services/asana` and may not
+restart postgres or run alembic migrations.
 
-#### GET /tasks/{task_gid}/dependents
-_Get dependents from a task_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 402, 403, 404, 500
+## Iteration budget
 
-#### GET /tasks/{task_gid}/subtasks
-_Get subtasks from a task_
-Parameters:
-  - limit (query, optional): integer
-  - offset (query, optional): string
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+For each endpoint, you have **at most 3 fix-and-retry
+iterations**. If after that many attempts the endpoint still fails, mark it
+as `passed: false` with a clear `diagnosis` and move on — do not block the
+batch.
 
-#### GET /tasks/{task_gid}/time_tracking_entries
-_Get time tracking entries for a task_
-Parameters:
-  - limit (query, optional): integer
-  - offset (query, optional): string
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+## Endpoints to verify
 
-#### GET /user_task_lists/{user_task_list_gid}/tasks
-_Get tasks from a user task list_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+### POST /tasks/{task_gid}/subtasks
+Query parameters: opt_fields: array
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskRequest"}}}
+Responses:
+  - 201: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskResponse"}}} — Successfully created the specified subtask.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id}
-_Get a task for a given custom ID_
-Errors: 400, 401, 403, 404, 500
+### POST /tasks/{task_gid}/setParent
+Query parameters: opt_fields: array
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskSetParentRequest"}}}
+Responses:
+  - 200: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskResponse"}}} — Successfully changed the parent of the specified subtask.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### GET /workspaces/{workspace_gid}/tasks/search
-_Search tasks in a workspace_
-Parameters:
-  - opt_fields (query, optional): array
-Errors: 400, 401, 403, 404, 500
+### POST /tasks/{task_gid}/duplicate
+Query parameters: opt_fields: array
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskDuplicateRequest"}}}
+Responses:
+  - 201: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/JobResponse"}}} — Successfully created the job to handle duplication.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### POST /tasks
-_Create a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
+### POST /tasks/{task_gid}/addFollowers
+Query parameters: opt_fields: array
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskAddFollowersRequest"}}}
+Responses:
+  - 200: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskResponse"}}} — Successfully added the specified followers to the task.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### POST /tasks/{task_gid}/addDependencies
-_Set dependencies for a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 402, 403, 404, 500
+### POST /tasks/{task_gid}/removeFollowers
+Query parameters: opt_fields: array
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskRemoveFollowersRequest"}}}
+Responses:
+  - 200: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskResponse"}}} — Successfully removed the specified followers from the task.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### POST /tasks/{task_gid}/addDependents
-_Set dependents for a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 402, 403, 404, 500
+### POST /tasks/{task_gid}/addProject
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskAddProjectRequest"}}}
+Responses:
+  - 200: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/EmptyResponse"}}} — Successfully added the specified project to the task.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
-#### POST /tasks/{task_gid}/addFollowers
-_Add followers to a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/addProject
-_Add a project to a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/addTag
-_Add a tag to a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/duplicate
-_Duplicate a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/removeDependencies
-_Unlink dependencies from a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 402, 403, 404, 500
-
-#### POST /tasks/{task_gid}/removeDependents
-_Unlink dependents from a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 402, 403, 404, 500
-
-#### POST /tasks/{task_gid}/removeFollowers
-_Remove followers from a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/removeProject
-_Remove a project from a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/removeTag
-_Remove a tag from a task_
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/setParent
-_Set the parent of a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/subtasks
-_Create a subtask_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### POST /tasks/{task_gid}/time_tracking_entries
-_Create a time tracking entry_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
-
-#### PUT /tasks/{task_gid}
-_Update a task_
-Parameters:
-  - opt_fields (query, optional): array
-Request body (application/json):
-  - data: object
-Errors: 400, 401, 403, 404, 500
+### POST /tasks/{task_gid}/removeProject
+Request body (application/json): inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/TaskRemoveProjectRequest"}}}
+Responses:
+  - 200: inline: {"type":"object","properties":{"data":{"$ref":"#/schemas/EmptyResponse"}}} — Successfully removed the specified project from the task.
+  - 400: `#/schemas/ErrorResponse` — This usually occurs because of a missing or malformed parameter. Check the documentation and the syntax of your request and try again.
+  - 401: `#/schemas/ErrorResponse` — A valid authentication token was not provided with the request, so the API could not associate a user with the request.
+  - 403: `#/schemas/ErrorResponse` — The authentication and request syntax was valid but the server is refusing to complete the request. This can happen if you try to read or write to objects or properties that the user does not have access to.
+  - 404: `#/schemas/ErrorResponse` — Either the request method and path supplied do not specify a known action in the API, or the object specified by the request does not exist.
+  - 500: `#/schemas/ErrorResponse` — There was a problem on Asana’s end. In the event of a server error the response body should contain an error phrase. These phrases can be used by Asana support to quickly look up the incident that caused the server error. Some errors are due to server load, and will not supply an error phrase.
 
 
-### Referenced Schemas
-
-These schemas appear in the endpoints above (as response bodies or request
-bodies) but are not direct representations of **tasks**. They
-define the shapes your serializers must produce and your operations must
-accept.
+## Schema definitions referenced above
 
 ```json
 {
@@ -292,52 +193,6 @@ accept.
         "readOnly": true,
         "example": "task",
         "x-insert-after": "gid"
-      }
-    }
-  },
-  "CreateTimeTrackingEntryRequest": {
-    "type": "object",
-    "properties": {
-      "duration_minutes": {
-        "description": "Time in minutes tracked by the entry. Must be greater than 0",
-        "type": "integer",
-        "example": 12
-      },
-      "entered_on": {
-        "description": "*Optional*. The day that this entry is logged on. Defaults to today if not specified",
-        "type": "string",
-        "format": "date",
-        "example": "2023-03-19"
-      },
-      "attributable_to": {
-        "type": "string",
-        "description": "*Optional*. The gid of the project which the time is attributable to.",
-        "example": "987654"
-      },
-      "billable_status": {
-        "description": "*Optional*. The current billable status of the entry.",
-        "type": "string",
-        "enum": [
-          "billable",
-          "nonBillable",
-          "notApplicable"
-        ],
-        "example": "billable"
-      },
-      "description": {
-        "description": "*Optional*. The description of the entry.",
-        "type": "string",
-        "example": "My description of work done on this entry"
-      },
-      "categories": {
-        "description": "*Optional*. The gids of time tracking categories to assign to this time tracking entry. Existing categories will be overridden. Currently limited to a maximum of 1 category.",
-        "type": "array",
-        "items": {
-          "type": "string"
-        },
-        "example": [
-          "12345"
-        ]
       }
     }
   },
@@ -1067,69 +922,6 @@ accept.
       }
     }
   },
-  "ModifyDependenciesRequest": {
-    "type": "object",
-    "properties": {
-      "dependencies": {
-        "description": "An array of task gids that a task depends on.",
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      }
-    },
-    "example": {
-      "dependencies": [
-        "133713",
-        "184253"
-      ]
-    }
-  },
-  "ModifyDependentsRequest": {
-    "description": "A set of dependent tasks.",
-    "type": "object",
-    "properties": {
-      "dependents": {
-        "description": "An array of task gids that are dependents of the given task.",
-        "type": "array",
-        "items": {
-          "type": "string"
-        }
-      }
-    },
-    "example": {
-      "dependents": [
-        "133713",
-        "184253"
-      ]
-    }
-  },
-  "NextPage": {
-    "type": "object",
-    "nullable": true,
-    "description": "*Conditional*. This property is only present when a limit query parameter is provided in the request. When making a paginated request, the API will return a number of results as specified by the limit parameter. If more results exist, then the response will contain a next_page attribute, which will include an offset, a relative path attribute, and a full uri attribute. If there are no more pages available, next_page will be null and no offset will be provided. Note that an offset token will expire after some time, as data may have changed.",
-    "properties": {
-      "offset": {
-        "type": "string",
-        "readOnly": true,
-        "description": "Pagination offset for the request.",
-        "example": "eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9"
-      },
-      "path": {
-        "type": "string",
-        "readOnly": true,
-        "description": "A relative path containing the query parameters to fetch for next_page",
-        "example": "/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9"
-      },
-      "uri": {
-        "type": "string",
-        "format": "uri",
-        "readOnly": true,
-        "description": "A full uri containing the query parameters to fetch for next_page",
-        "example": "https://app.asana.com/api/1.0/tasks/12345/attachments?limit=2&offset=eyJ0eXAiOJiKV1iQLCJhbGciOiJIUzI1NiJ9"
-      }
-    }
-  },
   "PortfolioCompact": {
     "description": "A *portfolio* gives a high-level overview of the status of multiple initiatives in Asana. Portfolios provide a dashboard overview of the state of multiple projects, including a progress report and the most recent [project status](/reference/project-statuses) update.\nPortfolios have some restrictions on size. Each portfolio has a max of 1500 items and, like projects, a max of 20 custom fields.",
     "type": "object",
@@ -1345,19 +1137,6 @@ accept.
     },
     "required": [
       "project"
-    ]
-  },
-  "TaskAddTagRequest": {
-    "type": "object",
-    "properties": {
-      "tag": {
-        "description": "The tag's gid to add to the task.",
-        "type": "string",
-        "example": "13579"
-      }
-    },
-    "required": [
-      "tag"
     ]
   },
   "TaskBase": {
@@ -1699,19 +1478,6 @@ accept.
       "project"
     ]
   },
-  "TaskRemoveTagRequest": {
-    "type": "object",
-    "properties": {
-      "tag": {
-        "description": "The tag's gid to remove from the task.",
-        "type": "string",
-        "example": "13579"
-      }
-    },
-    "required": [
-      "tag"
-    ]
-  },
   "TaskRequest": {
     "allOf": [
       {
@@ -1960,160 +1726,6 @@ accept.
       "parent"
     ]
   },
-  "TimeTrackingCategoryCompact": {
-    "description": "A *time tracking category* is a label that can be assigned to time tracking entries. Categories are workspace-scoped and allow users to classify logged time (e.g., 'Development', 'Meetings').",
-    "type": "object",
-    "properties": {
-      "gid": {
-        "description": "Globally unique identifier of the resource, as a string.",
-        "type": "string",
-        "readOnly": true,
-        "example": "12345",
-        "x-insert-after": false
-      },
-      "resource_type": {
-        "description": "The base type of this resource.",
-        "type": "string",
-        "readOnly": true,
-        "example": "time_tracking_category",
-        "x-insert-after": "gid"
-      },
-      "name": {
-        "description": "The name of the time tracking category.",
-        "type": "string",
-        "example": "Development"
-      },
-      "color": {
-        "description": "The color associated with this category for display purposes.",
-        "type": "string",
-        "enum": [
-          "none",
-          "red",
-          "orange",
-          "yellow-orange",
-          "yellow",
-          "yellow-green",
-          "green",
-          "blue-green",
-          "aqua",
-          "blue",
-          "indigo",
-          "purple",
-          "magenta",
-          "hot-pink",
-          "pink",
-          "cool-gray"
-        ],
-        "example": "blue"
-      }
-    }
-  },
-  "TimeTrackingEntryBase": {
-    "allOf": [
-      {
-        "$ref": "#/schemas/TimeTrackingEntryCompact"
-      },
-      {
-        "type": "object",
-        "properties": {
-          "task": {
-            "$ref": "#/schemas/TaskCompact",
-            "readOnly": true
-          },
-          "created_at": {
-            "description": "The time at which this resource was created.",
-            "type": "string",
-            "format": "date-time",
-            "readOnly": true,
-            "example": "2012-02-22T02:06:58.147Z"
-          },
-          "approval_status": {
-            "description": "*Optional*. The current approval status of the entry.",
-            "type": "string",
-            "readOnly": true,
-            "enum": [
-              "DRAFT",
-              "SUBMITTED",
-              "APPROVED",
-              "REJECTED"
-            ],
-            "example": "DRAFT"
-          },
-          "billable_status": {
-            "description": "*Optional*. The current billable status of the entry.",
-            "type": "string",
-            "readOnly": true,
-            "enum": [
-              "billable",
-              "nonBillable",
-              "notApplicable"
-            ],
-            "example": "billable"
-          },
-          "description": {
-            "description": "*Optional*. The description of the entry.",
-            "type": "string",
-            "readOnly": true,
-            "example": "My description of work done on this entry"
-          }
-        }
-      }
-    ]
-  },
-  "TimeTrackingEntryCompact": {
-    "description": "A generic Asana Resource, containing a globally unique identifier.",
-    "type": "object",
-    "properties": {
-      "gid": {
-        "description": "Globally unique identifier of the resource, as a string.",
-        "type": "string",
-        "readOnly": true,
-        "example": "12345",
-        "x-insert-after": false
-      },
-      "resource_type": {
-        "description": "The base type of this resource.",
-        "type": "string",
-        "readOnly": true,
-        "example": "time_tracking_entry",
-        "x-insert-after": "gid"
-      },
-      "duration_minutes": {
-        "description": "Time in minutes tracked by the entry.",
-        "type": "integer",
-        "example": 12
-      },
-      "entered_on": {
-        "description": "The day that this entry is logged on.",
-        "type": "string",
-        "format": "date",
-        "example": "2015-03-14"
-      },
-      "attributable_to": {
-        "allOf": [
-          {
-            "$ref": "#/schemas/ProjectCompact"
-          },
-          {
-            "type": "object",
-            "description": "The attributable to project specifies which project's budget a time entry should be counted toward, if the task belongs to more than one project. If it only belongs to one project, it should be that project."
-          }
-        ]
-      },
-      "created_by": {
-        "$ref": "#/schemas/UserCompact",
-        "readOnly": true
-      },
-      "categories": {
-        "description": "The categories linked to this time tracking entry.",
-        "type": "array",
-        "items": {
-          "$ref": "#/schemas/TimeTrackingCategoryCompact"
-        },
-        "readOnly": true
-      }
-    }
-  },
   "UserCompact": {
     "description": "A *user* object represents an account in Asana that can be given access to various workspaces, projects, and tasks.",
     "type": "object",
@@ -2167,82 +1779,72 @@ accept.
 }
 ```
 
----
+## What "verified" means for each endpoint
 
-## Implementation Rules
+For every endpoint:
 
-### Files you will edit
+1. **Happy path** — call it with valid input. Response status must match the
+   declared 2xx code; response body must match the declared schema shape
+   (correct keys, correct types, lists where lists are declared, etc.).
+   Where the endpoint requires referenced rows to exist (e.g. a `project_gid`
+   for a task endpoint), seed them first via the relevant `POST` endpoint.
+2. **Not-found path** — for `GET`, `PUT`, `PATCH`, `DELETE` on a path with a
+   `{...}` parameter, call it with a clearly fake id. Response must be a 404
+   shaped like the `Asana` error envelope, not a 500.
+3. **Soft-delete consistency** — if an endpoint deletes, a subsequent `GET`
+   for the same id must return 404, not the deleted row.
 
-1. **`database/schema.py`** — add the ORM model class
-2. **`database/operations.py`** — add CRUD functions
-3. **`core/serializers.py`** — add serialization functions
-4. **`api/routes.py`** — add handler functions and Route entries
+Skip checks that do not apply (e.g. no not-found check for collection
+`GET /...` endpoints with no path parameter).
 
-### ORM model (`database/schema.py`)
+## Output
 
-- Add a class `AsanaTask(Base)` with `__tablename__ = "asana_tasks"`
-- **Primary key**: look at the `gid` field in the bound schemas —
-  check its `type`, `format`, and `examples` to determine the correct column
-  type. Use `Integer` for integer IDs, `String(50)` for opaque string IDs,
-  `String(36)` for UUID-formatted strings, etc.
-- One column per field in the schemas above. Use these type mappings:
-  - `string` → `String(N)` or `Text` for long content
-  - `integer` → `Integer`
-  - `boolean` → `Boolean`
-  - `object` (nested) → `JSONB`. Use JSONB for nested objects that represent
-    settings, metadata, permissions, file maps, or any structure the API
-    returns as-is without filtering on individual sub-fields
-  - nullable fields → `Mapped[Optional[T]]` with `nullable=True`
-- Store timestamps as `String(50)` when the API returns ISO strings
-- Add `is_deleted: Mapped[bool]` with `default=False` for soft-delete support
-- **Do NOT add any ForeignKey columns or relationship() declarations** — those
-  will be added in Pass 2
+When you finish the batch, write the results as JSON to:
 
-### CRUD operations (`database/operations.py`)
+```
+automatic_schema_generation/apps/asana/pipeline_out/test_results/tasks_batch2.json
+```
 
-- Every function takes `Session` as the first argument
-- Use `generate_id("task")` for new IDs
-- Use `now_iso()` for timestamp fields
-- Use `session.flush()` after mutations — never `session.commit()`
-- Filter out `is_deleted` rows in all read queries
-- Cursor pagination: fetch `limit + 1` rows, return next cursor from the last row
+The file must be valid JSON with this exact shape — the pipeline parses it
+and merges it back into `test_registry.json`:
 
-### Serializers (`core/serializers.py`)
+```json
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns task by gid; 404 on bogus id; soft-deleted task returns 404.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/tasks/<gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks",
+      "passed": false,
+      "iterations": 3,
+      "diagnosis": "Create returns 200 but response body omits the 'gid' field.",
+      "curl_examples": ["..."],
+      "code_changes": [
+        {"file": "backend/src/services/asana/core/serializers.py", "summary": "Added gid to serialize_task output"}
+      ]
+    }
+  ]
+}
+```
 
-- Return a dict matching the API response shape exactly
-- Use the same key names and casing as the original API
-- Include a `serialize_task_list()` for collection endpoints
-- For fields that reference other resources (e.g. `owner`, `user`), serialize
-  them as the raw column value for now — Pass 2 will refine these
+`diagnosis` should be one or two sentences describing what you observed
+(pass) or what is broken and why your fix did not resolve it (fail).
+`code_changes` lists every file you edited during this batch with a one-line
+summary of the change. Leave it empty if you made no edits.
 
-### Route handlers (`api/routes.py`)
+Write **one entry per endpoint listed above**, in the same order. Do not
+omit endpoints — if you ran out of time on one, write it with `passed:
+false` and an honest diagnosis.
 
-- One async handler per endpoint, following the pattern in the file
-- Insert Route entries **above** the `/{_unknown_path:path}` catch-all
-- Fixed paths before parameterized paths
-- Use `_session(request)`, `_principal_user_id(request)`, `_parse_json_body(request)`,
-- **Error responses**: Already implemented in `core/errors.py`: `bad_request()`, `unauthorized()`, `forbidden()`, `not_found()`, `handle_exception()`
-
-For error codes not covered above, implement the response inline or add a new constructor to `core/errors.py`.
-  `_pagination_params(request)` from the existing request helpers
-
-### Stubs from previous implementations
-
-Previous resource implementations may have created **stub models** for
-tasks in `database/schema.py`, marked with
-`# STUB — expand when implementing this resource`. If you find a stub
-for `AsanaTask`, **replace it** with the full implementation.
-Do not create a duplicate class — expand the stub in place.
-
-### What NOT to do
-
-- Do not modify `database/base.py`
-- Do not remove or modify existing *completed* implementations for other
-  resources — but DO expand any stubs that exist for tasks
-- Do not invent API behavior not present in the endpoint definitions above
-- Do not hard-delete records — use soft-delete via `is_deleted`
-- Do not add ForeignKey, relationship(), or association tables — Pass 2 handles those
-
-Read the existing files in the target directory before editing. Preserve
-all existing code for other resources — add your new models, functions,
-and routes alongside what is already there.
+Do not write any other files. Do not modify `test_registry.json` directly —
+the pipeline will do that after parsing your JSON output.

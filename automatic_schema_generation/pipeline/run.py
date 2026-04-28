@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from collections import defaultdict
 from pathlib import Path
@@ -39,8 +40,24 @@ from pipeline.implementation.build_prompt import build_pass1_prompt, build_pass2
 from pipeline.llm import make_llm_call
 from pipeline.register_tests import build_test_registry, scan_implemented_routes, write_registry
 from pipeline.scaffold import detect_mount_suffix, generate_scaffold
+from pipeline.testing.runner import run_test_endpoints
 
-_STAGES = ["init", "configure", "suggest_aliases", "extract", "implement_responses", "implement", "register_tests"]
+_STAGES = [
+    "init",
+    "configure",
+    "suggest_aliases",
+    "extract",
+    "implement_responses",
+    "implement",
+    "register_tests",
+    "seed_template",
+    "test_endpoints",
+]
+
+# Backend repo root, used to locate replicas.yaml when wiring the test stage.
+_REPO_ROOT = Path(__file__).parent.parent.parent
+_REPLICAS_YAML = _REPO_ROOT / "backend" / "src" / "services" / "replicas.yaml"
+_COMPOSE_FILE = _REPO_ROOT / "ops" / "docker-compose.yml"
 
 
 def run_pipeline(
@@ -50,8 +67,21 @@ def run_pipeline(
     only_resources: list[str] | None = None,
     configure_model: str = "claude-sonnet-4-5",
     implement_model: str = "claude-opus-4-6",
+    test_model: str = "claude-opus-4-6",
+    test_batch_size: int = 7,
+    test_max_iterations: int = 3,
+    test_force_retest: bool = False,
+    test_timeout: int = 1800,
 ) -> None:
-    stages = _STAGES if stage == "all" else [stage]
+    if stage == "all":
+        stages = _STAGES
+    elif stage.startswith("up_to:"):
+        target = stage.split(":", 1)[1]
+        if target not in _STAGES:
+            raise ValueError(f"Unknown up-to stage: {target}")
+        stages = _STAGES[: _STAGES.index(target) + 1]
+    else:
+        stages = [stage]
 
     # --- Stage: Init ---
     if "init" in stages:
@@ -294,6 +324,99 @@ def run_pipeline(
             except Exception as exc:
                 print(f"  [error] Could not scan routes: {exc}")
 
+    # --- Stage: Seed Template ---
+    # Drops the postgres template schema for this app and re-runs the
+    # replica's seed command via ``docker compose exec``. Required after
+    # ``implement`` regenerates ``database/schema.py``: the old template
+    # schema is shaped against the previous tables, so cloning a runtime
+    # environment from it would mismatch the new ORM models. Also bounces
+    # the backend container so uvicorn picks up newly-mounted replicas.
+    if "seed_template" in stages:
+        config = load_config(config_path)
+        print(f"\n=== SEED TEMPLATE — drop & reseed {config.app_slug}_base ===")
+
+        if dry_run:
+            print(f"  [dry-run] Would drop {config.app_slug}_base, reseed, and restart backend")
+        elif not _COMPOSE_FILE.exists():
+            print(f"  [skip] docker-compose.yml not found at {_COMPOSE_FILE}")
+        else:
+            drop_command = [
+                "docker", "compose", "-f", str(_COMPOSE_FILE),
+                "exec", "-T", "postgres",
+                "psql", "-U", "postgres", "-d", "diff_the_universe",
+                "-c", f"DROP SCHEMA IF EXISTS {config.app_slug}_base CASCADE;",
+            ]
+            drop_result = subprocess.run(drop_command, capture_output=True, text=True)
+            if drop_result.returncode != 0:
+                print(f"  [warn] drop schema failed: {drop_result.stderr.strip()[:300]}")
+            else:
+                print(f"  Dropped schema {config.app_slug}_base")
+
+            seed_command = [
+                "docker", "compose", "-f", str(_COMPOSE_FILE),
+                "exec", "-T", "backend",
+                "python", "utils/seed_template.py", "--app", config.app_slug,
+            ]
+            seed_result = subprocess.run(seed_command, capture_output=True, text=True)
+            if seed_result.returncode != 0:
+                print(f"  [error] seed failed (rc={seed_result.returncode})")
+                print(f"    stdout: {seed_result.stdout.strip()[:500]}")
+                print(f"    stderr: {seed_result.stderr.strip()[:500]}")
+            else:
+                tail_lines = [line for line in seed_result.stdout.split("\n") if line.strip()][-6:]
+                for line in tail_lines:
+                    print(f"    {line}")
+
+            # Touch main.py so uvicorn --reload re-imports REST_REPLICAS and
+            # mounts any newly-registered replica routes. Without this, an
+            # app added to replicas.yaml during this run stays unmounted.
+            touch_command = [
+                "docker", "compose", "-f", str(_COMPOSE_FILE),
+                "exec", "-T", "backend",
+                "touch", "/app/src/platform/api/main.py",
+            ]
+            subprocess.run(touch_command, capture_output=True, text=True)
+            print(f"  Triggered uvicorn reload")
+
+    # --- Stage: Test Endpoints ---
+    if "test_endpoints" in stages:
+        config = load_config(config_path)
+        output_dir = config_path.parent / "pipeline_out"
+
+        print(f"\n=== TEST ENDPOINTS — drive replica via curl, fix bugs in place ({test_model}) ===")
+        if test_force_retest:
+            print("  [force] retesting endpoints already marked tested=true")
+
+        summary = run_test_endpoints(
+            config_path=config_path,
+            app_name=config.app_name,
+            app_slug=config.app_slug,
+            target_dir=config.target_dir,
+            output_dir=output_dir,
+            replicas_yaml=_REPLICAS_YAML,
+            repo_root=_REPO_ROOT,
+            model=test_model,
+            batch_size=test_batch_size,
+            max_iterations=test_max_iterations,
+            force=test_force_retest,
+            dry_run=dry_run,
+            timeout=test_timeout,
+            only_subjects=only_resources,
+        )
+        if summary.get("skipped"):
+            print(f"  [skip] {summary.get('reason')}")
+        else:
+            print(
+                f"  Done. Batches: {summary['total_batches']}, "
+                f"recorded {summary['endpoints_recorded']}/{summary['endpoints_attempted']}, "
+                f"passed {summary['endpoints_passed']}"
+            )
+            for subject, subject_summary in summary.get("subjects", {}).items():
+                print(
+                    f"    {subject}: {subject_summary['passed']}/{subject_summary['recorded']} passed "
+                    f"across {subject_summary['batches']} batch(es)"
+                )
+
     print("\nPipeline complete.")
 
 
@@ -402,20 +525,51 @@ def _extract_responses(spec: dict, resources_doc: dict) -> dict:
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Run the pipeline orchestrator.")
     parser.add_argument("config", type=Path, help="Path to app.yaml")
-    parser.add_argument("--stage", choices=_STAGES + ["all"], default="all")
+    parser.add_argument(
+        "--stage",
+        choices=_STAGES + ["all"],
+        default="all",
+        help="Run a single stage (or 'all' for the full pipeline)",
+    )
+    parser.add_argument(
+        "--up-to-stage",
+        choices=_STAGES,
+        default=None,
+        help="Run every stage from the start through this one (inclusive); overrides --stage",
+    )
     parser.add_argument("--resource", nargs="+", metavar="NAME", help="Restrict to specific resources")
     parser.add_argument("--dry-run", action="store_true", help="Build prompts without calling LLM")
     parser.add_argument("--configure-model", default="claude-sonnet-4-5", help="Model for alias/PK inference")
     parser.add_argument("--implement-model", default="claude-opus-4-6", help="Model for entity implementation")
+    parser.add_argument("--test-model", default="claude-opus-4-6", help="Model for test_endpoints stage")
+    parser.add_argument("--test-batch-size", type=int, default=7, help="Endpoints per LLM call in test_endpoints")
+    parser.add_argument("--test-max-iterations", type=int, default=3, help="Fix-and-retry budget per endpoint")
+    parser.add_argument("--test-timeout", type=int, default=1800, help="Per-batch claude -p timeout in seconds")
+    parser.add_argument(
+        "--force-retest",
+        action="store_true",
+        help="Test endpoints already marked tested=true (regression sweep)",
+    )
     args = parser.parse_args(argv)
+
+    selected_stage = args.stage
+    if args.up_to_stage:
+        # Compose a synthetic pseudo-stage marker that run_pipeline expands
+        # into the prefix of _STAGES up to and including the named one.
+        selected_stage = f"up_to:{args.up_to_stage}"
 
     run_pipeline(
         config_path=args.config,
-        stage=args.stage,
+        stage=selected_stage,
         dry_run=args.dry_run,
         only_resources=args.resource,
         configure_model=args.configure_model,
         implement_model=args.implement_model,
+        test_model=args.test_model,
+        test_batch_size=args.test_batch_size,
+        test_max_iterations=args.test_max_iterations,
+        test_force_retest=args.force_retest,
+        test_timeout=args.test_timeout,
     )
 
 

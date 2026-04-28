@@ -1,86 +1,102 @@
 app_slug: asana
 app_name: Asana
-openapi_path: ../../open_api_schemas/asana_oas.json
+openapi_path: inputs/openapi.scoped.json
 target_dir: ../../../backend/src/services/asana
 resources:
-  projects:
+  tasks:
     aliases:
-    - project
-    - project_compact
-    - projects
+    - dependencies
+    - dependency
+    - dependent
+    - dependents
+    - duplicate_of
+    - duplicated_from
+    - parent
+    - target
+    - task
+    - tasks
+    - task_base
+    - task_compact
+    - task_request
+    - task_response
     primary_key: gid
     self_id_fields:
     - gid
-  tasks:
+  projects:
     aliases:
-    - task
-    - task_compact
-    - tasks
+    - project
+    - projects
+    - project_base
+    - project_compact
+    - project_request
+    - project_response
+    - project_update_request
     primary_key: gid
     self_id_fields:
     - gid
   sections:
     aliases:
+    - new_section
+    - old_section
     - section
-    - section_compact
     - sections
-    - project_section_insert_request
-    - section_request
-    - section_task_insert_request
-    primary_key: gid
-    self_id_fields:
-    - gid
-  users:
-    aliases:
-    - assignee
-    - author
-    - completed_by
-    - created_by
-    - creator
-    - follower
-    - followers
-    - liked_by
-    - member
-    - members
-    - modified_by
-    - owner
-    - user
-    - user_compact
-    - users
-    - add_followers_request
-    - add_members_request
-    - remove_followers_request
-    - remove_members_request
-    - task_add_followers_request
-    - task_remove_followers_request
-    - team_add_user_request
-    - team_remove_user_request
-    - workspace_add_user_request
-    - workspace_remove_user_request
-    primary_key: gid
-    self_id_fields:
-    - gid
-  teams:
-    aliases:
-    - team
-    - team_compact
-    - teams
-    primary_key: gid
-    self_id_fields:
-    - gid
-  workspaces:
-    aliases:
-    - workspace
-    - workspace_compact
-    - workspaces
+    - section_base
+    - section_compact
+    - section_response
     primary_key: gid
     self_id_fields:
     - gid
   tags:
     aliases:
     - tag
-    - tag_compact
     - tags
+    - tag_base
+    - tag_base_request
+    - tag_compact
+    - tag_create_request
+    - tag_create_tag_for_workspace_request
+    - tag_response
+    - tag_update_request
+    primary_key: gid
+    self_id_fields:
+    - gid
+  users:
+    aliases:
+    - assigned_by
+    - assignee
+    - completed_by
+    - created_by
+    - follower
+    - followers
+    - owner
+    - user
+    - users
+    - user_base
+    - user_base_response
+    - user_compact
+    - user_response
+    primary_key: gid
+    self_id_fields:
+    - gid
+  teams:
+    aliases:
+    - team
+    - teams
+    - team_base
+    - team_compact
+    - team_request
+    - team_response
+    primary_key: gid
+    self_id_fields:
+    - gid
+  workspaces:
+    aliases:
+    - workspace
+    - workspaces
+    - workspace_base
+    - workspace_compact
+    - workspace_request
+    - workspace_response
     primary_key: gid
     self_id_fields:
     - gid
@@ -88,8 +104,8 @@ resources:
     aliases:
     - stories
     - story
-    - story_compact
     - story_base
+    - story_compact
     - story_request
     - story_response
     primary_key: gid
@@ -100,7 +116,7 @@ naming:
   - parent_
   - source_
   - target_
-  self_id_fields:
-  - gid
   pk_field_names:
+  - gid
+  self_id_fields:
   - gid

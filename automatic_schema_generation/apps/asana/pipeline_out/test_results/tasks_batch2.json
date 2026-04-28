@@ -1,0 +1,90 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/subtasks",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with full TaskResponse shape including parent reference; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<parent_gid>/subtasks -d '{\"data\": {\"name\": \"Child Task\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/subtasks -d '{\"data\": {\"name\": \"Child\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/setParent",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with TaskResponse showing updated parent; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/setParent -d '{\"data\": {\"parent\": \"<new_parent_gid>\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/setParent -d '{\"data\": {\"parent\": \"123\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/duplicate",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with JobResponse containing gid, resource_type, resource_subtype, status, and new_task compact; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/duplicate -d '{\"data\": {\"name\": \"Duplicated Task\", \"include\": \"notes,assignee\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/duplicate -d '{\"data\": {\"name\": \"Dup\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addFollowers",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with TaskResponse including updated followers array; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/addFollowers -d '{\"data\": {\"followers\": [\"user-123\", \"user-456\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/addFollowers -d '{\"data\": {\"followers\": [\"user-123\"]}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeFollowers",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with TaskResponse; specified follower removed from followers array; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/removeFollowers -d '{\"data\": {\"followers\": [\"user-456\"]}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/removeFollowers -d '{\"data\": {\"followers\": [\"user-123\"]}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/addProject",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object; subsequent GET confirms project association; 404 with error envelope on bogus task_gid.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/addProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/addProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/tasks/{task_gid}/removeProject",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object; subsequent GET confirms project removed; 404 with error envelope on bogus task_gid after fix to add task existence check.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/removeProject -d '{\"data\": {\"project\": \"<project_gid>\"}}'",
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/99999999999/removeProject -d '{\"data\": {\"project\": \"123\"}}'"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/api/routes.py", "summary": "Added task existence check in remove_project_from_task to return 404 for non-existent tasks"}
+      ]
+    }
+  ]
+}

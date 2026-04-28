@@ -1,0 +1,15 @@
+{
+  "constructors": [
+    "bad_request",
+    "unauthorized",
+    "forbidden",
+    "not_found",
+    "conflict",
+    "gone",
+    "unprocessable_entity",
+    "unprocessable_entity_simple",
+    "internal_server_error",
+    "service_unavailable",
+    "handle_exception"
+  ]
+}

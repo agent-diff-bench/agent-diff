@@ -1,0 +1,21 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tasks/search",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns TaskCompact array for valid workspace after seeding a task; returns 404 with Asana error envelope for non-existent workspace_gid (fixed: added workspace existence check).",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/1234567890/tasks/search",
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/9999999999/tasks/search"
+      ],
+      "code_changes": [
+        {
+          "file": "backend/src/services/asana/api/routes.py",
+          "summary": "Added workspace existence check to search_tasks_in_workspace, returning 404 for unknown workspace_gid"
+        }
+      ]
+    }
+  ]
+}

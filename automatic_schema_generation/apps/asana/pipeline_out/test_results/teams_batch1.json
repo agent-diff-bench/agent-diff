@@ -1,0 +1,83 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/teams",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with TeamResponse shape including gid, resource_type, name, description, organization compact, permalink_url, visibility, access level fields, endorsed, and custom_field_settings. No path parameter so no 404 test needed.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Engineering\",\"description\":\"The engineering team\",\"organization\":\"org-123\",\"visibility\":\"public\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/addUser",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with TeamMembershipResponse including gid, resource_type, user compact, team compact, is_guest, is_limited_access, is_admin. Returns 404 with error envelope for bogus team gid.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"user\":\"user-123\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/addUser"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "POST",
+      "path": "/teams/{team_gid}/removeUser",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object {\"data\": {}} matching EmptyResponse. Returns 404 with error envelope for bogus team gid.",
+      "curl_examples": [
+        "curl -X POST -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"user\":\"user-to-remove\"}}' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/removeUser"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/team_memberships",
+      "passed": true,
+      "iterations": 2,
+      "diagnosis": "Returns 200 with array of TeamMembershipCompact objects and next_page. Initially only returned 1 of 2 added members due to SQLAlchemy JSONB mutation tracking bug; fixed by copying the list before appending. Returns 404 for bogus team gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/team_memberships"
+      ],
+      "code_changes": [
+        {"file": "backend/src/services/asana/database/operations.py", "summary": "Copy JSONB members list before appending in add_user_to_team to fix SQLAlchemy mutation tracking"}
+      ]
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/custom_field_settings",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with data array of CustomFieldSettingResponse objects (empty for newly created teams). Returns 404 for bogus team gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/custom_field_settings"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}/project_templates",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data array and next_page null (project templates are not a modeled resource). Returns 404 for bogus team gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>/project_templates"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/teams/{team_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full TeamResponse including gid, resource_type, name, description, organization compact, permalink_url, visibility, all access level fields, endorsed, and custom_field_settings. Returns 404 with error envelope for bogus team gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/teams/<team_gid>"
+      ],
+      "code_changes": []
+    }
+  ]
+}

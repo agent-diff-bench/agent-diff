@@ -1,0 +1,37 @@
+{
+  "results": [
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/workspace_memberships",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns array of WorkspaceMembershipCompact objects with user and workspace compact shapes; 404 with error envelope on nonexistent workspace_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/workspace-1/workspace_memberships"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns full WorkspaceResponse with gid, resource_type, name, email_domains, and is_organization; 404 with error envelope on nonexistent workspace_gid.",
+      "curl_examples": [
+        "curl -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws-test-1"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/workspaces/{workspace_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Updates workspace fields (name, is_organization, email_domains) and returns updated WorkspaceResponse; changes persist on subsequent GET; 404 with error envelope on nonexistent workspace_gid.",
+      "curl_examples": [
+        "curl -X PUT -H 'x-impersonate-user-id: test-user' -H 'Content-Type: application/json' -d '{\"data\":{\"name\":\"Updated Name\"}}' http://localhost:8000/api/env/$ENV/services/asana/workspaces/ws-put-1"
+      ],
+      "code_changes": []
+    }
+  ]
+}

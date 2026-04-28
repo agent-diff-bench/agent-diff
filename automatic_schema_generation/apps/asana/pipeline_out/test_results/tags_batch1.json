@@ -1,0 +1,82 @@
+{
+  "results": [
+    {
+      "method": "POST",
+      "path": "/tags",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 201 with correct TagResponse shape including gid, resource_type, name, color, notes, created_at, followers, workspace, and permalink_url.",
+      "curl_examples": [
+        "curl -s -X POST -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags -d '{\"data\": {\"name\": \"Test Tag\", \"color\": \"light-green\", \"notes\": \"Some notes\", \"workspace\": \"workspace-1\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tags",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with paginated array of TagCompact objects (gid, resource_type, name) and next_page field. Workspace query filter works correctly.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags",
+        "curl -s -H 'x-impersonate-user-id: test-user' 'http://localhost:8000/api/env/$ENV_ID/services/asana/tags?workspace=ws-1'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tags/{tag_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with full TagResponse for valid gid; returns 404 with Asana error envelope for nonexistent gid.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "PUT",
+      "path": "/tags/{tag_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with updated TagResponse reflecting changed fields; returns 404 with Asana error envelope for nonexistent gid.",
+      "curl_examples": [
+        "curl -s -X PUT -H 'Content-Type: application/json' -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid> -d '{\"data\": {\"name\": \"Updated\", \"color\": \"light-green\"}}'"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "DELETE",
+      "path": "/tags/{tag_gid}",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with empty data object; subsequent GET returns 404 confirming soft-delete consistency; DELETE on nonexistent gid returns 404.",
+      "curl_examples": [
+        "curl -s -X DELETE -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tags/<tag_gid>"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/tasks/{task_gid}/tags",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with array of TagCompact objects linked to the task via addTag, plus next_page field.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/tasks/<task_gid>/tags"
+      ],
+      "code_changes": []
+    },
+    {
+      "method": "GET",
+      "path": "/workspaces/{workspace_gid}/tags",
+      "passed": true,
+      "iterations": 1,
+      "diagnosis": "Returns 200 with paginated array of TagCompact objects filtered by workspace; returns empty array for nonexistent workspace.",
+      "curl_examples": [
+        "curl -s -H 'x-impersonate-user-id: test-user' http://localhost:8000/api/env/$ENV_ID/services/asana/workspaces/<workspace_gid>/tags"
+      ],
+      "code_changes": []
+    }
+  ]
+}

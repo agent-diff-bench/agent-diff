@@ -1,7 +1,7 @@
-# Entity Implementation (Pass 2 — Relationships): tasks
+# Entity Implementation (Pass 2 — Relationships): projects
 
-You are adding foreign key relationships to the **tasks** resource
-(`AsanaTask` in `asana_tasks`). The base model, operations,
+You are adding foreign key relationships to the **projects** resource
+(`AsanaProject` in `asana_projects`). The base model, operations,
 serializers, and routes already exist from Pass 1.
 
 The full OpenAPI spec is available at: `/Users/azh/agent-diff/automatic_schema_generation/apps/asana/inputs/openapi.scoped.json`
@@ -335,18 +335,18 @@ class ExampleNode(Base):
 
 ## Related Resources
 
-These resources have a demonstrated relationship with **tasks**
+These resources have a demonstrated relationship with **projects**
 through shared endpoints, FK-shaped property names, or schema cross-references.
 
 Direction key:
-- **outgoing** — tasks's schemas contain fields that reference
+- **outgoing** — projects's schemas contain fields that reference
   the related resource (e.g. a `_id` field or nested object pointing there).
-  **Action**: add a FK column on `asana_tasks` pointing at the related
+  **Action**: add a FK column on `asana_projects` pointing at the related
   resource's table, plus a `relationship()` on both sides.
-- **incoming** — the related resource's endpoints reference tasks
-  (the subject of those endpoints is the other resource, not tasks).
-  **Action**: do NOT add a FK column on `asana_tasks`. The FK lives on the
-  other resource's table. Add only a `relationship()` on the tasks
+- **incoming** — the related resource's endpoints reference projects
+  (the subject of those endpoints is the other resource, not projects).
+  **Action**: do NOT add a FK column on `asana_projects`. The FK lives on the
+  other resource's table. Add only a `relationship()` on the projects
   side (the "many" side) if the other resource's model already exists or will
   be created as a stub. If the incoming evidence is only URL segments (no
   property-level field), it may just be endpoint nesting — no FK needed.
@@ -367,106 +367,88 @@ Then build the appropriate FK columns, indexes, and `relationship()`
 declarations using the reference patterns above.
 
 ### projects
+- **SELF-REFERENTIAL** — this resource references itself
+- Use the Self Referential pattern: nullable FK to own table,
+  `remote_side=[id]` on the parent relationship
 - Table: `asana_projects`
 - Primary key: `gid`
-- Direction: outgoing, incoming
-- **Fields referencing projects**: `data.projects`
-
-These fields all point at the `asana_projects` table. Infer the correct FK relationship type and apply using the reference patterns above.
+- Direction: outgoing
 
 Evidence:
-  - POST /tasks — property: data.projects
-  - POST /tasks — property: data.projects
-  - GET /tasks/{task_gid} — property: data.projects
-  - PUT /tasks/{task_gid} — property: data.projects
-  - PUT /tasks/{task_gid} — property: data.projects
-  - GET /projects/{project_gid}/tasks — url_segment: projects
-  - POST /tasks/{task_gid}/subtasks — property: data.projects
-  - POST /tasks/{task_gid}/subtasks — property: data.projects
-  - POST /tasks/{task_gid}/setParent — property: data.projects
-  - POST /tasks/{task_gid}/addFollowers — property: data.projects
-  - POST /tasks/{task_gid}/removeFollowers — property: data.projects
-  - GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id} — property: data.projects
-  - GET /tasks/{task_gid}/projects — url_segment: tasks (incoming)
+  - GET /projects/{project_gid}/custom_field_settings — url_segment: projects
+  - POST /projects/{project_gid}/project_briefs — url_segment: projects
+  - GET /projects/{project_gid}/project_memberships — url_segment: projects
+  - GET /projects/{project_gid}/project_portfolio_settings — url_segment: projects
+  - GET /projects/{project_gid}/project_statuses — url_segment: projects
+  - POST /projects/{project_gid}/project_statuses — url_segment: projects
+  - GET /projects — url_segment: projects
+  - POST /projects — url_segment: projects
+  - GET /projects/{project_gid} — url_segment: projects
+  - PUT /projects/{project_gid} — url_segment: projects
+  - DELETE /projects/{project_gid} — url_segment: projects
+  - POST /projects/{project_gid}/duplicate — url_segment: projects
+  - GET /tasks/{task_gid}/projects — url_segment: projects
+  - GET /teams/{team_gid}/projects — url_segment: projects
+  - POST /teams/{team_gid}/projects — url_segment: projects
+  - GET /workspaces/{workspace_gid}/projects — url_segment: projects
+  - POST /workspaces/{workspace_gid}/projects — url_segment: projects
+  - GET /workspaces/{workspace_gid}/projects/search — url_segment: projects
+  - POST /projects/{project_gid}/addCustomFieldSetting — url_segment: projects
+  - POST /projects/{project_gid}/removeCustomFieldSetting — url_segment: projects
+  - GET /projects/{project_gid}/task_counts — url_segment: projects
+  - POST /projects/{project_gid}/addMembers — url_segment: projects
+  - POST /projects/{project_gid}/removeMembers — url_segment: projects
+  - POST /projects/{project_gid}/addFollowers — url_segment: projects
+  - POST /projects/{project_gid}/removeFollowers — url_segment: projects
+  - POST /projects/{project_gid}/saveAsTemplate — url_segment: projects
 
 ### sections
 - Table: `asana_sections`
 - Primary key: `gid`
-- Direction: outgoing
-
-Evidence:
-  - GET /sections/{section_gid}/tasks — url_segment: sections
-
-### stories
-- Table: `asana_stories`
-- Primary key: `gid`
 - Direction: incoming
+- **Fields referencing sections**: `data.projects`
+
+These fields all point at the `asana_sections` table. Infer the correct FK relationship type and apply using the reference patterns above.
 
 Evidence:
-  - GET /tasks/{task_gid}/stories — url_segment: tasks (incoming)
-  - POST /tasks/{task_gid}/stories — url_segment: tasks (incoming)
-
-### tags
-- Table: `asana_tags`
-- Primary key: `gid`
-- Direction: outgoing, incoming
-- **Fields referencing tags**: `data.tags`
-
-These fields all point at the `asana_tags` table. Infer the correct FK relationship type and apply using the reference patterns above.
-
-Evidence:
-  - POST /tasks — property: data.tags
-  - POST /tasks — property: data.tags
-  - GET /tasks/{task_gid} — property: data.tags
-  - PUT /tasks/{task_gid} — property: data.tags
-  - PUT /tasks/{task_gid} — property: data.tags
-  - GET /tags/{tag_gid}/tasks — url_segment: tags
-  - POST /tasks/{task_gid}/subtasks — property: data.tags
-  - POST /tasks/{task_gid}/subtasks — property: data.tags
-  - POST /tasks/{task_gid}/setParent — property: data.tags
-  - POST /tasks/{task_gid}/addFollowers — property: data.tags
-  - POST /tasks/{task_gid}/removeFollowers — property: data.tags
-  - GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id} — property: data.tags
-  - GET /tasks/{task_gid}/tags — url_segment: tasks (incoming)
+  - GET /sections/{section_gid} — property: data.projects (incoming)
+  - PUT /sections/{section_gid} — property: data.projects (incoming)
+  - GET /projects/{project_gid}/sections — url_segment: projects (incoming)
+  - POST /projects/{project_gid}/sections — url_segment: projects (incoming)
+  - POST /projects/{project_gid}/sections — property: data.projects (incoming)
+  - POST /projects/{project_gid}/sections/insert — url_segment: projects (incoming)
 
 ### tasks
-- **SELF-REFERENTIAL** — this resource references itself
-- Use the Self Referential pattern: nullable FK to own table,
-  `remote_side=[id]` on the parent relationship
 - Table: `asana_tasks`
+- Primary key: `gid`
+- Direction: outgoing, incoming
+- **Fields referencing tasks**: `data.projects`
+
+These fields all point at the `asana_tasks` table. Infer the correct FK relationship type and apply using the reference patterns above.
+
+Evidence:
+  - GET /tasks/{task_gid}/projects — url_segment: tasks
+  - POST /tasks — property: data.projects (incoming)
+  - POST /tasks — property: data.projects (incoming)
+  - GET /tasks/{task_gid} — property: data.projects (incoming)
+  - PUT /tasks/{task_gid} — property: data.projects (incoming)
+  - PUT /tasks/{task_gid} — property: data.projects (incoming)
+  - GET /projects/{project_gid}/tasks — url_segment: projects (incoming)
+  - POST /tasks/{task_gid}/subtasks — property: data.projects (incoming)
+  - POST /tasks/{task_gid}/subtasks — property: data.projects (incoming)
+  - POST /tasks/{task_gid}/setParent — property: data.projects (incoming)
+  - POST /tasks/{task_gid}/addFollowers — property: data.projects (incoming)
+  - POST /tasks/{task_gid}/removeFollowers — property: data.projects (incoming)
+  - GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id} — property: data.projects (incoming)
+
+### teams
+- Table: `asana_teams`
 - Primary key: `gid`
 - Direction: outgoing
 
 Evidence:
-  - GET /tasks — url_segment: tasks
-  - POST /tasks — url_segment: tasks
-  - GET /tasks/{task_gid} — url_segment: tasks
-  - PUT /tasks/{task_gid} — url_segment: tasks
-  - DELETE /tasks/{task_gid} — url_segment: tasks
-  - POST /tasks/{task_gid}/duplicate — url_segment: tasks
-  - GET /projects/{project_gid}/tasks — url_segment: tasks
-  - GET /sections/{section_gid}/tasks — url_segment: tasks
-  - GET /tags/{tag_gid}/tasks — url_segment: tasks
-  - GET /user_task_lists/{user_task_list_gid}/tasks — url_segment: tasks
-  - GET /tasks/{task_gid}/subtasks — url_segment: tasks
-  - POST /tasks/{task_gid}/subtasks — url_segment: tasks
-  - POST /tasks/{task_gid}/setParent — url_segment: tasks
-  - GET /tasks/{task_gid}/dependencies — url_segment: tasks
-  - POST /tasks/{task_gid}/addDependencies — url_segment: tasks
-  - POST /tasks/{task_gid}/removeDependencies — url_segment: tasks
-  - GET /tasks/{task_gid}/dependents — url_segment: tasks
-  - POST /tasks/{task_gid}/addDependents — url_segment: tasks
-  - POST /tasks/{task_gid}/removeDependents — url_segment: tasks
-  - POST /tasks/{task_gid}/addProject — url_segment: tasks
-  - POST /tasks/{task_gid}/removeProject — url_segment: tasks
-  - POST /tasks/{task_gid}/addTag — url_segment: tasks
-  - POST /tasks/{task_gid}/removeTag — url_segment: tasks
-  - POST /tasks/{task_gid}/addFollowers — url_segment: tasks
-  - POST /tasks/{task_gid}/removeFollowers — url_segment: tasks
-  - GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id} — url_segment: tasks
-  - GET /workspaces/{workspace_gid}/tasks/search — url_segment: tasks
-  - GET /tasks/{task_gid}/time_tracking_entries — url_segment: tasks
-  - POST /tasks/{task_gid}/time_tracking_entries — url_segment: tasks
+  - GET /teams/{team_gid}/projects — url_segment: teams
+  - POST /teams/{team_gid}/projects — url_segment: teams
 
 ### workspaces
 - Table: `asana_workspaces`
@@ -474,18 +456,19 @@ Evidence:
 - Direction: outgoing
 
 Evidence:
-  - GET /workspaces/{workspace_gid}/tasks/custom_id/{custom_id} — url_segment: workspaces
-  - GET /workspaces/{workspace_gid}/tasks/search — url_segment: workspaces
+  - GET /workspaces/{workspace_gid}/projects — url_segment: workspaces
+  - POST /workspaces/{workspace_gid}/projects — url_segment: workspaces
+  - GET /workspaces/{workspace_gid}/projects/search — url_segment: workspaces
 
 
 ---
 
 ## External Schemas
 
-These schemas reference **tasks** but belong to entities that are
+These schemas reference **projects** but belong to entities that are
 **not part of this implementation**. Do NOT create FK columns, relationship
 declarations, or stub models for them. They are shown only so you understand
-how tasks appears in the broader API.
+how projects appears in the broader API.
 
 _No external schemas reference this resource._
 
