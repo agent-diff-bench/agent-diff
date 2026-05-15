@@ -311,6 +311,119 @@ class TestAssertionEngineEvaluate:
         assert result["score"]["passed"] == 0
         assert len(result["failures"]) == 1
 
+    def test_added_count_failure_reports_only_non_matching_rows(self):
+        spec = {
+            "version": "0.1",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "issues",
+                    "where": {
+                        "title": {"contains": "product documentation"},
+                        "teamId": {"eq": "team-1"},
+                        "assigneeId": {"eq": "user-1"},
+                    },
+                    "expected_count": 2,
+                }
+            ],
+        }
+        diff = {
+            "inserts": [
+                {
+                    "__table__": "issues",
+                    "id": "matched",
+                    "title": "product documentation cleanup",
+                    "teamId": "team-1",
+                    "assigneeId": "user-1",
+                },
+                {
+                    "__table__": "issues",
+                    "id": "near-miss",
+                    "title": "product documentation cleanup",
+                    "teamId": "team-1",
+                    "assigneeId": None,
+                },
+            ],
+            "updates": [],
+            "deletes": [],
+        }
+
+        result = AssertionEngine(spec).evaluate(diff)
+
+        assert result["passed"] is False
+        failure = result["failures"][0]
+        assert "non-matching issues rows" in failure
+        assert "id='near-miss'" in failure
+        assert "title contains 'product documentation'" in failure
+        assert "teamId='team-1'" in failure
+        assert "assigneeId=null (expected 'user-1')" in failure
+        assert "id='matched'" not in failure
+
+    def test_added_zero_count_failure_reports_unexpected_matching_rows(self):
+        spec = {
+            "version": "0.1",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "messages",
+                    "where": {"text": {"contains": "hello"}},
+                    "expected_count": 0,
+                }
+            ],
+        }
+        diff = {
+            "inserts": [
+                {"__table__": "messages", "id": "msg-1", "text": "hello world"}
+            ],
+            "updates": [],
+            "deletes": [],
+        }
+
+        result = AssertionEngine(spec).evaluate(diff)
+
+        assert result["passed"] is False
+        failure = result["failures"][0]
+        assert "matching rows" in failure
+        assert "id='msg-1'" in failure
+
+    def test_added_nested_where_failure_reports_nested_field_mismatch(self):
+        spec = {
+            "version": "0.1",
+            "assertions": [
+                {
+                    "diff_type": "added",
+                    "entity": "calendar_events",
+                    "where": {
+                        "start.dateTime": {"contains": "2018-06-18T08:00"},
+                        "start.timeZone": {"eq": "America/Los_Angeles"},
+                    },
+                    "expected_count": 1,
+                }
+            ],
+        }
+        diff = {
+            "inserts": [
+                {
+                    "__table__": "calendar_events",
+                    "id": "event-1",
+                    "start": {
+                        "dateTime": "2018-06-18T08:00:00",
+                        "timeZone": "Europe/London",
+                    },
+                }
+            ],
+            "updates": [],
+            "deletes": [],
+        }
+
+        result = AssertionEngine(spec).evaluate(diff)
+
+        assert result["passed"] is False
+        failure = result["failures"][0]
+        assert "start.dateTime contains '2018-06-18T08:00'" in failure
+        assert "start.timeZone='Europe/London'" in failure
+        assert "expected 'America/Los_Angeles'" in failure
+
     def test_removed_assertion_passes(self):
         spec = {
             "version": "0.1",
@@ -396,6 +509,92 @@ class TestAssertionEngineEvaluate:
         result = engine.evaluate(diff)
 
         assert result["passed"] is False
+
+    def test_changed_failure_reports_expected_change_mismatch(self):
+        spec = {
+            "version": "0.1",
+            "strict": True,
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "issues",
+                    "where": {"identifier": {"eq": "ENG-2"}},
+                    "expected_changes": {
+                        "assigneeId": {"to": {"eq": "user-1"}}
+                    },
+                    "expected_count": 1,
+                    "ignore": ["updatedAt"],
+                }
+            ],
+        }
+        diff = {
+            "inserts": [],
+            "updates": [
+                {
+                    "__table__": "issues",
+                    "before": {
+                        "identifier": "ENG-2",
+                        "assigneeId": "user-2",
+                        "updatedAt": "before",
+                    },
+                    "after": {
+                        "identifier": "ENG-2",
+                        "assigneeId": None,
+                        "updatedAt": "after",
+                    },
+                }
+            ],
+            "deletes": [],
+        }
+
+        result = AssertionEngine(spec).evaluate(diff)
+
+        assert result["passed"] is False
+        failure = result["failures"][0]
+        assert "matched where but failed expected changes" in failure
+        assert "identifier='ENG-2'" in failure
+        assert "assigneeId after=null (expected to 'user-1')" in failure
+
+    def test_changed_failure_reports_all_where_mismatches(self):
+        spec = {
+            "version": "0.1",
+            "assertions": [
+                {
+                    "diff_type": "changed",
+                    "entity": "issues",
+                    "where": {"identifier": {"eq": "ENG-2"}},
+                    "expected_changes": {
+                        "assigneeId": {"to": {"eq": "user-1"}}
+                    },
+                    "expected_count": 1,
+                    "ignore": ["updatedAt"],
+                }
+            ],
+        }
+        diff = {
+            "inserts": [],
+            "updates": [
+                {
+                    "__table__": "issues",
+                    "before": {"identifier": "ENG-1", "assigneeId": None},
+                    "after": {"identifier": "ENG-1", "assigneeId": "user-1"},
+                },
+                {
+                    "__table__": "issues",
+                    "before": {"identifier": "ENG-3", "assigneeId": None},
+                    "after": {"identifier": "ENG-3", "assigneeId": "user-1"},
+                },
+            ],
+            "deletes": [],
+        }
+
+        result = AssertionEngine(spec).evaluate(diff)
+
+        assert result["passed"] is False
+        failure = result["failures"][0]
+        assert "updated rows that did not match where" in failure
+        assert "identifier='ENG-1' (expected 'ENG-2')" in failure
+        assert "identifier='ENG-3' (expected 'ENG-2')" in failure
 
     def test_unchanged_assertion_passes_no_changes(self):
         spec = {
