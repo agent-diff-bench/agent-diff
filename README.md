@@ -179,12 +179,23 @@ The SFT pipeline filters high-reward Devstral rollouts (reward > 0.8), applies c
 
 If you use Agent-Diff in your research, please cite:
 
+**ACM Reference Format:**
+> Hubert M. Pyskło, Artem Zhuravel, and Patrick D. Watson. 2026. Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation. In Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD ’26), August 09–13, 2026, Jeju Island, Republic of Korea. ACM, New York, NY, USA, 11 pages. https://doi.org/10.1145/3770855.3817555
+
+Or use the following BibTeX entry:
+
 ```bibtex
-@article{pysklo2025agentdiff,
-  title={Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
-  author={Pysklo, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
-  journal={arXiv preprint arXiv:2602.11224},
-  year={2025}
+@inproceedings{pysklo2026agentdiff,
+  author    = {Pysk{\l}o, Hubert M. and Zhuravel, Artem and Watson, Patrick D.},
+  title     = {Agent-Diff: Benchmarking LLM Agents on Enterprise API Tasks via Code Execution with State-Diff-Based Evaluation},
+  booktitle = {Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD '26)},
+  series    = {KDD '26},
+  year      = {2026},
+  publisher = {Association for Computing Machinery},
+  address   = {New York, NY, USA},
+  doi       = {10.1145/3770855.3817555},
+  url       = {https://doi.org/10.1145/3770855.3817555},
+  numpages  = {11}
 }
 ```
 
